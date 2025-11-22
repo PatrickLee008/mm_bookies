@@ -1,0 +1,147 @@
+{
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/match/home",
+			"style": {}
+		},
+		{
+			"path": "pages/index/wallet",
+			"style": {}
+		},
+		{
+			"path": "pages/index/coupon",
+			"style": {}
+		},
+		{
+			"path": "pages/index/contact",
+			"style": {}
+		},
+		{
+			"path": "pages/index/favor",
+			"style": {}
+		},
+		{
+			"path": "pages/index/game",
+			"style": {}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {}
+		},
+		{
+			"path": "pages/login/register",
+			"style": {}
+		},
+		{
+			"path": "pages/orders/home"
+		},
+		{
+			"path": "pages/ucenter/home",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/charge",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/withdraw",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/language",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/account",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/invite/index",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/invite/share",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/invite/bonus_dashboard",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/invite/user_dashboard",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/bonus",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/download",
+			"style": {}
+		}, {
+			"path": "pages/payment/payment",
+			"style": {}
+
+		},
+		{
+			"path" : "pages/ucenter/message",
+			"style" : {}
+		},
+		{
+			"path": "pages/ucenter/messageDetail",
+			"style": {
+				"navigationBarTitleText": "Message Detail",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/ucenter/charge_history",
+			"style": {
+				"navigationBarTitleText": "Charge History",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/webview/index",
+			"style": {
+				"navigationBarTitleText": "Game",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/game/webview",
+			"style": {
+				"navigationBarTitleText": "Game",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": false
+			}
+		}
+	],
+	"globalStyle": {
+		"mp-alipay": {
+			/* 支付宝小程序特有相关 */
+			"transparentTitle": "always",
+			"allowsBounceVertical": "NO"
+		},
+		"navigationBarBackgroundColor": "#0081ff",
+		"navigationBarTitleText": "ONEX2",
+		"navigationStyle": "custom",
+		"navigationBarTextStyle": "white"
+	},
+	"usingComponts": true,
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "表单", //模式名称
+			"path": "pages/index/index", //启动页面
+			"query": "" //启动参数
+		}]
+	}
+
+}

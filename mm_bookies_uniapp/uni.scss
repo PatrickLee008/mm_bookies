@@ -1,0 +1,41 @@
+/* 颜色变量 */
+
+// 主要颜色
+$color-primary: #2A6268;
+$color-lprimary:#37BDCC;
+$color-active: rgb(255, 196, 54);
+$color-info: rgb(161, 160, 161);
+$color-linfo: rgb(217, 217, 217);
+	
+/* 行为相关颜色 */
+// $color-primary: #E54D42;
+$color-primary1: #ff6700;
+$color-success: #83c44e;
+$color-warning: #f0ad4e;
+$color-error: #dd524d;
+
+/* 文字基本颜色 */
+$text-color:#333;//基本色
+$text-color-inverse:#fff;//反色
+$text-color-grey:#999;//辅助灰色，如加载更多的提示信息
+$text-color-placeholder: #808080;
+$text-color-disable:#c0c0c0;
+
+/* 背景颜色 */
+$bg-color:#ffffff;
+$bg-color-grey:#f5f5f5;
+$bg-color-gray:#b0b0b0;
+$bg-color-hover:#f1f1f1;//点击状态颜色
+$bg-color-mask:rgba(0, 0, 0, .5);//遮罩颜色
+
+/* 边框颜色 */
+$border-color:#e0e0e0;
+
+/* 页面宽度 */
+$page-width: 1226px;
+
+// flex布局且垂直居中
+%flex-align-center {
+	display: flex;
+	align-items: center;
+}

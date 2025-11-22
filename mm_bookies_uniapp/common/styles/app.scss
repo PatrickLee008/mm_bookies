@@ -1,0 +1,30 @@
+/* 加载中样式 */
+uni-toast {
+	.uni-mask {
+		background: rgba(#fff, .9) !important;
+	}
+
+	.uni-toast {
+		background: transparent !important;
+		
+		.uni-toast__content {
+			color: $text-color-grey;
+		}
+	}
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar {
+	-webkit-appearance: none;
+	width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.25);
+	transition: color 0.2s ease;
+}

@@ -1,0 +1,182 @@
+
+$attr-list:(
+	'width','height','min-width','min-height','max-width','max-height','line-height','gap','border-radius',
+);
+$attr-with-position-list:(
+	'margin','padding',
+);
+
+$postion-list:(
+	'':'',
+	'top':'-top',
+	'bottom':'-bottom',
+	'left':'-left',
+	'right':'-right',
+);
+
+$unit-list:(
+	'':1%,
+	'px':1px,
+	'upx':1upx,
+	'vw':1vw,
+	'vh':1vh,
+	'em':1em,
+	'rem':1rem,
+);
+
+@for $i from 1 through 100 {
+	
+	@each $attr in $attr-list {
+		@each $key, $unit in $unit-list {
+				.#{$attr}-#{$i}#{$key} {
+				  #{$attr}: #{$i * $unit} !important;
+				}
+			}
+	}
+	
+	@each $awp in $attr-with-position-list {
+		@each $key, $unit in $unit-list {
+				@each $pkey, $pst in $postion-list {
+				.#{$awp}#{$pst}-#{$i}#{$key} {
+				  #{$awp}#{$pst}: #{$i * $unit} !important;
+				}
+			}
+	}
+	
+	
+	@each $key, $unit in $unit-list {
+			.myfont-#{$i}#{$key} {
+			  font-size: #{$i * $unit} !important;
+			}
+			.radius-#{$i}#{$key} {
+			  border-radius: #{$i * $unit} !important;
+			}
+		}
+	}
+	
+  .radius-left-#{$i}px {
+    border-bottom-left-radius: #{$i}px !important;
+    border-top-left-radius: #{$i}px !important;
+  }
+  .radius-right-#{$i}px {
+    border-bottom-right-radius: #{$i}px !important;
+    border-top-right-radius: #{$i}px !important;
+  }
+  .radius-top-#{$i}px {
+    border-top-left-radius: #{$i}px !important;
+    border-top-right-radius: #{$i}px !important;
+  }
+  .radius-bottom-#{$i}px {
+    border-bottom-left-radius: #{$i}px !important;
+    border-bottom-right-radius: #{$i}px !important;
+  }
+  
+  .transcale-#{$i}{
+	  transform: scale(#{$i * 1%} ) !important;
+  }
+  .z-index-#{$i}{
+	  z-index: #{$i}  !important;
+  }
+  .blur-#{$i}px{
+  	 filter: blur(#{$i}px)  !important;
+  }
+}
+
+
+@for $i from 1 through 200 {
+  .height-#{$i}upx {
+    height: #{$i}upx !important;
+  }
+}
+
+@for $i from 1 through 10 {
+  .fw-#{$i}00 {
+    font-weight: #{$i}00 !important;
+  }
+}
+
+
+@for $i from 1 through 200 {
+  .height-#{$i}upx {
+    height: #{$i}upx !important;
+  }
+}
+
+@for $i from 1 through 10 {
+  .fw-#{$i}00 {
+    font-weight: #{$i}00 !important;
+  }
+}
+
+
+$border-colors: (
+	// 主要颜色
+	primary: #2A6268,
+	lprimary:#37BDCC,
+	active: rgb(255, 196, 54),
+	info: rgb(161, 160, 161),
+	linfo: rgb(217, 217, 217),
+	
+    white: white,
+	lgrey: rgb(220, 220, 220),
+	grey: #667d9c,
+	dgrey: #c7c7c7,
+	dblue: #042946,
+	blue: #063154,
+	purple: rgb(136, 118, 242),
+	red:#eb4c39,
+);
+
+$border-positions:(
+	'':'',
+	top:-top,
+	left:-left,
+	right:-right,
+	bottom:-bottom,
+);
+
+@each $key, $color in $border-colors {
+	@each $key2, $pos in $border-positions {
+		.#{$key}-border#{$pos} {
+			border#{$pos}: 1rpx solid $color;
+		}
+	}
+}
+
+@each $key2, $pos in $border-positions {
+	.no-border#{$pos} {
+		border#{$pos}: none !important;
+	}
+}
+
+$colors-list: (
+	// 主要颜色
+	primary: #2A6268,
+	lprimary:rgb(1, 116, 190),
+	active: rgb(255, 196, 54),
+	info: rgb(161, 160, 161),
+	linfo: rgb(217, 217, 217),
+	league: rgb(50, 106, 178),
+	
+	
+	llgrey: rgb(231, 231, 231),
+	lllgrey: rgb(245, 245, 245),
+	ddgrey: #7b7b7b,
+	dddgrey: #625d5d,
+	ddddgrey: rgb(60,  54,  54),
+);
+
+$white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,dddgrey,apple,apple,dblue,ddblue,blue,green,dgreen,ddgreen,red,lgreen,;
+
+@each $key, $color in $colors-list {
+    .mybg-#{$key} {
+         background-color: $color !important;
+		 @if index($white-list, $key) {
+		      color: white!important;
+		}
+		
+    }
+    .mycolor-#{$key} {
+         color: $color !important;
+    }
+}

@@ -1,0 +1,712 @@
+.borderbottom {
+	border-bottom: 1px solid #e0e0e0;
+	background: #fff;
+}
+
+.comcontain {
+	margin-top: 30upx;
+	text-align: center;
+	background: #fff;
+}
+
+.bgp-colr {
+	background-color: #fbecec;
+	/* color: #d34647; */
+	color: rgb(184, 0, 0);
+}
+
+.bglg-colg {
+	background-color: #e8eee9;
+	color: rgb(2, 178, 119);
+}
+
+.mybg-green {
+	background-color: rgb(2, 178, 119);
+	color: white;
+	text-align: center;
+}
+
+.mybg-pink {
+	background-color: #fbecec;
+	color: white;
+}
+
+.mybg-red {
+	background-color: rgb(184, 0, 0);
+	/* background-color: #d34647; */
+	color: white;
+	text-align: center;
+}
+
+.mycolor-green {
+	color: rgb(2, 178, 119);
+	text-align: center;
+}
+
+.mycolor-red {
+	/* color: #d34647; */
+	color: rgb(184, 0, 0);
+	text-align: center;
+}
+
+.mycolor-blue {
+	/* color: #d34647; */
+	color: rgb(0, 0, 255);
+}
+
+.under-line {
+	text-decoration: underline 2px;
+}
+
+.mybg-orange {
+	background-color: #f69e57;
+	color: white;
+	text-align: center;
+}
+
+.mycolor-orange {
+	color: #f69e57;
+	text-align: center;
+}
+
+.mycolor-red {
+	/* color: #d85c5d; */
+	color: rgb(184, 0, 0);
+	text-align: center;
+}
+
+.mybg-red {
+	/* background: #d85c5d; */
+	background: rgb(184, 0, 0);
+	text-align: center;
+}
+
+.mybg-grey {
+	background: #f8f8f8;
+	text-align: center;
+}
+
+.mybg-dgrey {
+	background: #f5f5f5;
+	text-align: center;
+}
+
+.mybg-white {
+	background: white;
+	text-align: center;
+}
+
+.myfont {
+	color: black;
+	font-size: 12px;
+	text-align: center;
+}
+
+.myrect {
+	width: 90vw;
+	margin-left: 5vw;
+	margin-top: 10px;
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	border-radius: 13px;
+
+}
+
+.mysrect {
+	width: 90vw;
+	margin-left: 5vw;
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	border-radius: 13px;
+}
+
+.box-shadow {
+	box-shadow: 0px 5upx 10px 3px #e6e6e6;
+}
+
+.padding-ud20px {
+	width: 28%;
+	padding: 20px 0 10px 0;
+}
+
+.myrect2 {
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	border-radius: 13px;
+
+}
+
+.col-line {
+	width: 2px;
+	border-radius: 9px;
+	height: 13px;
+	margin: 0 5px 0;
+}
+
+.myfont-bold {
+	font-weight: bold;
+}
+
+.myfont-12px {
+	font-size: 13px;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.flex-row {
+	display: flex;
+	flex-direction: row;
+	align-content: center;
+	align-items: center;
+	width: 100%;
+}
+
+.flex-column1 {
+	display: flex;
+	flex-direction: column;
+}
+
+.flex-row1 {
+	display: flex;
+	flex-direction: row;
+}
+
+.text-title {
+	color: black;
+	font-weight: 550;
+	font-size: 20px;
+	text-align: center;
+	padding: 2vh;
+}
+
+.my-icon {
+	width: 12px;
+	height: 14px;
+	margin-right: 5px;
+}
+
+.my-icon-minus {
+	width: 12px;
+	height: 12px;
+	margin-right: 5px;
+}
+
+.my-icon-plus {
+	width: 45px;
+	height: 45px;
+	margin-right: 5px;
+}
+
+.my-input {
+	font-size: 12px;
+	height: 40px;
+	border-radius: 50px;
+	margin: 3vw 0 3vw 0;
+	padding: 0 7vw;
+	text-align: left;
+}
+
+.my-button-orange {
+	background-color: #f69e57;
+	color: white;
+	border-radius: 100px;
+	padding: 5px 20px 5px 20px;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.full-page {
+	height: 100vh;
+}
+
+.league-image {
+	width: 25px;
+	height: 25px;
+}
+
+.top-icon {
+	/* position: absolute;
+	top: 14px; */
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background-color: white;
+	font-size: 22px;
+	font-weight: bold;
+}
+
+.icon-single {
+	/* content: url(./static/icon/single.png); */
+	content: url(./static/icon/bar/single.svg);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	padding-bottom: 4px;
+}
+
+.icon-mix {
+	content: url(./static/icon/mix.png);
+	width: 22px;
+	height: 16px;
+	display: inline-block;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.icon-history {
+	content: url(./static/icon/bar/history.svg);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	padding-bottom: 4px;
+}
+
+.icon-favor {
+	content: url(./static/icon/bar/favor.png);
+	width: 21px;
+	height: 20px;
+	display: inline-block;
+}
+
+.icon-game {
+	content: url(./static/icon/bar/game.svg);
+	width: 48px;
+	height: 18px;
+	display: inline-block;
+	padding-bottom: 4px;
+}
+
+.icon-home {
+	content: url(./static/icon/home.png);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-wallet {
+	content: url(./static/icon/wallet.png);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-coupon {
+	content: url(./static/icon/coupon.png);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-contact {
+	content: url(./static/icon/contact.png);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-setting {
+	content: url(./static/icon/setting.png);
+	width: 22px;
+	height: 22px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-phone {
+	content: url(./static/icon/phone.png);
+	width: 25px;
+	height: 25px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-password {
+	content: url(./static/icon/password.png);
+	width: 25px;
+	height: 25px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-captcha {
+	content: url(./static/icon/captcha.png);
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-bankcard {
+	content: url(./static/icon/bankcard.png);
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.icon-fullname {
+	content: url(./static/icon/fullname.png);
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	/* padding-bottom: 4px; */
+}
+
+.yellow2white {
+	filter: sepia(1) saturate(0) brightness(1.5);
+}
+
+.rotate-180 {
+	transform: rotate(180deg);
+}
+
+.yellow2dblue {
+	filter: invert(68%) sepia(78%) saturate(948%) hue-rotate(178deg) brightness(50%) contrast(87%);
+}
+
+.yellow2lblue {
+	filter: invert(18%) sepia(78%) saturate(748%) hue-rotate(178deg) brightness(90%) contrast(87%);
+}
+
+.lblue2blue {
+	filter: brightness(0) saturate(100%) invert(15%) sepia(91%) saturate(626%) hue-rotate(180deg) brightness(113%) contrast(92%);
+}
+
+.black2red {
+	filter: brightness(0) saturate(100%) invert(20%) sepia(100%) saturate(5000%) hue-rotate(340deg);
+}
+
+/* 页面标题 */
+.title-bar {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: 50px;
+	padding: 10px;
+	border-radius: 0px 0px 8px 8px;
+	box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+}
+
+.title-text {
+	margin-left: 10px;
+	font-weight: bold;
+	font-size: 16px;
+	color: #0C356A;
+}
+
+
+/* 登录样式 */
+.title-tab {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	height: 40px;
+	border-radius: 4px;
+	box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+}
+
+.login-btn {
+	background-color: #0C356A;
+	color: white;
+	border-radius: 8px;
+	padding: 5px 20px 5px 20px;
+	font-size: 0.87rem;
+	font-weight: bold;
+}
+
+.register-btn {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 50%;
+	height: 40px;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: bold;
+	box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.login-page {
+	display: flex;
+	flex-direction: column;
+	webkit-box-pack: center;
+	-webkit-box-align: center;
+	justify-content: center;
+	padding: 8px 24px;
+	align-items: center;
+	height: calc(100vh - 120px);
+	width: 100%;
+	background-color: white;
+}
+
+.login-form {
+	/* margin-top: 5rpx; */
+	width: 100%;
+}
+
+.input-error {
+	border-color: #e54d42;
+}
+
+/* Label styles */
+.input-label {
+	position: absolute;
+	left: 76rpx;
+	/* top: 34rpx; */
+	top: 18rpx;
+	font-size: 28rpx;
+	color: #909399;
+	transition: all 0.3s;
+	pointer-events: none;
+	/* background: #fff; */
+	background-image:
+		linear-gradient(to bottom, rgba(255, 255, 255, 0) 33.33%, rgba(255, 255, 255, 1) 33.34%);
+	padding: 0 10rpx;
+	border-radius: 10px;
+	z-index: 1;
+}
+
+.label-focused {
+	top: -28rpx;
+	left: 20rpx;
+	font-size: 24rpx;
+	color: #606266;
+}
+
+/* 输入框 */
+.input-container {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	width: 100%;
+}
+
+.icon-container {
+	width: 80rpx;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 0px;
+	z-index: 10;
+}
+
+.cuIcon-mobile,
+.cuIcon-lock {
+	font-size: 40rpx;
+	color: #606266;
+}
+
+.input-focused .cuIcon-mobile,
+.input-focused .cuIcon-lock {
+	color: $color-primary;
+}
+
+.input-error .cuIcon-mobile,
+.input-error .cuIcon-lock {
+	color: #e54d42;
+}
+
+/* Input fields */
+.info-input {
+	/* 移除动态type的边框 */
+	-webkit-appearance: none;
+	/* 移除webkit默认样式 */
+	-moz-appearance: none;
+	/* 移除Firefox默认样式 */
+	appearance: none;
+	/* 标准写法 */
+	outline: none;
+	/* 移除默认的焦点轮廓 */
+	box-shadow: none;
+	/* 移除可能的阴影效果 */
+	border-radius: 0;
+	/* 移除可能的圆角 */
+	border: none;
+	/* 移除边框 */
+
+	flex: 1;
+	height: 100%;
+	border: 0px;
+	padding: 0 20rpx;
+	/* // padding-left: 20rpx; */
+	font-size: 28rpx;
+}
+
+.placeholder-hidden {
+	opacity: 0;
+}
+
+.eye-icon {
+	width: 80rpx;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.eye-icon text {
+	font-size: 40rpx;
+	color: #606266;
+}
+
+/* Error message */
+.error-message {
+	padding-left: 10px;
+	font-size: 24rpx;
+	line-height: 1.1;
+	color: #e54d42;
+	/* margin-top: 10rpx; */
+	text-align: center;
+}
+
+.captcha-container {
+	height: 100%;
+	width: 90px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.captcha {
+	width: 90px;
+	height: 45px;
+	margin-right: 5px;
+}
+
+.ticket-wrapper {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	padding: 5px;
+	background-color: #0c356a;
+	align-items: center;
+	flex-direction: column;
+	display: flex;
+	justify-content: center;
+	vertical-align: middle;
+	position: fixed;
+	bottom: 100px;
+	right: 20px;
+	z-index: 12;
+	filter: drop-shadow(rgb(12, 53, 106) 0px 0px 2px);
+	box-shadow: rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px, rgba(17, 17, 26, 0.1) 0px 24px 80px;
+}
+
+.ticket-tag {
+	font-size: 10px;
+	line-height: 1;
+	position: absolute;
+	top: 0px;
+	left: -5px;
+	color: rgb(12, 53, 106);
+	font-weight: 600;
+	border: 3px solid rgb(255, 196, 54);
+	background-color: rgb(255, 196, 54);
+	padding: 1px 4px;
+	border-radius: 50%;
+}
+
+.ticket {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 38 38" fill="%23fff"><path d="M37.5406 13.0952L34.0468 9.60126C33.7649 9.32317 33.3891 9.16079 32.9934 9.14613C32.5977 9.13148 32.2109 9.26561 31.9092 9.52209C31.4435 9.91854 30.8458 10.1255 30.2346 10.1021C29.6235 10.0786 29.0434 9.8264 28.6094 9.39541C28.1787 8.96145 27.9266 8.38153 27.9032 7.77051C27.8797 7.1595 28.0865 6.56195 28.4828 6.09623C28.7392 5.79454 28.8733 5.4077 28.8587 5.012C28.844 4.61629 28.6817 4.24043 28.4036 3.95854L24.9067 0.460635C24.6111 0.165665 24.2107 0 23.7931 0C23.3756 0 22.9751 0.165665 22.6796 0.460635L17.11 6.02973C16.7662 6.37484 16.5068 6.79487 16.3524 7.25692C16.3223 7.34576 16.2721 7.42647 16.2058 7.49279C16.1395 7.55911 16.0588 7.60926 15.97 7.63934C15.5078 7.79381 15.0877 8.05345 14.7428 8.39782L0.460611 22.6808C0.165656 22.9763 0 23.3768 0 23.7944C0 24.2119 0.165656 24.6124 0.460611 24.908L3.95833 28.4019C4.24021 28.68 4.61605 28.8424 5.01173 28.857C5.40742 28.8717 5.79424 28.7376 6.09592 28.4811C6.56055 28.0814 7.15905 27.8721 7.77148 27.8951C8.38391 27.9181 8.96502 28.1717 9.39838 28.6051C9.83174 29.0385 10.0853 29.6196 10.1083 30.2321C10.1313 30.8445 9.92202 31.4431 9.52238 31.9077C9.26592 32.2094 9.13179 32.5963 9.14644 32.992C9.1611 33.3877 9.32348 33.7635 9.60155 34.0454L13.0953 37.5394C13.3908 37.8343 13.7913 38 14.2088 38C14.6264 38 15.0268 37.8343 15.3224 37.5394L29.6046 23.2564C29.9488 22.9117 30.2084 22.4919 30.363 22.03C30.393 21.9409 30.4432 21.8599 30.5096 21.7934C30.5761 21.7269 30.6571 21.6767 30.7462 21.6468C31.208 21.4923 31.6277 21.2329 31.9726 20.8891L37.5414 15.3192C37.8352 15.0237 38.0001 14.6238 38 14.207C37.9999 13.7903 37.8347 13.3905 37.5406 13.0952ZM19.4606 10.7477C19.3429 10.8654 19.2033 10.9587 19.0496 11.0224C18.8959 11.0861 18.7311 11.1188 18.5648 11.1188C18.3984 11.1188 18.2336 11.0861 18.0799 11.0224C17.9262 10.9587 17.7866 10.8654 17.669 10.7477L16.7577 9.83641C16.5259 9.59765 16.3974 9.27727 16.3999 8.94451C16.4024 8.61176 16.5358 8.29335 16.7711 8.0581C17.0064 7.82285 17.3249 7.68965 17.6576 7.6873C17.9904 7.68494 18.3107 7.81361 18.5493 8.0455L19.4606 8.956C19.5782 9.07363 19.6716 9.21329 19.7352 9.36701C19.7989 9.52072 19.8317 9.68547 19.8317 9.85185C19.8317 10.0182 19.7989 10.183 19.7352 10.3367C19.6716 10.4904 19.5782 10.6301 19.4606 10.7477ZM22.944 14.2314C22.7065 14.4687 22.3844 14.6021 22.0486 14.6021C21.7128 14.6021 21.3907 14.4687 21.1532 14.2314L20.2823 13.3604C20.1647 13.2428 20.0714 13.1031 20.0077 12.9494C19.9441 12.7957 19.9113 12.631 19.9113 12.4646C19.9113 12.2982 19.9441 12.1335 20.0077 11.9798C20.0714 11.826 20.1647 11.6864 20.2823 11.5687C20.5199 11.3311 20.8422 11.1977 21.1782 11.1977C21.3445 11.1977 21.5093 11.2304 21.663 11.2941C21.8167 11.3578 21.9563 11.4511 22.074 11.5687L22.9448 12.4396C23.0629 12.5573 23.1566 12.697 23.2205 12.8509C23.2845 13.0049 23.3175 13.1699 23.3175 13.3365C23.3176 13.5032 23.2848 13.6682 23.221 13.8222C23.1572 13.9761 23.0636 14.116 22.9456 14.2337L22.944 14.2314ZM26.4275 17.715C26.3099 17.8327 26.1702 17.926 26.0165 17.9897C25.8628 18.0534 25.6981 18.0861 25.5317 18.0861C25.3653 18.0861 25.2006 18.0534 25.0469 17.9897C24.8932 17.926 24.7535 17.8327 24.6359 17.715L23.765 16.8441C23.5333 16.6053 23.4047 16.285 23.4072 15.9522C23.4097 15.6194 23.5431 15.301 23.7784 15.0658C24.0138 14.8305 24.3322 14.6973 24.6649 14.695C24.9977 14.6926 25.318 14.8213 25.5566 15.0532L26.4275 15.9241C26.5459 16.0415 26.6399 16.1812 26.7042 16.335C26.7685 16.4889 26.8018 16.654 26.8022 16.8207C26.8026 16.9875 26.77 17.1527 26.7064 17.3068C26.6428 17.4609 26.5493 17.601 26.4315 17.719L26.4275 17.715ZM29.945 21.2414C29.8274 21.3591 29.6877 21.4524 29.534 21.5161C29.3803 21.5798 29.2156 21.6125 29.0492 21.6125C28.8828 21.6125 28.7181 21.5798 28.5644 21.5161C28.4107 21.4524 28.271 21.3591 28.1534 21.2414L27.2477 20.3309C27.1276 20.2136 27.032 20.0736 26.9664 19.9191C26.9009 19.7645 26.8667 19.5984 26.8659 19.4305C26.8651 19.2627 26.8977 19.0963 26.9618 18.9411C27.0258 18.7859 27.1201 18.645 27.2391 18.5266C27.3581 18.4081 27.4994 18.3145 27.6549 18.2512C27.8104 18.1879 27.9769 18.1562 28.1448 18.1578C28.3127 18.1594 28.4786 18.1944 28.6328 18.2607C28.7871 18.327 28.9266 18.4233 29.0433 18.544L29.9498 19.4537C30.0674 19.5714 30.1606 19.7111 30.2243 19.8648C30.2879 20.0185 30.3206 20.1833 30.3205 20.3497C30.3204 20.5161 30.2876 20.6808 30.2238 20.8345C30.1601 20.9882 30.0667 21.1278 29.949 21.2454L29.945 21.2414Z" fill="%23fff"></path></svg>');
+
+}
+
+.filter {
+	gap: 0px 20px;
+	border-radius: 8px;
+	box-shadow: rgba(99 99 99 / 20%) 0px 2px 3px 0px;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+
+.filter-row {
+	flex-direction: row;
+	display: flex;
+	align-items: center;
+	gap: 15rpx;
+}
+
+.filter-row .text {
+	font-weight: 700;
+	font-size: 10px;
+}
+
+.filter-row .tag {
+	background-color: #bdbdbd;
+	color: white;
+	gap: 15rpx;
+}
+
+
+.title-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+}
+
+.bank-title {
+	margin: 6px 0px 0px;
+	font-family: __Inter_7be8ac, __Inter_Fallback_7be8ac;
+	line-height: 1.5;
+	font-weight: 700;
+	font-size: 18px;
+}
+
+.tips {
+	width: 100%;
+	padding: 15px 30px;
+	font-family: __Inter_7be8ac, __Inter_Fallback_7be8ac;
+	font-weight: 400;
+	line-height: 1.6;
+	color: rgb(51, 51, 51);
+	text-align: initial;
+	font-size: 12px;
+}
+
+/* 登录样式,放到这里就失效 */
+/* .input-wrapper {
+	position: relative;
+	border: 1px solid #c0c4cc;
+	border-radius: 8rpx;
+	padding: 0;
+	height: 56px;
+	margin: 40px 0;
+	transition: all 0.3s;
+	width: 100%;
+}
+
+.input-focused {
+	border-color: $color-primary;
+}
+
+.input-error {
+	border-color: #e54d42;
+}
+
+.input-focused .label-focused {
+	color: $color-primary;
+}
+
+.input-error .label-focused {
+	color: #e54d42;
+} */
