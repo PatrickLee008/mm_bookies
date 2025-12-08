@@ -9,10 +9,7 @@
 			<view class="welcome-text">Welcome back</view>
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': phoneError}" type="number"
-					placeholder-class="input-placeholder" v-model="loginInfo.account"
-					placeholder="Please enter phone number" maxlength="11" @blur="handlePhoneBlur"
-					@input="handlePhoneBlur" />
+				<input class="input-field" :class="{'input-error': phoneError}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.account" placeholder="Please enter phone number" maxlength="11" @blur="handlePhoneBlur" @input="handlePhoneBlur" />
 				<view class="error-message" v-if="phoneError">
 					{{$t("L_input_number_limit")}}
 				</view>
@@ -21,9 +18,7 @@
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
 				<!-- :type="showPassword ? 'text' : 'password'" -->
-				<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password"
-					type="password" placeholder-class="input-placeholder" placeholder="Please enter your password"
-					maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
+				<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="password" placeholder-class="input-placeholder" placeholder="Please enter your password" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
 				<view class="error-message" v-if="passwordError">
 					{{$t("L_password_limit")}}
 				</view>
@@ -58,8 +53,7 @@
 			<!-- Remember Me -->
 			<view class="remember-row">
 				<text class="remember-text">Remember me</text>
-				<switch class="remember-switch" :checked="loginInfo.rememberMe" @change="switchChange"
-					color="#2A6268" />
+				<switch class="remember-switch" :checked="loginInfo.rememberMe" @change="switchChange" color="#2A6268" />
 			</view>
 
 			<!-- Login Button -->
