@@ -1,7 +1,11 @@
 <template name="orders">
-	<view class="mybg-grey " :style="{'height':calc_page_height,}">
+	<view class="full-page">
 		<zw-header></zw-header>
-		<view class="flex-row mybg-lprimary padding-tb justify-around myfont-17px line-height-17px">
+
+		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<view class="header-placeholder"></view>
+
+		<!-- <view class="flex-row mybg-lprimary padding-tb justify-around myfont-17px line-height-17px">
 			<view class="flex-column gap-5px">
 				<view class="myfont-12px">{{$t('winnings')}}</view>
 				<view class="text-bold">{{$toolbox.num_format(report.win)}}</view>
@@ -14,13 +18,10 @@
 				<view class="myfont-12px">{{$t('all_stake')}} / {{$t('betting')}}</view>
 				<view class="text-bold">{{$toolbox.num_format(report.all_stake,0)}} / {{history_list.length}}</view>
 			</view>
-		</view>
-		<view class="padding-sm">
+		</view> -->
+		<!-- <view class="padding-sm">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<!-- <view class="cuIcon-calendar mycolor-info text-bold myfont-18px" @click="$refs.date_picker.show()">
-				</view> -->
-				<image mode="widthFix" class="width-38upx " src="/static/image/order/calender.svg"
-					@click="$refs.date_picker.show()" />
+				<image mode="widthFix" class="width-38upx " src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
@@ -39,216 +40,189 @@
 					</view>
 				</view>
 			</view>
+		</view> -->
+
+		<!-- from tangjq--- 标题栏 -->
+		<view class="title-bar">
+			<view class="tab-selector">
+				<view class="tab-container">
+					<view class="tab-item" :class="{'active':current_page==='Ongoing'}" @click="page_change('Ongoing')">
+						<text class="tab-text">Ongoing</text>
+					</view>
+					<view class="tab-item" :class="{'active':current_page==='Finished'}" @click="page_change('Finished')">
+						<text class="tab-text">Finished</text>
+					</view>
+
+					<!-- from tangjq--- 底部滑动指示器 -->
+					<view class="slide-indicator" :class="{'indicator-finished': current_page==='Finished'}"></view>
+				</view>
+			</view>
 		</view>
-		<view class="flex-row padding-lr padding-bottom-8px myfont-12px">
-			<view class="grey-border radius-8px width-50 height-37px" style="position: relative;"
-				@click="page_change('Pending')" :class="{'mybg-primary':current_page==='Pending',}">
-				<view class="line-height-35px" :class="{'myfont-11px':$t('lang')==='mm',}">{{$t('Pending')}}</view>
-				<view class="flex-row text-container">
-					<view style="" class="myfont-8px radius-5px page-text mycolor-primary"
-						:class="current_page==='Pending'?'bg-white':'mybg-info'">{{total}}</view>
-				</view>
-			</view>
-			<view class="grey-border radius-8px width-50 height-37px" style="" @click="page_change('Settled')"
-				:class="{'mybg-primary':current_page==='Settled',}">
-				<view class="line-height-35px" :class="{'myfont-11px':$t('lang')==='mm',}">{{$t('Settled')}}</view>
-				<view></view>
-			</view>
-		</view>
-		<scroll-view scroll-y class="page padding-lr-sm myfont-9px line-height-13px"
-			style="height: calc(100% - 560upx);">
-			<view v-for="(item,index) in history_list" class="padding-top-xs " :key='index'>
-				<!-- 单笔 -->
-				<view class="bet-row text-left text-bold" v-if="item.IS_MIX == '0' || item.IS_MIX === false">
-					<view class="wallet">{{item.pay_wallet ==='Money'?$t('main_wallet'):$t('pro_wallet')}}</view>
-					<!-- 左 -->
-					<view class="flex-row justify-between">
-						<view class="flex-column width-20 " style="align-items: start;">
-							<view class="myfont-9px">Single</view>
-							<view class="flex-row">
-								<image mode="widthFix" class="status-icon margin-right-3upx" :src="item.status_img" />
-								<text>{{item.bet_status}}</text>
+
+		<scroll-view scroll-y class="main-scroll-view">
+			<view class="history-container">
+				<view v-for="(item,index) in history_list" :key='index' class="history-item">
+					<!-- 单笔投注 -->
+					<view class="bet-card" v-if="item.IS_MIX == '0' || item.IS_MIX === false">
+						<!-- 卡片头部 -->
+						<view class="card-header">
+							<view class="header-match">
+								<text class="team-name">{{item.HOME}}</text>
+								<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
+								<text class="score-text" v-else>{{item.SCORE}}</text>
+								<text class="team-name">{{item.AWAY}}</text>
 							</view>
-							<view class="myfont-6px margin-top-2px" style="">{{item.order_time}}</view>
+							<view class="match-time">{{item.order_time}}</view>
 						</view>
-						<!-- 中间 -->
-						<view class="flex-column width-50">
-							<view class="flex-row align-center">
-								<text>
-									<text class="icon-single width-10px height-10px margin-right-xs"
-										style="padding: 0;">
-									</text>{{item.LEAGUE}}
-								</text>
+
+						<!-- 卡片内容 -->
+						<view class="card-content">
+							<view class="info-row">
+								<text class="label">Bet Time</text>
+								<text class="value">{{item.order_time}}</text>
 							</view>
-							<view class="flex-row" style="align-items: flex-start;">
-								<view class="width-40" :class="{'text-red':item.LOSE_TEAM=='1',}">{{item.HOME}}</view>
-								<view class="width-20">
-									<text>{{item.SCORE}}</text>
+							<view class="info-row">
+								<text class="label">Type</text>
+								<text class="value">{{item.show_order_type || 'HDP'}}</text>
+							</view>
+							<view class="info-row">
+								<text class="label">Bet</text>
+								<text class="value">{{item.team_name}}</text>
+							</view>
+							<view class="info-row">
+								<text class="label">Odds</text>
+								<text class="value">{{item.real_odds}}</text>
+							</view>
+							<view class="info-row">
+								<text class="label">Bet Amount</text>
+								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
+							</view>
+							<view class="info-row" v-if="current_page==='Ongoing'">
+								<text class="label">Potential Win Amount</text>
+								<text class="value value-amount">{{item.benefit}}</text>
+							</view>
+						</view>
+
+						<!-- 已结算状态条 -->
+						<view class="result-bar" v-if="current_page==='Finished'" :class="{'result-win':item.benefit.indexOf('-') === -1 && item.benefit !== '\\', 'result-lose':item.benefit.indexOf('-') > -1 || item.benefit === '\\'}">
+							<text class="result-text" v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN {{item.benefit}} MMK</text>
+							<text class="result-text" v-else-if="item.benefit === '\\'">CANCEL</text>
+							<text class="result-text" v-else>LOSE {{item.benefit}} MMK</text>
+						</view>
+					</view>
+
+					<!-- 混合投注 Parlay -->
+					<view class="bet-card parlay-card" v-else>
+						<!-- 单个比赛项 - 折叠时只显示一个 -->
+						<view v-if="!item.show_detail">
+							<view class="card-header">
+								<view class="header-match">
+									<text class="team-name">{{item.HOME}}</text>
+									<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
+									<text class="score-text" v-else>{{item.SCORE}}</text>
+									<text class="team-name">{{item.AWAY}}</text>
 								</view>
-								<view class="width-40" :class="{'text-red':item.LOSE_TEAM=='2',}">{{item.AWAY}}</view>
+								<view class="match-time">{{item.order_time}}</view>
 							</view>
-							<view class="flex-row myfont-6px justify-between mycolor-info ">
-								<view class="flex-column">
-									<view class="width-100">Stake</view>
-									<view class="myfont-12px line-height-16px">
-										{{$toolbox.num_format(item.BET_MONEY,0)}} <text class="myfont-5px margin-left-xs">Ks</text>
+							<view class="card-content">
+								<view class="info-row">
+									<text class="label">Bet Time</text>
+									<text class="value">{{item.order_time}}</text>
+								</view>
+								<view class="info-row">
+									<text class="label">Type</text>
+									<text class="value">{{item.show_order_type || 'HDP'}}</text>
+								</view>
+								<view class="info-row">
+									<text class="label">Bet</text>
+									<text class="value">{{item.team_name}}</text>
+								</view>
+								<view class="info-row">
+									<text class="label">Odds</text>
+									<text class="value">{{item.real_odds}}</text>
+								</view>
+							</view>
+						</view>
+
+						<!-- 展开时显示所有比赛 -->
+						<view v-else>
+							<view v-for="(detail,_index) in item.detail" :key="_index">
+								<view class="card-header">
+									<view class="header-match">
+										<text class="team-name">{{detail.HOME}}</text>
+										<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
+										<text class="score-text" v-else>{{detail.SCORE}}</text>
+										<text class="team-name">{{detail.AWAY}}</text>
+									</view>
+									<view class="match-time">{{detail.order_time}}</view>
+								</view>
+								<view class="card-content">
+									<view class="info-row">
+										<text class="label">Bet Time</text>
+										<text class="value">{{detail.order_time}}</text>
+									</view>
+									<view class="info-row">
+										<text class="label">Type</text>
+										<text class="value">{{detail.show_order_type || 'HDP'}}</text>
+									</view>
+									<view class="info-row">
+										<text class="label">Bet</text>
+										<text class="value">{{detail.team_name}}</text>
+									</view>
+									<view class="info-row">
+										<text class="label">Odds</text>
+										<text class="value">{{detail.real_odds}}</text>
 									</view>
 								</view>
-								<view class="width-100">
-									<image mode="widthFix" class="width-22upx margin-right-3upx max-height-30upx"
-										src="/static/image/order/copy.svg" @click="copy(item)" />
-									<text>Bet ID: {{item.ORDER_ID}}</text>
-								</view>
+								<view class="divider" v-if="_index < item.detail.length - 1"></view>
 							</view>
 						</view>
-						<!-- 右 -->
-						<view class="flex-column width-20" style="align-items: flex-start;">
-							<view>{{item.show_order_type}}</view>
-							<view class="myfont-8px">
-								<text class="" :class="{'text-red':item.DRAW_BUNKO==='1',}">{{item.real_odds}}</text>
-								<text class="">@</text>
-								<text class="bg-green margin-left-2px">{{$toolbox.num_format(item.BET_ODDS,2)}}</text>
+
+						<!-- Parlay 底部汇总信息 -->
+						<view class="parlay-summary">
+							<view class="info-row">
+								<text class="label">Bet Amount</text>
+								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
-							<view :class="{'text-red':item.team_name===(item.LOSE_TEAM == 1 ?item.HOME:item.AWAY),}">{{item.team_name}}</view>
-							<view class="flex-column">
-								<view class="width-100 mycolor-info myfont-6px">{{$t('potential')}}</view>
-								<view class="myfont-12px line-height-16px width-100">
-									<text :class="{'text-red':item.benefit.indexOf('-') > -1,}">{{item.benefit}}</text>
-									<text class="myfont-5px margin-left-xs">Ks</text>
-								</view>
+							<view class="info-row">
+								<text class="label">Total Match</text>
+								<text class="value">{{item.ORDER_COUNT}}</text>
+							</view>
+							<view class="info-row" v-if="current_page==='Ongoing'">
+								<text class="label">Potential Win Amount</text>
+								<text class="value value-amount">{{item.benefit}} MMK</text>
+							</view>
+						</view>
+
+						<!-- 已结算状态条 -->
+						<view class="result-bar" v-if="current_page==='Finished'" :class="{'result-win':item.benefit.indexOf('-') === -1 && item.benefit !== '\\', 'result-lose':item.benefit.indexOf('-') > -1 || item.benefit === '\\'}">
+							<text class="result-text" v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN {{item.benefit}} MMK</text>
+							<text class="result-text" v-else-if="item.benefit === '\\'">CANCEL</text>
+							<text class="result-text" v-else>LOSE {{item.benefit}} MMK</text>
+						</view>
+
+						<!-- Parlay 折叠/展开按钮 -->
+						<view class="parlay-toggle" @click="show_detail(item)">
+							<text class="parlay-label">Parlay {{item.ORDER_COUNT}} x 1</text>
+							<view class="toggle-icon">
+								<text v-if="!item.show_detail">▼</text>
+								<text v-else>▲</text>
 							</view>
 						</view>
 					</view>
 				</view>
 
-				<view v-else @click="show_detail(item)">
-					<!-- 混合 -->
-					<view class="bet-row text-left myfont-9px line-height-13px text-bold" style="position: relative;">
-						<view class="wallet">{{item.pay_wallet ==='Money'?$t('main_wallet'):$t('pro_wallet')}}</view>
-						<!-- <image mode="widthFix" class="width-48upx" v-show="item.show_detail" src="/static/image/order/unfold-order.svg" style="position: absolute;right: 0px;top: -5px;"/> -->
-						<image mode="widthFix" class="width-48upx" :style="{visibility:item.show_detail?'':'hidden'}"
-							src="/static/image/order/unfold-order.svg"
-							style="position: absolute;right: 0px;top: -5px;" />
-						<!-- <text class="cuIcon-copy width-48upx line-height-26px myfont-18px text-center"
-							@click="copy(item)" style="position: absolute;right: 48upx;top: -3px;" /> -->
-						<image mode="widthFix" class="width-48upx" :style="{visibility:!item.show_detail?'':'hidden'}"
-							src="/static/image/order/fold-order.svg" style="position: absolute;right: 0px;top: -5px;" />
-						<!-- 左 -->
-						<view class="flex-row justify-between">
-							<view class="flex-column width-25" style="align-items: start;">
-								<view class="myfont-9px">Mixparlay</view>
-								<view class="flex-row" v-if="current_page==='Pending'">
-									<image mode="widthFix" class="status-icon margin-right-3upx"
-										:src="`/static/image/order/pending.svg`" />
-									<text>Pending</text>
-								</view>
-								<view class="flex-row" v-else>
-									<image mode="widthFix" class="status-icon margin-right-3upx"
-										:src="item.status_img" />
-									<text>{{item.bet_status}}</text>
-								</view>
-								<view class="myfont-6px margin-top-2px" style="">{{item.order_time}}</view>
-							</view>
-							<!-- 中间 -->
-							<view class="flex-column width-50">
-								<view>
-									<text class="">{{item.ORDER_COUNT}}</text>
-									<text class="padding-lr-xs">@</text>
-									<text
-										class="bg-green">{{$toolbox.num_format(Math.pow(2,item.ORDER_COUNT),2)}}</text>
-								</view>
-								<view class="flex-row myfont-6px justify-between mycolor-info">
-									<view class="flex-column">
-										<view class="width-100 text-center">{{$t('stake')}}</view>
-										<view class="myfont-12px line-height-16px">
-											{{$toolbox.num_format(item.BET_MONEY,0)}} <text class="myfont-5px margin-left-xs">Ks</text>
-										</view>
-									</view>
-								</view>
-							</view>
-							<!-- 右 -->
-							<view class="flex-column width-25" style="align-items: flex-start;">
-								<view class="flex-column">
-									<view class="width-100 mycolor-info myfont-6px">
-										{{current_page==='Pending'?$t('potential_winnings_over'):$t('potential')}}
-									</view>
-									<view class="myfont-12px line-height-16px width-100">
-										<text
-											:class="{'text-red':item.benefit.indexOf('-') > -1,}">{{item.benefit}}</text>
-										<text class="myfont-5px margin-left-xs">Ks</text>
-									</view>
-								</view>
-								<view>
-									<image mode="widthFix" class="width-22upx margin-right-3upx max-height-30upx"
-										src="/static/image/order/copy.svg" @click="copy(item)" />
-									<text class="myfont-6px line-height-9px mycolor-info">Bet ID:
-										{{item.ORDER_ID}}</text>
-								</view>
-							</view>
-						</view>
+				<!-- 空状态 -->
+				<view class="padding-top-5vh flex-column align-center gap-5vh" v-show="history_list.length === 0">
+					<image src="/static/image/order/empty.svg" class="width-10vw height-10vw"></image>
+					<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
+						{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
 					</view>
-
-					<!-- 混合详情 -->
-					<view class="flex-column" v-show="item.show_detail">
-						<view v-for="(detail,_index) in item.detail" class="width-100" :key='_index'>
-							<view class="flex-row justify-between padding-sm text-bold mix-detail">
-								<view class="flex-column width-20 " style="align-items: start;">
-									<view class="flex-row">
-										<image mode="widthFix" class="status-icon margin-right-3upx"
-											:src="detail.status_img" />
-										<text>{{detail.bet_status}}</text>
-									</view>
-								</view>
-								<!-- 中间 -->
-								<view class="flex-column width-50">
-									<view class="flex-row align-center">
-										<text>
-											<text class="icon-single width-10px height-10px margin-right-xs"
-												style="padding: 0;">
-											</text>{{detail.LEAGUE}}
-										</text>
-									</view>
-									<view class="flex-row text-left" style="align-items: flex-start;">
-										<view class="width-40" :class="{'text-red':detail.LOSE_TEAM=='1',}">
-											{{detail.HOME}}
-										</view>
-										<view class="width-20">
-											<text>{{detail.SCORE}}</text>
-										</view>
-										<view class="width-40" :class="{'text-red':detail.LOSE_TEAM=='2',}">
-											{{detail.AWAY}}
-										</view>
-									</view>
-
-								</view>
-								<!-- 右 -->
-								<view class="flex-column width-20" style="">
-									<view>{{detail.show_order_type}}</view>
-									<view class="myfont-8px">
-										<text class=""
-											:class="{'text-red':detail.DRAW_BUNKO==='1',}">{{detail.real_odds}}</text>
-										<text class="">@</text>
-										<text class="bg-green margin-left-2px">2.00</text>
-									</view>
-									<view :class="{'text-red':detail.team_name===(detail.LOSE_TEAM == 1 ?detail.HOME:detail.AWAY),}">{{detail.team_name}}
-									</view>
-								</view>
-							</view>
-						</view>
-					</view>
+					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #2F5D62;color: white;">
+						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
+						{{$t('Place Bet')}}
+					</button>
 				</view>
-			</view>
-			<view class="padding-top-5vh flex-column align-center gap-5vh" v-show="history_list.length === 0">
-				<image src="/static/image/order/empty.svg" class="width-10vw height-10vw"></image>
-				<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
-					{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
-				</view>
-				<!-- <view class="myfont-12px margin-top-sm">{{language['add more predictions for winner']}}</view> -->
-
-				<button class="cu-btn mybg-lprimary radius-12px height-10vw" @click="navi_to_single">
-					<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
-					{{$t('Place Bet')}}
-				</button>
 			</view>
 		</scroll-view>
 
@@ -282,8 +256,8 @@
 					page: 1,
 				},
 				total: 0,
-				win_status_2_str: ['Lose', 'Win', 'Pending'],
-				current_page: 'Pending',
+				win_status_2_str: ['Lose', 'Win', 'Ongoing'],
+				current_page: 'Ongoing',
 				history_list: [],
 				type_list: [],
 				status_list: [],
@@ -405,6 +379,7 @@
 					// status: _this.listQuery.status,
 					// order_type: _this.listQuery.type == 3 ? 3 : '',
 					// game_type: 1,
+					// start_time: '2025-12-01', // 测试
 					start_time: _this.date_range[0].value,
 					end_time: _this.date_range[1].value,
 					// is_mix: _this.listQuery.is_mix == 'Mixparlay' ? 1 : _this.listQuery.is_mix == 'Single' ? 0 : ''
@@ -413,7 +388,7 @@
 				uni.showLoading({
 					title: 'Loading!'
 				})
-				let url = _this.current_page == 'Pending' ? '/order/get' : '/order/get_history';
+				let url = _this.current_page == 'Ongoing' ? '/order/get' : '/order/get_history';
 				// var url = '/order/get'
 				_this.$http.get(url, {
 					data: paras
@@ -454,8 +429,8 @@
 					return
 				}
 				let _this = this;
-				let url = _this.current_page == 'Pending' ? '/order/get' : '/order/get_history';
-				// let url = _this.current_page == 'Pending' ? '/order/get' : '/order/get_history';
+				let url = _this.current_page == 'Ongoing' ? '/order/get' : '/order/get_history';
+				// let url = _this.current_page == 'Ongoing' ? '/order/get' : '/order/get_history';
 				// var url = '/order/get'
 				if (this.$toolbox.click_too_fast(1)) return
 				let paras = {
@@ -495,8 +470,8 @@
 				ele.team_name = this.calc_team_name(ele)
 				ele.show_order_type = this.order_type_2_str(ele)
 				ele.order_time = this.parse_time(ele)
-				ele.bet_status = ele.bet_status ? ele.bet_status : `${this.current_page==='Pending'?'pending':''}`
-				ele.bet_status = ele.bet_status.replace('Half','').replace('half','')
+				ele.bet_status = ele.bet_status ? ele.bet_status : `${this.current_page==='Ongoing'?'pending':''}`
+				ele.bet_status = ele.bet_status.replace('Half', '').replace('half', '')
 				ele.status_img = `/static/image/order/${ele.bet_status.toLowerCase()}.svg`
 
 				ele.order_type_desc = desc.replace('串', 'x')
@@ -546,7 +521,7 @@
 						// Team names and scores from AppBetOrder
 						HOME: order.home || '',
 						AWAY: order.away || '',
-						
+
 						// Results (if available)
 						BET_HOST_TEAM_RESULT: order.home_score || '',
 						BET_GUEST_TEAM_RESULT: order.away_score || '',
@@ -660,7 +635,7 @@
 						// str = parseFloat(odds) * parseInt(order.BET_MONEY) * (1 - this.commission)
 					}
 				}
-				if(order.bet_status ==='Cancel'){
+				if (order.bet_status === 'Cancel') {
 					return '\\'
 					// str = order.stake
 				}
@@ -700,7 +675,276 @@
 	}
 </script>
 
-<style>
+<style scoped lang="scss">
+	/* from tangjq--- header占位元素样式 */
+	.header-placeholder {
+		height: 220px;
+		width: 100%;
+		flex-shrink: 0;
+	}
+
+	page {
+		background: #2F5D62;
+		height: 100vh;
+		overflow: hidden;
+	}
+
+	.full-page {
+		height: 100vh;
+		background: #2F5D62;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.title-bar {
+		background: #fff;
+		border-radius: 20px 20px 0 0;
+		flex-shrink: 0;
+	}
+
+	/* Tab 样式 */
+	.tab-selector {
+		width: 100%;
+		background: #fff;
+		border-radius: 20px 20px 0 0;
+	}
+
+	.tab-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid #d9d9d9;
+	}
+
+	.tab-item {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		height: 30px;
+		padding: 0 10px;
+	}
+
+	.tab-text {
+		font-size: 16px;
+		color: #5a7a8f;
+		transition: color 0.25s ease;
+		font-weight: 400;
+	}
+
+	.tab-item.active .tab-text {
+		color: #4fb3bf;
+	}
+
+	.slide-indicator {
+		position: absolute;
+		bottom: 0;
+		left: 10px;
+		height: 1px;
+		background: #4fb3bf;
+		border-radius: 2px;
+		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+		width: 60px;
+	}
+
+	.slide-indicator.indicator-finished {
+		left: auto;
+		right: 10px;
+	}
+
+	.main-scroll-view {
+		flex: 1;
+		height: 0;
+		background: #fff;
+	}
+
+	.history-container {
+		padding: 10px 15px;
+		background: #ffffff;
+	}
+
+	.history-item {
+		margin-bottom: 32upx;
+	}
+
+	/* 投注卡片 */
+	.bet-card {
+		background: #FFFFFF;
+		border-radius: 15px;
+		overflow: hidden;
+		box-shadow: 0 4upx 12upx rgba(0, 0, 0, 0.08);
+	}
+
+	/* 卡片头部 */
+	.card-header {
+		background: linear-gradient(135deg, #2E7D7C 0%, #366968 100%);
+		padding: 5px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: relative;
+	}
+
+	/* from tangjq--- 横向布局的比赛信息 */
+	.header-match {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		flex-wrap: wrap;
+	}
+
+	.team-name {
+		font-size: 12px;
+		color: #FFFFFF;
+		font-weight: 600;
+		text-align: center;
+		flex-shrink: 1;
+	}
+
+	/* from tangjq--- 主队名称使用青绿色 */
+	.header-match .team-name:first-child {
+		color: #5FB5BD;
+		min-width: 0;
+	}
+
+	.vs-text {
+		font-size: 28upx;
+		color: #FFFFFF;
+		font-weight: 700;
+		margin: 0 16upx;
+		flex-shrink: 0;
+	}
+
+	.score-text {
+		font-size: 32upx;
+		color: #FFFFFF;
+		font-weight: 700;
+		margin: 0 16upx;
+		flex-shrink: 0;
+	}
+
+	.match-time {
+		font-size: 24upx;
+		color: rgba(255, 255, 255, 0.8);
+		margin-top: 8upx;
+		text-align: center;
+	}
+
+	/* 卡片内容 */
+	.card-content {
+		padding: 20upx 28upx;
+	}
+
+	.info-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20upx;
+	}
+
+	.info-row:last-child {
+		margin-bottom: 0;
+	}
+
+	.label {
+		font-size: 24upx;
+		color: #546E7A;
+		font-weight: 400;
+	}
+
+	.value {
+		font-size: 24upx;
+		color: #263238;
+		font-weight: 600;
+		text-align: right;
+	}
+
+	.value-amount {
+		color: #2E7D7C;
+		font-weight: 700;
+	}
+
+	/* 结算状态条 */
+	.result-bar {
+		padding: 5upx;
+		margin: 10upx;
+		text-align: center;
+	}
+
+	/* from tangjq--- 单笔投注的result-bar四个角都圆角 */
+	.bet-card:not(.parlay-card) .result-bar {
+		border-radius: 15px;
+	}
+
+	.result-win {
+		background: linear-gradient(90deg, #4DBFBF 0%, #5DD5D5 100%);
+		border-radius: 15px;
+	}
+
+	.result-lose {
+		background: linear-gradient(90deg, #E74C3C 0%, #EC7063 100%);
+		border-radius: 15px;
+	}
+
+	.result-text {
+		font-size: 28upx;
+		color: #FFFFFF;
+		font-weight: 700;
+		letter-spacing: 1upx;
+	}
+
+	/* Parlay 特殊样式 */
+	.parlay-card {
+		/* Parlay卡片的额外样式 */
+	}
+
+	/* from tangjq--- Parlay汇总信息，与上方内容连接 */
+	.parlay-summary {
+		padding: 0 15px 10px;
+		background: #FFFFFF;
+	}
+
+	.parlay-toggle {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 5upx;
+		background: #edfffe;
+		border-top: 2upx solid #E0E0E0;
+		cursor: pointer;
+		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
+		border-radius: 0 0 15px 15px;
+	}
+
+	.parlay-label {
+		font-size: 28upx;
+		color: #2E7D7C;
+		font-weight: 600;
+		margin-right: 16upx;
+	}
+
+	.toggle-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.toggle-icon text {
+		font-size: 24upx;
+		color: #2E7D7C;
+	}
+
+	/* 分隔线 */
+	.divider {
+		height: 2upx;
+		background: #E0E0E0;
+		margin: 24upx 0;
+	}
+
+	/* 旧样式保留（以防某些组件仍在使用） */
 	.bet-row {
 		display: flex;
 		flex-direction: column;
@@ -749,7 +993,6 @@
 		align-items: center;
 		height: 100%;
 		justify-content: end;
-		/* top: 15upx; */
 	}
 
 	.page-text {

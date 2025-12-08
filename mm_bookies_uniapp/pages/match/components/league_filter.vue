@@ -1,35 +1,56 @@
 <template>
-	<scroll-view scroll-y class="dialog-wrapper bg-white" v-show="!hidden">
-		<view style="" class="">
-			<view class="flex-row box-shadow padding mybg-primary" @click="set_dialog_hide(true)"
-				style="position: sticky;top: 0;">
-				<view class="margin-left width-100 text-bold">{{'LEAGUE FILTER'}}</view>
-				<view class="cuIcon-close"></view>
-			</view>
-			<view class="myfont-12px text-left">
-				<checkbox-group class="block" @change="CheckboxChange">
-					<view class="league-row">
-						<checkbox class="blue" style="scale: .65;" :class="all_status?'checked':''"
-							:checked="all_status?true:false" value="All"></checkbox>
+	<!-- from tangjq--- 改造为右侧弹出的过滤器弹窗 -->
+	<view class="filter-popup-wrapper" v-show="!hidden">
+		<!-- from tangjq--- 遮罩层 -->
+		<view class="filter-mask" @click="set_dialog_hide(true)"></view>
 
-						<text class="margin-left-sm" style="">
-							All
-						</text>
-					</view>
-					<view class="league-row" v-for="(league,index) in league_list" :key="index" v-show='league[`include_${tomorrow?"tomorrow":"today"}`]'>
-						<checkbox class="blue" style="scale: .65;" :class="league.checked?'checked':''"
-							:checked="league.checked?true:false" :value="String(index)"></checkbox>
-						<text class="margin-left-sm" style="">
-							{{league.name}}
-						</text>
-					</view>
-
-				</checkbox-group>
+		<!-- from tangjq--- 右侧弹出的内容容器 -->
+		<view class="filter-container" :class="{'filter-show': !hidden}">
+			<!-- from tangjq--- 标题栏 -->
+			<view class="filter-header">
+				<text class="filter-title">Filter</text>
 			</view>
 
+			<!-- from tangjq--- 滚动列表区域 -->
+			<scroll-view scroll-y class="filter-scroll">
+				<view class="filter-list">
+					<checkbox-group @change="CheckboxChange">
+						<!-- from tangjq--- All选项 -->
+						<view class="filter-item" @click="toggleAll">
+							<text class="filter-item-text">All</text>
+							<view class="filter-radio" :class="{'filter-radio-checked': all_status}">
+								<view class="filter-radio-inner" v-if="all_status"></view>
+							</view>
+						</view>
+
+						<!-- from tangjq--- 联赛列表 -->
+						<view class="filter-item"
+							v-for="(league,index) in league_list"
+							:key="index"
+							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]'
+							@click="toggleLeague(index)">
+							<text class="filter-item-text">{{league.name}}</text>
+							<view class="filter-radio" :class="{'filter-radio-checked': league.checked}">
+								<view class="filter-radio-inner" v-if="league.checked"></view>
+							</view>
+							<!-- from tangjq--- 隐藏的checkbox用于保持原有逻辑 -->
+							<checkbox style="display: none;" :checked="league.checked" :value="String(index)"></checkbox>
+						</view>
+
+						<!-- from tangjq--- 隐藏的All checkbox用于保持原有逻辑 -->
+						<checkbox style="display: none;" :checked="all_status" value="All"></checkbox>
+					</checkbox-group>
+				</view>
+			</scroll-view>
+
+			<!-- from tangjq--- 底部确认按钮 -->
+			<view class="filter-footer">
+				<view class="filter-confirm-btn" @click="set_dialog_hide(true)">
+					<text class="filter-confirm-text">Confirm</text>
+				</view>
+			</view>
 		</view>
-		</view>
-	</scroll-view>
+	</view>
 </template>
 
 <script>
@@ -89,6 +110,33 @@
 			show_dialog(...args) {
 
 			},
+			// from tangjq--- 切换All选项
+			toggleAll() {
+				this.all_status = !this.all_status
+				let list = this.$toolbox.deep_clone(this.league_list)
+				list.forEach((league, index) => {
+					league.checked = this.all_status
+				})
+				list.forEach(ele=>{
+					ele.match_list.forEach(match=>{
+						match.checked = true
+					})
+				})
+				this.$emit('update:league_list', list)
+			},
+			// from tangjq--- 切换单个联赛选项
+			toggleLeague(index) {
+				let list = this.$toolbox.deep_clone(this.league_list)
+				list[index].checked = !list[index].checked
+				// 检查是否所有联赛都被选中
+				this.all_status = list.every(league => league.checked)
+				list.forEach(ele=>{
+					ele.match_list.forEach(match=>{
+						match.checked = true
+					})
+				})
+				this.$emit('update:league_list', list)
+			},
 			CheckboxChange(evt) {
 				let check_list = evt.detail.value
 				let origin_all = this.all_status
@@ -115,53 +163,152 @@
 </script>
 
 <style lang="scss">
-	.dialog-wrapper {
-		z-index: 10000;
-		// background-color: white;
+	/* from tangjq--- 右侧弹出过滤器样式 */
+	.filter-popup-wrapper {
 		position: fixed;
+		top: 0;
 		left: 0;
+		right: 0;
 		bottom: 0;
-		// height: calc(100vh - 55px);
-		height: 100vh;
-		width: 100vw;
+		z-index: 10000;
 	}
 
-	.box-shadow {
-		box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+	/* from tangjq--- 遮罩层 */
+	.filter-mask {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 1;
 	}
 
-	.league-row {
-		padding: 5px;
+	/* from tangjq--- 右侧弹出容器 */
+	.filter-container {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		width: 260px;
+		background-color: white;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		transform: translateX(100%);
+		transition: transform 0.3s ease;
+		box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+		border-radius: 10px 0 0 10px;
+	}
+
+	/* from tangjq--- 显示时滑入 */
+	.filter-container.filter-show {
+		transform: translateX(0);
+	}
+
+	/* from tangjq--- 标题栏 */
+	.filter-header {
+		background-color: #2F5D62;
+		padding: 15px 20px;
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		border-radius: 10px 0 0 0;
+	}
+
+	.filter-title {
+		color: white;
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	/* from tangjq--- 滚动区域 */
+	.filter-scroll {
+		flex: 1;
+		overflow-y: auto;
+		min-height: 0;
+		background-color: #f8f9fa;
+		padding: 20px 0;
+	}
+
+	.filter-list {
+		padding: 0;
+	}
+
+	/* from tangjq--- 过滤项样式 */
+	.filter-item {
+		background-color: #F1FAFB;
+		margin-bottom: 1px;
+		padding: 8px 25px;
 		display: flex;
 		flex-direction: row;
-		justify-content: flex-start;
+		justify-content: space-between;
 		align-items: center;
+		cursor: pointer;
+		transition: background-color 0.2s;
 	}
 
-	.league-row image {
-		width: 25px;
-		height: 25px;
+	.filter-item:active {
+		background-color: #f5f5f5;
 	}
 
-	/deep/ uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked:before {
-		font: normal normal normal 14px/1 uni;
-		content: "EA08";
-		font-size: 0;
-		/* 重点使用这一步取消的默认样式 */
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -48%) scale(1);
-		-webkit-transform: translate(-50%, -48%) scale(1);
+	.filter-item-text {
+		color: #2A6268;
+		font-size: 14px;
+		font-weight: 500;
+		flex: 1;
 	}
 
-	/* 重新定义复选框选中后的样式*/
-	/deep/ .uni-checkbox-input-checked::before {
-		width: 19px;
-		height: 19px;
-		background: #ff0000;
+	/* from tangjq--- 自定义单选按钮样式 */
+	.filter-radio {
+		width: 22px;
+		height: 22px;
+		border: 2px solid #5FB5BD;
 		border-radius: 50%;
-		/* background: url(../../static/img/seal.png) no-repeat center; */
-		//选中图标
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		transition: all 0.2s;
+	}
+
+	.filter-radio-checked {
+		background-color: white;
+		border-color: #5FB5BD;
+	}
+
+	.filter-radio-inner {
+		width: 12px;
+		height: 12px;
+		background-color: #5FB5BD;
+		border-radius: 50%;
+	}
+
+	/* from tangjq--- 底部按钮区域 */
+	.filter-footer {
+		padding: 20px;
+		flex-shrink: 0;
+		background-color: white;
+		box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+		border-radius: 0 0 0 10px;
+	}
+
+	.filter-confirm-btn {
+		background-color: #2F5D62;
+		border-radius: 25px;
+		padding: 8px;
+		text-align: center;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.filter-confirm-btn:active {
+		background-color: #2d5d5d;
+	}
+
+	.filter-confirm-text {
+		color: white;
+		font-size: 16px;
+		font-weight: 600;
 	}
 </style>

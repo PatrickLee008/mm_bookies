@@ -54,7 +54,7 @@ export default {
 		},
 		{
 			name: 'wallet',
-			url: '/pages/index/wallet',
+			url: '/pages/wallet/wallet',
 			icon: 'icon-wallet',
 			need_login: true,
 			login_show: true,
@@ -150,17 +150,17 @@ export default {
 		},
 		// 钱包の仔
 		{
-			parent_url: '/pages/index/wallet',
+			parent_url: '/pages/wallet/wallet',
 			url: '/pages/ucenter/withdraw',
 			need_login: true,
 		},
 		{
-			parent_url: '/pages/index/wallet',
+			parent_url: '/pages/wallet/wallet',
 			url: '/pages/ucenter/charge',
 			need_login: true,
 		},
 		{
-			parent_url: '/pages/index/wallet',
+			parent_url: '/pages/wallet/wallet',
 			url: '/pages/payment/payment',
 			need_login: true,
 		},

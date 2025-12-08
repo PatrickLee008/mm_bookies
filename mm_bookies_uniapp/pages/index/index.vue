@@ -1,26 +1,21 @@
 <template>
-	<view class="mybg-grey full-page"
-		style="background-image: url(../../static/image/index_bg.jpg);background-repeat: no-repeat;background-size: 100% 100%;">
+	<view class="mybg-grey full-page" style="background-image: url(../../static/image/index_bg.jpg);background-repeat: no-repeat;background-size: 100% 100%;">
 		<cu-custom>
 			<block slot="content">INNWA BET</block>
 		</cu-custom>
 		<view>
-			<swiper class="box-shadow myrect screen-swiper" :class="dotStyle?'square-dot':'round-dot'"
-				:indicator-dots="false" :circular="true" :autoplay="true" interval="3000" duration="500"
-				style="border-radius: 13px;">
+			<swiper class="box-shadow myrect screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="false" :circular="true" :autoplay="true" interval="3000" duration="500" style="border-radius: 13px;">
 				<swiper-item v-for="(item,index) in swiperList" :key="index">
 					<image style="border-radius: 13px;" :src="item.url" mode="scaleToFill" v-if="item.type=='image'">
 					</image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false"
-						objectFit="cover" v-if="item.type=='video'"></video>
+					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
 				</swiper-item>
 			</swiper>
 		</view>
 
 		<view class="myrect box-shadow flex-row bg-white padmar" style="width: 90vw;">
 			<!-- <image class="icon" src="../../static/image/notice.png"></image> -->
-			<uni-notice-bar backgroundColor="white" color="black" :speed="speed" scrollable="true" :text="notice"
-				style="margin-bottom: 0;font-weight: bold;"></uni-notice-bar>
+			<uni-notice-bar backgroundColor="white" color="black" :speed="speed" scrollable="true" :text="notice" style="margin-bottom: 0;font-weight: bold;"></uni-notice-bar>
 		</view>
 		<scroll-view>
 			<view class="myrect box-shadow bg-white padmar">
@@ -31,8 +26,7 @@
 					</view>
 					<!-- <image style="width: 14px;height: 10px;float: right;margin: 13px 10px;" src="../../static/image/fanhui(5).png"></image> -->
 				</view>
-				<view class="mybg-red flex-row"
-					style="padding: 5vw 2vw 5vw 2vw;border-radius: 5px;align-items: center;width: 96%;margin-left: 2%;">
+				<view class="mybg-red flex-row" style="padding: 5vw 2vw 5vw 2vw;border-radius: 5px;align-items: center;width: 96%;margin-left: 2%;">
 					<view class="flex-column">
 						<view class="myfont-bold padding-col" style="font-size: 18px;">{{userInfo.total_withdraw}}</view>
 						<view class="myfont padding-col">{{language.totalCashOut}}</view>
@@ -44,46 +38,38 @@
 					</view>
 				</view>
 			</view>
-			<view class="myrect flex-row"
-				style="line-height: 20px;width: 90vw;margin: 3vw 5vw;justify-content: space-between;">
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="goto('match/mixed')">
+			<view class="myrect flex-row" style="line-height: 20px;width: 90vw;margin: 3vw 5vw;justify-content: space-between;">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/mixed')">
 					<!-- <image class="pic" src="../../static/image/mixbet.png"></image> -->
 					<text class="myfont-bold mycolor-red">{{language.mixed}}</text>
 				</view>
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="goto('match/home')">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/home')">
 					<!-- <image class="pic" src="../../static/image/zuqiu.png"></image> -->
 					<text class="text-bold text-yellow">{{language.single}}</text>
 				</view>
 				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
 					@click="goto(navi2D3D=='3D'? 'number/3d-number-bet' : 'number/number-bet')"> -->
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="goto('number/3d-number-bet')">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('number/3d-number-bet')">
 					<!-- <image class="pic" src="../../static/image/2D3D.png"></image> -->
 					<text class="text-purple text-bold">2D/3D</text>
 				</view>
 			</view>
-			<view class="myrect flex-row"
-				style="width: 90vw;margin: 3vw 5vw;justify-content: space-between;align-items: flex-start;">
+			<view class="myrect flex-row" style="width: 90vw;margin: 3vw 5vw;justify-content: space-between;align-items: flex-start;">
 
 
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="to_score_link" :style="{'min-height':dyHeight()}">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="to_score_link" :style="{'min-height':dyHeight()}">
 					<!-- <image class="pic" src="../../static/image/score.png"></image> -->
 					<text class="text-blue text-bold">{{language.score}}</text>
 				</view>
 
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;"
-					@click="goto('orders/home')" :style="{'min-height':dyHeight()}">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('orders/home')" :style="{'min-height':dyHeight()}">
 					<!-- <image class="pic" src="../../static/image/zhangdan_.png"></image> -->
 					<text class="text-green text-bold" style="padding: 0 8px 0 8px;">{{language.myBet}}</text>
 				</view>
 				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/score')" :style="{'min-height':dyHeight()}"> -->
 
 
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;"
-					@click="goto('ucenter/home')" :style="{'min-height':dyHeight()}">
+				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('ucenter/home')" :style="{'min-height':dyHeight()}">
 					<!-- <image class="pic" src="../../static/image/jingjiren_icon.png"></image> -->
 					<text class="text-orange text-bold" style="padding: 0 8px 0 8px;">{{language.ucenter}}</text>
 				</view>

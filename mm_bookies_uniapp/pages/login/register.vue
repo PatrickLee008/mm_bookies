@@ -1,7 +1,14 @@
 <template>
 	<view class="login-container">
-		<!-- App Title -->
-		<view class="app-title">MM Bookies</view>
+		<!-- 标题图片 -->
+		<view class="login-title-container">
+			<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+		</view>
+
+		<!-- 广告区域 -->
+		<view class="ad-container">
+			<image class="ad-image" src="../../figma/login/login_ad.png" mode="widthFix"></image>
+		</view>
 
 		<!-- Login Form -->
 		<view class="login-form">
@@ -10,21 +17,15 @@
 
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" style="margin-bottom: 40px;" :class="{'input-error': phone_error}" type="number"
-					placeholder-class="input-placeholder" v-model="loginInfo.phone"
-					placeholder="Please enter phone number" maxlength="11" @blur="handle_phone_blur"
-					@input="handle_phone_blur" />
-				<view class="error-message" style="bottom: -30px;" v-if="phone_error">
+				<input class="input-field" :class="{'input-error': phone_error}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.phone" placeholder="Please enter phone number" maxlength="11" @blur="handle_phone_blur" @input="handle_phone_blur" />
+				<view class="error-message" v-if="phone_error">
 					{{$t("r_input_number_error")}}
 				</view>
 			</view>
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}"
-					type="password" placeholder-class="input-placeholder" v-model="loginInfo.password"
-					placeholder="Please enter your password" maxlength="32" @blur="handle_password_blur"
-					@input="handle_password_blur" />
+				<input class="input-field" :class="{'input-error': password_error}" type="password" placeholder-class="input-placeholder" v-model="loginInfo.password" placeholder="Please enter your password" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
 				<view class="error-message" v-if="password_error">
 					{{$t("r_password_limit")}}
 				</view>
@@ -32,10 +33,7 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="password"
-					placeholder-class="input-placeholder" v-model="loginInfo.confirm_password"
-					placeholder="Please confirm your password" maxlength="32" @blur="handle_confirm_password_blur"
-					@input="handle_confirm_password_blur" />
+				<input class="input-field" :class="{'input-error': confirm_password_error}" type="password" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" placeholder="Please confirm your password" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
 				<view class="error-message" v-if="confirm_password_error">
 					{{$t("those_passwords")}}
 				</view>
@@ -44,7 +42,9 @@
 			<!-- Remember Me -->
 			<view class="remember-row">
 				<text class="remember-text">Remember me</text>
-				<switch class="remember-switch" :checked="rememberMe" @change="switchChange" color="#2A6268" />
+				<view class="custom-switch" @click="toggleRememberMe">
+					<view class="switch-dot" :class="{'switch-dot-active': rememberMe}"></view>
+				</view>
 			</view>
 
 			<!-- Sign up Button -->
@@ -58,6 +58,22 @@
 				<text class="register-text">Already have an account? </text>
 				<text class="register-link-text" @click="toLogin()">Login</text>
 				<text class="register-text"> now.</text>
+			</view>
+		</view>
+
+		<!-- Contact Support -->
+		<view class="contact-support">
+			<text class="contact-text">Contact Support</text>
+			<view class="social-icons">
+				<view class="social-icon facebook-icon">
+					<image class="icon-image" src="../../figma/login/facebook.png" mode="aspectFit"></image>
+				</view>
+				<view class="social-icon call-icon">
+					<image class="icon-image" src="../../figma/login/call.png" mode="aspectFit"></image>
+				</view>
+				<view class="social-icon telegram-icon">
+					<image class="icon-image" src="../../figma/login/telegram‌.png" mode="aspectFit"></image>
+				</view>
 			</view>
 		</view>
 
@@ -252,6 +268,10 @@
 				});
 				return encrypted.toString();
 			},
+			// from tangjq--- 切换记住我状态
+			toggleRememberMe() {
+				this.rememberMe = !this.rememberMe
+			}
 		},
 		onLoad(option) {
 			uni.removeStorageSync('login_success');
@@ -262,21 +282,54 @@
 <style lang="scss">
 	.login-container {
 		min-height: 100vh;
-		background-color: $color-primary;
+		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: space-between;
-		padding: 0 40rpx;
+		padding: 0 30rpx;
 		box-sizing: border-box;
 	}
 
-	.app-title {
-		margin-top: 8vh;
-		font-size: 72rpx;
-		font-weight: bold;
-		color: #ffffff;
-		text-align: center;
+	/* 标题区域 */
+	.login-title-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		margin-top: 115rpx;
+		margin-bottom: 60rpx;
+	}
+
+	.login-title-image {
+		width: 75%;
+		height: auto;
+	}
+
+	.login-subtitle {
+		margin-top: 10rpx;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 24rpx;
+		letter-spacing: 2rpx;
+	}
+
+	/* 广告区域 */
+	.ad-container {
+		width: 800rpx;
+		margin-bottom: 30rpx;
+		padding: 0 55rpx;
+		margin-top: 30rpx;
+	}
+
+	.ad-image {
+		width: 100%;
+		height: auto;
+		border-radius: 32rpx;
+	}
+
+	/* 表单区域 */
+	.login-form {
+		width: 100%;
+		margin-bottom: 30rpx;
 	}
 
 	.welcome-text {
@@ -284,23 +337,17 @@
 		font-weight: 600;
 		color: #ffffff;
 		text-align: center;
-		margin-bottom: 6px;
-	}
-
-	.login-form {
-		width: 100%;
-		max-width: 600rpx;
-		padding-bottom: 10vh;
+		margin-bottom: 30rpx;
 	}
 
 	.input-wrapper {
 		position: relative;
+		margin-bottom: 30rpx;
 	}
 
 	.input-field {
-		width: 100%;
-		height: 80rpx;
-		background-color: #699195;
+		height: 85rpx;
+		background-color: rgba(105, 145, 149, 0.6);
 		border: none;
 		border-radius: 20rpx;
 		padding: 0 40rpx;
@@ -308,14 +355,14 @@
 		color: #ffffff;
 		box-sizing: border-box;
 		text-align: center;
-		margin-bottom: 50rpx;
+		font-style: italic;
 	}
 
 	.input-placeholder {
-		color: #204b4f;
+		color: #103C42;
 		text-align: center;
 		font-style: italic;
-		font-size: 12px;
+		font-size: 24rpx;
 	}
 
 	.input-error {
@@ -324,69 +371,134 @@
 
 	.error-message {
 		position: absolute;
-		bottom: -20px;
-		// left: 20rpx;
+		bottom: -25rpx;
+		left: 20rpx;
 		color: #ff6b6b;
-		font-size: 24rpx;
+		font-size: 22rpx;
 	}
 
 	.remember-row {
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 		align-items: center;
-		margin-bottom: 20rpx;
+		margin-bottom: 25rpx;
 		padding: 0 10rpx;
 	}
 
 	.remember-text {
 		font-size: 24rpx;
+		font-weight: 400;
 		color: #ffffff;
 		font-style: italic;
+		margin-right: auto;
 	}
 
-	.remember-switch {
-		transform: scale(0.8);
+	/* from tangjq--- 自定义圆形复选框 */
+	.custom-switch {
+		width: 40rpx;
+		height: 40rpx;
+		border: 3rpx solid rgba(255, 255, 255, 0.6);
+		border-radius: 50%;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		transition: border-color 0.3s;
+	}
+
+	.custom-switch:active {
+		opacity: 0.8;
+	}
+
+	.switch-dot {
+		width: 0;
+		height: 0;
+		background-color: #50C8CE;
+		border-radius: 50%;
+		transition: width 0.2s, height 0.2s;
+	}
+
+	.switch-dot-active {
+		width: 24rpx;
+		height: 24rpx;
 	}
 
 	.login-btn {
-		width: 100%;
-		height: 80rpx;
+		height: 70rpx;
 		background-color: #ffffff;
-		border-radius: 20rpx;
+		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: $color-primary;
-		margin-bottom: 40rpx;
+		color: #2A5F63;
+		margin-bottom: 30rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	}
 
 	.login-btn:active {
 		opacity: 0.9;
+		transform: scale(0.98);
 	}
 
 	.register-link {
 		text-align: center;
 		font-size: 24rpx;
-		font-style: italic;
 	}
 
 	.register-text {
-		color: rgba(255, 255, 255, 0.8);
+		color: rgba(255, 255, 255, 0.9);
+		font-style: italic;
+		font-weight: 400;
 	}
 
 	.register-link-text {
-		color: $color-lprimary;
+		color: #50C8CE;
 		text-decoration: underline;
-		font-weight: 500;
+		font-weight: 600;
+	}
+
+	/* Contact Support 区域 */
+	.contact-support {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-top: 50rpx;
+		margin-bottom: 30rpx;
+	}
+
+	.contact-text {
+		color: #ffffff;
+		font-size: 24rpx;
+		font-weight: 600;
+		margin-bottom: 30rpx;
+	}
+
+	.social-icons {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 40rpx;
+	}
+
+	.social-icon {
+		width: 80rpx;
+		height: 80rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.icon-image {
+		width: 80rpx;
+		height: 80rpx;
 	}
 
 	.version-info {
-		position: fixed;
-		right: 20rpx;
-		bottom: 20rpx;
+		margin-top: auto;
 		font-size: 22rpx;
 		color: rgba(255, 255, 255, 0.5);
+		text-align: center;
 	}
 </style>

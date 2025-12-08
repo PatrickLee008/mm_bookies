@@ -1,39 +1,49 @@
 <template>
-	<view class="full-page cu-list menu languageDialogs mybg-grey">
-		<zw-header @doSomething=""></zw-header>
-		<view class="mybg-grey flex-row margin-top-lg">
-			<!-- <view class="content">
-				<text class="text-grey">English</text>
-			</view> -->
-			<button style="border-radius: 10px;width: 90%;margin: 5% 5% 0 5%;"
-				:class="picker=='en'? 'mybg-primary':'bg-white'" @click="pickerChange('en')">English</button>
+	<view class="language-page full-page">
+		<!-- 顶部栏 -->
+		<view class="language-header">
+			<text class="header-back-icon" @click="goBack">←</text>
+			<text class="header-title">Change Language</text>
+			<text class="header-placeholder"></text>
 		</view>
-		<view class="mybg-grey flex-row">
-			<button style="border-radius: 10px;width: 90%;margin: 4% 5% 0 5%;"
-				:class="picker=='mm'? 'mybg-primary':'bg-white'" @click="pickerChange('mm')">မြန်မာ</button>
-		</view>
-		<view class="mybg-grey flex-row">
-			<button style="border-radius: 10px;width: 90%;margin: 4% 5% 0 5%;"
-				:class="picker=='th'? 'mybg-primary':'bg-white'" @click="pickerChange('th')">ภาษาไทย</button>
-		</view>
-		<view class="mybg-grey flex-row">
-			<button style="border-radius: 10px;width: 90%;margin: 4% 5% 0 5%;"
-				:class="picker=='cn'? 'mybg-primary':'bg-white'" @click="pickerChange('cn')">中文</button>
-		</view>
-		<!-- <view class="myrect cu-item flex-row" :class="{'bg-gradual-purple':picker=='mm'}" @click="pickerChange('mm')">
-			<view class="content">
-				<text class="text-grey">မြန်မာ</text>
+
+		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+			<view class="language-content">
+				<!-- 语言选项列表 -->
+				<view class="language-item" @click="pickerChange('mm')">
+					<text class="language-label">မြန်မာ</text>
+					<view class="radio-circle" :class="{ 'radio-selected': picker === 'mm' }">
+						<view class="radio-dot" v-if="picker === 'mm'"></view>
+					</view>
+				</view>
+
+				<view class="language-item" @click="pickerChange('en')">
+					<text class="language-label">English</text>
+					<view class="radio-circle" :class="{ 'radio-selected': picker === 'en' }">
+						<view class="radio-dot" v-if="picker === 'en'"></view>
+					</view>
+				</view>
+
+				<view class="language-item" @click="pickerChange('th')">
+					<text class="language-label">ภาษาไทย</text>
+					<view class="radio-circle" :class="{ 'radio-selected': picker === 'th' }">
+						<view class="radio-dot" v-if="picker === 'th'"></view>
+					</view>
+				</view>
+
+				<view class="language-item" @click="pickerChange('cn')">
+					<text class="language-label">中文</text>
+					<view class="radio-circle" :class="{ 'radio-selected': picker === 'cn' }">
+						<view class="radio-dot" v-if="picker === 'cn'"></view>
+					</view>
+				</view>
+
+				<!-- Confirm 按钮 -->
+				<view class="confirm-btn" @click="submit()">
+					<text class="confirm-btn-text">{{language.confirm || 'Confirm'}}</text>
+				</view>
 			</view>
-		</view> -->
-		<!--
-		<view class="cu-item" :class="{'bg-gradual-pink':picker=='cn'}" @click="pickerChange('cn')">
-			<view class="content">
-				<text class="text-grey">中文</text>
-			</view>
-		</view>
-		-->
-		<button class="register-btn mybg-active" style="width: 70%;margin: 30px 15% 10px 15%;" @click="submit()">
-			{{language.confirm}}</button>
+		</scroll-view>
 	</view>
 </template>
 
@@ -48,6 +58,10 @@
 			}
 		},
 		methods: {
+			// from tangjq--- 返回上一页
+			goBack() {
+				uni.navigateBack()
+			},
 			toHome() {
 				uni.reLaunch({
 					url: '/pages/ucenter/home'
@@ -62,10 +76,10 @@
 				if (!this.picker) this.picker = 'mm';
 				config.language = language[this.picker];
 				uni.setStorageSync('language', this.picker);
-				
+
 				uni.setLocale(this.picker)
 				this.$i18n.locale = this.picker;
-				
+
 				this.toHome()
 			}
 		},
@@ -73,12 +87,91 @@
 	}
 </script>
 
-<style>
-	.submit {
-		width: 100vw;
+<style lang="scss" scoped>
+	.language-page {
+		background: #f5f5f5;
+		min-height: 100vh;
 	}
 
-	.bg-green {
-		background-color: rgb(41, 150, 56)
+	/* 顶部栏 */
+	.language-header {
+		background: #3d6877;
+		padding: 40px 20px 20px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.header-back-icon, .header-placeholder {
+		width: 40px;
+		font-size: 24px;
+		color: #fff;
+		font-weight: 300;
+	}
+
+	.header-title {
+		font-size: 20px;
+		font-weight: 700;
+		color: #fff;
+		flex: 1;
+		text-align: center;
+	}
+
+	/* 内容区域 */
+	.language-content {
+		padding: 30px 20px;
+	}
+
+	.language-item {
+		background: #fff;
+		border-radius: 12px;
+		padding: 16px 20px;
+		margin-bottom: 12px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+	}
+
+	.language-label {
+		font-size: 16px;
+		font-weight: 600;
+		color: #1e3a5f;
+	}
+
+	.radio-circle {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		border: 2px solid #ccc;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+	}
+
+	.radio-circle.radio-selected {
+		border-color: #4fb3bf;
+	}
+
+	.radio-dot {
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background: #4fb3bf;
+	}
+
+	.confirm-btn {
+		background: #3d6877;
+		border-radius: 12px;
+		padding: 14px;
+		text-align: center;
+		margin-top: 30px;
+	}
+
+	.confirm-btn-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
 	}
 </style>

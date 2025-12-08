@@ -1,65 +1,89 @@
 <template>
 	<view class="mybg-grey page" :style="{'height':calc_page_height,}">
-		<zw-header>
-			<block slot="center">
-				<view class="text-white text-bold myfont-16px">eGames</view>
-			</block>
-		</zw-header>
+		<!-- from tangjq--- 使用新的统一header组件 -->
+		<zw-header></zw-header>
 
-		<!-- Filter Tabs: Hot / New / All -->
-		<view class="flex-row mybg-lprimary justify-around padding-tb-sm">
-			<button class="cu-btn sm width-30 myfont-10px" :class="{'mybg-active': filter_type === 'hot'}"
-				@click="filter_type = 'hot'">Hot</button>
-			<button class="cu-btn sm width-30 myfont-10px" :class="{'mybg-active': filter_type === 'new'}"
-				@click="filter_type = 'new'">New</button>
-			<button class="cu-btn sm width-30 myfont-10px" :class="{'mybg-active': filter_type === 'all'}"
-				@click="filter_type = 'all'">All</button>
+		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<view class="header-placeholder"></view>
+
+		<!-- Search Bar and Filter Button -->
+		<view class="search-container padding-lr-sm">
+			<view class="search-wrapper">
+				<view class="search-box">
+					<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
+					<input class="search-input" type="text" placeholder="Search" v-model="searchKeyword" />
+					<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword" @tap="clearSearch"></image>
+				</view>
+				<view class="filter-button" @click="openFilterPopup">
+					<view class="filter-icon">
+						<view class="filter-line"></view>
+						<view class="filter-line"></view>
+						<view class="filter-line"></view>
+					</view>
+				</view>
+			</view>
 		</view>
 
 		<!-- Game Categories and Game Cards -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px" style="line-height: 1.5;"
-			:style="{height:isLogin?`calc(${calc_page_height} - 55px - 58px - 46px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 58px - 46px - 65px)`,}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
 
 			<!-- Loop through game categories -->
 			<view class="flex-column padding-tb-sm" v-for="(category, catIndex) in game_categories" :key="catIndex">
 				<!-- Category Header -->
-				<view
-					class="category-header flex-row justify-between align-center radius-10px text-white padding-lr-sm padding-tb-xs mybg-lprimary">
-					<view class="flex-row1 align-center">
-						<view class="cuIcon-favorfill margin-right-sm myfont-14px"
-							:class="category.favorite ? 'text-yellow' : 'text-white'"
-							@click.stop="toggleCategoryFavorite(category)"></view>
-						<text class="myfont-12px text-bold">{{category.name}}</text>
-					</view>
-					<view class="flex-row1 align-center gap-5px" @click="category.expanded = !category.expanded">
-						<view class="cu-tag round sm mybg-active mycolor-primary min-width-30px">
-							{{category.games.length}}
-						</view>
-						<view class="myfont-12px" :class="category.expanded ? 'cuIcon-unfold' : 'cuIcon-fold'"></view>
-					</view>
+				<view class="category-header" @click="category.expanded = !category.expanded">
+					<text class="category-text text-white">{{category.name}}</text>
+					<view class="cuIcon-unfold category-arrow text-white"></view>
 				</view>
 
 				<!-- Game Grid -->
 				<view v-show="category.expanded" class="game-grid margin-top-sm">
-					<view class="game-card" v-for="(game, gameIndex) in category.games" :key="gameIndex"
-						@click="openGame(game)">
+					<view class="game-card" v-for="(game, gameIndex) in category.games" :key="gameIndex" @click="openGame(game)">
 						<!-- Game Image -->
-						<image :src="game.image" mode="aspectFill" class="game-image" lazy-load></image>
+						<view class="game-image-wrapper">
+							<image :src="game.image" mode="aspectFill" class="game-image" lazy-load></image>
+						</view>
 
-						<!-- Game Info Overlay -->
+						<!-- Game Info Section -->
 						<view class="game-info">
-							<view class="flex-row1 justify-between align-center">
-								<text class="game-name text-white text-bold myfont-12px">{{game.name}}</text>
-								<view class="cuIcon-favorfill myfont-16px"
-									:class="game.favorite ? 'text-yellow' : 'text-white'"
-									@click.stop="toggleFavorite(game)"></view>
+							<view class="game-info-content">
+								<text class="game-name text-white text-bold">{{game.name}}</text>
+								<text class="game-desc">{{game.description}}</text>
 							</view>
-							<text class="game-desc myfont-10px">{{game.description}}</text>
+							<view class="game-favorite" @click.stop="toggleFavorite(game)">
+								<view class="favorite-icon" :class="[game.favorite ? 'cuIcon-favorfill' : 'cuIcon-favor', 'text-white']"></view>
+							</view>
 						</view>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
+
+		<!-- Filter Popup -->
+		<view class="filter-popup-overlay" v-if="showFilterPopup" @click="closeFilterPopup">
+			<view class="filter-popup" @click.stop>
+				<!-- Filter Header -->
+				<view class="filter-header">
+					<text class="filter-title">Filter</text>
+				</view>
+
+				<!-- Filter Options -->
+				<view class="filter-options">
+					<view class="filter-option" v-for="(option, index) in filterOptions" :key="index" @click="selectFilterOption(option)">
+						<text class="filter-option-text">{{option}}</text>
+						<view class="filter-radio" :class="{'active': filterOption === option}">
+							<view class="filter-radio-inner" v-if="filterOption === option"></view>
+						</view>
+					</view>
+				</view>
+
+				<!-- Confirm Button -->
+				<view class="filter-confirm">
+					<view class="filter-confirm-btn" @click="confirmFilter">
+						<text class="filter-confirm-text">Confirm</text>
+					</view>
+				</view>
+			</view>
+		</view>
 
 		<login-modal ref='login_modal' :hidden.sync="hide_login_modal"></login-modal>
 	</view>
@@ -79,7 +103,13 @@
 				game_categories: [],
 				loading: false,
 				pageNo: 1,
-				pageSize: 100
+				pageSize: 100,
+				// from tangjq--- 新增搜索和筛选相关变量
+				searchKeyword: '', // 搜索关键词
+				showFilterPopup: false, // 控制筛选弹窗显示
+				filterOption: 'All', // 当前选中的筛选选项
+				filterOptions: ['All'], // 筛选选项列表（将动态填充游戏类型）
+				allGames: [] // 存储所有原始游戏数据
 			}
 		},
 		computed: {
@@ -90,10 +120,37 @@
 				}
 				return '100vh'
 			},
+			// from tangjq--- 计算过滤后的游戏列表
+			filteredGames() {
+				let games = this.allGames
+
+				// 根据搜索关键词过滤
+				if (this.searchKeyword && this.searchKeyword.trim()) {
+					const keyword = this.searchKeyword.toLowerCase().trim()
+					games = games.filter(game => {
+						const name = (game.name || '').toLowerCase()
+						return name.includes(keyword)
+					})
+				}
+
+				// 根据游戏类型过滤
+				if (this.filterOption && this.filterOption !== 'All') {
+					games = games.filter(game => game.gameType === this.filterOption)
+				}
+
+				return games
+			}
 		},
 		watch: {
 			filter_type() {
 				this.loadGames()
+			},
+			// from tangjq--- 监听搜索关键词和筛选选项变化，重新分组游戏
+			searchKeyword() {
+				this.groupGamesByPlatform(this.filteredGames)
+			},
+			filterOption() {
+				this.groupGamesByPlatform(this.filteredGames)
 			}
 		},
 		methods: {
@@ -122,7 +179,23 @@
 
 					if (res.statusCode == 200 && res.data.code == 200) {
 						const games = res.data.data.records || []
-						_this.groupGamesByPlatform(games)
+						// from tangjq--- 保存原始游戏数据并转换格式
+						_this.allGames = games.map(game => ({
+							id: game.id,
+							platform: game.platform,
+							gameType: game.gameType,
+							gameCode: game.gameCode,
+							name: game.nameZh || game.nameEn || 'Unknown',
+							description: `RTP: ${game.rtp || 'N/A'}%`,
+							image: game.iconUrl ? `${_this.siteinfo.awcImgUrl}${game.iconUrl}` : (game.thumbnailUrl || '/static/image/game/default-game.png'),
+							favorite: game.isFavourite === 1,
+							isHot: game.isHot === 1,
+							isNew: game.isNew === 1
+						}))
+						// from tangjq--- 提取所有游戏类型并添加到筛选选项
+						_this.extractGameTypes()
+						// from tangjq--- 使用过滤后的游戏数据进行分组
+						_this.groupGamesByPlatform(_this.filteredGames)
 					} else {
 						uni.showToast({
 							title: res.data.message || 'Failed to load games',
@@ -154,21 +227,21 @@
 						}
 					}
 
-					platformMap[platform].games.push({
-						id: game.id,
-						platform: game.platform,
-						gameType: game.gameType,
-						gameCode: game.gameCode,
-						name: game.nameZh || game.nameEn || 'Unknown',
-						description: `RTP: ${game.rtp || 'N/A'}%`,
-						image: game.iconUrl ? `${this.siteinfo.awcImgUrl}${game.iconUrl}` : (game.thumbnailUrl || '/static/image/game/default-game.png'),
-						favorite: game.isFavourite === 1,
-						isHot: game.isHot === 1,
-						isNew: game.isNew === 1
-					})
+					platformMap[platform].games.push(game)
 				})
 
 				this.game_categories = Object.values(platformMap)
+			},
+
+			// from tangjq--- 提取所有游戏类型并添加到筛选选项
+			extractGameTypes() {
+				const gameTypes = new Set()
+				this.allGames.forEach(game => {
+					if (game.gameType) {
+						gameTypes.add(game.gameType)
+					}
+				})
+				this.filterOptions = ['All', ...Array.from(gameTypes).sort()]
 			},
 
 			// 打开游戏
@@ -325,6 +398,31 @@
 					title: category.favorite ? 'Category favorited' : 'Category unfavorited',
 					icon: 'none'
 				})
+			},
+
+			// from tangjq--- 打开筛选弹窗
+			openFilterPopup() {
+				this.showFilterPopup = true
+			},
+
+			// from tangjq--- 关闭筛选弹窗
+			closeFilterPopup() {
+				this.showFilterPopup = false
+			},
+
+			// from tangjq--- 选择筛选选项
+			selectFilterOption(option) {
+				this.filterOption = option
+			},
+
+			// from tangjq--- 确认筛选
+			confirmFilter() {
+				// 关闭弹窗，筛选会通过watch自动触发
+				this.showFilterPopup = false
+			},
+			// from tangjq--- 清空搜索关键字
+			clearSearch() {
+				this.searchKeyword = ''
 			}
 		},
 		onLoad(options) {
@@ -336,9 +434,128 @@
 </script>
 
 <style>
-	.category-header {
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	/* from tangjq--- header占位元素样式 */
+	.header-placeholder {
+		height: 220px;
+		width: 100%;
+	}
+
+	/* Search Container */
+	.search-container {
+		background-color: #f5f5f5;
+	}
+
+	.search-wrapper {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.search-box {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		background-color: #ffffff;
+		border-radius: 25px;
+		padding: 6px 15px;
+		border: 1px solid #2A6268;
+	}
+
+	.search-icon {
+		width: 20px;
+		height: 20px;
+		margin-right: 10px;
+	}
+
+	.search-input {
+		flex: 1;
+		font-size: 14px;
+		color: #333;
+		border: none;
+	}
+
+	.search-input::placeholder {
+		color: #999;
+	}
+
+	.clear-icon {
+		width: 16px;
+		height: 16px;
+		margin-left: 8px;
 		cursor: pointer;
+	}
+
+	.filter-button {
+		width: 35px;
+		height: 35px;
+		background-color: #2F5D62;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.filter-button:active {
+		background-color: #2d5d5d;
+	}
+
+	.filter-icon {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		align-items: center;
+	}
+
+	.filter-line {
+		height: 2px;
+		background-color: #ffffff;
+		border-radius: 1px;
+	}
+
+	.filter-line:nth-child(1) {
+		width: 18px;
+	}
+
+	.filter-line:nth-child(2) {
+		width: 10px;
+	}
+
+	.filter-line:nth-child(3) {
+		width: 4px;
+	}
+
+	.scroll-container {
+		margin-top: 10px;
+		background-color: #ffffff;
+	}
+
+	/* Category Header */
+	.category-header {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		background-color: #2F5D62;
+		border-radius: 25px;
+		padding: 8px 20px;
+		cursor: pointer;
+		margin-bottom: 10px;
+		width: 100%;
+	}
+
+	.category-text {
+		color: #ffffff;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.category-arrow {
+		color: #ffffff;
+		font-size: 16px;
 	}
 
 	.game-grid {
@@ -350,14 +567,26 @@
 	}
 
 	.game-card {
-		position: relative;
-		border-radius: 10px;
+		display: flex;
+		flex-direction: column;
+		border-radius: 15px;
 		overflow: hidden;
-		box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		width: 48%;
+		background: #2F5D62;
+		margin-bottom: 12px;
+		transition: transform 0.2s;
+	}
+
+	.game-card:active {
+		transform: scale(0.98);
+	}
+
+	.game-image-wrapper {
+		width: 100%;
 		height: 200px;
+		overflow: hidden;
 		background: #333;
-		margin-bottom: 10px;
 	}
 
 	.game-image {
@@ -367,27 +596,180 @@
 	}
 
 	.game-info {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.6) 50%, transparent 100%);
-		min-height: 70px;
-		padding: 10px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		background-color: #2F5D62;
+		padding: 0 12px;
+		min-height: 50px;
+	}
+
+	.game-info-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		overflow: hidden;
+		text-align: left;
 	}
 
 	.game-name {
-		flex: 1;
+		font-size: 12px;
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		line-height: 1;
+	}
+
+	.game-desc {
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 11px;
+		line-height: 1.3;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.game-desc {
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 10px;
-		margin-top: 4px;
-		display: block;
+	.game-favorite {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		flex-shrink: 0;
+		margin-left: 8px;
+	}
+
+	.favorite-icon {
+		font-size: 20px;
+	}
+
+	/* Filter Popup */
+	.filter-popup-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 9999;
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.filter-popup {
+		width: 260px;
+		height: 100%;
+		background-color: #ffffff;
+		display: flex;
+		flex-direction: column;
+		animation: slideInRight 0.3s ease-out;
+		border-radius: 10px 0 0 10px;
+	}
+
+	@keyframes slideInRight {
+		from {
+			transform: translateX(100%);
+		}
+
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	.filter-header {
+		background-color: #2F5D62;
+		padding: 15px 20px;
+		display: flex;
+		align-items: center;
+		border-radius: 10px 0 0 0;
+	}
+
+	.filter-title {
+		color: #ffffff;
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	.filter-options {
+		flex: 1;
+		padding: 20px 0;
+		background-color: #f8f9fa;
+	}
+
+	.filter-option {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 8px 25px;
+		background-color: #ffffff;
+		margin-bottom: 1px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		background-color: #F1FAFB;
+	}
+
+	.filter-option:active {
+		background-color: #f5f5f5;
+	}
+
+	.filter-option-text {
+		color: #2A6268;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.filter-radio {
+		width: 22px;
+		height: 22px;
+		border: 2px solid #5FB5BD;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+	}
+
+	.filter-radio.active {
+		border-color: #5FB5BD;
+	}
+
+	.filter-radio-inner {
+		width: 12px;
+		height: 12px;
+		background-color: #5FB5BD;
+		border-radius: 50%;
+	}
+
+	.filter-confirm {
+		padding: 20px;
+		background-color: #ffffff;
+		box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+		border-radius: 0 0 0 10px;
+	}
+
+	.filter-confirm-btn {
+		background-color: #2F5D62;
+		border-radius: 25px;
+		padding: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		transition: background-color 0.3s;
+	}
+
+	.filter-confirm-btn:active {
+		background-color: #2d5d5d;
+	}
+
+	.filter-confirm-text {
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: 600;
 	}
 
 	.page {

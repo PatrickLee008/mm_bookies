@@ -6,7 +6,7 @@
 			"style": {}
 		},
 		{
-			"path": "pages/index/wallet",
+			"path": "pages/wallet/wallet",
 			"style": {}
 		},
 		{
@@ -83,14 +83,31 @@
 		{
 			"path": "pages/ucenter/download",
 			"style": {}
-		}, {
+		},
+		{
+			"path": "pages/ucenter/profile",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/contact",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/about",
+			"style": {}
+		},
+		{
+			"path": "pages/ucenter/customer_support",
+			"style": {}
+		},
+		{
 			"path": "pages/payment/payment",
 			"style": {}
 
 		},
 		{
-			"path" : "pages/ucenter/message",
-			"style" : {}
+			"path": "pages/ucenter/message",
+			"style": {}
 		},
 		{
 			"path": "pages/ucenter/messageDetail",
@@ -130,7 +147,7 @@
 			"allowsBounceVertical": "NO"
 		},
 		"navigationBarBackgroundColor": "#0081ff",
-		"navigationBarTitleText": "ONEX2",
+		"navigationBarTitleText": "MM Bookies",
 		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white"
 	},

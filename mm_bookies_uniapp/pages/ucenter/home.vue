@@ -2,100 +2,342 @@
 	<view class="bg-white full-page">
 		<zw-header @doSomething=""></zw-header>
 
-		<scroll-view scroll-y style="height: calc(100vh - 110px);">
-			<view class="title-bar">
+		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<view class="header-placeholder"></view>
+
+		<scroll-view scroll-y style="height: calc(100vh - 250px);">
+			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
-						<image class="yellow2dblue" style="height: 25px;" mode="heightFix"
-							src="/static/icon/setting.png"></image>
+						<image class="yellow2dblue" style="height: 25px;" mode="heightFix" src="/static/icon/setting.png"></image>
 						<text class="title-text" style="">{{$t('setting')}}</text>
 					</view>
 				</view>
-			</view>
-			<!-- <view class="myrect flex-row">
-				<view>
-					<image src="../../static/image/user_img.png" style="width: 70px;height: 70px;"></image>
-				</view>
-				<view class="flex-column" style="margin-left: 15px;">
-					<view class="flex-row" style="font-size: 16px;">
-						<text class="myfont-bold">{{currentLanguage.name}}：{{$store.state.userInfo.nick_name}}</text>
-					</view>
-					<view class="flex-row">
-						<text class="myfont-bold">{{currentLanguage.phone}}：{{$store.state.userInfo.phone}}</text>
-					</view>
-				</view>
 			</view> -->
 
-			<!-- <view class="balance-bar myrect box-shadow flex-row">
-				<view>
-					<image src="../../static/image/cash.png" style="width: 70px;height: 70px;margin-left: 5px;"></image>
+			<!-- 主列表区域 -->
+			<view class="settings-list-container">
+				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)" v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)">
+					<text class="setting-item-text">{{$t(bar.title)}}</text>
 				</view>
-				<view class="flex-column" style="margin-left: 15px;">
-					<view class="flex-row" style="font-size: 16px;">
-						<text class="myfont-bold">{{currentLanguage.balance}}</text>
-					</view>
-					<view class="flex-row">
-						<text class="myfont-bold">{{$store.state.userInfo.money}}</text>
-					</view>
-				</view>
-
-				<view class="flex-column" style="margin-left: 15px;padding:20px 0;">
-					<view class="flex-row" style="font-size: 16px;">
-						<text class="myfont-bold">{{currentLanguage.cashCode}}</text>
-					</view>
-					<view class="flex-row">
-						<text class="myfont-bold">{{$store.state.userInfo.cash_code}}</text>
-					</view>
-				</view>
-
-			</view> -->
-			<view class="cu-list menu " style="margin-bottom: 20px;">
-
-				<view class="bar-row flex-row" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)"
-					v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)">
-					<view class="flex-row content">
-						<view class="bar-icon">
-							<image class="bar-icon-image" style="" :src="bar.img" mode="heightFix"></image>
-						</view>
-						<view class="flex-column1">
-							<text class="myfont-14px text-bold">{{$t(bar.title)}}</text>
-							<text class="myfont-11px mycolor-info">{{bar.content}}</text>
-						</view>
-					</view>
-				</view>
-
 
 				<!-- #ifdef APP-PLUS -->
-				<!-- <view class="cu-item">
-				<view class="content">
-					<text class="text-grey">version</text>
-				</view>
-				<view class="action">
-					<text class="text-grey text-sm"> {{version}} </text>
-				</view>
-			</view> -->
-				<view class="bar-row flex-row myrect cu-item">
-					<view class="flex-row content" style="text-align: left;">
-						<view class="bar-icon">
-							<!-- <image class="bar-icon-image" :src="bar.img"></image> -->
-						</view>
-						<text class="text-grey">Version:{{version}}</text>
-					</view>
-					<view class="action">
-						<text class="text-grey text-sm">〉</text>
-					</view>
+				<view class="setting-item version-item">
+					<text class="setting-item-text">Version: {{version}}</text>
 				</view>
 				<!-- #endif-->
-
 			</view>
 
-			<button class="mybg-active logout-btn" style="" @click="logout"
-				v-if="isLogin">{{$t('sign_out')}}</button>
 			<view class="padding"></view>
-
 		</scroll-view>
 
+		<!-- Profile 弹窗 -->
+		<view class="modal-overlay" v-if="profileModalVisible" @click="hideProfileModal">
+			<view class="modal-content profile-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title">Edit Profile</text>
+					<text class="modal-close" @click="hideProfileModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<!-- 用户头像 -->
+					<view class="profile-avatar-section">
+						<view class="profile-avatar-circle">
+							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill"></image>
+						</view>
+					</view>
 
+					<!-- My ID -->
+					<view class="profile-info-row">
+						<text class="profile-info-label">My ID : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
+					</view>
+
+					<!-- Phone No -->
+					<view class="profile-phone-row">
+						<text class="profile-phone-label">Phone No: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
+						<image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image>
+					</view>
+
+					<!-- Change Password 按钮 -->
+					<view class="profile-change-pwd-btn" @click="showPasswordChangeModal">
+						<text class="profile-change-pwd-text">Change Password</text>
+					</view>
+
+					<!-- Save 按钮 -->
+					<view class="profile-save-btn" @click="hideProfileModal">
+						<text class="profile-save-text">Save</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Contact 弹窗 -->
+		<view class="modal-overlay" v-if="contactModalVisible" @click="hideContactModal">
+			<view class="modal-content contact-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title" style="text-align: left;">Contact Us</text>
+					<text class="modal-close" @click="hideContactModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<text class="contact-section-title">Contact</text>
+					<text class="contact-description">Explore our website for more information and updates!</text>
+
+					<!-- 联系方式列表 -->
+					<view class="contact-row-item">
+						<text class="contact-row-label">Viber</text>
+						<view class="contact-input-wrapper">
+							<text class="contact-input-value">09789456123</text>
+							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+								<text class="copy-button-text">Copy</text>
+								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+							</view>
+						</view>
+					</view>
+
+					<view class="contact-row-item">
+						<text class="contact-row-label">Telegram</text>
+						<view class="contact-input-wrapper">
+							<text class="contact-input-value">09789456123</text>
+							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+								<text class="copy-button-text">Copy</text>
+								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+							</view>
+						</view>
+					</view>
+
+					<view class="contact-row-item">
+						<text class="contact-row-label">Email</text>
+						<view class="contact-input-wrapper">
+							<text class="contact-input-value">mmbookies@test.com</text>
+							<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
+								<text class="copy-button-text">Copy</text>
+								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- About 弹窗 -->
+		<view class="modal-overlay" v-if="aboutModalVisible" @click="hideAboutModal">
+			<view class="modal-content about-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title" style="text-align: left;">About</text>
+					<text class="modal-close" @click="hideAboutModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<!-- Rules 部分 -->
+					<view class="about-section">
+						<text class="about-section-title">Rules</text>
+						<view class="about-rule-item">
+							<text class="rule-number">1.</text>
+							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">2.</text>
+							<text class="rule-text">Terms of service for online betting platforms outlined here</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">3.</text>
+							<text class="rule-text">Common betting strategies used by successful gamblers</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">4.</text>
+							<text class="rule-text">Legal age and identification requirements for placing bets</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">5.</text>
+							<text class="rule-text">How to recognize and report suspicious betting activities</text>
+						</view>
+					</view>
+
+					<!-- Regulation 部分 -->
+					<view class="about-section">
+						<text class="about-section-title">Regulation</text>
+						<view class="about-rule-item">
+							<text class="rule-number">1.</text>
+							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">2.</text>
+							<text class="rule-text">Terms of service for online betting platforms outlined here</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">3.</text>
+							<text class="rule-text">Common betting strategies used by successful gamblers</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">4.</text>
+							<text class="rule-text">Legal age and identification requirements for placing bets</text>
+						</view>
+						<view class="about-rule-item">
+							<text class="rule-number">5.</text>
+							<text class="rule-text">How to recognize and report suspicious betting activities</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Language 弹窗 -->
+		<view class="modal-overlay" v-if="languageModalVisible" @click="hideLanguageModal">
+			<view class="modal-content language-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title">Change Language</text>
+					<text class="modal-close" @click="hideLanguageModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<!-- 语言选项列表 -->
+					<view class="language-item" @click="selectLanguage('mm')">
+						<text class="language-label">မြန်မာ</text>
+						<view class="radio-circle" :class="{ 'radio-selected': selectedLanguage === 'mm' }">
+							<view class="radio-dot" v-if="selectedLanguage === 'mm'"></view>
+						</view>
+					</view>
+
+					<view class="language-item" @click="selectLanguage('en')">
+						<text class="language-label">English</text>
+						<view class="radio-circle" :class="{ 'radio-selected': selectedLanguage === 'en' }">
+							<view class="radio-dot" v-if="selectedLanguage === 'en'"></view>
+						</view>
+					</view>
+
+					<view class="language-item" @click="selectLanguage('th')">
+						<text class="language-label">ภาษาไทย</text>
+						<view class="radio-circle" :class="{ 'radio-selected': selectedLanguage === 'th' }">
+							<view class="radio-dot" v-if="selectedLanguage === 'th'"></view>
+						</view>
+					</view>
+
+					<view class="language-item" @click="selectLanguage('cn')">
+						<text class="language-label">中文</text>
+						<view class="radio-circle" :class="{ 'radio-selected': selectedLanguage === 'cn' }">
+							<view class="radio-dot" v-if="selectedLanguage === 'cn'"></view>
+						</view>
+					</view>
+
+					<!-- Confirm 按钮 -->
+					<view class="language-confirm-btn" @click="confirmLanguage()">
+						<text class="language-confirm-text">Confirm</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Customer Support 弹窗 -->
+		<view class="modal-overlay" v-if="customerSupportModalVisible" @click="hideCustomerSupportModal">
+			<view class="modal-content support-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title" style="text-align: left;">Customer Support</text>
+					<text class="modal-close" @click="hideCustomerSupportModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<text class="support-main-title">Contact us via following for any support</text>
+					<text class="support-description">Explore our website for more information and updates!</text>
+
+					<!-- 支持渠道列表 -->
+					<view class="support-channel-section">
+						<text class="support-channel-title">KBZPay</text>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+					</view>
+
+					<view class="support-channel-section">
+						<text class="support-channel-title">KBZPay</text>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+						<view class="support-link-item" @click="openSupportLink('https://contact.mmbookies/D1')">
+							<text class="support-link-text">https://contact.mmbookies/D1</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Change Password 弹窗 -->
+		<view class="modal-overlay" v-if="passwordChangeModalVisible" @click="hidePasswordChangeModal">
+			<view class="modal-content password-change-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title">Change Password</text>
+					<text class="modal-close" @click="hidePasswordChangeModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<!-- Old Password 输入框 -->
+					<view class="pwd-input-wrapper" :class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
+						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" placeholder="Please enter your old password" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" />
+						<view class="eye-icon" @click="show_old_password = !show_old_password">
+							<text :class="show_old_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
+						</view>
+					</view>
+
+					<!-- New Password 输入框 -->
+					<view class="pwd-input-wrapper" :class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
+						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" placeholder="Please enter your new password" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" />
+						<view class="eye-icon" @click="show_new_password = !show_new_password">
+							<text :class="show_new_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
+						</view>
+					</view>
+
+					<!-- Confirm Password 输入框 -->
+					<view class="pwd-input-wrapper" :class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
+						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" placeholder="Please enter your new password" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" />
+						<view class="eye-icon" @click="show_confirm_password = !show_confirm_password">
+							<text :class="show_confirm_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
+						</view>
+					</view>
+
+					<!-- 错误提示 -->
+					<text class="pwd-error-message" v-if="password_error_message">{{ password_error_message }}</text>
+
+					<!-- Cancel 按钮 -->
+					<view class="pwd-cancel-btn" @click="hidePasswordChangeModal">
+						<text class="pwd-cancel-text">Cancel</text>
+					</view>
+
+					<!-- Save 按钮 -->
+					<view class="pwd-save-btn" @click="submitPasswordChange">
+						<text class="pwd-save-text">Save</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Logout 弹窗 -->
+		<view class="logout-modal" v-if="showLogoutConfirm" @click="hideLogoutModal">
+			<view class="logout-modal-content" @click.stop="">
+				<view class="logout-modal-header">
+					<text class="logout-modal-title">Log Out</text>
+				</view>
+				<view class="logout-modal-body">
+					<text class="logout-question">Are you sure you want to log out?</text>
+				</view>
+				<view class="logout-modal-buttons">
+					<view class="logout-btn-confirm" @click="logout">
+						<text class="logout-btn-text-red">Log Out</text>
+					</view>
+					<view class="logout-btn-cancel" @click="hideLogoutModal">
+						<text class="logout-btn-text-white">Cancel</text>
+					</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -116,114 +358,108 @@
 				picker: '',
 				contact2: '',
 				contact: [],
-				bar_list: [{
-						title: 'account_information',
-						content: '',
-						method: 'goto',
-						args: ['/pages/ucenter/account'],
-						img: '../../static/icon/ucenter/account.png',
-						para: {
-							need_login: true
-						},
-					},
+				bar_list: [
+					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
-						title: 'awc_game_lobby',
+						title: "profile", // from tangjq--- 使用语言文件中的键名
 						content: '',
-						method: 'enterAWCGameLobby',
+						method: 'showProfileModal', // from tangjq--- 改为显示弹窗
 						args: [],
-						img: '../../static/icon/ucenter/logo-AWC-l-CGTOWzF4.webp',
+						img: '../../static/icon/ucenter/profile.png',
 						para: {
 							need_login: true
 						},
 					},
 					{
-						title: 'invite',
+						title: "contact_us", // from tangjq--- 使用语言文件中的键名
 						content: '',
-						method: 'goto',
-						args: ['/pages/ucenter/invite/index'],
-						img: '../../static/icon/ucenter/invite.png',
-						para: {
-							need_login: true
-						},
-					},
-					// {
-					// 	title: "bank",
-					// 	content: '',
-					// 	method: 'goto',
-					// 	args: ['/pages/ucenter/banks'],
-					// 	img: '../../static/icon/ucenter/language.png',
-					// 	para: {},
-					// },
-					{
-						title: "contact",
-						content: '',
-						method: 'goto',
-						args: ['/pages/index/contact'],
+						method: 'showContactModal', // from tangjq--- 改为显示弹窗
+						args: [],
 						img: '../../static/icon/ucenter/contact_lblue.png',
 						para: {},
 					},
 					{
-						title: 'bonus',
+						title: "about us", // from tangjq--- 使用语言文件中的键名
 						content: '',
-						method: 'goto',
-						args: ['/pages/ucenter/bonus'],
-						img: '../../static/icon/ucenter/bonus.png',
-						para: {
-							need_login: true
-						},
+						method: 'showAboutModal', // from tangjq--- 改为显示弹窗
+						args: [],
+						img: '../../static/icon/ucenter/about.png',
+						para: {},
 					},
 					{
-						title: "language",
+						title: "language", // from tangjq--- 使用语言文件中的键名
 						content: '',
-						method: 'goto',
-						args: ['/pages/ucenter/language'],
+						method: 'showLanguageModal', // from tangjq--- 改为显示弹窗
+						args: [],
 						img: '../../static/icon/ucenter/language.png',
 						para: {},
 					},
 					{
-						title: "downloadapp",
-						content: 'V 0.0.1',
-						// method: 'download',
-						// args: ['https://apkdemo.1x2mm.net/'],
-						method: 'goto',
-						args: ['/pages/ucenter/download'],
-						img: '../../static/icon/ucenter/download.png',
+						title: "customer_support", // from tangjq--- 使用语言文件中的键名
+						content: '',
+						method: 'showCustomerSupportModal', // from tangjq--- 改为显示弹窗
+						args: [],
+						img: '../../static/icon/ucenter/support.png',
 						para: {},
 					},
+					{
+						title: "logout", // from tangjq--- 使用语言文件中的键名
+						content: '',
+						method: 'showLogoutModal',
+						args: [],
+						img: '../../static/icon/ucenter/logout.png',
+						para: {
+							need_login: true
+						},
+					},
+					// from tangjq--- 保留的原有列表项（不在设计稿中但保留）
 					// {
-					// 	title: config.language.withdraw_history,
-					// 	url: 'withdraw-history',
-					// 	img: '../../static/image/withdraw_history.png',
+					// 	title: 'account_information',
+					// 	content: '',
+					// 	method: 'goto',
+					// 	args: ['/pages/ucenter/account'],
+					// 	img: '../../static/icon/ucenter/account.png',
+					// 	para: {
+					// 		need_login: true
+					// 	},
 					// },
 					// {
-					// 	title: config.language.withdraw,
-					// 	url: 'withdraw',
-					// 	img: '../../static/image/withdraw.png',
+					// 	title: 'awc_game_lobby',
+					// 	content: '',
+					// 	method: 'enterAWCGameLobby',
+					// 	args: [],
+					// 	img: '../../static/icon/ucenter/logo-AWC-l-CGTOWzF4.webp',
+					// 	para: {
+					// 		need_login: true
+					// 	},
 					// },
 					// {
-					// 	title: config.language.recharge,
-					// 	url: 'charge',
-					// 	img: '../../static/image/withdraw.png',
+					// 	title: 'invite',
+					// 	content: '',
+					// 	method: 'goto',
+					// 	args: ['/pages/ucenter/invite/index'],
+					// 	img: '../../static/icon/ucenter/invite.png',
+					// 	para: {
+					// 		need_login: true
+					// 	},
 					// },
 					// {
-					// 	title: config.language.depositRecords,
-					// 	url: 'charge_record',
-					// 	img: '../../static/image/withdraw_history.png',
+					// 	title: 'bonus',
+					// 	content: '',
+					// 	method: 'goto',
+					// 	args: ['/pages/ucenter/bonus'],
+					// 	img: '../../static/icon/ucenter/bonus.png',
+					// 	para: {
+					// 		need_login: true
+					// 	},
 					// },
 					// {
-					// 	title: config.language.changePassword,
-					// 	url: 'change_pwd',
-					// 	img: '../../static/image/change_pw.png',
-					// },
-					// {
-					// 	title: config.language.userCharge,
-					// 	url: 'charge_upload',
-					// 	img: '../../static/image/withdraw.png',
-					// },
-					// {
-					// 	title: config.language.about,
-					// 	url: 'about',
-					// 	img: '../../static/image/about.png',
+					// 	title: "downloadapp",
+					// 	content: 'V 0.0.1',
+					// 	method: 'goto',
+					// 	args: ['/pages/ucenter/download'],
+					// 	img: '../../static/icon/ucenter/download.png',
+					// 	para: {},
 					// },
 				],
 				contact: '',
@@ -231,10 +467,138 @@
 				dislan2: 0,
 				version: uni.getStorageSync("version"),
 				modal_name: '',
+
+				// from tangjq--- Logout弹窗控制变量
+				showLogoutConfirm: false,
+
+				// from tangjq--- 各个弹窗的控制变量
+				profileModalVisible: false,
+				contactModalVisible: false,
+				aboutModalVisible: false,
+				languageModalVisible: false,
+				customerSupportModalVisible: false,
+
+				// from tangjq--- 语言选择器
+				selectedLanguage: uni.getStorageSync('UNI_LOCALE') || 'mm',
+
+				// from tangjq--- Change Password 弹窗相关变量
+				passwordChangeModalVisible: false,
+				old_password: '',
+				new_password: '',
+				confirm_password: '',
+				old_password_focused: false,
+				new_password_focused: false,
+				confirm_password_focused: false,
+				old_password_error: false,
+				new_password_error: false,
+				confirm_password_error: false,
+				show_old_password: false,
+				show_new_password: false,
+				show_confirm_password: false,
+				password_error_message: '',
 			}
 		},
 
 		methods: {
+			// from tangjq--- 显示Logout确认弹窗
+			showLogoutModal() {
+				this.showLogoutConfirm = true
+			},
+			// from tangjq--- 隐藏Logout确认弹窗
+			hideLogoutModal() {
+				this.showLogoutConfirm = false
+			},
+
+			// from tangjq--- Profile弹窗方法
+			showProfileModal() {
+				this.profileModalVisible = true
+			},
+			hideProfileModal() {
+				this.profileModalVisible = false
+			},
+
+			// from tangjq--- Contact弹窗方法
+			showContactModal() {
+				this.contactModalVisible = true
+			},
+			hideContactModal() {
+				this.contactModalVisible = false
+			},
+			copyToClipboard(text) {
+				uni.setClipboardData({
+					data: text,
+					success: () => {
+						uni.showToast({
+							title: 'Copied!',
+							icon: 'success',
+							duration: 1500
+						})
+					}
+				})
+			},
+
+			// from tangjq--- About弹窗方法
+			showAboutModal() {
+				this.aboutModalVisible = true
+			},
+			hideAboutModal() {
+				this.aboutModalVisible = false
+			},
+
+			// from tangjq--- Language弹窗方法
+			showLanguageModal() {
+				this.languageModalVisible = true
+			},
+			hideLanguageModal() {
+				this.languageModalVisible = false
+			},
+			selectLanguage(lang) {
+				this.selectedLanguage = lang
+			},
+			confirmLanguage() {
+				if (!this.selectedLanguage) this.selectedLanguage = 'mm'
+				config.language = language[this.selectedLanguage]
+				uni.setStorageSync('language', this.selectedLanguage)
+				uni.setLocale(this.selectedLanguage)
+				this.$i18n.locale = this.selectedLanguage
+				this.hideLanguageModal()
+
+				// 刷新页面
+				setTimeout(() => {
+					uni.reLaunch({
+						url: '/pages/ucenter/home'
+					})
+				}, 300)
+			},
+
+			// from tangjq--- Customer Support弹窗方法
+			showCustomerSupportModal() {
+				this.customerSupportModalVisible = true
+			},
+			hideCustomerSupportModal() {
+				this.customerSupportModalVisible = false
+			},
+			openSupportLink(url) {
+				//#ifdef H5
+				window.open(url, '_blank')
+				//#endif
+
+				//#ifdef APP-PLUS
+				plus.runtime.openURL(url)
+				//#endif
+
+				//#ifdef MP
+				uni.setClipboardData({
+					data: url,
+					success: () => {
+						uni.showToast({
+							title: 'Link copied',
+							icon: 'success'
+						})
+					}
+				})
+				//#endif
+			},
 			show_modal(modal) {
 				this.modal_name = modal
 			},
@@ -371,6 +735,10 @@
 			},
 			logout() {
 				// this.music.play_dede();
+				// from tangjq--- 隐藏确认弹窗
+				this.hideLogoutModal()
+
+				uni.removeStorageSync('splash_last_shown_time')
 				uni.removeStorageSync('Authorization');
 				uni.redirectTo({
 					url: '../login/login'
@@ -420,124 +788,834 @@
 				}
 
 			},
+
+			// from tangjq--- Change Password 弹窗方法
+			showPasswordChangeModal() {
+				this.passwordChangeModalVisible = true
+				// from tangjq--- 重置表单
+				this.old_password = ''
+				this.new_password = ''
+				this.confirm_password = ''
+				this.old_password_error = false
+				this.new_password_error = false
+				this.confirm_password_error = false
+				this.password_error_message = ''
+			},
+			hidePasswordChangeModal() {
+				this.passwordChangeModalVisible = false
+			},
+			// from tangjq--- Old Password 输入框失焦处理
+			handleOldPasswordBlur() {
+				this.old_password_focused = false
+				if (!this.old_password) {
+					this.old_password_error = true
+					this.password_error_message = this.$t('required') || 'This field is required'
+				} else {
+					this.old_password_error = false
+					this.password_error_message = ''
+				}
+			},
+			// from tangjq--- New Password 输入框失焦处理
+			handleNewPasswordBlur() {
+				this.new_password_focused = false
+				const pwd = this.new_password
+				// from tangjq--- 密码验证：长度 ≥ 8，包含大小写字母和数字
+				const isValid =
+					pwd &&
+					pwd.length >= 8 &&
+					/[a-z]/.test(pwd) &&
+					/[A-Z]/.test(pwd) &&
+					/\d/.test(pwd)
+
+				if (!isValid) {
+					this.new_password_error = true
+					this.password_error_message = this.$t('password_must_contain') || 'Password must be at least 8 characters with uppercase, lowercase and number'
+				} else {
+					this.new_password_error = false
+					this.password_error_message = ''
+				}
+
+				// from tangjq--- 如果确认密码已输入，检查是否匹配
+				if (this.confirm_password && this.new_password !== this.confirm_password) {
+					this.confirm_password_error = true
+					this.password_error_message = this.$t('those_passwords') || 'Passwords do not match'
+				}
+			},
+			// from tangjq--- Confirm Password 输入框失焦处理
+			handleConfirmPasswordBlur() {
+				this.confirm_password_focused = false
+				if (this.new_password !== this.confirm_password) {
+					this.confirm_password_error = true
+					this.password_error_message = this.$t('those_passwords') || 'Passwords do not match'
+				} else {
+					this.confirm_password_error = false
+					this.password_error_message = ''
+				}
+			},
+			// from tangjq--- 提交密码修改
+			submitPasswordChange() {
+				var _this = this
+
+				// from tangjq--- 表单验证
+				if (!this.old_password) {
+					this.old_password_error = true
+					this.password_error_message = this.$t('required') || 'Old password is required'
+					return
+				}
+
+				if (!this.new_password) {
+					this.new_password_error = true
+					this.password_error_message = this.$t('required') || 'New password is required'
+					return
+				}
+
+				if (!this.confirm_password) {
+					this.confirm_password_error = true
+					this.password_error_message = this.$t('required') || 'Please confirm your password'
+					return
+				}
+
+				if (this.new_password !== this.confirm_password) {
+					this.confirm_password_error = true
+					this.password_error_message = this.$t('those_passwords') || 'Passwords do not match'
+					return
+				}
+
+				if (this.new_password === this.old_password) {
+					uni.showModal({
+						title: 'Tips',
+						content: this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password',
+						showCancel: false,
+						confirmText: 'OK'
+					})
+					return
+				}
+
+				// from tangjq--- 提交到后端
+				var para = {
+					USER_PWD: this.new_password,
+					OLD_PASSWORD: this.old_password
+				}
+
+				uni.showLoading({
+					title: 'Saving...'
+				})
+
+				_this.$http.post('/app_user/edit', para, (res) => {
+					uni.hideLoading()
+					var tips = res.data.message
+					if (_this.$t(tips)) {
+						tips = _this.$t(tips)
+					}
+
+					if (res.statusCode == 200) {
+						uni.showModal({
+							title: 'Success',
+							content: tips || 'Password changed successfully',
+							showCancel: false,
+							confirmText: 'OK',
+							success: function(modalRes) {
+								_this.hidePasswordChangeModal()
+							}
+						})
+					} else {
+						uni.showModal({
+							title: 'Error',
+							content: tips || 'Failed to change password',
+							showCancel: false,
+							confirmText: 'OK'
+						})
+					}
+				})
+			},
 		},
-		mounted(){
-		},
+		mounted() {},
 		created() {}
 	}
 </script>
 
 <style lang="scss">
-	.bar-row {
-		width: calc(100% - 20px);
-		height: 55px;
-		margin: 5px 10px 5px;
-		padding: 5px 1px;
-		border-radius: 5px;
+	/* from tangjq--- header占位元素样式 */
+	.header-placeholder {
+		height: 240px;
+		width: 100%;
+	}
+
+	.ucenter-page {
+		background: #2F5D62;
+		min-height: 100vh;
+	}
+
+	/* 顶部栏 */
+	.ucenter-header {
+		background: #2F5D62;
+		padding: 40px 20px 20px 20px;
+		text-align: center;
+	}
+
+	.header-title {
+		font-size: 22px;
+		font-weight: 700;
+		color: #fff;
+	}
+
+	/* 用户信息卡片 */
+	.user-info-card {
+		background: #fff;
+		border-radius: 16px;
+		margin: 0 16px 20px 16px;
+		padding: 16px;
+		display: flex;
 		justify-content: space-between;
-		color: $color-primary;
-		box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+		align-items: center;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-	.bar-icon {
-		height: 48px;
-		padding: 10px;
+	.user-info-left {
+		display: flex;
+		align-items: center;
+		flex: 1;
 	}
 
-	.bar-icon-image {
+	.user-avatar {
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		background: #2F5D62;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+	}
+
+	.avatar-image {
+		width: 100%;
 		height: 100%;
 	}
 
-
-	.balance-bar {
-		width: 90vw;
-		padding: 2px;
-		background-color: #d54d4a;
-		margin-top: 15px;
-		color: white;
-	}
-
-	.logout-btn {
-		line-height: 35px;
-		font-weight: bold;
-		width: 45%;
-		height: 35px;
-		border-radius: 5px;
-		position: absolute;
-		left: 27.5%;
-		box-shadow: rgba(0, 0, 0, 0.25) 0px 2px 2px 0px;
-	}
-
-	.dialogs {
-		height: 50vh;
-	}
-
-	.about-text {
-		color: rgb(129, 58, 58);
-		font-size: 25px;
-		width: 100%;
-		display: inline-block;
-		white-space: pre-wrap;
-		word-wrap: break-word;
-		height: auto;
-	}
-
-	.menu {
-		margin-bottom: 60px;
-	}
-
-	.dialogsTitle {
-		height: 5vh;
-		line-height: 5vh;
-		border-bottom: 1px solid lightgrey;
-		font-size: 16px;
-	}
-
-	.span_box {
-		display: table;
-	}
-
-	.words_span {
-		display: table-cell;
-		vertical-align: middle;
-	}
-
-	.border-right {
-		border-right: 1px solid #E2E2E2;
-	}
-
-	.head {
-		height: 60px;
-		width: 100%;
-		line-height: 60px
-	}
-
-	.height-150 {
-		height: 150px;
-		padding: 45px 0 0 12px;
-		margin: 8px 0 8px 0;
-	}
-
-	.head image {
-		float: left;
-		height: 80px;
-		width: 80px;
-	}
-
-	.cu-list {
-		margin-top: 12px;
-	}
-
-	.head view {
+	.user-info-text {
 		margin-left: 12px;
-		float: left;
+		flex: 1;
 	}
 
+	.user-id {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1e3a5f;
+		display: block;
+		margin-bottom: 6px;
+	}
 
-	.user-info-loading {
-		height: 15px;
-		width: 15px;
+	.user-balance-row {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.balance-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	.balance-label,
+	.cashout-label {
+		font-size: 13px;
+		color: #1e3a5f;
+		font-weight: 600;
+	}
+
+	.balance-value,
+	.cashout-value {
+		font-size: 13px;
+		color: #1e3a5f;
+		font-weight: 700;
+		margin-right: 12px;
+	}
+
+	.user-settings-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.settings-icon-img {
+		width: 28px;
+		height: 28px;
+		tint-color: #2F5D62;
+	}
+
+	/* 快捷图标区域 */
+	.quick-icons-container {
+		background: #2F5D62;
+		padding: 0 16px 24px 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.quick-icon-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.icon-circle {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.15);
+		border: 2px solid rgba(255, 255, 255, 0.3);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.icon-img {
+		width: 28px;
+		height: 28px;
+	}
+
+	.icon-label {
+		font-size: 12px;
+		color: #4fb3bf;
+		font-weight: 500;
+	}
+
+	/* 设置列表区域 */
+	.settings-list-container {
+		background: #fff;
+		border-radius: 24px 24px 0 0;
+		padding: 20px;
+		min-height: 400px;
+	}
+
+	.setting-item {
+		background: #fff;
+		border: 2px solid #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+
+	.setting-item-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #2F5D62;
+	}
+
+	.version-item {
+		border: none;
+		background: transparent;
+	}
+
+	.version-item .setting-item-text {
+		color: #999;
+		font-size: 14px;
+		font-weight: 400;
+	}
+
+	/* Logout 弹窗 */
+	.logout-modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1001;
+		padding: 20px;
+	}
+
+	.logout-modal-content {
+		background: #fff;
+		border-radius: 16px;
+		width: 100%;
+		max-width: 400px;
+		overflow: hidden;
+	}
+
+	.logout-modal-header {
+		background: #2F5D62;
+		padding: 10px;
+		text-align: center;
+		border-radius: 16px 16px 0 0;
+	}
+
+	.logout-modal-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	.logout-modal-body {
+		padding: 30px 20px;
+		text-align: center;
+	}
+
+	.logout-question {
+		font-size: 16px;
+		color: #2F5D62;
+		font-weight: 500;
+	}
+
+	.logout-modal-buttons {
+		padding: 0 20px 20px 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.logout-btn-confirm {
+		background: #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.logout-btn-text-red {
+		font-size: 16px;
+		font-weight: 600;
+		color: #ff4444;
+	}
+
+	.logout-btn-cancel {
+		background: #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.logout-btn-text-white {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	/* from tangjq--- 弹窗通用样式 */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1001;
+		padding: 20px;
+	}
+
+	.modal-content {
+		background: #fff;
+		border-radius: 16px;
+		width: 100%;
+		max-width: 500px;
+		max-height: 90vh;
+		overflow-y: auto;
+	}
+
+	.modal-header {
+		background: #2F5D62;
+		padding: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		border-radius: 16px 16px 0 0;
+	}
+
+	.modal-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
+		flex: 1;
+		text-align: center;
+	}
+
+	.modal-close {
+		font-size: 20px;
+		color: #fff;
+		font-weight: 300;
+		line-height: 1;
 		position: absolute;
-		right: 5px
+		right: 30px;
+	}
+
+	.modal-body {
+		padding: 20px;
+	}
+
+	/* Profile 弹窗样式 */
+	.profile-avatar-section {
+		display: flex;
+		justify-content: center;
+		margin-bottom: 24px;
+	}
+
+	.profile-avatar-circle {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		// background: #2F5D62;
+		overflow: hidden;
+	}
+
+	.profile-avatar-img {
+		width: 100%;
+		height: 100%;
+	}
+
+	.profile-info-row {
+		margin-bottom: 10px;
+	}
+
+	.profile-info-label {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1e3a5f;
+	}
+
+	.profile-phone-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+
+	.profile-phone-label {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e3a5f;
+	}
+
+	.profile-edit-icon {
+		width: 20px;
+		height: 20px;
+	}
+
+	.profile-change-pwd-btn {
+		background: #fff;
+		border: 2px solid #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+		margin-bottom: 12px;
+	}
+
+	.profile-change-pwd-text {
+		font-size: 16px;
+		font-weight: 400;
+		color: #2F5D62;
+	}
+
+	.profile-save-btn {
+		background: #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.profile-save-text {
+		font-size: 15px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	/* Contact 弹窗样式 */
+	.contact-section-title {
+		font-size: 22px;
+		font-weight: 700;
+		color: #1e3a5f;
+		display: block;
+		margin-bottom: 12px;
+	}
+
+	.contact-description {
+		font-size: 14px;
+		color: #2F5D62;
+		line-height: 1.5;
+		display: block;
+		margin-bottom: 24px;
+	}
+
+	.contact-row-item {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		margin-bottom: 16px;
+		gap: 12px;
+	}
+
+	.contact-row-label {
+		font-size: 14px;
+		font-weight: 700;
+		color: #1e3a5f;
+		min-width: 75px;
+		flex-shrink: 0;
+	}
+
+	.contact-input-wrapper {
+		flex: 1;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		background: #fff;
+		border: 2px solid #5FB5BD;
+		border-radius: 20px;
+		overflow: hidden;
+		height: 38px;
+	}
+
+	.contact-input-value {
+		flex: 1;
+		font-size: 13px;
+		color: #1e3a5f;
+		padding: 0 12px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.contact-copy-button {
+		background: #5FB5BD;
+		padding: 8px 14px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 4px;
+		flex-shrink: 0;
+		height: 100%;
+	}
+
+	.copy-button-text {
+		font-size: 13px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	.copy-button-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* About 弹窗样式 */
+	.about-section {
+		margin-bottom: 24px;
+	}
+
+	.about-section-title {
+		font-size: 18px;
+		font-weight: 700;
+		color: #1e3a5f;
+		display: block;
+		margin-bottom: 12px;
+	}
+
+	.about-rule-item {
+		display: flex;
+		margin-bottom: 12px;
+		align-items: flex-start;
+	}
+
+	.rule-number {
+		font-size: 14px;
+		color: #2F5D62;
+		font-weight: 600;
+		margin-right: 8px;
+		flex-shrink: 0;
+	}
+
+	.rule-text {
+		font-size: 14px;
+		color: #5a7a8f;
+		line-height: 1.5;
+		flex: 1;
+	}
+
+	/* Language 弹窗样式 */
+	.language-item {
+		background: #fff;
+		border-radius: 12px;
+		padding: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.language-label {
+		font-size: 16px;
+		font-weight: 600;
+		color: #1e3a5f;
+	}
+
+	.radio-circle {
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		border: 2px solid #ccc;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+	}
+
+	.radio-circle.radio-selected {
+		border-color: #4fb3bf;
+	}
+
+	.radio-dot {
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background: #4fb3bf;
+	}
+
+	.language-confirm-btn {
+		background: #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+		margin-top: 30px;
+	}
+
+	.language-confirm-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	/* Customer Support 弹窗样式 */
+	.support-main-title {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1e3a5f;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	.support-description {
+		font-size: 13px;
+		color: #5a7a8f;
+		line-height: 1.5;
+		display: block;
+		margin-bottom: 20px;
+	}
+
+	.support-channel-section {
+		margin-bottom: 20px;
+	}
+
+	.support-channel-title {
+		font-size: 15px;
+		font-weight: 700;
+		color: #1e3a5f;
+		display: block;
+		margin-bottom: 10px;
+	}
+
+	.support-link-item {
+		background: #f7f9fb;
+		border-radius: 8px;
+		// padding: 12px;
+		margin-bottom: 8px;
+	}
+
+	.support-link-text {
+		font-size: 14px;
+		color: #2F5D62;
+		// text-decoration: underline;
+	}
+
+	/* from tangjq--- Change Password 弹窗样式 */
+	.password-change-modal {
+		max-width: 450px;
+	}
+
+	.pwd-input-wrapper {
+		position: relative;
+		background: #e8eff1;
+		border-radius: 12px;
+		margin-bottom: 16px;
+		transition: all 0.3s;
+	}
+
+	.pwd-input-wrapper.input-focused {
+		background: #d9e7ea;
+	}
+
+	// .pwd-input-wrapper.input-error {
+	// 	border: 2px solid #e54d42;
+	// }
+
+	.pwd-input {
+		width: 100%;
+		height: 50px;
+		font-size: 12px;
+		color: #103C42;
+		font-style: italic;
+		background: transparent;
+		border: 0;
+		text-align: center;
+		outline: none;
+	}
+
+	.pwd-input::placeholder {
+		color: #7a9aaa;
+		font-style: italic;
+	}
+
+	.eye-icon {
+		position: absolute;
+		right: 15px;
+		top: 50%;
+		transform: translateY(-50%);
+		font-size: 20px;
+		color: #5a7a8f;
+		cursor: pointer;
+	}
+
+	.pwd-error-message {
+		display: block;
+		font-size: 13px;
+		color: #e54d42;
+		margin-top: -10px;
+		margin-bottom: 10px;
+		padding-left: 5px;
+	}
+
+	.pwd-cancel-btn {
+		background: #fff;
+		border: 2px solid #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+		margin-bottom: 12px;
+		margin-top: 20px;
+	}
+
+	.pwd-cancel-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #2F5D62;
+	}
+
+	.pwd-save-btn {
+		background: #2F5D62;
+		border-radius: 12px;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.pwd-save-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #fff;
 	}
 </style>
