@@ -7,48 +7,14 @@
 				<text class="skip-text">skip {{ splashCountdown }}</text>
 			</view>
 
-<<<<<<< .mine
 			<!-- 标题图片 -->
 			<view class="splash-title-container">
 				<image class="splash-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
-
-
-
-
-
-
-
-=======
-		<!-- Login Form -->
-		<view class="login-form">
-			<!-- Welcome Text -->
-			<view class="welcome-text">Welcome back</view>
-			<!-- Phone Input Field -->
-			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': phoneError}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.account" placeholder="Please enter phone number" maxlength="11" @blur="handlePhoneBlur" @input="handlePhoneBlur" />
-				<view class="error-message" v-if="phoneError">
-					{{$t("L_input_number_limit")}}
-				</view>
->>>>>>> .theirs
 			</view>
 
-<<<<<<< .mine
 			<!-- 主体图片 -->
 			<view class="splash-body-container">
 				<image class="splash-body-image" src="../../figma/login/skip_body.png" mode="widthFix"></image>
-
-
-
-
-=======
-			<!-- Password Input Field -->
-			<view class="input-wrapper">
-				<!-- :type="showPassword ? 'text' : 'password'" -->
-				<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="password" placeholder-class="input-placeholder" placeholder="Please enter your password" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
-				<view class="error-message" v-if="passwordError">
-					{{$t("L_password_limit")}}
-				</view>
->>>>>>> .theirs
 			</view>
 		</view>
 
@@ -99,21 +65,12 @@
 					<text>Login</text>
 				</view>
 
-<<<<<<< .mine
 				<!-- Register Link -->
 				<view class="register-link">
 					<text class="register-text">Dont have an account? </text>
 					<text class="register-link-text" @click="toRegister()">Register</text>
 					<text class="register-text"> now for free.</text>
 				</view>
-=======
-			<!-- Remember Me -->
-			<view class="remember-row">
-				<text class="remember-text">Remember me</text>
-				<switch class="remember-switch" :checked="loginInfo.rememberMe" @change="switchChange" color="#2A6268" />
-
-
->>>>>>> .theirs
 			</view>
 
 			<!-- Contact Support -->
@@ -135,9 +92,6 @@
 			<!-- Version Info -->
 			<view class="version-info">{{version}}</view>
 		</view>
-
-		<!-- Version Info -->
-		<view class="version-info">{{version}}</view>
 	</view>
 </template>
 
