@@ -620,6 +620,16 @@
 				agent_bankcard: {},
 				agent_no_bankcard: false,
 				transaction_disable: false,
+
+				// from Tangjq--- 模拟QR Pay数据
+				mockQRCodeData: 'https://example.com/qrpay?order=MOCK123456&amount=50000',
+				mockOrderInfo: {
+					tradeOrderId: 'MOCK_ORDER_12345',
+					out_order_id: 'MOCK_ORDER_12345',
+					amount: 50000,
+					status: 'pending',
+					qrcode: 'https://example.com/qrpay?order=MOCK123456&amount=50000'
+				}
 			}
 		},
 		watch: {
@@ -1224,6 +1234,21 @@
 					title: 'Loading...'
 				})
 
+				// from Tangjq--- 使用模拟数据直接显示QR Code弹窗
+				setTimeout(() => {
+					uni.hideLoading()
+					this.orderInfo = this.mockOrderInfo
+					// 直接调用显示QR Code（跳过getOrderDetail API调用）
+					this.qrCodeData = this.mockQRCodeData
+					this.showQRCodeModal = true
+					this.showContinueBtn = true
+					this.countdown = 600
+					this.startCountdown()
+				}, 800)
+				return // from Tangjq--- 直接返回，跳过下面的API调用
+
+
+				// from Tangjq--- 原有API调用已被跳过，如需恢复请删除上面的return和模拟数据代码
 				this.$http.post('/charge_apply/add', para, res => {
 					uni.hideLoading()
 					let data = res.data
@@ -2228,7 +2253,7 @@
 	}
 
 	.qrcode-section {
-		padding: 30px 20px 20px;
+		padding: 8px;
 		background-color: #fff;
 	}
 
@@ -2243,9 +2268,9 @@
 
 	.save-qr-btn {
 		width: 200px;
-		height: 50px;
+		height: 35px;
 		background-color: #2F5D62;
-		border-radius: 25px;
+		border-radius: 12px;
 		border: none;
 		margin: 20px auto 0;
 		display: flex;
@@ -2303,13 +2328,13 @@
 	}
 
 	.qrcode-info-label {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 600;
 		color: #000;
 	}
 
 	.qrcode-info-value {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 700;
 		color: #2F5D62;
 	}
@@ -2321,14 +2346,14 @@
 	}
 
 	.qrcode-countdown-text {
-		font-size: 36px;
+		font-size: 16px;
 		font-weight: 700;
 		color: #E02B2B;
 	}
 
 	.qrcode-continue-btn {
 		width: calc(100% - 40px);
-		height: 56px;
+		height: 35px;
 		background-color: #2F5D62;
 		border-radius: 12px;
 		border: none;

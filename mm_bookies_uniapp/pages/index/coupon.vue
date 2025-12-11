@@ -216,6 +216,221 @@
 				showDetailModal: false,
 				selectedCoupon: null,
 				claimedCoupons: [], // 存储已领取的优惠券ID
+
+				// from Tangjq--- 模拟数据：Promotions (未使用的优惠券)
+				mockPromotionsData: [{
+						id: 1,
+						coupon_id: 'PROMO001',
+						coupon_name: 'Welcome Bonus 100%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Get 100% bonus on your first deposit! Minimum deposit of 1,000 required. Valid for sports betting and casino games. Terms and conditions apply.',
+						bonus_amount: '5,000',
+						min_bet_required: '1,000',
+						start_time: '2025-12-01 00:00',
+						expire_time: '2025-12-31 23:59',
+						create_time: '2025-12-01 10:30:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					},
+					{
+						id: 2,
+						coupon_id: 'PROMO002',
+						coupon_name: 'Daily Bonus 3%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Daily recharge bonus of 3%! Recharge any amount and get instant 3% bonus. Maximum bonus: 10,000. Can be claimed once per day.',
+						bonus_amount: '300',
+						min_bet_required: '500',
+						start_time: '2025-12-10 00:00',
+						expire_time: '2025-12-15 23:59',
+						create_time: '2025-12-10 08:00:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					},
+					{
+						id: 3,
+						coupon_id: 'PROMO003',
+						coupon_name: 'Weekend Cashback 10%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Get 10% cashback on all losses during weekends! Valid from Saturday 00:00 to Sunday 23:59. Maximum cashback: 50,000. Automatically credited on Monday.',
+						bonus_amount: '1,500',
+						min_bet_required: '2,000',
+						start_time: '2025-12-14 00:00',
+						expire_time: '2025-12-16 23:59',
+						create_time: '2025-12-11 09:15:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					},
+					{
+						id: 4,
+						coupon_id: 'PROMO004',
+						coupon_name: 'VIP Exclusive Bonus',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Exclusive bonus for VIP members! Get extra 20% on deposits above 10,000. Valid for all games. VIP level 3 and above required.',
+						bonus_amount: '8,000',
+						min_bet_required: '10,000',
+						start_time: '2025-12-01 00:00',
+						expire_time: '2025-12-31 23:59',
+						create_time: '2025-12-05 14:20:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					},
+					{
+						id: 5,
+						coupon_id: 'PROMO005',
+						coupon_name: 'Free Bet 500',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Claim your free bet of 500! No deposit required. Can be used on any sports event with odds 1.5 or higher. Win only, stake not returned.',
+						bonus_amount: '500',
+						min_bet_required: '0',
+						start_time: '2025-12-11 00:00',
+						expire_time: '2025-12-13 23:59',
+						create_time: '2025-12-11 11:00:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					},
+					{
+						id: 6,
+						coupon_id: 'PROMO006',
+						coupon_name: 'Refer a Friend Bonus',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Invite friends and earn rewards! Get 1,000 bonus for each friend who registers and makes their first deposit. No limit on referrals.',
+						bonus_amount: '1,000',
+						min_bet_required: '0',
+						start_time: '2025-12-01 00:00',
+						expire_time: '2025-12-31 23:59',
+						create_time: '2025-12-08 16:45:00',
+						status: 'Unused',
+						turnover_requirement: 0,
+						turnover_progress: 0
+					}
+				],
+
+				// from Tangjq--- 模拟数据：Claim History (已使用的优惠券)
+				mockClaimHistoryData: [{
+						id: 101,
+						coupon_id: 'CLAIM001',
+						coupon_name: 'Daily Bonus 3%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Daily recharge bonus of 3%',
+						bonus_amount: '10,000',
+						min_bet_required: '5,000',
+						start_time: '2025-12-01 00:00',
+						expire_time: '2025-12-05 23:59',
+						create_time: '2025-12-01 10:00:00',
+						use_time: '2025-12-01 14:30:00',
+						status: 'Used',
+						game_status: 'Win',
+						turnover_requirement: 50000,
+						turnover_progress: 50000
+					},
+					{
+						id: 102,
+						coupon_id: 'CLAIM002',
+						coupon_name: 'Welcome Bonus 100%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'First deposit bonus',
+						bonus_amount: '15,000',
+						min_bet_required: '10,000',
+						start_time: '2025-11-25 00:00',
+						expire_time: '2025-11-30 23:59',
+						create_time: '2025-11-25 09:00:00',
+						use_time: '2025-11-25 10:15:00',
+						status: 'Used',
+						game_status: 'Win',
+						turnover_requirement: 75000,
+						turnover_progress: 75000
+					},
+					{
+						id: 103,
+						coupon_id: 'CLAIM003',
+						coupon_name: 'Weekend Cashback 10%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Weekend special cashback',
+						bonus_amount: '8,500',
+						min_bet_required: '3,000',
+						start_time: '2025-11-30 00:00',
+						expire_time: '2025-12-02 23:59',
+						create_time: '2025-11-30 08:00:00',
+						use_time: '2025-11-30 12:45:00',
+						status: 'Used',
+						game_status: 'Lose',
+						turnover_requirement: 42500,
+						turnover_progress: 42500
+					},
+					{
+						id: 104,
+						coupon_id: 'CLAIM004',
+						coupon_name: 'Free Bet 500',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Free bet promotion',
+						bonus_amount: '2,000',
+						min_bet_required: '0',
+						start_time: '2025-12-05 00:00',
+						expire_time: '2025-12-08 23:59',
+						create_time: '2025-12-05 07:30:00',
+						use_time: '2025-12-05 16:20:00',
+						status: 'Used',
+						game_status: 'Win',
+						turnover_requirement: 10000,
+						turnover_progress: 10000
+					},
+					{
+						id: 105,
+						coupon_id: 'CLAIM005',
+						coupon_name: 'VIP Exclusive Bonus',
+						image_url: '/static/image/deals/deals.png',
+						description: 'VIP member special bonus',
+						bonus_amount: '25,000',
+						min_bet_required: '20,000',
+						start_time: '2025-11-20 00:00',
+						expire_time: '2025-11-25 23:59',
+						create_time: '2025-11-20 11:00:00',
+						use_time: '2025-11-20 15:30:00',
+						status: 'Used',
+						game_status: 'Win',
+						turnover_requirement: 125000,
+						turnover_progress: 125000
+					},
+					{
+						id: 106,
+						coupon_id: 'CLAIM006',
+						coupon_name: 'Refer a Friend Bonus',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Referral reward',
+						bonus_amount: '3,500',
+						min_bet_required: '1,000',
+						start_time: '2025-12-08 00:00',
+						expire_time: '2025-12-10 23:59',
+						create_time: '2025-12-08 09:30:00',
+						use_time: '2025-12-08 13:15:00',
+						status: 'Used',
+						game_status: 'Pending',
+						turnover_requirement: 17500,
+						turnover_progress: 8500
+					},
+					{
+						id: 107,
+						coupon_id: 'CLAIM007',
+						coupon_name: 'Daily Bonus 3%',
+						image_url: '/static/image/deals/deals.png',
+						description: 'Daily recharge bonus',
+						bonus_amount: '6,200',
+						min_bet_required: '2,500',
+						start_time: '2025-12-09 00:00',
+						expire_time: '2025-12-11 23:59',
+						create_time: '2025-12-09 08:45:00',
+						use_time: '2025-12-09 11:30:00',
+						status: 'Used',
+						game_status: 'Draw',
+						turnover_requirement: 31000,
+						turnover_progress: 31000
+					}
+				]
 			}
 		},
 		onLoad() {
@@ -485,6 +700,8 @@
 			// 获取优惠券列表
 			getCouponList() {
 				let _this = this
+				// from Tangjq--- 临时使用模拟数据，注释掉下面这行可恢复API调用
+				return this._getCouponList_Mock()
 
 				// 根据tab_index确定status参数
 				let statusParam = null
@@ -642,6 +859,34 @@
 				if (_this.isCouponClaimed(_this.selectedCoupon)) {
 					return
 				}
+				// from Tangjq--- 模拟领取操作（临时使用）
+				uni.showLoading({
+					title: 'Processing...',
+					mask: true
+				})
+
+				setTimeout(() => {
+					uni.hideLoading()
+
+					// 模拟成功领取
+					uni.showToast({
+						icon: 'success',
+						title: 'Claimed successfully!',
+						duration: 2000
+					})
+
+					// 添加到已领取列表
+					let couponId = _this.selectedCoupon.id || _this.selectedCoupon.coupon_id
+					_this.claimedCoupons.push(couponId)
+
+					// 关闭弹窗
+					_this.closeDetailModal()
+
+					// 刷新列表
+					_this.getCouponList()
+				}, 800)
+
+				// from Tangjq--- 原有API调用已注释在下方
 
 				// uni.showLoading({
 				// 	title: 'Processing...',
@@ -702,6 +947,30 @@
 					activePromotions,
 					totalBonus: totalBonus.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 				}
+			},
+
+			// from Tangjq--- 模拟数据版本的getCouponList（临时替换原方法）
+			_getCouponList_Mock() {
+				let _this = this
+
+				uni.showLoading({
+					title: 'Loading...',
+					mask: true
+				})
+
+				setTimeout(() => {
+					uni.hideLoading()
+
+					if (_this.tab_index === 0) {
+						// Promotions - 未使用的优惠券
+						_this.couponList = JSON.parse(JSON.stringify(_this.mockPromotionsData))
+					} else if (_this.tab_index === 1) {
+						// Claim History - 已使用的优惠券
+						_this.couponList = JSON.parse(JSON.stringify(_this.mockClaimHistoryData))
+					} else {
+						_this.couponList = []
+					}
+				}, 500)
 			}
 		},
 		created() {}
@@ -943,7 +1212,7 @@
 	.history-status-btn {
 		background: #2F5D62;
 		border-radius: 10px;
-		padding: 14px;
+		padding: 8px;
 		text-align: center;
 	}
 

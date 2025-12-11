@@ -19,9 +19,28 @@
 				<view class="text-bold">{{$toolbox.num_format(report.all_stake,0)}} / {{history_list.length}}</view>
 			</view>
 		</view> -->
-		<!-- <view class="padding-sm">
+
+
+		<!-- from tangjq--- 标题栏 -->
+		<view class="title-bar">
+			<view class="tab-selector">
+				<view class="tab-container">
+					<view class="tab-item" :class="{'active':current_page==='Ongoing'}" @click="page_change('Ongoing')">
+						<text class="tab-text">Ongoing</text>
+					</view>
+					<view class="tab-item" :class="{'active':current_page==='Finished'}" @click="page_change('Finished')">
+						<text class="tab-text">Finished</text>
+					</view>
+
+					<!-- from tangjq--- 底部滑动指示器 -->
+					<view class="slide-indicator" :class="{'indicator-finished': current_page==='Finished'}"></view>
+				</view>
+			</view>
+		</view>
+
+		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<image mode="widthFix" class="width-38upx " src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
+				<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
@@ -38,23 +57,6 @@
 					<view class="text mycolor-primary line-height-34px">Period:
 						{{date_range[0].show}}{{' - '}}{{date_range[1].show}}
 					</view>
-				</view>
-			</view>
-		</view> -->
-
-		<!-- from tangjq--- 标题栏 -->
-		<view class="title-bar">
-			<view class="tab-selector">
-				<view class="tab-container">
-					<view class="tab-item" :class="{'active':current_page==='Ongoing'}" @click="page_change('Ongoing')">
-						<text class="tab-text">Ongoing</text>
-					</view>
-					<view class="tab-item" :class="{'active':current_page==='Finished'}" @click="page_change('Finished')">
-						<text class="tab-text">Finished</text>
-					</view>
-
-					<!-- from tangjq--- 底部滑动指示器 -->
-					<view class="slide-indicator" :class="{'indicator-finished': current_page==='Finished'}"></view>
 				</view>
 			</view>
 		</view>
