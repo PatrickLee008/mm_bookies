@@ -10,6 +10,7 @@ class MAppMemberCoupon(db.Model):
     # 主键和关联
     id = db.Column(db.String(64), primary_key=True, comment='唯一标识ID')
     link_id = db.Column(db.String(64), comment='关联ID（可能关联活动或订单）')
+    player_activity_record_id = db.Column(db.String(64), comment='活动记录id')
     p_id = db.Column(db.String(64), comment='优惠活动ID')
     p_name = db.Column(db.String(64), comment='优惠活动名称')
     mb_id = db.Column(db.String(64), comment='会员ID')
@@ -43,6 +44,7 @@ class MAppMemberCoupon(db.Model):
     
     # 网络相关
     mb_ip = db.Column(db.String(64), comment='会员IP地址')
+    device_id = db.Column(db.String(128), comment='设备唯一标识 (IMEI/UUID/Device ID)')
     mn_id = db.Column(db.String(64), comment='会员数字ID（可能为冗余字段）')
     
     # 渠道信息
@@ -50,9 +52,9 @@ class MAppMemberCoupon(db.Model):
     ep_channel = db.Column(db.String(255), comment='活动参与渠道')
     
     # 基础字段
-    status = db.Column(db.String, default=1, comment='状态: Unused, Used, Expired')
+    status = db.Column(db.String, default=1, comment='状态: Unused, Used, Expired, Active, Exhausted')
     sort = db.Column(db.Integer, comment='排序序号')
-    
+
     # 审计字段
     create_by_id = db.Column(db.String(64), comment='创建人')
     create_time = db.Column(db.DateTime, comment='创建时间')

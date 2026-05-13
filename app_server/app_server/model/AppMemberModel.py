@@ -9,13 +9,14 @@ import datetime
 import hashlib
 import app_server.utils.DictDef as DictDef
 from app_server.utils.BaseSaasModel import BaseSaasModel
-
+from app_server.utils.Kits import Kits
 
 # 新会员新表
 class AppMember(BaseSaasModel):
     __tablename__ = 'm_app_member'
     id = Column(String(32), primary_key=True, comment='用户唯一标识ID')
     rid = Column(String(32), comment='推荐人ID')
+    r_code = Column(String(32), comment='邀请码')
     aid = Column(String(32), comment='所属代理ID')
     cpid = Column(String(32), comment='关联合作伙伴ID')
     name = Column(String(50), comment='用户真实姓名')
@@ -24,6 +25,7 @@ class AppMember(BaseSaasModel):
     cash_code = Column(String(100), comment='提现验证码')
     money = Column(Numeric(20, 2), default=0, comment='可用余额')
     money_promotion = Column(Numeric(20, 2), default=0, comment='促销活动金额')
+    money_promotion_withdrawable = Column(Numeric(20, 2), default=0, comment='可从主钱包提现的促销金额（从促销钱包转到主钱包的）')
     phone = Column(String(20), comment='绑定手机号')
     favourite = Column(Text, comment='用户偏好设置(JSON格式)')
     favourite_list = Column(Text, comment='偏好选项列表')
@@ -31,6 +33,7 @@ class AppMember(BaseSaasModel):
     money_lock = Column(Numeric(20, 2), default=0, comment='冻结金额')
     mn_username = Column(String(100), comment='MN平台用户名')
     ads_type = Column(String(50), comment='广告投放类型')
+    ad_link_id = Column(String(64), comment='广告链接ID')
     count_deposit = Column(SmallInteger, default=0, comment='存款总次数')
     count_withdraw = Column(SmallInteger, default=0, comment='提现总次数')
     total_deposit = Column(Numeric(20, 2), default=0, comment='累计存款金额')
@@ -53,9 +56,14 @@ class AppMember(BaseSaasModel):
     last_login_time = Column(DateTime, comment='最近登陆时间')
     setting_bet = Column(Text, comment='投注设置(JSON格式)')
     status = Column(SmallInteger, default=1, comment='状态: 0-停用, 1-启用')
+    timezone = Column(String(128), default='Asia/Yangon', comment='用户时区')
     awc = Column(String(1), default='0', comment='AWC注册状态: 0-未注册, 1-已注册')
     awc_createtime = Column(DateTime, comment='AWC账号创建时间')
-
+    current_wallet_type = Column(String(20), default='Money', comment='当前选择的钱包类型: Money-主钱包, Promotion-促销钱包（用于AWC游戏下注）')
+    wallet_type_update_time = Column(DateTime, comment='钱包类型变更时间')
+    required_turnover_accumulated = Column(Numeric(20, 2), default=0, comment='累积需要的流水')
+    current_turnover_accumulated = Column(Numeric(20, 2), default=0, comment='累积当前流水')
+    del_flag = Column(Integer, default=0, comment='删除标记')
 
     def set_psw(self, password):
         self.password = hashlib.sha1((password + self.salt).encode(encoding='utf-8')).hexdigest()
@@ -100,7 +108,7 @@ class AppMember(BaseSaasModel):
             print("token has been logout")
             return None
         admin = AppMember.query.get(data['member_id'])
-        if not admin or not admin.status:
+        if not admin or not admin.status or (admin.del_flag and admin.del_flag != 0):
             return None
         return admin
 
@@ -124,9 +132,18 @@ class AppMember(BaseSaasModel):
             result[key] = value
         result['money'] = format(self.money, ",")
         result['money_promotion'] = format(self.money_promotion, ",")
+        result['money_promotion_withdrawable'] = format(self.money_promotion_withdrawable, ",")
         result['total_deposit'] = format(self.total_deposit, ",")
         result['total_withdraw'] = format(self.total_withdraw, ",")
         result['money_lock'] = format(self.money_lock, ",")
-        #log_login
-        #/{"os": "Windows", "device": "Unknown", "is_bot": false, "browser": "Chrome", "ip_address": "122.154.228.132", "last_login": "2025-01-24T17:05:14.015Z", "user_agent": "Chrome 131.0.0.0 Windows 10 undefined Blink 131.0.0.0 amd64"}
+        result['required_turnover_accumulated'] = float(self.required_turnover_accumulated) if self.required_turnover_accumulated else 0.0
+        result['current_turnover_accumulated'] = float(self.current_turnover_accumulated) if self.current_turnover_accumulated else 0.0
+        # log_login
+        # /{"os": "Windows", "device": "Unknown", "is_bot": false, "browser": "Chrome", "ip_address": "122.154.228.132", "last_login": "2025-01-24T17:05:14.015Z", "user_agent": "Chrome 131.0.0.0 Windows 10 undefined Blink 131.0.0.0 amd64"}
         return result
+
+    #获取用户时区时间
+    def to_system_time(self, date_time_str, is_end=False):
+        date_time = date_time_str + ' ' + ('23:59:59' if is_end else '00:00:00')
+        return Kits.user_time_to_system_time(self.timezone, date_time)
+

@@ -21,6 +21,7 @@ class OrderHistory(BaseSaasModel2):
     ORDER_DESC = Column(String(64), comment="订单描述")
     BET_MONEY = Column(String(64), comment="下注金额")
     BET_TYPE = Column(String(4), comment="下注类型:1主胜,2客胜,3平局")
+    BET_TYPE_INFO = Column(String(64), comment="下注描述")
     MATCH_TIME = Column(TIMESTAMP)
     order_type_desc = Column(String(64), comment="备注")
     BET_HOST_TEAM_RESULT = Column(String(16), comment="比赛主队结果")

@@ -60,6 +60,23 @@ class Match(Base):
             result[key] = value
         return result
 
+    def to_cache_dict(self):
+        """
+        返回用于Redis缓存的精简字段（仅包含前端和后端需要的字段）
+        注意：HOST_TEAM_WEBID和GUEST_TEAM_WEBID仅在写入缓存时查询logo用，写入后应删除
+        """
+        return {
+            'MATCH_ID': self.MATCH_ID,
+            'LEAGUE': self.LEAGUE,
+            'HOST_TEAM': self.HOST_TEAM,
+            'GUEST_TEAM': self.GUEST_TEAM,
+            'MATCH_TIME': str(self.MATCH_TIME) if self.MATCH_TIME else None,  # 后端计算时区转换必需
+            'status': self.status,
+            # 以下两个字段仅用于写缓存时查询logo，写入Redis前会被删除
+            'HOST_TEAM_WEBID': self.HOST_TEAM_WEBID,
+            'GUEST_TEAM_WEBID': self.GUEST_TEAM_WEBID,
+        }
+
 
 # 定义MatchAttr对象:
 class MatchAttr(Base):
@@ -78,6 +95,8 @@ class MatchAttr(Base):
     MATCH_ID = Column(String(20), comment="比赛号")
     ODDS_HOST_TEAM_RESULT = Column(String(16), comment="比赛主队结果")
     ODDS_GUEST_TEAM_RESULT = Column(String(16), comment="比赛客队结果")
+    CS_SCORE = Column(String(20), comment="波胆比分")
+    CS_INDEX = Column(String(20), comment="波胆比分索引")
     REMARK = Column(String(64), comment="备注")
     CREATE_TIME = Column(TIMESTAMP, default=datetime.now, comment="创建时间")
     UPDATE_TIME = Column(TIMESTAMP, onupdate=datetime.now, comment="更新时间")
@@ -95,6 +114,28 @@ class MatchAttr(Base):
                 value = str(value)
             result[key] = value
         return result
+
+    def to_cache_dict(self):
+        """
+        返回用于Redis缓存的精简字段（仅包含前端需要的字段）
+        """
+        # 前端需要的核心字段
+        return {
+            'MATCH_ATTR_ID': self.MATCH_ATTR_ID,
+            'MATCH_ATTR_TYPE': self.MATCH_ATTR_TYPE,
+            'ODDS': self.ODDS,
+            'ODDS_GUEST': self.ODDS_GUEST,
+            'DRAW_BUNKO': self.DRAW_BUNKO,
+            'DRAW_ODDS': self.DRAW_ODDS,
+            'MATCH_ID': self.MATCH_ID,
+            'ODDS_HOST_TEAM_RESULT': self.ODDS_HOST_TEAM_RESULT,
+            'ODDS_GUEST_TEAM_RESULT': self.ODDS_GUEST_TEAM_RESULT,
+            'CS_SCORE': self.CS_SCORE,
+            'CS_INDEX': self.CS_INDEX,
+            'LOSE_TEAM': self.LOSE_TEAM,
+            'LOSE_BALL_NUM': self.LOSE_BALL_NUM,
+            'MATCH_WEB_ID': self.MATCH_WEB_ID,
+        }
 
 
 class Result(Base):
@@ -123,15 +164,6 @@ class Result(Base):
         return result
 
 
-# Config:
-class Config(Base):
-    # 表的名字:
-    __tablename__ = 'm_dict'
-
-    # 表的结构:
-    MDICT_ID = Column(String(20), primary_key=True)
-    CONTENT = Column(String(20))
-
 
 # 记录联赛球队信息
 class LeagueTteamScraper(Base):
@@ -145,6 +177,7 @@ class LeagueTteamScraper(Base):
 
     # 球队信息
     name = Column(String(128), comment="爬虫球队名称")
+    show_name = Column(String(128), comment="爬虫球队名称（前端显示名称）")
     web_id = Column(String(128), comment="爬虫球队ID")
     team_id = Column(String(64), index=True, comment="球队ID")
     team_name = Column(String(128), comment="球队名称")
@@ -179,25 +212,62 @@ class LeagueTteamScraper(Base):
 
     # 通过web_id获取球队信息
     @staticmethod
-    def get_match_icon(web_id: str) -> Optional[str]:
-        obj = DBSession().query(LeagueTteamScraper).filter_by(web_id=web_id).first()
-        if obj and obj.logo:
-            return obj.logo.strip()
-        else:
-            return None
+    def get_match_icon(web_id: str, session=None) -> Optional[str]:
+        should_close = False
+        if session is None:
+            session = DBSession()
+            should_close = True
 
+        try:
+            # 增加条件可能
+            obj = session.query(LeagueTteamScraper).filter_by(web_id=web_id,status=1,del_flag=0).order_by(LeagueTteamScraper.sort.desc()).first()
+            if obj and obj.logo:
+                return obj.logo.strip()
+            else:
+                return None
+        finally:
+            if should_close:
+                session.close()
 
-# redis
-Redis = redis.StrictRedis("127.0.0.1", 6379, 0, decode_responses=True)
+    def get_match_team(web_id: str, session=None) -> Optional[str]:
+        should_close = False
+        if session is None:
+            session = DBSession()
+            should_close = True
 
-# 初始化数据库连接:
-# 本地
-#engine = create_engine("mysql+pymysql://root:123456@localhost/javasaas-game-master")
-# 服务器测试
-# engine = create_engine("mysql+pymysql://root:zaq12WSX@localhost/elszuqiu")
-# 服务器prod
-engine = create_engine("mysql+pymysql://onex2_db:NthAiX2mRmNFWwr3@localhost/onex2_db", pool_size=30, pool_recycle=600,)
-# engine = create_engine("mysql+pymysql://root:123456@192.168.99.114/javasaas-game", pool_size=30, pool_recycle=600,)
-# 创建DBSession类型:
+        try:
+            # 增加条件可能
+            obj = session.query(LeagueTteamScraper).filter_by(web_id=web_id,status=1,del_flag=0).order_by(LeagueTteamScraper.sort.desc()).first()
+            if obj:
+                return obj
+            else:
+                return None
+        finally:
+            if should_close:
+                session.close()
+
+# 导入配置
+from env_config import Config
+
+# Redis连接
+Redis = redis.StrictRedis(
+    host=Config.REDIS_HOST,
+    port=Config.REDIS_PORT,
+    db=Config.REDIS_DB,
+    decode_responses=Config.REDIS_DECODE_RESPONSES,
+    password=Config.REDIS_PASSWORD
+)
+
+# 初始化数据库连接
+engine = create_engine(
+    Config.get_database_uri(),
+    pool_size=Config.DB_POOL_SIZE,
+    max_overflow=Config.DB_MAX_OVERFLOW,
+    pool_timeout=Config.DB_POOL_TIMEOUT,
+    pool_recycle=Config.DB_POOL_RECYCLE,
+    pool_pre_ping=Config.DB_POOL_PRE_PING
+)
+
+# 创建DBSession类型
 DBSession = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)

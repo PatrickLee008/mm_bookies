@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer, Text
 from sqlalchemy.dialects.mysql import TINYINT, DATETIME
 from datetime import datetime
 from app_server.utils.BaseSaasModel import BaseSaasModel
-from app_server.utils.DataVo import SysConfigVO
+from app_server.utils.DataVo import SysConfigVO, ScraperCfgVo, PlatformOrderCfgVo, AppFrontSettingVo
 
 
 # 系统业务字典，读取系统配置
@@ -112,6 +112,39 @@ class SysBisDict(BaseSaasModel):
         sys_config = dict_list.get('sys_config', {})
         sys_config_vo = SysConfigVO().map_from(sys_config)
         return sys_config_vo
+
+    # 返回Scraper配置
+    @staticmethod
+    def get_scraper_config(tenant_id=None) -> ScraperCfgVo:
+        """
+        获取Scraper配置
+        """
+        dict_list = SysBisDict.get_flat_dict_by_dir('scraper', tenant_id)
+        scraper_config = dict_list.get('scraper', {})
+        scraper_cfg_vo = ScraperCfgVo().map_from(scraper_config)
+        return scraper_cfg_vo
+
+    # 返回平台订单配置
+    @staticmethod
+    def get_platform_order_config(tenant_id=None) -> PlatformOrderCfgVo:
+        """
+        获取平台订单配置
+        """
+        dict_list = SysBisDict.get_flat_dict_by_dir('platformOrder', tenant_id)
+        platform_order_config = dict_list.get('platformOrder', {})
+        platform_order_cfg_vo = PlatformOrderCfgVo().map_from(platform_order_config)
+        return platform_order_cfg_vo
+
+    # 返回App前端配置
+    @staticmethod
+    def get_app_front_setting(tenant_id=None) -> AppFrontSettingVo:
+        """
+        获取App前端配置
+        """
+        dict_list = SysBisDict.get_flat_dict_by_dir('app_front_setting', tenant_id)
+        app_front_setting = dict_list.get('app_front_setting', {})
+        app_front_setting_vo = AppFrontSettingVo().map_from(app_front_setting)
+        return app_front_setting_vo
 
 
 db.create_all()

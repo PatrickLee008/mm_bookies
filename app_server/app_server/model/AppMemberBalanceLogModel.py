@@ -11,35 +11,42 @@ class TransactionType:
     """
     交易类型
     """
-    Deposit = "Deposit"               # 存款
-    Withdraw = "Withdraw"             # 提款
-    Transfer = "Transfer"             # 转账
-    Reward = "Reward"                 # 奖励
-    Refund = "Refund"                 # 退款
-    Bonus = "Bonus"                   # 红利
-    Settlement = "Settlement"         # 结算
-    Adjustment = "Adjustment"         # 调整（变动）
-    Fee = "Fee"                       # 手续费
-    Commission = "Commission"         # 佣金
-    Promotion = "Promotion"           # 促销活动
-    Exchange = "Exchange"             # 兑换
+    Deposit = "Deposit"  # 存款
+    Withdraw = "Withdraw"  # 提款
+    Transfer = "Transfer"  # 转账
+    Reward = "Reward"  # 奖励
+    Refund = "Refund"  # 退款
+    Bonus = "Bonus"  # 红利
+    Settlement = "Settlement"  # 结算
+    Adjustment = "Adjustment"  # 调整（变动）
+    Fee = "Fee"  # 手续费
+    Commission = "Commission"  # 佣金
+    Activity = "Activity"  # 活动（主类型）
+    InvitationReward="Invite a Friend and Get Rewarded"
+    Promotion = "Promotion"  # 促销活动
+    PromotionParticipation = "PromotionParticipation"  # 促销活动参与（扣除参与金额）
+    PromotionReward = "PromotionReward"  # 促销活动奖励
+    PromotionComplete = "PromotionComplete"  # 促销活动奖励
+    Exchange = "Exchange"  # 兑换
     CouponRedemption = "CouponRedemption"  # 优惠券兑换
-    Other = "Other"                   # 其他
-    Void = "Void"                     # 作废交易
-    Formal = "Formal"                 # 正式交易
-    NoneFormal = "NoneFormal"         # 非正式交易
+    Other = "Other"  # 其他
+    Void = "Void"  # 作废交易
+    Formal = "Formal"  # 正式交易
+    NoneFormal = "NoneFormal"  # 非正式交易
     FundsAdjustments = "FundsAdjustments"  # 资金调整
-    Order = "Order"                   # 下注
+    Order = "Order"  # 下注
+
 
 class TransactionMap:
     """
     交易Source Target类型
     """
-    System = "System"         # 系统钱包
-    Ewallet = "Ewallet"       # 电子钱包
-    ProWallet = "ProWallet"   # 专业钱包
-    Provider = "Provider"     # 提供商
-    Merchant = "Merchant"     # 商户
+    System = "System"  # 系统钱包
+    Ewallet = "Ewallet"  # 电子钱包
+    ProWallet = "Promotion"  # 专业钱包
+    Provider = "Provider"  # 提供商
+    Merchant = "Merchant"  # 商户
+
 
 # 会员余额日志模型
 class AppMemberBalanceLog(BaseSaasModel):
@@ -86,8 +93,8 @@ class AppMemberBalanceLog(BaseSaasModel):
     # 状态与备注
     status = Column(TINYINT, nullable=False, server_default="1", comment="状态: 0-无效，1-有效")
     source_status = Column(TINYINT, nullable=False, server_default="0", comment="原数据状态: 0: 请求中,1: 成功,2: 拒绝")
+    pay_wallet = Column(String(32), comment="付款账户（Money：主钱包，Promotion：活动钱包）（从字典读取）")
 
     __mapper_args__ = {
         "order_by": BaseSaasModel.create_time.desc(),
     }
-

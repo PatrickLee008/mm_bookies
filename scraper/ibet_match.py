@@ -81,24 +81,25 @@ def add_team_map(db_session, new_match):
     """
     # 查找是否一键存在，存在则更新，不存在则新增
     # 主队
-    team_name = new_match.HOST_TEAM
+    league_name = new_match.LEAGUE
     web_id = new_match.HOST_TEAM_WEBID
-    team = db_session.query(LeagueTteamScraper).filter(LeagueTteamScraper.name == team_name, LeagueTteamScraper.web_id == web_id).first()
+    team = db_session.query(LeagueTteamScraper).filter(LeagueTteamScraper.league_name == league_name, LeagueTteamScraper.web_id == web_id, LeagueTteamScraper.del_flag == 0).first()
     if team:
-        team.UPDATE_TIME = datetime.now()
+        team.name = new_match.HOST_TEAM
+        team.update_time = datetime.now()
     else:
         # 加001-100随机数，防止重复
-        team = LeagueTteamScraper(id=new_match.MATCH_ID+str(1), name=team_name, web_id=web_id, league_name=new_match.LEAGUE)
+        team = LeagueTteamScraper(id=new_match.MATCH_ID+str(1), name=new_match.HOST_TEAM, web_id=web_id, league_name=league_name)
         db_session.add(team)
 
     # 客队
-    team_name = new_match.GUEST_TEAM
     web_id = new_match.GUEST_TEAM_WEBID
-    team = db_session.query(LeagueTteamScraper).filter(LeagueTteamScraper.name == team_name, LeagueTteamScraper.web_id == web_id).first()
+    team = db_session.query(LeagueTteamScraper).filter(LeagueTteamScraper.league_name == league_name, LeagueTteamScraper.web_id == web_id, LeagueTteamScraper.del_flag == 0).first()
     if team:
-        team.UPDATE_TIME = datetime.now()
+        team.name = new_match.GUEST_TEAM
+        team.update_time = datetime.now()
     else:
-        team = LeagueTteamScraper(id=new_match.MATCH_ID+str(2), name=team_name, web_id=web_id, league_name=new_match.LEAGUE)
+        team = LeagueTteamScraper(id=new_match.MATCH_ID+str(2), name=new_match.GUEST_TEAM, web_id=web_id, league_name=league_name)
         db_session.add(team)
 
 # Arthur 判断两场比赛是否队名相同

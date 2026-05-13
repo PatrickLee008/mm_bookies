@@ -45,6 +45,7 @@ class AppBetOrder(BaseSaasModel):
     aid = Column(String(64), comment="代理ID")
     mb_id = Column(String(64), comment="会员ID")
     mb_username = Column(String(64), comment="会员用户名")
+    game_session_id = Column(String(64), comment="游戏会话ID（关联m_app_game_session表）")
 
     # 游戏相关
     game_id = Column(String(64), comment="游戏ID")
@@ -59,7 +60,9 @@ class AppBetOrder(BaseSaasModel):
 
     # 投注相关
     bet_type = Column(String(64), comment="投注类型（单Single、混合Mixparlay）（从字典读取）")
+    bet_type_info = Column(String(64), comment="下注描述")
     bet_type_sub = Column(String(64), comment="投注子类型（具体玩法）（从字典读取）")
+    bet_type_sub2 = Column(String(64), comment="投注子类型2")
     bet_group = Column(String(64), comment="投注组别")
     bet_status = Column(String(64), comment="投注状态（从字典读取）")
 
@@ -79,8 +82,9 @@ class AppBetOrder(BaseSaasModel):
     lose_ball_num = Column(String(16), comment="胜负时：让球数/大小球时：球数")
 
     # 优惠相关
-    in_promotion = Column(Boolean, default=False, comment="是否优惠券下注(0否1是)")
+    in_promotion = Column(Boolean, nullable=False, server_default='0', default=False, comment="是否优惠券下注(0否1是)")
     pro_id = Column(String(64), comment="优惠券ID")
+    activity_record_id = Column(String(64), comment="活动记录ID（关联m_app_player_activity_record.id）")
 
     # 其他信息
     currency = Column(String(5), comment="货币类型")
@@ -99,8 +103,8 @@ class AppBetOrder(BaseSaasModel):
                    bet_type=None, bet_type_sub=None, bet_group=None,
                    stake=None, stake_actual=None, netwin=0.00, netwin_actual=0.00,
                    fee_pt=0.00, fee_actual=0.00, odds=None, game_status=None,
-                   bet_status=None, in_promotion=False, pro_id=None, currency=None,
-                   is_credit=False, pay_wallet=None, create_by_id=None, **kwargs):
+                   bet_status=None, in_promotion=False, pro_id=None, activity_record_id=None,
+                   currency=None, is_credit=False, pay_wallet=None, create_by_id=None, **kwargs):
         """
         创建新的下注订单实例
         
@@ -126,6 +130,7 @@ class AppBetOrder(BaseSaasModel):
             bet_status: 投注状态
             in_promotion: 是否优惠券下注，默认False
             pro_id: 优惠券ID
+            activity_record_id: 活动记录ID
             currency: 货币类型
             is_credit: 是否信用投注，默认False
             pay_wallet: 付款账户
@@ -162,6 +167,7 @@ class AppBetOrder(BaseSaasModel):
             bet_status=bet_status,
             in_promotion=in_promotion,
             pro_id=pro_id,
+            activity_record_id=activity_record_id,
             currency=currency,
             is_credit=is_credit,
             pay_wallet=pay_wallet,
@@ -183,9 +189,9 @@ class AppBetOrder(BaseSaasModel):
         Returns:
             AppBetOrder: 新创建的订单实例
         """
-
         bet_type_value = getattr(order_instance, 'BET_TYPE', None)
-        
+        print(order_instance)
+
         # 从Order模型映射到AppBetOrder模型的字段
         field_mapping = {
             'aid': order_instance.AGENT_CODE,
@@ -196,8 +202,10 @@ class AppBetOrder(BaseSaasModel):
             'game_type_sub': 'Football',  # 默认为Football
             'game_ratio': 0.00,
             'bet_type': 'Single' if order_instance.IS_MIX == '0' else 'Mixparlay',
+            'bet_type_info':order_instance.BET_TYPE_INFO if order_instance.IS_MIX == '0' else order_instance.order_type_desc,
             'remarks': order_instance.ORDER_DESC,
-            'bet_type_sub': f'{order_instance.ORDER_TYPE}:{bet_type_value}',  # 使用安全的bet_type_value
+            'bet_type_sub': order_instance.ORDER_TYPE,  # 使用安全的bet_type_value
+            'bet_type_sub2': bet_type_value,  # 使用安全的bet_type_value
             'league': order_instance.LEAGUE,
             'bet_group': order_instance.ORDER_ID,
             'stake': Decimal(str(order_instance.BET_MONEY)) if order_instance.BET_MONEY else None,
@@ -208,7 +216,7 @@ class AppBetOrder(BaseSaasModel):
             'netwin': Decimal(str(order_instance.BONUS)) if order_instance.BONUS and order_instance.IS_WIN == '1' else Decimal('0.00'),
             'netwin_actual': Decimal(str(order_instance.BONUS)) if order_instance.BONUS and order_instance.IS_WIN == '1' else Decimal('0.00'),
             'currency': 'CNY',  # 默认货币
-            'pay_wallet': 'Money',  # 默认主钱包
+            'pay_wallet': order_instance.pay_wallet,  # 默认主钱包
             'lose_team': order_instance.LOSE_TEAM,
             'draw_bunko': order_instance.DRAW_BUNKO,
             'draw_odds': order_instance.DRAW_ODDS,

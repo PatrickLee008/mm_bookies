@@ -63,6 +63,9 @@ class AwcGame(BaseSaasModel):
     # 扩展配置（remarks字段由BaseSaasModel基类提供）
     extra_config = Column(Text, comment="扩展配置 (JSON格式)")
 
+    # 汇率
+    exchange_rate = Column(DECIMAL(18, 4), default=1.0000, server_default='1.0000', comment="汇率 (货币转换率)")
+
     def to_dict(self, include_fields=None):
         """
         转换为字典
@@ -104,6 +107,7 @@ class AwcGame(BaseSaasModel):
             'thumbnailUrl': self.thumbnail_url,
             'remarks': self.remarks,
             'extraConfig': self.extra_config,
+            'exchangeRate': float(self.exchange_rate) if self.exchange_rate else None,
             'createTime': self.create_time.isoformat() if self.create_time else None,
             'updateTime': self.update_time.isoformat() if self.update_time else None
         }
@@ -133,6 +137,7 @@ class AwcGame(BaseSaasModel):
             'thumbnailUrl': self.thumbnail_url,
             'bannerUrl': self.banner_url,
             'rtp': float(self.rtp) if self.rtp else None,
+            'exchangeRate': float(self.exchange_rate) if self.exchange_rate else 1.0000,
             'isHot': self.is_hot,
             'isNew': self.is_new,
             'hasFreeSpin': self.has_free_spin,
@@ -236,3 +241,5 @@ class AwcGame(BaseSaasModel):
 
     def __repr__(self):
         return f'<AwcGame {self.game_code} - {self.name_en}>'
+
+    db.create_all()

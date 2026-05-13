@@ -23,6 +23,10 @@ def get_balance_logs():
                                 filter: {},
                                 start_time: "2021-09-10",
                                 end_time: "2021-09-12",
+                                type: "Deposit|Withdraw|Transfer|Order|Settlement|Refund|Promotion|Adjustment",
+                                type_sub: "Auto|Manual|Football|Egame|etc",
+                                pay_wallet: "Money|Promotion",
+                                status: "0|1|2"  (0=Pending, 1=Success, 2=Failed/Rejected)
                             }
                     #### Returns::
                             {
@@ -36,6 +40,8 @@ def get_balance_logs():
     query_filter = request.args.get('filter')
     status = request.args.get('status')
     type = request.args.get('type')
+    pay_wallet = request.args.get('pay_wallet')
+    type_sub = request.args.get('type_sub')
 
     try:
         balance_log_list = (
@@ -51,10 +57,14 @@ def get_balance_logs():
         if end_time:
             balance_log_list = balance_log_list.filter(db.cast(AppMemberBalanceLog.create_time, db.Date) <= end_time)
 
-        if status is not None:  # TODO 修改为对应的状态值
+        if status is not None:
             balance_log_list = balance_log_list.filter(AppMemberBalanceLog.source_status == status)
-        if type is not None:  # TODO 修改为对应的状态值
+        if type is not None:
             balance_log_list = balance_log_list.filter(AppMemberBalanceLog.type == type)
+        if pay_wallet is not None:
+            balance_log_list = balance_log_list.filter(AppMemberBalanceLog.pay_wallet == pay_wallet)
+        if type_sub is not None:
+            balance_log_list = balance_log_list.filter(AppMemberBalanceLog.type_sub == type_sub)
 
         total = balance_log_list.count()
 

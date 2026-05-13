@@ -22,6 +22,207 @@ logger = logging.getLogger(__name__)
 awc_game_bp = Blueprint('awc_game', __name__, url_prefix='/awc')
 
 
+def validate_promotion_wallet_for_awc(user_id, game_platform=None):
+    """
+    验证玩家是否有支持AWC/Egame的活动，从而允许使用促销钱包
+
+    Args:
+        user_id: 玩家ID/手机号
+        game_platform: 具体的游戏平台名称（如 'JILI', 'PG', 'PRAGMATIC' 等），用于精确匹配
+
+    Returns:
+        dict: {
+            'valid': bool,  # 是否验证通过
+            'message': str,  # 错误消息（如果验证失败）
+            'activity_info': dict  # 活动信息（如果验证通过）
+        }
+    """
+    try:
+        from app_server.model.AppPlayerActivityRecordModel import AppPlayerActivityRecord
+        from app_server.model.MAppCouponModel import MAppCoupon
+        from app_server.model.AppMemberModel import AppMember
+        from app_server import db
+
+        # 1. 获取玩家ID
+        member = AppMember.query.filter_by(phone=user_id).first()
+        if not member:
+            return {
+                'valid': False,
+                'message': 'Player not found'
+            }
+
+        # 2. 查询玩家正在参与的活动（status='ACTIVE'或'Active'）
+        active_records = AppPlayerActivityRecord.query.filter(
+            AppPlayerActivityRecord.mb_id == member.id,
+            AppPlayerActivityRecord.status.in_(['ACTIVE', 'Active']),
+            AppPlayerActivityRecord.del_flag == 0
+        ).all()
+
+        if not active_records:
+            logger.info(f"Player {user_id} has no active activities, cannot use promotion wallet for AWC")
+            return {
+                'valid': False,
+                'message': 'No active activity found. You must participate in an activity that supports AWC/Egame to use promotion wallet.'
+            }
+
+        # 3. 遍历活动记录，检查是否有支持AWC/Egame的活动
+        for record in active_records:
+            activity_type = record.activity_type
+            activity_id = record.activity_id
+
+            logger.info(f"Checking activity: type={activity_type}, id={activity_id}, name={record.activity_name}")
+
+            # 根据活动类型查询对应的活动配置
+            if activity_type == 'COUPON':
+                # 优惠券：检查 usage_scenario_config
+                coupon = MAppCoupon.query.filter_by(id=activity_id, del_flag=0).first()
+                if coupon and coupon.usage_scenario_config:
+                    try:
+                        scenario_config = json.loads(coupon.usage_scenario_config)
+
+                        # 新格式：{"scenarios": [{"type": "Egame", "enabled": true, "config": {...}}, ...]}
+                        scenarios = scenario_config.get('scenarios', [])
+
+                        if scenarios:
+                            # 遍历所有场景，查找启用的Egame场景
+                            for scenario in scenarios:
+                                scenario_type = scenario.get('type', '')
+                                enabled = scenario.get('enabled', False)
+                                config = scenario.get('config', {})
+
+                                # 检查是否是启用的Egame场景
+                                if scenario_type == 'Egame' and enabled:
+                                    # 如果配置了platforms，需要检查具体的游戏平台是否在列表中
+                                    platforms = config.get('platforms', [])
+
+                                    if platforms:
+                                        # 如果提供了具体的游戏平台，检查是否在允许列表中
+                                        if game_platform:
+                                            # 不区分大小写比较
+                                            allowed_platforms_upper = [p.upper() for p in platforms]
+                                            game_platform_upper = game_platform.upper()
+
+                                            if game_platform_upper in allowed_platforms_upper:
+                                                logger.info(f"Player {user_id} has active COUPON activity '{record.activity_name}' supporting platform '{game_platform}', promotion wallet allowed")
+                                                return {
+                                                    'valid': True,
+                                                    'message': 'Validation passed',
+                                                    'activity_info': {
+                                                        'type': activity_type,
+                                                        'name': record.activity_name,
+                                                        'scenario': 'Egame',
+                                                        'platforms': platforms,
+                                                        'matched_platform': game_platform
+                                                    }
+                                                }
+                                            else:
+                                                logger.info(f"Player {user_id} has Egame scenario but platform '{game_platform}' not in allowed list {platforms}")
+                                                continue
+                                        else:
+                                            # 没有提供游戏平台（向后兼容），使用旧逻辑检查是否有AWC平台
+                                            from app_server.model.AwcGameModel import AwcGame
+                                            awc_platforms = [p.upper() for p in AwcGame.get_platforms()]
+                                            has_awc = any(platform.upper() in awc_platforms for platform in platforms)
+
+                                            if has_awc:
+                                                logger.info(f"Player {user_id} has active COUPON activity '{record.activity_name}' supporting Egame with AWC platforms: {platforms}, promotion wallet allowed (no platform specified)")
+                                                return {
+                                                    'valid': True,
+                                                    'message': 'Validation passed',
+                                                    'activity_info': {
+                                                        'type': activity_type,
+                                                        'name': record.activity_name,
+                                                        'scenario': 'Egame',
+                                                        'platforms': platforms
+                                                    }
+                                                }
+                                            else:
+                                                logger.info(f"Player {user_id} has Egame scenario but platforms {platforms} don't include AWC")
+                                                continue
+                                    else:
+                                        # 没有配置platforms，表示支持所有Egame平台
+                                        logger.info(f"Player {user_id} has active COUPON activity '{record.activity_name}' supporting all Egame platforms, promotion wallet allowed")
+                                        return {
+                                            'valid': True,
+                                            'message': 'Validation passed',
+                                            'activity_info': {
+                                                'type': activity_type,
+                                                'name': record.activity_name,
+                                                'scenario': 'Egame',
+                                                'platforms': 'all'
+                                            }
+                                        }
+                        else:
+                            # 旧格式兼容：{"type": "Egame", "config": {...}} 或 {"type": "All"}
+                            scenario_type = scenario_config.get('type', '')
+                            if scenario_type in ['Egame', 'All']:
+                                logger.info(f"Player {user_id} has active COUPON activity '{record.activity_name}' supporting {scenario_type} (legacy format), promotion wallet allowed")
+                                return {
+                                    'valid': True,
+                                    'message': 'Validation passed',
+                                    'activity_info': {
+                                        'type': activity_type,
+                                        'name': record.activity_name,
+                                        'scenario': scenario_type
+                                    }
+                                }
+
+                    except json.JSONDecodeError as e:
+                        logger.warning(f"Failed to parse usage_scenario_config for coupon {activity_id}: {str(e)}")
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error processing usage_scenario_config for coupon {activity_id}: {str(e)}", exc_info=True)
+                        continue
+
+            elif activity_type == 'PROMOTION':
+                # 促销活动：检查 egamesConfig
+                # 查询 m_app_promotion 表
+                promotion_result = db.session.execute(
+                    db.text("SELECT egames_config FROM m_app_promotion WHERE id = :id AND del_flag = 0"),
+                    {'id': activity_id}
+                ).fetchone()
+
+                if promotion_result and promotion_result[0]:
+                    # egamesConfig 不为空，表示支持Egame
+                    logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' with egamesConfig, promotion wallet allowed")
+                    return {
+                        'valid': True,
+                        'message': 'Validation passed',
+                        'activity_info': {
+                            'type': activity_type,
+                            'name': record.activity_name,
+                            'scenario': 'Egame'
+                        }
+                    }
+
+            elif activity_type == 'INVITATION':
+                # 邀请活动：默认允许（或根据业务需求调整）
+                logger.info(f"Player {user_id} has active INVITATION activity '{record.activity_name}', promotion wallet allowed")
+                return {
+                    'valid': True,
+                    'message': 'Validation passed',
+                    'activity_info': {
+                        'type': activity_type,
+                        'name': record.activity_name,
+                        'scenario': 'All'
+                    }
+                }
+
+        # 4. 没有找到支持AWC/Egame的活动
+        logger.info(f"Player {user_id} has {len(active_records)} active activity(ies), but none support AWC/Egame")
+        return {
+            'valid': False,
+            'message': 'Your current activity does not support AWC/Egame games. Please use main wallet or join an activity that supports Egame.'
+        }
+
+    except Exception as e:
+        logger.error(f"Error validating promotion wallet for AWC: {str(e)}", exc_info=True)
+        return {
+            'valid': False,
+            'message': f'Validation error: {str(e)}'
+        }
+
+
 def get_request_data():
     """获取请求数据"""
     if request.method == 'POST':
@@ -169,6 +370,7 @@ def launch_game():
         platform: 平台名称 (必填)
         gameType: 游戏类型 (必填)
         gameCode: 游戏代码 (必填)
+        walletType: 钱包类型 Money/Promotion (可选，默认Money)
         isMobileLogin: 是否移动端 (可选，默认true)
         currency: 货币类型 (可选，默认MMK)
         language: 语言 (可选，默认en)
@@ -196,17 +398,24 @@ def launch_game():
 
         data = get_request_data()
 
-        # 优先从前端获取userId，如果没有则从JWT token获取
-        user_id = data.get('userId')
-        if not user_id:
-            user_id = g.user.phone
-
+        username = g.user.username
         platform = data.get('platform')
         game_type = data.get('gameType')
         game_code = data.get('gameCode')
+        wallet_type = data.get('walletType', 'Money')  # 默认使用主钱包
 
-        if not all([user_id, platform, game_type, game_code]):
+        if not all([username, platform, game_type, game_code]):
             return Kits.rt_error('Missing required parameters: userId, platform, gameType, gameCode')
+
+        # 验证钱包类型
+        if wallet_type not in ['Money', 'Promotion']:
+            return Kits.rt_error('Invalid walletType, must be Money or Promotion')
+
+        # 如果选择促销钱包，需要验证玩家是否有支持AWC/Egame的活动
+        if wallet_type == 'Promotion':
+            validation_result = validate_promotion_wallet_for_awc(username, platform)
+            if not validation_result['valid']:
+                return Kits.rt_error(validation_result['message'])
 
         # 获取默认配置
         awc_service = get_awc_api_service()
@@ -217,11 +426,28 @@ def launch_game():
         is_new_member = False
 
         # 第一步：查询用户的awc字段，检查是否已注册
-        member = AppMember.query.filter_by(phone=user_id).first()
+        member = AppMember.query.filter_by(username=username).first()
 
         if not member:
-            logger.error(f"User not found: {user_id}")
+            logger.error(f"User not found: {username}")
             return Kits.rt_error('User not found')
+
+        # 更新玩家当前选择的钱包类型
+        try:
+            from app_server import db
+            from datetime import datetime
+
+            # 只有在钱包类型发生变化时才更新
+            if member.current_wallet_type != wallet_type:
+                member.current_wallet_type = wallet_type
+                member.wallet_type_update_time = datetime.now()
+                db.session.commit()
+                logger.info(f"Updated wallet selection for user {username}: {wallet_type} at {member.wallet_type_update_time}")
+            else:
+                logger.info(f"Wallet type unchanged for user {username}: {wallet_type}")
+        except Exception as wallet_update_error:
+            logger.error(f"Failed to update wallet type: {str(wallet_update_error)}", exc_info=True)
+            # 不影响游戏启动，继续执行
 
         # 检查用户是否已在AWC注册
         need_create = not hasattr(member, 'awc') or member.awc != '1'
@@ -231,10 +457,10 @@ def launch_game():
             try:
                 default_bet_limit = awc_service.default_bet_limit
 
-                logger.info(f"Creating AWC member - userId: {user_id}, currency: {currency}, language: {language}, betLimit: {default_bet_limit}")
+                logger.info(f"Creating AWC member - userId: {username}, currency: {currency}, language: {language}, betLimit: {default_bet_limit}")
 
                 create_result = awc_service.create_member(
-                    user_id=user_id,
+                    user_id=username,
                     currency=currency,
                     bet_limit=default_bet_limit,
                     language=language
@@ -250,7 +476,7 @@ def launch_game():
                     member.awc_createtime = datetime.now()
                     db.session.commit()
                     is_new_member = True
-                    logger.info(f"Successfully created AWC member and updated database: {user_id}")
+                    logger.info(f"Successfully created AWC member and updated database: {username}")
                 elif create_result.get('status') == '1017':
                     # 1017 = 会员已存在，更新数据库awc字段
                     from datetime import datetime
@@ -259,18 +485,18 @@ def launch_game():
                     if not member.awc_createtime:
                         member.awc_createtime = datetime.now()
                     db.session.commit()
-                    logger.info(f"AWC member already exists, updated database flag: {user_id}")
+                    logger.info(f"AWC member already exists, updated database flag: {username}")
                 else:
                     # 其他错误，返回错误信息
                     error_msg = create_result.get('desc', 'Failed to create AWC member')
-                    logger.error(f"创建AWC会员失败: status={create_result.get('status')}, desc={error_msg}, user={user_id}")
+                    logger.error(f"创建AWC会员失败: status={create_result.get('status')}, desc={error_msg}, user={username}")
                     return Kits.rt_error(f'Failed to create game account: {error_msg}')
             except Exception as create_error:
                 # 创建异常，返回错误
-                logger.error(f"创建AWC会员异常: {str(create_error)}, user={user_id}", exc_info=True)
+                logger.error(f"创建AWC会员异常: {str(create_error)}, user={username}", exc_info=True)
                 return Kits.rt_error(f'Failed to create game account: {str(create_error)}')
         else:
-            logger.info(f"User already registered with AWC, launch game directly: {user_id}")
+            logger.info(f"User already registered with AWC, launch game directly: {username}")
 
         # 第三步：启动游戏
         # 处理布尔值
@@ -283,7 +509,7 @@ def launch_game():
             is_enable_jackpot = data.get('isEnableJackpot') in ['true', 'True', True, '1', 1]
 
         result = awc_service.do_login_and_launch_game(
-            user_id=user_id,
+            user_id=username,
             platform=platform,
             game_type=game_type,
             game_code=game_code,
@@ -303,6 +529,43 @@ def launch_game():
         if result.get('status') == '0000':
             # 添加新会员标记
             result['isNewMember'] = is_new_member
+
+            # 创建游戏会话记录
+            try:
+                from app_server.model.GameSessionModel import GameSession
+                from app_server.model.AwcGameModel import AwcGame
+                from app_server import db
+
+                # 获取游戏名称
+                game = AwcGame.get_by_game_code(game_code)
+                game_name = game.name_en if game else game_code
+
+                # 创建会话记录
+                session = GameSession.create_session(
+                    mb_id=member.id,
+                    mb_username=member.username or member.phone,
+                    game_code=game_code,
+                    game_name=game_name,
+                    platform=platform,
+                    game_type=game_type,
+                    main_wallet=member.money or 0,
+                    promo_wallet=member.money_promotion or 0,
+                    game_url=result.get('url'),
+                    aid=member.aid
+                )
+
+                db.session.add(session)
+                db.session.commit()
+
+                # 返回sessionId给前端
+                result['sessionId'] = session.id
+
+                logger.info(f"Created game session: {session.id} for user {member.username}, game {game_name}")
+
+            except Exception as session_error:
+                # 会话创建失败不影响游戏启动，只记录日志
+                logger.error(f"Failed to create game session: {str(session_error)}", exc_info=True)
+
             return Kits.rt_code(200, 'Launch game successfully', result)
         else:
             return Kits.rt_error(result.get('desc', 'Failed to launch game'))
@@ -1188,7 +1451,22 @@ def get_game_types():
 
         game_types = AwcGame.get_game_types()
 
-        logger.info(f"获取游戏类型列表成功: count={len(game_types)}")
+        # 默认排序
+        print("game_types", game_types)
+        # 优化排序逻辑：优先按 leagues_sort 顺序排列，其余按名称排序
+        type_sort = ["EGAME", "SLOT", "LIVE"]
+        if type_sort:
+            def sort_key(name):
+                if name in type_sort:
+                    return (0, type_sort.index(name))  # 在优先列表中，按索引排序
+                else:
+                    return (1, name)  # 不在优先列表中，按名称排序
+
+            game_types.sort(key=sort_key)
+        else:
+            game_types.sort()  # 如果没有配置排序，按名称排序
+
+        logger.info(f"获取游戏类型列表成功: {game_types}")
 
         return Kits.rt_code(200, '获取成功', {
             'gameTypes': game_types
@@ -1197,3 +1475,454 @@ def get_game_types():
     except Exception as e:
         logger.error(f"获取游戏类型列表失败: {str(e)}", exc_info=True)
         return Kits.rt_error(f'获取游戏类型列表失败: {str(e)}')
+
+
+@awc_game_bp.route('/getHotGames', methods=['GET', 'POST'])
+def get_hot_games():
+    """
+    获取热门游戏列表
+
+    请求参数:
+        gameType: 游戏类型 (可选)，如果不传则返回所有类型的热门游戏
+        pageNo: 页码 (可选，默认1)
+        pageSize: 每页数量 (可选，默认20)
+
+    返回:
+        {
+            "code": 200,
+            "message": "Success",
+            "data": {
+                "records": [游戏列表],
+                "total": 总数,
+                "pageNo": 1,
+                "pageSize": 20
+            }
+        }
+    """
+    try:
+        from app_server.model.AwcGameModel import AwcGame
+        from app_server.model.AwcGameFavouriteModel import AwcGameFavourite
+        from flask import g
+
+        data = get_request_data()
+        game_type = data.get('gameType')
+        page_no = int(data.get('pageNo', 1))
+        page_size = int(data.get('pageSize', 20))
+
+        # 获取当前登录用户的ID（如果已登录）
+        mb_id = None
+        _auth = auth.get_auth()
+        if _auth and verify_token(_auth.get('token')):
+            mb_id = g.user.id
+
+        # 获取热门游戏
+        games, total = AwcGame.get_game_list(
+            filter_type='hot',
+            game_type=game_type,
+            platform=None,
+            page_no=page_no,
+            page_size=page_size
+        )
+
+        # 转换为移动端格式
+        game_list = [game.to_mobile_dict() for game in games]
+
+        # 如果用户已登录，添加isFavourite字段
+        if mb_id:
+            favourite_codes = AwcGameFavourite.get_user_favourites(mb_id)
+            for game in game_list:
+                game['isFavourite'] = 1 if game['gameCode'] in favourite_codes else 0
+        else:
+            for game in game_list:
+                game['isFavourite'] = 0
+
+        logger.info(f"获取热门游戏成功: gameType={game_type}, total={total}")
+
+        return Kits.rt_code(200, '获取成功', {
+            'records': game_list,
+            'total': total,
+            'pageNo': page_no,
+            'pageSize': page_size
+        })
+
+    except Exception as e:
+        logger.error(f"获取热门游戏失败: {str(e)}", exc_info=True)
+        return Kits.rt_error(f'获取热门游戏失败: {str(e)}')
+
+
+@awc_game_bp.route('/getAllVendors', methods=['GET', 'POST'])
+def get_all_vendors():
+    """
+    获取所有厂商列表（按游戏类型分组）
+
+    请求参数:
+        gameType: 游戏类型 (可选)，如果不传则返回所有类型的厂商
+
+    返回:
+        {
+            "code": 200,
+            "message": "Success",
+            "data": {
+                "vendors": [
+                    {
+                        "platform": "JILI",
+                        "gameCount": 150,
+                        "sampleGame": {
+                            "iconUrl": "...",
+                            "thumbnailUrl": "..."
+                        },
+                        "platform_image": "/image/platform/JILI/JILI.png"
+                    },
+                    ...
+                ]
+            }
+        }
+    """
+    try:
+        from app_server.model.AwcGameModel import AwcGame
+        from app_server import db
+
+        data = get_request_data()
+        game_type = data.get('gameType')
+
+        # 构建查询
+        query = db.session.query(
+            AwcGame.platform,
+            db.func.count(AwcGame.id).label('game_count')
+        ).filter(
+            AwcGame.status == 1,
+            AwcGame.del_flag == 0
+        )
+
+        # 如果指定了游戏类型，添加过滤
+        if game_type and game_type != 'All':
+            query = query.filter(AwcGame.game_type == game_type)
+
+        # 按平台分组并计数
+        vendors_data = query.group_by(AwcGame.platform).all()
+
+        # 为每个厂商获取一个示例游戏图片
+        vendors = []
+        for platform, game_count in vendors_data:
+            # 获取该平台的第一个游戏作为示例
+            sample_query = AwcGame.query.filter(
+                AwcGame.platform == platform,
+                AwcGame.status == 1,
+                AwcGame.del_flag == 0
+            )
+
+            if game_type and game_type != 'All':
+                sample_query = sample_query.filter(AwcGame.game_type == game_type)
+
+            sample_game = sample_query.order_by(AwcGame.sort_order.desc()).first()
+
+            vendor_info = {
+                'platform': platform,
+                'gameCount': game_count,
+                'platform_image': f'/image/platform/{platform}/{platform}.png'
+            }
+
+            # 添加示例游戏图片
+            if sample_game:
+                vendor_info['sampleGame'] = {
+                    'iconUrl': sample_game.icon_url,
+                    'thumbnailUrl': sample_game.thumbnail_url
+                }
+
+            vendors.append(vendor_info)
+
+        # 按游戏数量降序排列
+        vendors.sort(key=lambda x: x['gameCount'], reverse=True)
+
+        logger.info(f"获取厂商列表成功: gameType={game_type}, vendorCount={len(vendors)}")
+
+        return Kits.rt_code(200, '获取成功', {
+            'vendors': vendors
+        })
+
+    except Exception as e:
+        logger.error(f"获取厂商列表失败: {str(e)}", exc_info=True)
+        return Kits.rt_error(f'获取厂商列表失败: {str(e)}')
+
+
+@awc_game_bp.route('/closeGameSession', methods=['POST'])
+@auth.login_required
+def close_game_session():
+    """
+    关闭游戏会话
+
+    当用户退出游戏时调用，计算余额变化和盈亏
+
+    请求参数:
+        sessionId: 会话ID (必填)
+
+    返回:
+        {
+            "code": 200,
+            "message": "Session closed successfully",
+            "ok": true,
+            "data": {
+                "sessionId": "会话ID",
+                "netTotal": 净变化金额,
+                "resultStatus": "Win/Loss/Draw",
+                "sessionDuration": 会话时长(秒)
+            }
+        }
+    """
+    try:
+        from flask import g
+        from app_server.model.GameSessionModel import GameSession, SessionStatus
+        from app_server.model.AppMemberModel import AppMember
+        from datetime import datetime
+        from app_server import db
+
+        data = get_request_data()
+        session_id = data.get('sessionId')
+
+        if not session_id:
+            return Kits.rt_error('Missing required parameter: sessionId')
+
+        # 查找会话
+        session = GameSession.query.filter_by(id=session_id, del_flag=0).first()
+        if not session:
+            return Kits.rt_error('Session not found')
+
+        # 验证会话所属用户
+        if session.mb_id != g.user.id:
+            return Kits.rt_error('Session does not belong to current user')
+
+        # 检查会话是否已关闭
+        if session.session_status == SessionStatus.Completed:
+            logger.info(f"Session {session_id} already closed")
+            return Kits.rt_code(200, 'Session already closed', {
+                'sessionId': session.id,
+                'netTotal': float(session.net_total) if session.net_total else 0,
+                'resultStatus': session.result_status,
+                'sessionDuration': session.session_duration
+            })
+
+        # 获取当前余额
+        member = AppMember.query.filter_by(id=session.mb_id).first()
+        if not member:
+            return Kits.rt_error('Member not found')
+
+        # 更新退出时间和余额
+        session.exit_time = datetime.now()
+
+        # 计算余额变化和结果
+        session.calculate_results(
+            exit_main_wallet=member.money or 0,
+            exit_promo_wallet=member.money_promotion or 0
+        )
+
+        # 更新会话状态为已完成
+        session.session_status = SessionStatus.Completed
+
+        db.session.commit()
+
+        logger.info(f"Closed game session: {session.id}, user: {member.username}, "
+                   f"net_total: {session.net_total}, result: {session.result_status}")
+
+        return Kits.rt_code(200, 'Session closed successfully', {
+            'sessionId': session.id,
+            'netTotal': float(session.net_total) if session.net_total else 0,
+            'resultStatus': session.result_status,
+            'sessionDuration': session.session_duration,
+            'entryMainWallet': float(session.entry_main_wallet),
+            'entryPromoWallet': float(session.entry_promo_wallet),
+            'exitMainWallet': float(session.exit_main_wallet) if session.exit_main_wallet else 0,
+            'exitPromoWallet': float(session.exit_promo_wallet) if session.exit_promo_wallet else 0
+        })
+
+    except Exception as e:
+        logger.error(f"Close session failed: {str(e)}", exc_info=True)
+        return Kits.rt_error(f'Failed to close session: {str(e)}')
+
+
+@awc_game_bp.route('/sessionHeartbeat', methods=['POST'])
+@auth.login_required
+def session_heartbeat():
+    """
+    游戏会话心跳
+
+    前端定期调用以更新会话状态，防止会话超时
+
+    请求参数:
+        sessionId: 会话ID (必填)
+
+    返回:
+        {
+            "code": 200,
+            "message": "Heartbeat updated",
+            "ok": true,
+            "data": {
+                "sessionId": "会话ID",
+                "lastHeartbeatTime": "最后心跳时间"
+            }
+        }
+    """
+    try:
+        from flask import g
+        from app_server.model.GameSessionModel import GameSession, SessionStatus
+        from datetime import datetime
+        from app_server import db
+
+        data = get_request_data()
+        session_id = data.get('sessionId')
+
+        if not session_id:
+            return Kits.rt_error('Missing required parameter: sessionId')
+
+        # 查找会话
+        session = GameSession.query.filter_by(id=session_id, del_flag=0).first()
+        if not session:
+            return Kits.rt_error('Session not found')
+
+        # 验证会话所属用户
+        if session.mb_id != g.user.id:
+            return Kits.rt_error('Session does not belong to current user')
+
+        # 只更新进行中的会话
+        if session.session_status == SessionStatus.InProgress:
+            session.last_heartbeat_time = datetime.now()
+            db.session.commit()
+
+            return Kits.rt_code(200, 'Heartbeat updated', {
+                'sessionId': session.id,
+                'lastHeartbeatTime': session.last_heartbeat_time.isoformat()
+            })
+        else:
+            return Kits.rt_code(200, 'Session already completed', {
+                'sessionId': session.id,
+                'sessionStatus': session.session_status
+            })
+
+    except Exception as e:
+        logger.error(f"Session heartbeat failed: {str(e)}", exc_info=True)
+        return Kits.rt_error(f'Failed to update heartbeat: {str(e)}')
+
+
+@awc_game_bp.route('/getGameSessionHistory', methods=['GET', 'POST'])
+@auth.login_required
+def get_game_session_history():
+    """
+    获取用户的游戏会话历史
+
+    请求参数:
+        pageNo: 页码 (可选，默认1)
+        pageSize: 每页数量 (可选，默认20)
+        sessionStatus: 会话状态过滤 (可选: InProgress, Completed, Timeout)
+        resultStatus: 结果状态过滤 (可选: Win, Loss, Draw)
+
+    返回:
+        {
+            "code": 200,
+            "message": "Success",
+            "ok": true,
+            "data": {
+                "records": [...],
+                "total": 100,
+                "pageNo": 1,
+                "pageSize": 20
+            }
+        }
+    """
+    try:
+        from flask import g
+        from app_server.model.GameSessionModel import GameSession
+
+        data = get_request_data()
+        page_no = int(data.get('pageNo', 1))
+        page_size = int(data.get('pageSize', 20))
+        session_status_filter = data.get('sessionStatus')
+        result_status_filter = data.get('resultStatus')
+
+        # 构建查询
+        query = GameSession.query.filter_by(
+            mb_id=g.user.id,
+            del_flag=0
+        )
+
+        # 状态过滤
+        if session_status_filter:
+            query = query.filter_by(session_status=session_status_filter)
+
+        if result_status_filter:
+            query = query.filter_by(result_status=result_status_filter)
+
+        # 排序
+        query = query.order_by(GameSession.entry_time.desc())
+
+        # 获取总数
+        total = query.count()
+
+        # 分页
+        sessions = query.paginate(
+            page=page_no,
+            per_page=page_size,
+            error_out=False
+        )
+
+        # 转换为字典
+        session_list = [session.to_dict() for session in sessions.items]
+
+        logger.info(f"Get game session history: user={g.user.username}, total={total}")
+
+        return Kits.rt_code(200, 'Get session history successfully', {
+            'records': session_list,
+            'total': total,
+            'pageNo': page_no,
+            'pageSize': page_size
+        })
+
+    except Exception as e:
+        logger.error(f"Get game session history failed: {str(e)}", exc_info=True)
+        return Kits.rt_error(f'Failed to get session history: {str(e)}')
+
+
+@awc_game_bp.route('/getGameConfig', methods=['GET'])
+@auth.login_required
+def get_game_config():
+    """
+    获取游戏配置（包括闲置超时等设置）
+
+    返回:
+        {
+            "code": 200,
+            "message": "Success",
+            "data": {
+                "enabled": true,
+                "timeoutMinutes": 15,
+                "warningMinutes": 2,
+                "awcAutoLogout": true,
+                "sessionHeartbeatInterval": 30,
+                "sessionMaxDuration": 120
+            }
+        }
+    """
+    try:
+        from flask import current_app
+
+        # 从Flask配置读取游戏设置
+        config = {
+            'enabled': current_app.config.get('AWC_GAME_IDLE_TIMEOUT_ENABLED', True),
+            'timeoutMinutes': current_app.config.get('AWC_GAME_IDLE_TIMEOUT_MINUTES', 15),
+            'warningMinutes': current_app.config.get('AWC_GAME_IDLE_WARNING_MINUTES', 2),
+            'awcAutoLogout': current_app.config.get('AWC_GAME_AUTO_LOGOUT', True),
+            'sessionHeartbeatInterval': current_app.config.get('AWC_GAME_SESSION_HEARTBEAT_INTERVAL', 30),
+            'sessionMaxDuration': current_app.config.get('AWC_GAME_SESSION_MAX_DURATION', 120)
+        }
+
+        return Kits.rt_code(200, 'Success', config)
+
+    except Exception as e:
+        logger.error(f"Get game config failed: {str(e)}", exc_info=True)
+        # 返回默认配置
+        return Kits.rt_code(200, 'Success', {
+            'enabled': True,
+            'timeoutMinutes': 15,
+            'warningMinutes': 2,
+            'awcAutoLogout': True,
+            'sessionHeartbeatInterval': 30,
+            'sessionMaxDuration': 120
+        })

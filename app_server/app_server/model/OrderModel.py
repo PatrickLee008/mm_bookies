@@ -8,13 +8,27 @@ from datetime import datetime
 from app_server.utils.BaseSaasModel2 import BaseSaasModel2
 
 class OrderType:
-    Digit = "8"
+    Digit = "8" # 数字
+    Digit3D = "9" # 数字盘3d
+    SG_HDP = "1" # 单-胜负（让球）
+    SG_OU = "2" # 单-大小
+    SG_CS = "3" # 单-波胆
+    MIX_HDP = "4" # 混合-胜负
+    MIX_OU = "5" # 混合-大小
+    SG_OE = "6" # 单-单双
+    MIX_OE = "7" # 混合-单双
+    SG_1X2 = "10" # 单-胜负平
+    MIX_1X2 = "11" # 混合-胜负平
+    SG_BTTS = "18" # 单笔 Both/One/Neither Team To Score （BTTS进球数方）
+    MIX_BTTS = "19" # 混合 Both/One/Neither Team To Score （BTTS进球数方）
 
 
 class BetType:
     Host = 1
     Guest = 2
     Draw = 3
+
+# 订单类型:1单笔胜负(让球)2单笔大小球3波胆4混合胜负5混合大小6单笔单双7混合单双8数字盘 9数字盘3d 10胜负平单笔 11胜负平混合
 
 class Order(BaseSaasModel2):
     __tablename__ = 'm_app_order'
@@ -28,6 +42,7 @@ class Order(BaseSaasModel2):
     ORDER_DESC = Column(String(64), comment="订单描述")
     BET_MONEY = Column(String(64), comment="下注金额")
     BET_TYPE = Column(String(4), comment="下注类型:1主胜,2客胜,3平局")
+    BET_TYPE_INFO = Column(String(64), comment="下注描述")
     MATCH_TIME = Column(TIMESTAMP)
     order_type_desc = Column(String(64), comment="备注")
     BET_HOST_TEAM_RESULT = Column(String(16), comment="比赛主队结果")

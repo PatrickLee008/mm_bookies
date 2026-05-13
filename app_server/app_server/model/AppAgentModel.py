@@ -36,3 +36,18 @@ class AppAgent(BaseSaasModel):
         "order_by": sort.asc(),
     }
 
+    def get_admin_user_ids(self):
+        """
+        获取该代理关联的所有管理员用户ID列表
+        通过查询 sys_user 表，根据 aid 获取所有关联的管理员ID
+
+        Returns:
+            List[str]: 管理员用户ID列表
+        """
+        from app_server.model.SysUserModel import SysUser
+
+        if not self.id:
+            return []
+
+        return SysUser.get_admin_ids_by_aid(self.id)
+

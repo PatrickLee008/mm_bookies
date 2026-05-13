@@ -1,0 +1,1 @@
+alter table m_app_bankcard add PRIMARY_CARD boolean default FALSE comment "默认银行卡";

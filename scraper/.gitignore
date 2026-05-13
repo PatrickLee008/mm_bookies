@@ -1,0 +1,29 @@
+__pycache__
+.idea
+
+# 环境配置文件（包含敏感信息，不要提交到仓库）
+.env
+.env.local
+# 但保留示例文件
+!.env.example
+
+# Cookie文件
+cookies
+
+# 日志文件
+*.log
+*.txt
+
+# 临时文件
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+/check_result.html
+/sync_status.json
+/.claude

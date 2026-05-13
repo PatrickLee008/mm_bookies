@@ -26,7 +26,10 @@ class MAppCoupon(db.Model):
     p_at_ep_cond = db.Column(db.Text, comment='自动派发条件（如存款金额触发）')
     p_at_billout = db.Column(db.Integer, comment='是否自动出账（0否1是）')
     p_at_ep = db.Column(db.Integer, comment='是否自动派发（0否1是）')
-    p_at_ep_amt = db.Column(db.Numeric(65, 30), comment='自动派发触发金额')
+    p_at_ep_type = db.Column(db.String(20), comment='自动派发奖金类型（Amount-固定金额 Percent-百分比）')
+    p_at_ep_amt = db.Column(db.Numeric(65, 30), comment='自动派发触发金额/百分比值')
+    p_at_ep_min_amt = db.Column(db.Numeric(65, 30), comment='自动派发最低金额要求')
+    p_at_ep_max_amt = db.Column(db.Numeric(65, 30), comment='自动派发最大可领取金额（单次派发上限）')
     p_ep_cond = db.Column(db.Text, comment='手动派发条件')
     p_ep_amtrq = db.Column(db.Numeric(65, 30), comment='手动派发要求金额')
     p_lm_bo = db.Column(db.Integer, comment='是否限制返水（0否1是）')
@@ -68,6 +71,7 @@ class MAppCoupon(db.Model):
     p_img_dt = db.Column(db.String(512), comment='桌面端图片URL')
     p_min_deposit = db.Column(db.Numeric(65, 30), comment='最低存款额要求')
     min_bet_amount_required = db.Column(db.Numeric(10, 2), comment='使用优惠券所需的最低投注金额')
+    min_main_wallet_balance = db.Column(db.Numeric(15, 2), comment='主钱包最低余额要求（领取优惠券时验证）')
     
     # 注册时间限制
     p_register_start = db.Column(db.DateTime, comment='注册时间限制-开始')
@@ -101,10 +105,15 @@ class MAppCoupon(db.Model):
     geo_fencing_enabled = db.Column(db.Integer, default=0, comment='地理围栏是否启用：0-禁用，1-启用')
     allowed_regions = db.Column(db.Text, comment='允许的地区列表（逗号分隔）')
     
-    # 净赢条件
-    net_win_enabled = db.Column(db.Integer, default=0, comment='净赢条件是否启用：0-禁用，1-启用')
-    net_win_condition_type = db.Column(db.String(20), comment='净赢条件类型：GREATER_EQUAL-大于等于，LESS_EQUAL-小于等于')
-    net_win_amount = db.Column(db.Numeric(15, 2), comment='净赢目标金额')
+    # 流水/净赢条件（统一字段）
+    p_ep_cond = db.Column(db.String(20), comment='条件类型：Turnover-流水，Net Win-净赢')
+    p_ep_amtrq = db.Column(db.Numeric(15, 2), comment='条件要求金额（流水或净赢）')
+
+    # 使用场景配置
+    usage_scenario_config = db.Column(db.Text, comment='使用场景配置(JSON格式): {"type":"1x2"|"Egame"|"All","config":{...}}')
+
+    # 玩家下次参与时间间隔（小时）
+    next_participate_hours = db.Column(db.Integer, comment='玩家下次可参与时间间隔（小时）')
 
     def __repr__(self):
         return f'<MAppCoupon(id={self.id}, p_name={self.p_name}, p_code={self.p_code})>'

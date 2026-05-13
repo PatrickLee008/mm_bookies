@@ -9,6 +9,7 @@ class AppAgentBankcard(db.Model):
 
     id = Column(String(64), primary_key=True, comment='记录ID')
     aid = Column(String(64), comment='代理ID')
+    channel_type = Column(String(50), comment='通道类型')
     rc_bank_code = Column(String(50), comment='银行代码')
     rc_bank_username = Column(String(255), comment='银行用户名')
     rc_bank_account = Column(String(100), comment='银行账号')

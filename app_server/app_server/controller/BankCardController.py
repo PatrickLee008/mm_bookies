@@ -10,6 +10,62 @@ from app_server.utils.Kits import Kits
 bank_card = Blueprint('bank_card', __name__)
 
 
+@bank_card.route('/check_repeat', methods=['POST'])
+def check_repeat_bank_card():
+    """ check_repeat_bank_card API Endpoint (无需登录，用于注册时检查)
+        ---
+        tags:
+          - bank_card
+        parameters:
+          - in: body
+            name: body
+            required: true
+            description: bank card info to check
+            schema:
+              type: object
+              required:
+                - acc_number
+                - bank_code
+              properties:
+                acc_number:
+                  type: string
+                  description: the acc_number of the bank_card
+                  example: "09123456789"
+                bank_code:
+                  type: string
+                  description: the bank_code of the bank_card
+                  example: "KBZ Pay"
+        responses:
+          400:
+            description: Bank card already exists
+          200:
+            description: Bank card is available
+        """
+    args = request.get_json()
+    acc_number = args.get("acc_number")
+    bank_code = args.get("bank_code")
+
+    if not acc_number or not bank_code:
+        response = jsonify({'message': "Account number and bank code are required"})
+        response.status_code = 400
+        return response
+
+    try:
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code).first()
+        if card:
+            response = jsonify(
+                {'message': "This bank card has already been saved. Please use a different card to save"})
+            response.status_code = 400
+            return response
+
+        return jsonify({'message': "Bank card is available"})
+    except Exception as e:
+        print("check repeat bank card error:", e)
+        response = jsonify({'message': "System or Technical Error"})
+        response.status_code = 500
+        return response
+
+
 @bank_card.route('/get', methods=['GET'])
 @auth.login_required
 def get_bank_cards():
@@ -63,7 +119,7 @@ def add_bank_card():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           200:
             description: 绑定成功
         """
@@ -74,14 +130,16 @@ def add_bank_card():
     acc_name = args.get("acc_name")
 
     try:
-        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code).one_or_none()
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code).first()
         if card:
-            response = jsonify({'message': "The bankcard already exists. Please save with a different bankcard"})
+            response = jsonify(
+                {'message': "This bank card has already been saved. Please use a different card to save"})
             response.status_code = 400
             return response
         user_card_count = AppMemberBank.query.filter_by(mb_id=g.user.id).count()
         if user_card_count >= 5:
-            response = jsonify({'message': "Up to five bank accounts can be added"})
+            response = jsonify(
+                {'message': "You have reached the maximum number of bank accounts allowed to be saved (5)"})
             response.status_code = 429
             return response
 
@@ -98,7 +156,7 @@ def add_bank_card():
         db.session.rollback()
         print("add card error:", e)
 
-    response = jsonify({'message': "System or Technical Error."})
+    response = jsonify({'message': "System or Technical Error"})
     response.status_code = 500
     return response
 
@@ -138,7 +196,7 @@ def edit_bank_card():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           200:
             description: edit successful.
         """
@@ -153,7 +211,7 @@ def edit_bank_card():
         return jsonify({'message': "edit successful."})
     except Exception as e:
         db.session.rollback()
-        response = jsonify({'message': "System or Technical Error."})
+        response = jsonify({'message': "System or Technical Error"})
         response.status_code = 500
         return response
 
@@ -181,7 +239,7 @@ def delete_bank_card():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           200:
             description: 解绑成功
         """
@@ -194,7 +252,7 @@ def delete_bank_card():
         return jsonify({'message': "解绑成功"})
     except Exception as e:
         db.session.rollback()
-        response = jsonify({'message': "System or Technical Error."})
+        response = jsonify({'message': "System or Technical Error"})
         response.status_code = 500
         return response
 
@@ -222,7 +280,7 @@ def set_default_bank_card():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           200:
             description: 设置成功
         """
@@ -239,6 +297,6 @@ def set_default_bank_card():
         return jsonify({'message': "设置成功"})
     except Exception as e:
         db.session.rollback()
-        response = jsonify({'message': "System or Technical Error."})
+        response = jsonify({'message': "System or Technical Error"})
         response.status_code = 500
         return response

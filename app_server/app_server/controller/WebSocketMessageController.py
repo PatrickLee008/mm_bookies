@@ -44,7 +44,7 @@ class WebSocketMessageModel(BaseModel):
         self.created_time = None        # 创建时间
         self.updated_time = None        # 更新时间
         self.device_info = None         # 设备信息（JSON格式）
-        self.source = None              # 消息来源（JAVA_BACKEND, SYSTEM等）
+        self.source = None              # 消息来源（SYSTEM, BUSINESS等）
         self.target_page = None         # 目标页面
         self.priority = None            # 消息优先级（HIGH, NORMAL, LOW）
         self.expires_at = None          # 过期时间
@@ -98,7 +98,7 @@ def save_message():
                 'created_time': datetime.now(),
                 'updated_time': datetime.now(),
                 'device_info': json.dumps(data.get('device_info', {})) if data.get('device_info') else None,
-                'source': data.get('source', 'JAVA_BACKEND'),
+                'source': data.get('source', 'SYSTEM'),
                 'target_page': data.get('target_page'),
                 'priority': data.get('priority', 'NORMAL'),
                 'expires_at': datetime.fromisoformat(data['expires_at']) if data.get('expires_at') else None

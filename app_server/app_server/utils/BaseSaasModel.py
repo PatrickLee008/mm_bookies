@@ -4,6 +4,8 @@ from sqlalchemy.dialects.mysql import BIGINT
 from datetime import datetime, date
 from decimal import Decimal
 
+from app_server.utils.Kits import Kits
+
 
 # 多租户模式下的model基类
 class BaseSaasModel(db.Model):
@@ -41,3 +43,7 @@ class BaseSaasModel(db.Model):
                 setattr(self, key, value)
 
 
+    # 生成ID
+    @staticmethod
+    def generate_id():
+        return Kits.generate_uuid()

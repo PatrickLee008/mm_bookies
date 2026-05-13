@@ -27,6 +27,7 @@ class SysTenant(BaseSaasModel):
     def get_tenant_id(request):
         # 获取tenant_id
         host = request.headers.get('host')
+        print("host:", host)
         # 处理host，比如localhost:8282，只需要域名部分
         if ':' in host:
             host = host.split(':')[0]
@@ -34,9 +35,14 @@ class SysTenant(BaseSaasModel):
         if host in ['localhost', '127.0.0.1']:
             return "10000"
         # 从数据库表sys_tenant，查询domain对应的tenant_id
-        tenant = SysTenant.query.filter_by(domain=host).first()
-        if not tenant:
-            return None
-        return tenant.id
+        # domain是逗号分隔的多个域名，如"域名1,域名2"
+        tenants = SysTenant.query.filter_by(status='1').all()
+        for tenant in tenants:
+            if tenant.domain:
+                # 将domain按逗号分隔，去除空格，检查host是否在其中
+                domains = [d.strip() for d in tenant.domain.split(',')]
+                if host in domains:
+                    return tenant.id
+        return None
 
 db.create_all()

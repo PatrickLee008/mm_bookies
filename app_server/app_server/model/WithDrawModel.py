@@ -1,5 +1,5 @@
 from app_server import db, app
-from sqlalchemy import Column, String, Integer, Text
+from sqlalchemy import Column, String, Integer, Text, Numeric
 from sqlalchemy.dialects.mysql import DATETIME, DECIMAL
 from datetime import datetime
 from typing import Optional
@@ -23,7 +23,9 @@ class WithDraw(BaseSaasModel):
     withdraw_code = Column(String(32), nullable=False, server_default='', comment="提现码")
     work_group_id = Column(String(32), nullable=False, server_default='', comment="提现工作组ID")
     amount = Column(DECIMAL(10, 0), nullable=False, server_default=None, comment="申请提现金额")
-    before_amount = Column(DECIMAL(16, 4), nullable=False, server_default=None,comment="提现前余额")
+    money_promotion_withdrawable = Column(Numeric(20, 2), default=0,
+                                          comment='可从主钱包提现的促销金额（从促销钱包转到主钱包的）')
+    before_amount = Column(DECIMAL(16, 4), nullable=False, server_default=None, comment="提现前余额")
     after_amount = Column(DECIMAL(16, 4), nullable=False, server_default=None, comment="提现后余额")
 
     # 会员信息
@@ -51,7 +53,8 @@ class WithDraw(BaseSaasModel):
     process_time = Column(DATETIME, comment="实际处理完成时间")
 
     # 状态与日志
-    status = Column(String(32), nullable=False, server_default='new',comment="提现状态：new,processing,verify,reject,completed,failed")
+    status = Column(String(32), nullable=False, server_default='new',
+                    comment="提现状态：new,processing,verify,reject,completed,failed")
     callback_log = Column(Text, comment="第三方回调日志（JSON格式）")
     order_log = Column(Text, comment="提现订单状态变更日志")
     slip = Column(Text, comment="付款凭证（如转账截图URL）")

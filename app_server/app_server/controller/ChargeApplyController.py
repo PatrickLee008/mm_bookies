@@ -4,6 +4,7 @@ import random
 import requests
 from sqlalchemy import or_, func, and_
 from app_server import app, db, auth, Redis
+from app_server.logger import get_logger
 from app_server.model.AppAgentBankcard import AppAgentBankcard
 from app_server.model.AppAgentModel import AppAgent
 from app_server.model.AppMemberBankModel import AppMemberBank
@@ -17,6 +18,7 @@ import os
 from app_server.utils.Kits import Kits
 
 charge_apply = Blueprint('charge_apply', __name__)
+logger = get_logger()
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF'}
 
@@ -44,13 +46,13 @@ def add_apply():
              description: remark of app_operation
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           200:
             description: 绑定成功
         """
     global bank_card
     args = request.get_json()
-    print("apply args:", args)
+    logger.info(f"充值申请请求 - 用户ID: {g.user.id}, 用户名: {g.user.username}, 请求参数: {args}")
     # apply args: {'charge_way': 0, 'bank_code': 'KBZ Pay', 'transaction_id': '', 'acc_name': 'Arthur', 'acc_number': '0988888880', 'amount': 5000, 'memo': 'memo', 'subject': 'charge 5000', 'card_id': '1948201677609897984'}
     charge_way = args.get('charge_way')  # 0自动充值，1手动充值
     bank_code = args.get('bank_code')  # 银行名称
@@ -64,7 +66,7 @@ def add_apply():
     if not all([bank_code, acc_name, acc_number, amount, memo, subject]):
         return Kits.rt_error("Incomplete parameters")
 
-    pay_channel = args.get('pay_channel', 'TCPay')  # 支付通道
+    pay_channel = args.get('pay_channel', app.config['PAY_CHANNEL_TYPE'])  # 支付通道
 
     # 检查代理是否开启自助充值
     agent_id = g.user.aid if g.user.aid else ""
@@ -88,6 +90,7 @@ def add_apply():
                                                     ChargeApply.status.in_([StatusLabelMap.Pending]),
                                                     ChargeApply.expire_time > datetime.now()).first()
         if unfinished_apply:
+            logger.warning(f"用户存在未完成充值订单 - 用户ID: {g.user.id}, 订单ID: {unfinished_apply.id}")
             return Kits.rt_code(409, "you have unfinished apply order.", unfinished_apply.to_dict())
         # 检查银行卡是否存在
         bank_card = None
@@ -97,32 +100,31 @@ def add_apply():
                 return Kits.rt_error("bank card not exist")
 
         # 轮询获取可用的银行卡信息
+        # 构建查询条件：获取代理的可用银行卡，增加type条件，All、Deposit
+        query_conditions = and_(
+            AppAgentBankcard.status == 1,
+            AppAgentBankcard.del_flag == 0,
+            AppAgentBankcard.rc_bank_code == bank_code,
+            AppAgentBankcard.channel_type == pay_channel,
+            AppAgentBankcard.aid == agent_id,
+            AppAgentBankcard.type.in_(['All', 'Deposit']),
+            AppAgentBankcard.limit_current + amount < AppAgentBankcard.limit_balance,
+        )
+        # 查询所有符合条件的银行卡
+        available_cards = AppAgentBankcard.query.filter(query_conditions).all()
+
+        if not available_cards:
+            logger.warning(f"没有可用的收款账号 - 用户ID: {g.user.id}, 用户名: {g.user.username}, 代理ID: {agent_id}, 银行代码: {bank_card.bank_code}, channelType:{pay_channel}")
+            return jsonify({'code': 40404,
+                            'message': "There is no available payment account at present. Please contact the customer service."})
+
         if pay_channel == "NFM2":
             # 轮询获取可用的银行卡信息
             try:
-                # 构建查询条件：获取代理的可用银行卡
-                query_conditions = and_(
-                    AppAgentBankcard.status == 1,
-                    AppAgentBankcard.rc_bank_code == bank_card.bank_code,
-                    AppAgentBankcard.type_sub == pay_channel,
-                    AppAgentBankcard.aid == agent_id,
-                    AppAgentBankcard.limit_current < AppAgentBankcard.limit_balance,
-                )
-
-                # 查询所有符合条件的银行卡
-                available_cards = AppAgentBankcard.query.filter(query_conditions).all()
-
-                if not available_cards:
-                    app.logger.warning(f"用户 {g.user.username} (代理ID: {agent_id}) 没有可用的收款账号")
-                    return jsonify({'code': 40404,
-                                    'message': "There is no available payment account at present. Please contact the customer service."})
-
                 # 智能轮询：从可用卡片中随机选择一张
                 selected_card = random.choice(available_cards)
-
                 # 记录选择的银行卡
-                app.logger.info(
-                    f"为用户 {g.user.username} 分配收款账号: {selected_card.ACCOUNT} (银行: {selected_card.rc_bank_code})")
+                logger.info(f"分配收款账号 - 用户ID: {g.user.id}, 用户名: {g.user.username}, 收款账号: {selected_card.ACCOUNT}, 银行: {selected_card.rc_bank_code}")
 
                 # 根据银行代码获取支付类型
                 payment_type = selected_card.rc_bank_code
@@ -130,12 +132,12 @@ def add_apply():
                 receive_account_name = selected_card.rc_bank_username
 
             except Exception as e:
-                app.logger.error(f"获取银行卡信息失败: {str(e)}")
+                logger.error(f"获取银行卡信息失败 - 用户ID: {g.user.id}, 错误: {e}", exc_info=True)
                 return jsonify(
                     {'code': 50001, 'message': "Failed to obtain the payment account. Please try again later."})
         else:
-            # 支付通道为TCPay,由第三方指定收款账号
-            payment_type = bank_card.bank_code
+            # 支付通道为VIPPay/TCPay,由第三方指定收款账号
+            payment_type = bank_code
             receive_account = ""
             receive_account_name = ""
 
@@ -148,6 +150,7 @@ def add_apply():
         db.session.add(apply)
         # 先支持添加充值申请，再调用支付接口
         db.session.commit()
+        logger.info(f"充值申请创建 - 申请ID: {apply_id}, 用户ID: {g.user.id}, 用户名: {g.user.username}, 金额: {amount}, 银行代码: {bank_code}, 过期时间: {ORDER_EXPIRE_MINUTES}分钟")
 
         # 使用PayOrderService创建充值订单
         result = pay_order_service.create_recharge_order(
@@ -163,13 +166,14 @@ def add_apply():
             payment_type=payment_type,
             receive_account=receive_account,
             receive_account_name=receive_account_name,
-            channelType=pay_channel or "TCPay"
+            channelType=pay_channel or app.config['PAY_CHANNEL_TYPE'],
         )
 
         if not result['success']:
             apply.status = StatusLabelMap.Failed
             apply.fail_reason = result['message']
             db.session.commit()
+            logger.warning(f"充值订单创建失败 - 申请ID: {apply_id}, 用户ID: {g.user.id}, 原因: {result['message']}")
             return Kits.rt_error("Failed to create order.")
 
         # 更新第三方订单信息
@@ -183,12 +187,13 @@ def add_apply():
         apply.status = StatusLabelMap.Pending
         # 订单创建成功
         db.session.commit()
+        logger.info(f"充值订单创建成功 - 申请ID: {apply_id}, 用户ID: {g.user.id}, 支付中心订单号: {resp_data.get('tradeNo')}, 支付通道: {pay_channel}, 状态: {StatusLabelMap.Pending}")
 
         return Kits.rt_data(resp_data)
     except Exception as e:
-        print("add charge_apply error:", e)
+        logger.error(f"充值申请失败 - 用户ID: {g.user.id}, 错误: {e}", exc_info=True)
 
-    return Kits.rt_error("System or Technical Error.")
+    return Kits.rt_error("System or Technical Error")
 
 
 @charge_apply.route('/edit', methods=['POST'])
@@ -222,7 +227,7 @@ def edit_apply():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           500:
             description: 文件格式不正确.
           200:
@@ -256,11 +261,12 @@ def edit_apply():
 
         db.session.add(apply)
         db.session.commit()
+        logger.info(f"充值申请修改成功 - 申请ID: {apply_id}, 用户ID: {g.user.id}")
         return jsonify({'message': "add successful."})
     except Exception as e:
-        print("add match error:", e)
+        logger.error(f"充值申请修改失败 - 用户ID: {g.user.id}, 错误: {e}", exc_info=True)
 
-    response = jsonify({'message': "System or Technical Error."})
+    response = jsonify({'message': "System or Technical Error"})
     response.status_code = 500
     return response
 
@@ -288,7 +294,7 @@ def delete_apply():
                   example: ""
         responses:
           500:
-            description: System or Technical Error.
+            description: System or Technical Error
           500:
             description: 文件格式不正确.
           200:
@@ -307,11 +313,12 @@ def delete_apply():
             if os.path.isfile(os.path.join(path, apply.picture)):
                 os.remove(os.path.join(path, apply.picture))
         db.session.commit()
+        logger.info(f"充值申请删除成功 - 申请ID: {apply_id}, 用户ID: {g.user.id}")
         return jsonify({'message': "delete successful."})
     except Exception as e:
-        print("add match error:", e)
+        logger.error(f"充值申请删除失败 - 用户ID: {g.user.id}, 错误: {e}", exc_info=True)
 
-    response = jsonify({'message': "System or Technical Error."})
+    response = jsonify({'message': "System or Technical Error"})
     response.status_code = 500
     return response
 

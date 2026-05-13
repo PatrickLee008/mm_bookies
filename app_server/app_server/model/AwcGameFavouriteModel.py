@@ -123,7 +123,8 @@ class AwcGameFavourite(db.Model):
         ).first()
 
         if favourite:
-            favourite.del_flag = 1
+            # 为了避免unique constraint 'uk_member_game'冲突，直接删除记录而不是标记删除
+            db.session.delete(favourite)
             db.session.commit()
             return True
 
