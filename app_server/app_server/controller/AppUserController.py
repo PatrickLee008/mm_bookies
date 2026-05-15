@@ -533,8 +533,8 @@ def add_app_user():
         else:
             user.aid = agent_id
 
-        # 处理广告链接信息
-        if adlink_id:
+        # 处理广告链接信息 不包含用户邀请
+        if adlink_id and not r_code:
             from app_server.model.AppAdlinkModel import AppAdlink
             # 保存广告链接ID
             user.ad_link_id = adlink_id
@@ -543,6 +543,8 @@ def add_app_user():
                 adlink = AppAdlink.query.filter_by(id=adlink_id, del_flag=0).first()
                 if adlink and adlink.campaign_name:
                     user.ads_type = adlink.campaign_name
+                    if adlink.agent_id:
+                        user.aid = adlink.agent_id
                 else:
                     user.ads_type = 'Unknown Adlink'
             except Exception as e:
@@ -704,7 +706,7 @@ def check_repeat_account(pid):
         """
 
     try:
-        repeat_account = AppMember.query.filter_by(phone=pid).first()
+        repeat_account = AppMember.query.filter_by(phone=pid,del_flag=0).first()
         if repeat_account:
             return jsonify({'message': "User already exist",
                             'status': True})
