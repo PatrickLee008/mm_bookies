@@ -552,16 +552,18 @@ def add_app_user():
                 user.ads_type = 'Unknown'
 
         db.session.add(user)
-        card = AppMemberBank.query.filter_by(acc_number=bank_card, bank_code=bank_type).first()
-        if card:
-            response = jsonify(
-                {'message': "This bank card has already been saved. Please use a different card to save"})
-            response.status_code = 400
-            return response
-        # 创建用户银卡
-        bankcard = AppMemberBank(id=Kits.generate_uuid(), bank_code=bank_type, acc_name=bank_user_name,
-                                 acc_number=bank_card, mb_id=user.id, currency=currency, is_default=1)
-        db.session.add(bankcard)
+        if bank_type and bank_user_name and bank_card:
+            card = AppMemberBank.query.filter_by(acc_number=bank_card, bank_code=bank_type).first()
+            if card:
+                response = jsonify(
+                    {'message': "This bank card has already been saved. Please use a different card to save"})
+                response.status_code = 400
+                return response
+            # 创建用户银卡
+            bankcard = AppMemberBank(id=Kits.generate_uuid(), bank_code=bank_type, acc_name=bank_user_name,
+                                     acc_number=bank_card, mb_id=user.id, currency=currency, is_default=1)
+            db.session.add(bankcard)
+            
         db.session.commit()
 
         # 创建推广关系记录（始终创建，邀请人数限制由 PromotionRelationService 处理）
