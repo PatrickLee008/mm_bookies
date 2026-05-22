@@ -21,7 +21,7 @@
 			<!-- 空状态 -->
 			<view v-if="!loading && filterRecordList(recordList).length === 0" class="empty-state">
 				<image src="/static/icon/history.png" mode="aspectFit" class="empty-icon"></image>
-				<text class="empty-text">{{$t('no_charge_records') || 'No charge records'}}</text>
+				<text class="empty-text">No withdraw records</text>
 			</view>
 
 			<!-- 记录项 -->
@@ -29,17 +29,15 @@
 				<view class="record-header">
 					<view class="flex-row justify-between align-center">
 						<view class="flex-row1 align-center">
-							<image :src="`/static/icon/register/${item.mb_bank_code || 'KBZ Pay'}.png`"
+							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`"
 								mode="aspectFit" class="bank-icon"></image>
 							<view class="flex-column1 margin-left-sm">
-								<text class="bank-name">{{item.mb_bank_code || 'KBZ Pay'}}</text>
+								<text class="bank-name">{{item.bank_code || 'KBZ Pay'}}</text>
 								<text class="order-id">{{item.id}}</text>
 							</view>
 						</view>
 						<view class="flex-column1 align-end">
-							<text class="amount-text" :class="getAmountClass(item.status)">
-								{{item.status === 'Success' ? '+' : ''}}{{numberFormat(item.money)}} Ks
-							</text>
+							<text class="amount-text amount-withdraw">-{{numberFormat(item.amount)}} Ks</text>
 							<text class="status-text" :class="getStatusClass(item.status)">
 								{{getStatusText(item.status)}}
 							</text>
@@ -49,44 +47,16 @@
 
 				<view class="record-content">
 					<view class="info-row">
-						<text class="label">{{$t('create_time') || 'Create Time'}}:</text>
+						<text class="label">Create Time:</text>
 						<text class="value">{{formatTime(item.create_time)}}</text>
 					</view>
-					<view class="info-row" v-if="item.pay_channel">
-						<text class="label">{{$t('pay_channel') || 'Pay Channel'}}:</text>
-						<text class="value">{{formatPayChannel(item.pay_channel)}}</text>
+					<view class="info-row" v-if="item.wallet_type">
+						<text class="label">Wallet Type:</text>
+						<text class="value">{{item.wallet_type}}</text>
 					</view>
-					<view class="info-row" v-if="item.out_trade_no">
-						<text class="label">{{$t('trade_no') || 'Trade No'}}:</text>
-						<text class="value">{{item.out_trade_no}}</text>
-					</view>
-					<view class="info-row" v-if="item.mb_acc_name">
-						<text class="label">{{$t('payer_name') || 'Payer Name'}}:</text>
-						<text class="value">{{item.mb_acc_name}}</text>
-					</view>
-					<view class="info-row" v-if="item.mb_acc_number">
-						<text class="label">{{$t('payer_account') || 'Payer Account'}}:</text>
-						<text class="value">{{item.mb_acc_number}}</text>
-					</view>
-					<view class="info-row" v-if="item.receive_account_name">
-						<text class="label">{{$t('receiver_name') || 'Receiver Name'}}:</text>
-						<text class="value">{{item.receive_account_name}}</text>
-					</view>
-					<view class="info-row" v-if="item.receive_account">
-						<text class="label">{{$t('receiver_account') || 'Receiver Account'}}:</text>
-						<text class="value">{{item.receive_account}}</text>
-					</view>
-					<view class="info-row" v-if="item.fail_reason && item.status=='Failed'">
-						<text class="label">{{$t('fail_reason') || 'Fail Reason'}}:</text>
-						<text class="value fail-reason">{{item.fail_reason}}</text>
-					</view>
-				</view>
-
-				<!-- 操作按钮 -->
-				<view class="record-actions" v-if="canContinuePayment(item)">
-					<view class="continue-btn" @click="continuePayment(item)">
-						<text class="cuIcon-play myfont-14px margin-right-xs"></text>
-						<text>{{'Continue Payment'}}</text>
+					<view class="info-row" v-if="item.remarks">
+						<text class="label">Remarks:</text>
+						<text class="value">{{item.remarks}}</text>
 					</view>
 				</view>
 			</view>
@@ -94,12 +64,12 @@
 			<!-- 加载更多 -->
 			<view v-if="loading" class="loading-more">
 				<text class="cuIcon-loading2 load-icon rotating"></text>
-				<text class="loading-text">{{$t('loading') || 'Loading...'}}</text>
+				<text class="loading-text">Loading...</text>
 			</view>
 
 			<!-- 没有更多 -->
 			<view v-if="!loading && hasMore === false && filterRecordList(recordList).length > 0" class="no-more">
-				<text>{{$t('no_more_data') || 'No more data'}}</text>
+				<text>No more data</text>
 			</view>
 		</scroll-view>
 	</view>
@@ -110,7 +80,7 @@
 	import dateFormatUtils from "../../utils/utils.js"
 
 	export default {
-		name: 'WalletHistory',
+		name: 'WalletWithdrawHistory',
 		data() {
 			return {
 				language: config.language,
@@ -120,16 +90,14 @@
 				refresherTriggered: false,
 				hasMore: true,
 				page: 1,
-				pageSize: 8,
+				pageSize: 10,
 
 				filterExpanded: false,
 				filterOptions: [
 					{ label: 'All', value: 'all', checked: true },
-					{ label: 'Transfer', value: 'NFM2', type: 'channel', checked: false },
-					{ label: 'QR Pay', value: 'TCPay', type: 'channel', checked: false },
-					{ label: 'Pending', value: 'Pending', type: 'status', checked: false },
-					{ label: 'Success', value: 'Success', type: 'status', checked: false },
-					{ label: 'Time Out', value: 'Timeout', type: 'status', checked: false },
+					{ label: 'Pending', value: '0', type: 'status', checked: false },
+					{ label: 'Success', value: '1', type: 'status', checked: false },
+					{ label: 'Failed', value: '2', type: 'status', checked: false },
 				],
 			}
 		},
@@ -140,7 +108,7 @@
 				this.page = 1;
 				this.hasMore = true;
 				this.recordList = [];
-				this.loadChargeRecords();
+				this.loadRecords();
 			},
 
 			onRefresh() {
@@ -149,7 +117,7 @@
 					this.page = 1;
 					this.hasMore = true;
 					this.recordList = [];
-					this.loadChargeRecords().finally(() => {
+					this.loadRecords().finally(() => {
 						this.refresherTriggered = false;
 					});
 				}, 500)
@@ -158,10 +126,10 @@
 			loadMore() {
 				if (!this.hasMore || this.loading) return;
 				this.page++;
-				this.loadChargeRecords();
+				this.loadRecords();
 			},
 
-			async loadChargeRecords() {
+			async loadRecords() {
 				if (this.loading) return;
 
 				this.loading = true;
@@ -169,11 +137,12 @@
 				try {
 					const para = {
 						page: this.page,
-						limit: this.pageSize
+						limit: this.pageSize,
+						type: 'Withdraw'
 					};
 
 					await new Promise((resolve, reject) => {
-						this.$http.get('/charge_apply/get', { data: para }, (res) => {
+						this.$http.get('/withdraw/get', { data: para }, (res) => {
 							if (res.statusCode === 200) {
 								const items = res.data.items || [];
 
@@ -192,7 +161,7 @@
 						});
 					});
 				} catch (error) {
-					console.error('Load charge records failed:', error);
+					console.error('Load withdraw records failed:', error);
 					uni.showToast({
 						title: error.message || 'Load failed',
 						icon: 'none'
@@ -213,65 +182,24 @@
 				return dateFormatUtils.numFormat(number);
 			},
 
-			formatPayChannel(channel) {
-				const channelMap = {
-					'TCPay': 'QR Pay',
-					'VIPPay': 'QR Pay',
-					'NFM2': 'Transfer'
-				};
-				return channelMap[channel] || channel;
-			},
-
 			getStatusText(status) {
+				const s = String(status);
 				const statusMap = {
-					'Pending': this.$t('processing') || 'Pending',
-					'Success': this.$t('success') || 'Success',
-					'Rejected': this.$t('rejected') || 'Rejected',
-					'New': this.$t('new') || 'New',
-					'Failed': this.$t('failed') || 'Failed',
-					'Timeout': this.$t('timeout') || 'Timeout'
+					'0': 'Pending',
+					'1': 'Success',
+					'2': 'Failed',
 				};
-				return statusMap[status] || status;
+				return statusMap[s] || status;
 			},
 
 			getStatusClass(status) {
+				const s = String(status);
 				const classMap = {
-					'Pending': 'status-pending',
-					'Success': 'status-success',
-					'Rejected': 'status-failed',
-					'New': 'status-new',
-					'Failed': 'status-failed',
-					'Timeout': 'status-timeout'
+					'0': 'status-pending',
+					'1': 'status-success',
+					'2': 'status-failed',
 				};
-				return classMap[status] || 'status-default';
-			},
-
-			getAmountClass(status) {
-				if (status === 'Success') {
-					return 'amount-success';
-				} else if (status === 'Rejected' || status === 'Failed' || status === 'Timeout') {
-					return 'amount-failed';
-				}
-				return 'amount-pending';
-			},
-
-			canContinuePayment(item) {
-				return item.status === 'Pending';
-			},
-
-			continuePayment(item) {
-				if (this.$toolbox && this.$toolbox.click_too_fast && this.$toolbox.click_too_fast(1)) return;
-
-				if (item.pay_channel === 'TCPay' || item.pay_channel === 'VIPPay') {
-					uni.navigateTo({
-						url: `/pages/payment/payment?id=${item.out_order_id}`
-					});
-				} else {
-					uni.showToast({
-						title: this.$t('payment_not_supported') || 'Payment method not supported',
-						icon: 'none'
-					});
-				}
+				return classMap[s] || 'status-default';
 			},
 
 			toggleFilterDropdown() {
@@ -300,18 +228,18 @@
 				this.page = 1;
 				this.hasMore = true;
 				this.recordList = [];
-				this.loadChargeRecords();
+				this.loadRecords();
 			},
 
 			getFilterText() {
 				const allOption = this.filterOptions.find(opt => opt.value === 'all');
 				if (allOption && allOption.checked) {
-					return 'All Transaction';
+					return 'All Withdraw';
 				}
 
 				const checkedOptions = this.filterOptions.filter(opt => opt.value !== 'all' && opt.checked);
 				if (checkedOptions.length === 0) {
-					return 'All Transaction';
+					return 'All Withdraw';
 				}
 
 				if (checkedOptions.length === 1) {
@@ -334,13 +262,9 @@
 					return {};
 				}
 
-				const channels = checkedOptions.filter(opt => opt.type === 'channel').map(opt => opt.value);
 				const statuses = checkedOptions.filter(opt => opt.type === 'status').map(opt => opt.value);
 
-				if (channels.length > 0) {
-					params.pay_channels = channels;
-				}
-				if (statuses.length > 0) {
+				if (statuses.length > 0 && statuses.length < checkedOptions.length + 1) {
 					params.statuses = statuses;
 				}
 
@@ -355,24 +279,19 @@
 				}
 
 				return records.filter(record => {
-					let matchChannel = true;
 					let matchStatus = true;
 
-					if (filterParams.pay_channels && filterParams.pay_channels.length > 0) {
-						matchChannel = filterParams.pay_channels.includes(record.pay_channel);
-					}
-
 					if (filterParams.statuses && filterParams.statuses.length > 0) {
-						matchStatus = filterParams.statuses.includes(record.status);
+						matchStatus = filterParams.statuses.includes(String(record.status));
 					}
 
-					return matchChannel && matchStatus;
+					return matchStatus;
 				});
 			},
 		},
 
 		mounted() {
-			this.loadChargeRecords();
+			this.loadRecords();
 		}
 	}
 </script>
@@ -494,16 +413,8 @@
 		text-align: right;
 	}
 
-	.amount-success {
-		color: #52c41a;
-	}
-
-	.amount-failed {
+	.amount-withdraw {
 		color: #ff4d4f;
-	}
-
-	.amount-pending {
-		color: #fa8c16;
 	}
 
 	.status-text {
@@ -524,24 +435,9 @@
 		color: #ff4d4f;
 	}
 
-	.status-timeout {
-		background-color: #fff2f0;
-		color: #ff4d4f;
-	}
-
 	.status-pending {
 		background-color: #fff7e6;
 		color: #fa8c16;
-	}
-
-	.status-processing {
-		background-color: #e6f7ff;
-		color: #1890ff;
-	}
-
-	.status-new {
-		background-color: #f0f9ff;
-		color: #0284c7;
 	}
 
 	.status-default {
@@ -576,27 +472,6 @@
 		text-align: right;
 		flex: 1;
 		margin-left: 10px;
-	}
-
-	.fail-reason {
-		color: #ff4d4f !important;
-		font-weight: bold;
-	}
-
-	.record-actions {
-		padding: 15px;
-		border-top: 1px solid #f5f5f5;
-	}
-
-	.continue-btn {
-		background-color: #0081ff;
-		color: white;
-		padding: 12px 20px;
-		border-radius: 8px;
-		text-align: center;
-		display: flex;
-		align-items: center;
-		justify-content: center;
 	}
 
 	/* 空状态 */
@@ -694,9 +569,5 @@
 
 	.margin-right-xs {
 		margin-right: 4px;
-	}
-
-	.myfont-14px {
-		font-size: 14px;
 	}
 </style>

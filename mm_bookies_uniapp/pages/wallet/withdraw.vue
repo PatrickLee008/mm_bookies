@@ -22,42 +22,6 @@
 					<text class="add-bank-text">Add Bank Account</text>
 				</view>
 			</view>
-
-			<!-- <view class="tips" style="">
-				<view class="text-bold">
-					{{$t('important_notice')}}:
-				</view>
-				<view>{{$t('withdraw_tips1')}}</view>
-				<view>{{$t('withdraw_tips2')}}</view>
-			</view>
-			<view class="width-100"
-				style="font-family: __Inter_7be8ac, __Inter_l;font-weight: 600;color: black;padding: 0 20px;">
-				{{'Amount'}}
-			</view>
-			<view class="flex-column mybg-lprimary text-white width-100" style="position: relative">
-				<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount"
-					placeholder-class="text-white" maxlength="7" placeholder=""></input>
-
-				<view class="ks" style="">Ks</view>
-				<view class="turnover">
-					Turnover Current: 100 Ks
-				</view>
-				<view class="limit">Minimum 10,000 Ks, Maximum 5,000,000</view>
-			</view>
-			<view
-				style="display: flex;flex-direction: row;flex-wrap:wrap;justify-content:space-between;padding: 5px 40px;width: 100%;">
-				<view class="amount-select" style="" v-for="(item,index) in amount_list" :key="index"
-					@click="amount_select(item)">{{numberFormat(item)}}
-				</view>
-			</view>
-
-			<view class="text-center text-red" style="font-weight: 400;font-size: 1rem;line-height: 1.5;">
-				{{$t('withdraw_tips3')}}
-			</view>
-			<button class="login-btn" style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="amount_error"
-				@click="submit()">
-				{{'SUBMIT'}}</button>
-			<view class="padding-xs"></view> -->
 		</scroll-view>
 
 		<!-- from tangjq--- 提现详情弹窗（仿照deposit-modal-dialog） -->
@@ -65,7 +29,7 @@
 			<view class="withdraw-modal-dialog">
 				<!-- 标题栏 -->
 				<view class="withdraw-modal-header">
-					<text class="withdraw-modal-title">Auto Withdraw</text>
+					<text class="withdraw-modal-title">Withdraw</text>
 					<text class="withdraw-modal-close" @click="modalName = ''">✕</text>
 				</view>
 
@@ -193,7 +157,6 @@
 			return {
 				language: config.language,
 				amount: 0.00,
-				amount_list: [10000, 50000, 100000, 500000, 1000000, 5000000],
 				amount_error: true,
 				card_list: [],
 				userInfo: {},
@@ -235,9 +198,6 @@
 			}
 		},
 		methods: {
-			amount_select(amount) {
-				this.amount = amount
-			},
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')
 				amount = amount ? parseInt(amount) : '0'
@@ -250,55 +210,6 @@
 			},
 			numberFormat(number) {
 				return dateFormatUtils.numFormat(number);
-			},
-			submit() {
-				var _this = this;
-
-				// Validate card list
-				if (!_this.card_list || _this.card_list.length === 0) {
-					uni.showModal({
-						title: _this.$t('tips'),
-						content: _this.$t('Please add a bank card first'),
-						showCancel: false,
-						confirmText: _this.$t('OK'),
-					});
-					return;
-				}
-
-				var para = {
-					'card_id': _this.card_list[0].id,
-					'money': parseInt(_this.amount),
-				}
-
-				// Validate minimum withdraw amount
-				if (_this.amount < parseInt(_this.$store.state.configs['withdraw_min_limit']) || _this.amount < 0) {
-					uni.showModal({
-						title: _this.$t('tips'),
-						content: this.language['The minimum withdraw must be equal or greater'] + _this.$store.state.configs['withdraw_min_limit'],
-						showCancel: false,
-						confirmText: _this.$t('OK'),
-					});
-					return;
-				}
-
-				// Call withdraw API
-				_this.$http.post('/withdraw/apply', para, (res) => {
-					if (res.statusCode == 200) {
-						uni.showModal({
-							title: `${_this.$t('Congratulations')}`,
-							content: `${_this.$t('Amount')} (${_this.amount}). ${_this.$t('withdraw_success')}`,
-							showCancel: false,
-						})
-
-						// Update user balance in store
-						var userInfo = _this.$store.state.userInfo
-						userInfo.money = String(parseInt(userInfo.money.replaceAll(',', '')) - parseInt(_this.amount));
-						_this.$store.dispatch('saveUserInfo', userInfo);
-
-						// Reset amount
-						_this.amount = 0;
-					}
-				})
 			},
 			get_bank_card_list() {
 				var _this = this;
@@ -371,18 +282,20 @@
 						_this.modalName = ''
 						_this.selectedCard = {}
 					} else {
+						_this.modalName = '';
 						var tips = '';
 						if (_this.language[res.data.message]) {
 							tips = res.statusCode == 429 ? _this.language[res.data.message] + "(" + _this.$store.state.configs[res.data.message] + ")" : _this.$t(res.data.message);
 						} else {
 							tips = res.data.message;
 						}
-
-						uni.showModal({
-							title: 'Tips',
-							content: tips,
-							showCancel: false,
-							confirmText: 'OK',
+						_this.$nextTick(() => {
+							uni.showModal({
+								title: 'Tips',
+								content: tips,
+								showCancel: false,
+								confirmText: 'OK',
+							});
 						});
 					}
 				})

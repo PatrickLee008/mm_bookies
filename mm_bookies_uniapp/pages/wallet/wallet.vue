@@ -17,7 +17,11 @@
 						<text class="tab-text">Withdraw</text>
 					</view>
 					<view class="tab-item" :class="{'active': tab_index === 2}" @click="handleTabClick(2)">
-						<text class="tab-text">History</text>
+						<text class="tab-text">Deposit History</text>
+					</view>
+
+					<view class="tab-item" :class="{'active': tab_index === 3}" @click="handleTabClick(3)">
+						<text class="tab-text">Withdraw History</text>
 					</view>
 
 					<!-- from tangjq--- 底部滑动指示器 -->
@@ -39,6 +43,10 @@
 
 			<!-- from tangjq--- History 子组件 -->
 			<wallet-history v-if="tab_index === 2"></wallet-history>
+
+
+			<!-- Withdraw History 子组件 -->
+			<wallet-withdraw-history v-if="tab_index === 3"></wallet-withdraw-history>
 		</view>
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮 -->
@@ -56,6 +64,7 @@
 	import WalletDeposit from './deposit.vue'
 	import WalletWithdraw from './withdraw.vue'
 	import WalletHistory from './history.vue'
+	import WalletWithdrawHistory from './withdraw_history.vue'
 
 	export default {
 		components: {
@@ -63,6 +72,7 @@
 			WalletDeposit,
 			WalletWithdraw,
 			WalletHistory,
+			WalletWithdrawHistory,
 		},
 		data() {
 			return {
@@ -183,7 +193,7 @@
 		justify-content: center;
 		cursor: pointer;
 		height: 30px;
-		min-width: 80px;
+		// min-width: 80px;
 	}
 
 	/* from tangjq--- 第一个 tab 居左对齐 */
@@ -199,7 +209,7 @@
 	}
 
 	.tab-text {
-		font-size: 16px;
+		font-size: 13px;
 		color: #5a7a8f;
 		transition: color 0.25s ease;
 		font-weight: 400;

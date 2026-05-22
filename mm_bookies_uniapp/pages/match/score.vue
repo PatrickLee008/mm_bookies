@@ -1,6 +1,6 @@
 <template>
 	<view class="mybg-grey full-page">
-		<cu-custom isBack backUrl="/pages/index/index">
+		<cu-custom isBack backUrl="/?mix=0">
 			<block slot="content">{{$t('score')}}
 			</block>
 			<block slot="right">
@@ -340,7 +340,7 @@
 		methods: {
 			toHome() {
 				uni.reLaunch({
-					url: '/pages/index/index'
+					url: '/?mix=0'
 				})
 			},
 			handleDateChange(filter) {

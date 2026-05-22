@@ -215,13 +215,13 @@
 					<!-- Account No -->
 					<view class="form-group">
 						<text class="form-label">Account No.</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="09789456123" v-model="card_conf.acc_number" />
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="Account Phone Number" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
 						<text class="form-label">User Name</text>
-						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Thi Ha" v-model="card_conf.acc_name" />
+						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Account Name" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 
@@ -286,16 +286,11 @@
 					</view>
 				</view>
 
-				<!-- 支付渠道选择 -->
+				<!-- 支付渠道：仅支持 QR Pay -->
 				<view class="payment-channel-section">
-					<text class="section-title">Select Payment Channel</text>
-					<view class="payment-channel-btns">
-						<view class="payment-channel-btn" :class="bank_list[0].checked?'selected':''" @click="select_option(bank_list[0],'bank_list')">
-							Transfer
-						</view>
-						<view class="payment-channel-btn" :class="bank_list[1].checked?'selected':''" @click="select_option(bank_list[1],'bank_list')">
-							QR Pay
-						</view>
+					<text class="section-title">Payment Channel</text>
+					<view class="payment-channel-single">
+						<text class="payment-channel-name">QR Pay</text>
 					</view>
 				</view>
 
@@ -569,12 +564,12 @@
 					value: 'KBZ Pay',
 					label: 'KBZPay',
 					src: '/static/icon/register/KBZ Pay.png',
-					checked: true
+					checked: false
 				}, {
 					value: 'Wave Money',
 					label: 'WavePay',
 					src: '/static/icon/register/Wave Money.png',
-					checked: false
+					checked: true
 				}],
 				amount: 0.00,
 				amount_list: [3000, 5000, 10000, 100000, 500000, 1000000],
@@ -620,16 +615,6 @@
 				agent_bankcard: {},
 				agent_no_bankcard: false,
 				transaction_disable: false,
-
-				// from Tangjq--- 模拟QR Pay数据
-				mockQRCodeData: 'https://example.com/qrpay?order=MOCK123456&amount=50000',
-				mockOrderInfo: {
-					tradeOrderId: 'MOCK_ORDER_12345',
-					out_order_id: 'MOCK_ORDER_12345',
-					amount: 50000,
-					status: 'pending',
-					qrcode: 'https://example.com/qrpay?order=MOCK123456&amount=50000'
-				}
 			}
 		},
 		watch: {
@@ -1074,19 +1059,9 @@
 						});
 					} else if (data.code == 409) {
 						let order = data.data;
-						uni.showModal({
-							title: 'Tips',
-							content: res.data.message,
-							confirmText: 'Pay the order',
-							showCancel: false,
-							success: (res1) => {
-								if (res1.confirm) {
-									uni.navigateTo({
-										url: `/pages/payment/payment?id=${order.out_order_id}`
-									});
-								}
-							}
-						})
+						uni.navigateTo({
+							url: `/pages/payment/payment?id=${order.out_order_id}`
+						});
 					} else {
 						uni.showModal({
 							confirmText: 'OK',
@@ -1135,17 +1110,8 @@
 					return
 				}
 
-				// 检查选中的支付方式
-				const selectedPayment = this.bank_list.find(item => item.checked)
-
-				// Transfer支付方式
-				if (selectedPayment.value === 'KBZ Pay') {
-					this.showTransferTips()
-					return
-				}
-
-				// QR Pay支付方式 - 先显示Tips弹窗
-				this.showQRPayTips()
+				// QR Pay 直接创建订单
+				this.createQRPayOrder()
 			},
 			// Transfer支付相关方法
 			showTransferTips() {
@@ -1234,42 +1200,20 @@
 					title: 'Loading...'
 				})
 
-				// from Tangjq--- 使用模拟数据直接显示QR Code弹窗
-				setTimeout(() => {
-					uni.hideLoading()
-					this.orderInfo = this.mockOrderInfo
-					// 直接调用显示QR Code（跳过getOrderDetail API调用）
-					this.qrCodeData = this.mockQRCodeData
-					this.showQRCodeModal = true
-					this.showContinueBtn = true
-					this.countdown = 600
-					this.startCountdown()
-				}, 800)
-				return // from Tangjq--- 直接返回，跳过下面的API调用
-
-
-				// from Tangjq--- 原有API调用已被跳过，如需恢复请删除上面的return和模拟数据代码
 				this.$http.post('/charge_apply/add', para, res => {
 					uni.hideLoading()
 					let data = res.data
 					if (data.code == 200) {
 						let order = data.data
-						this.orderInfo = order
-						// 获取订单详情（包含二维码）
-						this.getOrderDetail(order.tradeOrderId)
+						this.closeDepositModal()
+						uni.navigateTo({
+							url: `/pages/payment/payment?id=${order.tradeOrderId}`
+						})
 					} else if (data.code == 409) {
 						let order = data.data
-						uni.showModal({
-							title: 'Tips',
-							content: res.data.message,
-							confirmText: 'Continue',
-							showCancel: false,
-							success: (res1) => {
-								if (res1.confirm) {
-									// 获取已存在订单的详情
-									this.getOrderDetail(order.out_order_id)
-								}
-							}
+						this.closeDepositModal()
+						uni.navigateTo({
+							url: `/pages/payment/payment?id=${order.out_order_id}`
 						})
 					} else {
 						uni.showModal({
@@ -1277,29 +1221,6 @@
 							showCancel: false,
 							title: 'Error',
 							content: res.data.message
-						})
-					}
-				})
-			},
-			getOrderDetail(orderId) {
-				this.$http.get('/trade_order/detail', {
-					data: {
-						id: orderId
-					}
-				}, res => {
-					if (res.statusCode == 200) {
-						const orderData = res.data.item
-						this.qrCodeData = orderData.qrcode || ''
-						this.orderInfo = orderData
-						// 显示QR Code弹窗
-						this.showQRCodeModal = true
-						this.showContinueBtn = true
-						this.countdown = 600
-						this.startCountdown()
-					} else {
-						uni.showToast({
-							title: 'Failed to load QR code',
-							icon: 'none'
 						})
 					}
 				})
@@ -1874,6 +1795,26 @@
 
 	.payment-channel-btn.selected {
 		background-color: #4FB3BF;
+	}
+
+	.payment-channel-single {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 12px;
+	}
+
+	.payment-channel-name {
+		flex: 1;
+		height: 35px;
+		background-color: #4FB3BF;
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 600;
+		color: #fff;
 	}
 
 	.continue-btn {

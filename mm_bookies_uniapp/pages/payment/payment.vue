@@ -1,8 +1,9 @@
 <template>
 	<view class="bg-white full-page">
 		<zw-header></zw-header>
+		<view class="header-placeholder"></view>
 		<!-- 滚动内容区域 -->
-		<scroll-view scroll-y style="height: calc(100vh - 110px);position: sticky;" class="payment-content">
+		<scroll-view scroll-y class="payment-content">
 			<block>
 				<!-- <block v-if="isload && payInfo"> -->
 				<view class=""
@@ -252,7 +253,7 @@
 								confirmText: 'Back Home',
 								success: function(res) {
 									uni.redirectTo({
-										url: "/pages/index/index"
+										url: "/?mix=0"
 									})
 								}
 							});
@@ -369,8 +370,8 @@
 				});
 			},
 			back_home() {
-				uni.reLaunch({
-					url: '/pages/ucenter/charge'
+				uni.redirectTo({
+					url: '/pages/wallet/wallet'
 				})
 			},
 			formatDueDate(createTime) {
@@ -402,8 +403,21 @@
 		background-color: white;
 	}
 
+	.header-placeholder {
+		height: 220px;
+		width: 100%;
+	}
+
+	.full-page {
+		display: flex;
+		flex-direction: column;
+	}
+
 	.payment-content {
 		background-color: white;
+		flex: 1;
+		height: 0;
+		overflow-y: auto;
 	}
 
 	.top-image {
@@ -507,7 +521,7 @@
 	/* 底部确认支付条 */
 	.bottom-confirmation-bar {
 		position: fixed;
-		bottom: 65px;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		background-color: #E6EFFF;
