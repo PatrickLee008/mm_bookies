@@ -25,7 +25,10 @@
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}" type="password" placeholder-class="input-placeholder" v-model="loginInfo.password" placeholder="Please enter your password" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
+				<input class="input-field" :class="{'input-error': password_error}" type="text" :password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password" placeholder="Please enter your password" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
+				<view class="password-toggle" @click="togglePasswordVisibility">
+					<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+				</view>
 				<view class="error-message" v-if="password_error">
 					{{$t("r_password_limit")}}
 				</view>
@@ -33,7 +36,10 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="password" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" placeholder="Please confirm your password" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
+				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text" :password="!showConfirmPassword" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" placeholder="Please confirm your password" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
+				<view class="password-toggle" @click="toggleConfirmPasswordVisibility">
+					<uni-icons :type="showConfirmPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+				</view>
 				<view class="error-message" v-if="confirm_password_error">
 					{{$t("those_passwords")}}
 				</view>
@@ -103,6 +109,10 @@
 				phone_error: false,
 				password_error: false,
 				confirm_password_error: false,
+
+				// 密码显隐状态
+				showPassword: false,
+				showConfirmPassword: false,
 			}
 		},
 		computed: {
@@ -136,6 +146,12 @@
 			},
 			handle_confirm_password_blur() {
 				this.confirm_password_error = this.loginInfo.password !== this.loginInfo.confirm_password;
+			},
+			togglePasswordVisibility() {
+				this.showPassword = !this.showPassword;
+			},
+			toggleConfirmPasswordVisibility() {
+				this.showConfirmPassword = !this.showConfirmPassword;
 			},
 			switchChange(e) {
 				this.rememberMe = e.target.value;
@@ -192,6 +208,11 @@
 					USER_PWD: this.loginInfo.password,
 					PHONE: this.loginInfo.phone,
 				}
+				
+				const defaultAgentId = uni.getStorageSync('default_r_aid');
+				if (defaultAgentId) para.agent_id = defaultAgentId;
+				const adl = uni.getStorageSync('default_adl');
+				if (adl) para.adlink_id = adl;
 
 				uni.showLoading({
 					title: "registering"
@@ -231,11 +252,23 @@
 				let para = {
 					encryptedParams: encryptedParams
 				}
+				
+				const defaultAgentId = uni.getStorageSync('default_r_aid');
+				if (defaultAgentId) para.agent_id = defaultAgentId;
+				const adl = uni.getStorageSync('default_adl');
+				if (adl) para.adlink_id = adl;
 
 				_this.$http.post('/app_user/login', para, (res) => {
 					_this.loadding = '';
 					if (res.statusCode == 200) {
 						uni.setStorageSync('Authorization', res.data.token);
+						
+						// 登录成功后获取配置
+						const app = getApp()
+						if (app && app.getConfigs) {
+							app.getConfigs()
+						}
+						
 						uni.redirectTo({
 							url: '../match/home'
 						});
@@ -350,7 +383,7 @@
 		background-color: rgba(105, 145, 149, 0.6);
 		border: none;
 		border-radius: 20rpx;
-		padding: 0 40rpx;
+		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
 		color: #ffffff;
 		box-sizing: border-box;
@@ -367,6 +400,23 @@
 
 	.input-error {
 		border: 2rpx solid #e54d42;
+	}
+
+	.password-toggle {
+		position: absolute;
+		right: 20rpx;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 60rpx;
+		height: 60rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.eye-icon {
+		font-size: 36rpx;
+		color: rgba(255, 255, 255, 0.8);
 	}
 
 	.error-message {

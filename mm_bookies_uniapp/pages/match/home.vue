@@ -87,14 +87,16 @@
 												<text>P</text>
 											</view>
 											<view class="bet-buttons">
-												<view class="bet-btn" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
-													<text class="bet-text">Home</text>
+												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Home</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 												<view class="bet-odds">
 													<text>{{calc_real_odds(attr)}}</text>
 												</view>
-												<view class="bet-btn" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
-													<text class="bet-text">Away</text>
+												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Away</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 											</view>
 										</template>
@@ -106,14 +108,16 @@
 												<text>U</text>
 											</view>
 											<view class="bet-buttons">
-												<view class="bet-btn" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
-													<text class="bet-text">Over</text>
+												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Over</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 												<view class="bet-odds">
 													<text>{{attr.LOSE_BALL_NUM}}+{{attr.DRAW_ODDS}}</text>
 												</view>
-												<view class="bet-btn" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
-													<text class="bet-text">Under</text>
+												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Under</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 											</view>
 										</template>
@@ -128,15 +132,15 @@
 											<view class="bet-buttons bet-buttons-three">
 												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Home</text>
-													<text class="bet-odds-small">{{attr.ODDS}}</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.draw_selected,}" @click="betClick('draw',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Draw</text>
-													<text class="bet-odds-small">{{attr.DRAW_ODDS}}</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.DRAW_ODDS)}}</text>
 												</view>
 												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Away</text>
-													<text class="bet-odds-small">{{attr.ODDS_GUEST}}</text>
+													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
 												</view>
 											</view>
 										</template>
@@ -838,6 +842,12 @@
 			},
 		},
 		methods: {
+			// 格式化赔率，保留两位小数
+			formatOdds(odds) {
+				if (odds == null || odds == undefined) return '0.00';
+				const num = parseFloat(odds);
+				return num.toFixed(2);
+			},
 			// 获取可用优惠券
 			fetchAvailableCoupons() {
 				// 检查用户登录状态

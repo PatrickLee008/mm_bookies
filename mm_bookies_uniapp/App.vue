@@ -3,6 +3,7 @@
 	import config from './utils/config.js'
 	import language from './utils/language.js'
 	import websocketManager from './utils/websocket.js'
+	import { logAdlinkVisit } from './utils/api/public.js'
 
 	//#ifdef APP-PLUS
 	// let main = plus.android.runtimeMainActivity();
@@ -182,18 +183,86 @@
 			//#endif
 			getConfigs() {
 				var _this = this;
-				_this.$http.get('/config/get', {}, (res) => {
-					if (res.statusCode == 200) {
+				_this.$http.get('/config/get', { skipFilter: true }, (res) => {
+					if (res.statusCode == 200 && res.data) {
 						let config = res.data.items
-						_this.$store.dispatch('saveConfigs', config);
-						uni.setStorageSync('config', config)
+						if (config) {
+							_this.$store.dispatch('saveConfigs', config);
+							uni.setStorageSync('config', config)
+						}
 					}
+				}, (err) => {
+					// 忽略错误，不处理
+				})
+			},
+			
+			handleLaunchParams(option) {
+				let params = {}
+				
+				if (option && option.query) {
+					params = option.query
+				} else {
+					try {
+						const launchOptions = uni.getLaunchOptionsSync()
+						if (launchOptions && launchOptions.query) {
+							params = launchOptions.query
+						}
+					} catch (e) {
+						console.log('[App] getLaunchOptionsSync not available')
+					}
+				}
+				
+				if (typeof window !== 'undefined' && window.location && !params._aid) {
+					const urlParams = new URLSearchParams(window.location.search)
+					if (urlParams.has('_aid')) {
+						params._aid = urlParams.get('_aid')
+					}
+					if (urlParams.has('_adl')) {
+						params._adl = urlParams.get('_adl')
+					}
+				}
+				
+				if (params._aid) {
+					uni.setStorageSync('default_r_aid', params._aid)
+					console.log('[App] Saved default_r_aid:', params._aid)
+				}
+				if (params._adl) {
+					uni.setStorageSync('default_adl', params._adl)
+					console.log('[App] Saved default_adl:', params._adl)
+					this.trackFlow(params._adl, params._aid)
+				}
+			},
+			
+			trackFlow(adl, aid) {
+				if (!adl) return
+				
+				let memberId = null
+				try {
+					const userInfo = this.$store.state.userInfo
+					if (userInfo && userInfo.id) {
+						memberId = userInfo.id
+					} else {
+						const storedUserInfo = uni.getStorageSync('userInfo')
+						if (storedUserInfo && storedUserInfo.id) {
+							memberId = storedUserInfo.id
+						}
+					}
+				} catch (e) {
+					console.log('[App] Failed to get memberId:', e)
+				}
+				
+				logAdlinkVisit(this.$http, adl, memberId).then((res) => {
+					console.log('[App] Adlink visit logged successfully', res)
+				}).catch((err) => {
+					console.error('[App] Failed to log adlink visit:', err)
 				})
 			},
 		},
-		onLaunch: function() {
+		onLaunch: function(option) {
 
 			var _this = this;
+
+			_this.handleLaunchParams(option)
 
 			var lang = uni.getLocale();
 			let langs = ['cn', 'en', 'mm', 'th']
@@ -327,6 +396,9 @@
 		},
 		onShow: function() {
 			// console.log('[App] App Show - Application returned to foreground')
+			
+			// 刷新配置信息
+			this.getConfigs()
 			
 			// 检查并恢复WebSocket连接
 			this.checkWebSocketConnection()

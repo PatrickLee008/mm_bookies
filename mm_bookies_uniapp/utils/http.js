@@ -42,6 +42,8 @@ function init(con) {
  
 function request(con) {
     init(con);
+    // 检查是否跳过拦截器
+    const skipFilter = con.skipFilter;
     let config = {
         url: con.url ? con.url : http.baseUrl,
         data: con.data,
@@ -50,7 +52,11 @@ function request(con) {
         dataType: con.dataType ? con.dataType : 'json',
         responseType: con.responseType ? con.responseType : 'text',
         success: con.success ? (res) => {
-            http.afterResponseFilter(con.success(http.beforeResponseFilter(res)));
+            if (skipFilter) {
+                con.success(res);
+            } else {
+                http.afterResponseFilter(con.success(http.beforeResponseFilter(res)));
+            }
         } : null,
         fail: con.fail ? (res) => {
             con.fail(res);
@@ -59,7 +65,11 @@ function request(con) {
             con.complete(res);
         } : null
     }
-    return uni.request(http.beforeRequestFilter(config));
+    if (skipFilter) {
+        return uni.request(config);
+    } else {
+        return uni.request(http.beforeRequestFilter(config));
+    }
 }
  
 function get(url, con, success) {

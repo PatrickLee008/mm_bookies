@@ -45,7 +45,10 @@
 
 				<!-- Password Input Field -->
 				<view class="input-wrapper">
-					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="password" placeholder-class="input-placeholder" placeholder="Please enter your password" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
+					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="text" :password="!showPassword" placeholder-class="input-placeholder" placeholder="Please enter your password" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
+					<view class="password-toggle" @click="togglePasswordVisibility">
+						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+					</view>
 					<view class="error-message" v-if="passwordError">
 						{{$t("L_password_limit")}}
 					</view>
@@ -300,16 +303,26 @@
 				var para = {
 					encryptedParams: encryptedParams
 				}
+				
+				const adl = uni.getStorageSync('default_adl');
+				if (adl) para.adlink_id = adl;
 
 				_this.$http.post('/app_user/login', para, (res) => {
 					_this.loadding = '';
 					if (res.statusCode == 200) {
-						// if (_this.loginInfo.rememberMe) {
-						// 	uni.setStorageSync('loginInfo', _this.loginInfo);
-						// } else {
-						// 	uni.removeStorageSync('loginInfo');
-						// };
+						if (_this.loginInfo.rememberMe) {
+							uni.setStorageSync('loginInfo', _this.loginInfo);
+						} else {
+							uni.removeStorageSync('loginInfo');
+						}
 						uni.setStorageSync('Authorization', res.data.token);
+						
+						// 登录成功后获取配置
+						const app = getApp()
+						if (app && app.getConfigs) {
+							app.getConfigs()
+						}
+						
 						uni.redirectTo({
 							url: '../match/home'
 						});
@@ -540,7 +553,7 @@
 		background-color: rgba(105, 145, 149, 0.6);
 		border: none;
 		border-radius: 20rpx;
-		padding: 0 40rpx;
+		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
 		color: #ffffff;
 		box-sizing: border-box;
@@ -557,6 +570,23 @@
 
 	.input-error {
 		border: 2rpx solid #e54d42;
+	}
+
+	.password-toggle {
+		position: absolute;
+		right: 20rpx;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 60rpx;
+		height: 60rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.eye-icon {
+		font-size: 36rpx;
+		color: rgba(255, 255, 255, 0.8);
 	}
 
 	.error-message {
