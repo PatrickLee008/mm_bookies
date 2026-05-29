@@ -8,7 +8,7 @@
 					<view class="bank-card-content" @click="openDepositModal(card)">
 						<image class="bank-icon" :src="`/static/icon/register/${card.bank_code}.png`"></image>
 						<text class="bank-name">{{card.bank_code}}</text>
-						<text class="account-number">*****{{card.acc_number.slice(-4)}}</text>
+						<text class="account-number">*****{{(card.acc_number || '').slice(-4)}}</text>
 						<!-- 删除按钮 -->
 						<view class="delete-btn" @click.stop="removeBank(card)" v-if="!card.is_default">
 							<text class="cuIcon-delete delete-icon"></text>

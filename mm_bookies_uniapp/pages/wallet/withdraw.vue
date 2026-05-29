@@ -9,7 +9,7 @@
 					<view class="bank-card-content" @click="selectCard(card)">
 						<image class="bank-icon" :src="`/static/icon/register/${card.bank_code}.png`"></image>
 						<text class="bank-name">{{card.bank_code}}</text>
-						<text class="account-number">*****{{card.acc_number.slice(-4)}}</text>
+						<text class="account-number">*****{{(card.acc_number || '').slice(-4)}}</text>
 						<!-- 删除按钮 -->
 						<view class="delete-btn" @click.stop="removeBank(card)" v-if="!card.is_default">
 							<text class="cuIcon-delete delete-icon"></text>
@@ -127,13 +127,13 @@
 					<!-- Account No -->
 					<view class="form-group">
 						<text class="form-label">Account No.</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="09789456123" v-model="card_conf.acc_number" />
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="Account Phone Number" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
 						<text class="form-label">User Name</text>
-						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Thi Ha" v-model="card_conf.acc_name" />
+						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Account Name" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 

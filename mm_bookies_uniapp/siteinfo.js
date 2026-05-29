@@ -11,8 +11,8 @@ var siteinfo = {
 
 if (process.env.NODE_ENV == 'development') {
 	//开发
-	siteinfo.apiUrl = "http://localhost:8282";
-	siteinfo.payUrl = "http://192.168.1.32:9010"; //支付中心
+	// siteinfo.apiUrl = "http://localhost:8282";
+	// siteinfo.payUrl = "http://192.168.1.32:9010"; //支付中心
 	// siteinfo.apiUrl = "http://m.1x2mmm.net/api";
 	// siteinfo.imgUrl = "http://m.1x2mmm.net/img"; //java后端图片前缀
 
