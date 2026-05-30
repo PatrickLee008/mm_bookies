@@ -3,7 +3,7 @@
 		<!-- 顶部栏 -->
 		<view class="about-header">
 			<text class="header-back-icon" @click="goBack">←</text>
-			<text class="header-title">About</text>
+			<text class="header-title">{{ $t('about') }}</text>
 			<text class="header-close-icon" @click="goBack">✕</text>
 		</view>
 
@@ -11,7 +11,7 @@
 			<view class="about-content">
 				<!-- Rules 部分 -->
 				<view class="about-section">
-					<text class="section-title">Rules</text>
+					<text class="section-title">{{ $t('rules') }}</text>
 					<view class="rule-item" v-for="(rule, index) in rules" :key="'rule-' + index">
 						<text class="rule-number">{{ index + 1 }}.</text>
 						<text class="rule-text">{{ rule }}</text>
@@ -20,7 +20,7 @@
 
 				<!-- Regulation 部分 -->
 				<view class="about-section">
-					<text class="section-title">Regulation</text>
+					<text class="section-title">{{ $t('regulation') }}</text>
 					<view class="rule-item" v-for="(regulation, index) in regulations" :key="'regulation-' + index">
 						<text class="rule-number">{{ index + 1 }}.</text>
 						<text class="rule-text">{{ regulation }}</text>

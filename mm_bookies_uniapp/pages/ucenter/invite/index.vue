@@ -25,7 +25,7 @@
 				</view>
 			</view>
 			<view class="white-rec flex-column text-bold text-center" style="position: relative;">
-				<text>{{'Invite a Friend and Get Rewarded'}}</text>
+				<text>{{ $t('invite_friend_rewarded') }}</text>
 				<text class="cuIcon-infofill myfont-24px" style="position: absolute;top: 10px;right: 15px;"
 					@click="modal_hidden=false"></text>
 				<text
@@ -221,20 +221,21 @@
 						})
 					} else {
 						uni.showModal({
-							title: 'Tips',
+							title: this.$t('tips'),
 							content: res.data.message,
-							confirmText: 'OK',
+							confirmText: this.$t('ok'),
 							showCancel: false
 						})
 					}
 				});
 			},
 			copy() {
+				const _this = this
 				uni.setClipboardData({
-					data: this.userInfo.id,
+					data: _this.userInfo.id,
 					success: function() {
 						uni.showToast({
-							title: 'Copied to clipboard',
+							title: _this.$t('copied_to_clipboard'),
 							icon: 'success'
 						});
 					},

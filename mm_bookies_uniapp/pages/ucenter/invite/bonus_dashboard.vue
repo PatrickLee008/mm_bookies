@@ -5,7 +5,7 @@
 		<view class="flex-column1 align-start text-bold" style="line-height: 1;">
 			<text class="title-text margin-tb" style="">
 				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
-				{{'Bonus Dashboard'}}</text>
+				{{ $t('bonus_dashboard_title') }}</text>
 			<text class="margin-left-sm text-black margin-bottom-sm">{{'Where did your bonus come from?'}}</text>
 		</view>
 
@@ -25,38 +25,38 @@
 					<selector :option_list.sync="status_list" @click_option="onStatusSelect"></selector>
 				</view> -->
 				<view class="filter-row">
-					<view class="text mycolor-primary line-height-34px">Period:
+					<view class="text mycolor-primary line-height-34px">{{ $t('period') }}:
 						{{date_range[0].show}}{{' - '}}{{date_range[1].show}}
 					</view>
 				</view>
 			</view>
 			<view class="filter flex-column margin-top-sm text-black text-bold myfont-14px">
-				<text class="">{{'Overview of Bonus Earnings'}}</text>
+				<text class="">{{ $t('overview_bonus_earnings') }}</text>
 				<view class="flex-row justify-between padding-lr-sm">
-					<text class="">{{'1. Invitation Bonus'}}</text>
+					<text class="">{{ $t('invitation_bonus_item') }}</text>
 					<text class="">{{getInvitationAmount()}}<text class="margin-left-xs">Ks</text></text>
 				</view>
 				<view class="flex-row justify-between padding-lr-sm">
-					<text class="">{{'2. Turnover Bonus'}}</text>
+					<text class="">{{ $t('turnover_bonus_item') }}</text>
 					<text class="">{{getTurnoverAmount()}}<text class="margin-left-xs">Ks</text></text>
 				</view>
 				<view class="flex-row justify-between padding-lr-sm">
-					<text class="">{{'3. Net Win Bonus'}}</text>
+					<text class="">{{ $t('netwin_bonus_item') }}</text>
 					<text class="">{{getNetWinAmount()}}<text class="margin-left-xs">Ks</text></text>
 				</view>
 				<view class="flex-row justify-between padding-lr-sm mycolor-lprimary">
-					<text class="margin-left">{{'Total Bonus'}}</text>
+					<text class="margin-left">{{ $t('total_bonus') }}</text>
 					<text class="">{{getTotalAmount()}}<text class="margin-left-xs">Ks</text></text>
 				</view>
 			</view>
 			<view class="filter flex-column margin-top-sm text-black">
-				<text class="text-bold">{{'Invitees behaviors for your core earnings'}}</text>
+				<text class="text-bold">{{ $t('invitees_behaviors') }}</text>
 				<qiun-data-charts v-if="hasChartData" type="pie" :chartData="chartsDataPie1" />
 				<view v-else class="chart-no-data">
-					<text class="text-gray">No data available for the selected period</text>
+					<text class="text-gray">{{ $t('no_data_period') }}</text>
 				</view>
 				<view v-if="hasChartData" class="flex-row justify-between text-bold padding-lr-sm">
-					<text>{{'Insights'}}</text>
+					<text>{{ $t('insights') }}</text>
 					<text>{{'User'}}</text>
 					<text>{{'Amount'}}</text>
 				</view>

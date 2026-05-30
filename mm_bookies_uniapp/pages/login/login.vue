@@ -4,12 +4,14 @@
 		<view class="splash-screen" v-if="showSplash">
 			<!-- Skip 按钮 -->
 			<view class="skip-button" @click="closeSplash">
-				<text class="skip-text">skip {{ splashCountdown }}</text>
+				<text class="skip-text">{{ $t('skip') }} {{ splashCountdown }}</text>
 			</view>
 
 			<!-- 标题图片 -->
 			<view class="splash-title-container">
 				<image class="splash-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+				<!-- TODO: 替换为正确的缅甸文翻译 -->
+				<text class="splash-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 			</view>
 
 			<!-- 主体图片 -->
@@ -23,6 +25,8 @@
 			<!-- 标题图片 -->
 			<view class="login-title-container">
 				<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+				<!-- TODO: 替换为正确的缅甸文翻译 -->
+				<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 			</view>
 
 			<!-- 广告区域 -->
@@ -33,11 +37,11 @@
 			<!-- Login Form -->
 			<view class="login-form">
 				<!-- Welcome Text -->
-				<view class="welcome-text">Welcome back</view>
+				<view class="welcome-text">{{ $t('login_welcome_back') }}</view>
 
 				<!-- Phone Input Field -->
 				<view class="input-wrapper">
-					<input class="input-field" :class="{'input-error': phoneError}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.account" placeholder="Please enter phone number" maxlength="11" @blur="handlePhoneBlur" @input="handlePhoneBlur" />
+					<input class="input-field" :class="{'input-error': phoneError}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.account" :placeholder="$t('login_enter_phone')" maxlength="11" @blur="handlePhoneBlur" @input="handlePhoneBlur" />
 					<view class="error-message" v-if="phoneError">
 						{{$t("L_input_number_limit")}}
 					</view>
@@ -45,7 +49,7 @@
 
 				<!-- Password Input Field -->
 				<view class="input-wrapper">
-					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="text" :password="!showPassword" placeholder-class="input-placeholder" placeholder="Please enter your password" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
+					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="text" :password="!showPassword" placeholder-class="input-placeholder" :placeholder="$t('login_enter_password')" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
 					<view class="password-toggle" @click="togglePasswordVisibility">
 						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
 					</view>
@@ -56,7 +60,7 @@
 
 				<!-- Remember Me -->
 				<view class="remember-row">
-					<text class="remember-text">Remember me</text>
+					<text class="remember-text">{{ $t('remember_me') }}</text>
 					<view class="custom-switch" @click="toggleRememberMe">
 						<view class="switch-dot" :class="{'switch-dot-active': loginInfo.rememberMe}"></view>
 					</view>
@@ -65,20 +69,20 @@
 				<!-- Login Button -->
 				<view class="login-btn" @click="login()">
 					<text :class="loadding"></text>
-					<text>Login</text>
+					<text>{{ $t('login') }}</text>
 				</view>
 
 				<!-- Register Link -->
 				<view class="register-link">
-					<text class="register-text">Dont have an account? </text>
-					<text class="register-link-text" @click="toRegister()">Register</text>
-					<text class="register-text"> now for free.</text>
+					<text class="register-text">{{ $t('login_no_account') }}</text>
+					<text class="register-link-text" @click="toRegister()">{{ $t('register_button') }}</text>
+					<text class="register-text">{{ $t('login_register_free') }}</text>
 				</view>
 			</view>
 
 			<!-- Contact Support -->
 			<view class="contact-support">
-				<text class="contact-text">Contact Support</text>
+				<text class="contact-text">{{ $t('contact_support') }}</text>
 				<view class="social-icons">
 					<view class="social-icon facebook-icon">
 						<image class="icon-image" src="../../figma/login/facebook.png" mode="aspectFit"></image>
@@ -336,10 +340,10 @@
 						});
 					} else {
 						uni.showModal({
-							title: 'Tips',
+							title: _this.$t('tips'),
 							content: _this.$t(res.data.message),
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 							success: function(res) {}
 						});
 						// _this.loginDisabled = false;
@@ -575,7 +579,7 @@
 	.password-toggle {
 		position: absolute;
 		right: 20rpx;
-		top: 50%;
+		top: 42.5rpx;
 		transform: translateY(-50%);
 		width: 60rpx;
 		height: 60rpx;
@@ -590,11 +594,12 @@
 	}
 
 	.error-message {
-		position: absolute;
-		bottom: -25rpx;
-		left: 20rpx;
+		margin-top: 8rpx;
+		padding: 0 20rpx;
 		color: #ff6b6b;
 		font-size: 22rpx;
+		line-height: 1.3;
+		text-align: left;
 	}
 
 	.remember-row {

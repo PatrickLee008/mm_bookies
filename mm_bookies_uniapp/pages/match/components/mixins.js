@@ -59,9 +59,9 @@ export default {
 				league: league.name,
 			}
 			let url = 'favourite/add'
-			let fail_content = 'Add Favourite Failed'
+			let fail_content = _this.$t('add_favor_failed')
 			if (league.favor) {
-				fail_content = 'Delete Favourite Failed'
+				fail_content = _this.$t('delete_favor_failed')
 				url = 'favourite/delete'
 			}
 			_this.$http.post(url, para, (res) => {
@@ -79,9 +79,9 @@ export default {
 				} else {
 					uni.showModal({
 						content: fail_content,
-						title: 'Tips',
+						title: _this.$t('tips'),
 						showCancel: false,
-						confirmText: 'OK'
+						confirmText: _this.$t('ok')
 					})
 				}
 			})

@@ -42,7 +42,7 @@
 					@click="bet_click('draw',__index,attr)"
 					:class="{'mybg-active':attr.draw_selected,}"
 					v-if="attr.MATCH_ATTR_TYPE==bet_type.SINGLE_WDL">
-					<view class="league-match-attr-detail-up">DRAW</view>
+					<view class="league-match-attr-detail-up">{{ $t('draw') }}</view>
 					<view class="league-match-attr-detail-down">{{attr.DRAW_ODDS}}</view>
 				</view>
 				<view class="league-match-attr-detail"

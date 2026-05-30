@@ -125,10 +125,10 @@
 		methods: {
 			developingTips() {
 				uni.showModal({
-					title: 'Tips',
-					content: 'Coming Soon',
-					confirmText: 'OK',
-					cancelText: 'Cancel',
+					title: this.$t('tips'),
+					content: this.$t('coming_soon'),
+					confirmText: this.$t('ok'),
+					cancelText: this.$t('cancel'),
 				})
 			},
 			numberFormat(num) {

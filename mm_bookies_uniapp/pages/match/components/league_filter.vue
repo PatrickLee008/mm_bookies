@@ -8,7 +8,7 @@
 		<view class="filter-container" :class="{'filter-show': !hidden}">
 			<!-- from tangjq--- 标题栏 -->
 			<view class="filter-header">
-				<text class="filter-title">Filter</text>
+				<text class="filter-title">{{ $t('filter') }}</text>
 			</view>
 
 			<!-- from tangjq--- 滚动列表区域 -->
@@ -46,7 +46,7 @@
 			<!-- from tangjq--- 底部确认按钮 -->
 			<view class="filter-footer">
 				<view class="filter-confirm-btn" @click="set_dialog_hide(true)">
-					<text class="filter-confirm-text">Confirm</text>
+					<text class="filter-confirm-text">{{ $t('confirm') }}</text>
 				</view>
 			</view>
 		</view>

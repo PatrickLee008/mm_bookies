@@ -109,10 +109,10 @@
 									:src="`/static/icon/register/${card.bank_code}.png`"></image>
 							</view>
 							<view class="flex-column1 justify-center align-start myfont-11px margin-left">
-								<view class="myfont-12px text-bold text-black">Account Number</view>
+								<view class="myfont-12px text-bold text-black">{{ $t('account_number') }}</view>
 								<view>{{card.acc_number}}</view>
 								<view style="height: 2px;"></view>
-								<view class="myfont-12px text-bold text-black">Account Name</view>
+								<view class="myfont-12px text-bold text-black">{{ $t('account_ame') }}</view>
 								<view>{{card.acc_name}}</view>
 							</view>
 						</view>
@@ -121,7 +121,7 @@
 								:class="card.is_default?'mybg-linfo':''"
 								:style="card.is_default?'color:#666666':'background-color: #E02B2B;'" v-if="editing"
 								@click="card.is_default?'':removeBank(card)">
-								{{'Remove'}}
+								{{ $t('remove') }}
 							</view>
 							<view class="flex-column1 align-center justify-center" v-else>
 								<view class="myfont-10px margin-bottom-xs" :class="!index?'mycolor-primary':''">
@@ -139,7 +139,7 @@
 					@click="show_add_modal('add')">
 					<text class="cuIcon-roundadd myfont-28px mycolor-lprimary" style="">
 					</text>
-					<text class="myfont-17px margin-left-lg text-black">{{'Add Bank Manually'}}</text>
+					<text class="myfont-17px margin-left-lg text-black">{{ $t('add_bank_manually') }}</text>
 				</view>
 
 				<view class="height-45px radius-10px margin-top flex-column"
@@ -170,12 +170,12 @@
 						</view>
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
-							<view>Account Name</view>
+							<view>{{ $t('account_ame') }}</view>
 							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text
 									class="cuIcon-copy mycolor-info text-light margin-left"
 									@click="copy(agent_bankcard.rc_bank_account)"></text>
 							</view>
-							<view>Account Number</view>
+							<view>{{ $t('account_number') }}</view>
 						</view>
 					</view>
 				</view>
@@ -275,14 +275,14 @@
 						<view class="flex-row justify-between align-center height-42px text-black mybg-grey"
 							style="padding: 5px 7px;border: solid 1px #626262;">
 							<input type="text" class="" style="text-align: start;width: 100%;"
-								@input="set_add_disable()" placeholder="Enter your Bank Account Name"
+								@input="set_add_disable()" :placeholder="$t('enter_bank_account_name')"
 								v-model="card_conf.acc_name" />
 						</view>
 						<view class="margin-top-sm">{{'Bank Account Number'}}</view>
 						<view class="flex-row justify-between align-center height-42px text-black mybg-grey"
 							style="padding: 5px 7px;border: solid 1px #626262;">
 							<input type="number" class="" style="text-align: start;width: 100%;" maxlength="17"
-								@input="set_add_disable()" placeholder="Enter your Bank Account Number"
+								@input="set_add_disable()" :placeholder="$t('enter_bank_account_number')"
 								v-model="card_conf.acc_number" />
 						</view>
 						<view class="width-100 text-left margin-top-sm text-red myfont-13px"
@@ -479,11 +479,12 @@
 				return dateFormatUtils.numFormat(number);
 			},
 			copy(account) {
+				const _this = this
 				uni.setClipboardData({
 					data: account,
 					success: function() {
 						uni.showToast({
-							title: 'Copied to clipboard',
+							title: _this.$t('copied_to_clipboard'),
 							icon: 'success'
 						});
 					},
@@ -498,10 +499,10 @@
 					let _this = this
 					if (_this.chargeForm.charge_way == 1 && _this.agent_no_bankcard) {
 						uni.showModal({
-							title: 'Tips',
-							content: 'Your agent no bankcard',
+							title: _this.$t('tips'),
+							content: _this.$t('agent_no_bankcard'),
 							showCancel: false,
-							confirmText: 'Back',
+							confirmText: _this.$t('back'),
 							success: res => {
 								if (res.confirm) {
 									this.goto('/pages/ucenter/charge')
@@ -518,8 +519,8 @@
 			show_add_modal(modal_type) {
 				if (modal_type == 'add' && this.card_list.length >= 5) {
 					uni.showModal({
-						title: 'Tips',
-						content: 'Up to five bank accounts can be added',
+						title: this.$t('tips'),
+						content: this.$t('max_five_banks'),
 						showCancel: false,
 						confirmText: this.$t('confirm'),
 						success: res => {
@@ -563,7 +564,7 @@
 				_this.$http.post('/bank_card/add', para, (res) => {
 					if (res.statusCode == 200) {
 						uni.showToast({
-							title: 'Saved Success',
+							title: _this.$t('saved_success'),
 							// title: 'Your Bank Account has been successfully saved',
 							icon: 'success',
 							duration: 2000
@@ -595,7 +596,7 @@
 							_this.$http.post('/bank_card/delete', para, (res) => {
 								if (res.statusCode == 200) {
 									uni.showToast({
-										title: 'Removed Success',
+										title: _this.$t('removed_success'),
 										// title: 'Your Bank Account has been successfully removed',
 										icon: 'success',
 										duration: 2000
@@ -687,7 +688,7 @@
 				// }
 				if (this.picture) {
 					uni.showLoading({
-						title: 'Upload Pic...'
+						title: this.$t('upload_pic')
 					})
 					var con = {
 						url: url,
@@ -730,10 +731,10 @@
 								}
 								uni.hideLoading()
 								uni.showModal({
-									title: 'tips',
+									title: _this.$t('tips'),
 									content: tips,
 									showCancel: false,
-									confirmText: 'OK'
+									confirmText: _this.$t('ok')
 								})
 							}
 						}
@@ -741,7 +742,7 @@
 					_this.$http.uploadFile(con)
 				} else {
 					uni.showToast({
-						title: 'please upload the charge picture!',
+						title: this.$t('upload_charge_pic'),
 						image: '../../static/icon/error.png',
 						duration: 2000
 					})
@@ -814,7 +815,7 @@
 				// 手动充值
 				var _this = this;
 				uni.showLoading({
-					title: 'Loading...'
+					title: _this.$t('loading_dots')
 				});
 				// 如果有图片需要上传
 				if (_this.chargeForm.charge_way && _this.picture) {
@@ -847,19 +848,19 @@
 									});
 								} else {
 									uni.showModal({
-										confirmText: 'OK',
+										confirmText: this.$t('ok'),
 										showCancel: false,
-										title: 'Error',
+										title: this.$t('error_title'),
 										content: data.message
 									});
 								}
 							} catch (e) {
 								// console.error('解析响应失败:', e);
 								uni.showModal({
-									confirmText: 'OK',
+									confirmText: this.$t('ok'),
 									showCancel: false,
-									title: 'Error',
-									content: 'Unknow error'
+									title: this.$t('error_title'),
+									content: this.$t('unknown_error')
 								});
 							}
 						},
@@ -867,10 +868,10 @@
 							uni.hideLoading();
 							// console.error('上传失败:', err);
 							uni.showModal({
-								confirmText: 'OK',
+								confirmText: this.$t('ok'),
 								showCancel: false,
-								title: 'Error',
-								content: 'Upload Fail'
+								title: this.$t('error_title'),
+								content: this.$t('upload_fail')
 							});
 						}
 					});
@@ -896,9 +897,9 @@
 							});
 						} else {
 							uni.showModal({
-								confirmText: 'OK',
+								confirmText: this.$t('ok'),
 								showCancel: false,
-								title: 'Error',
+								title: this.$t('error_title'),
 								content: res.data.message
 							});
 						}
@@ -982,7 +983,7 @@
 					if (data.code == 200) {
 						let order = data.data;
 						uni.showToast({
-							title: "Success!"
+							title: _this.$t('success_excl')
 						})
 						_this.card_conf = _this.$options.data().card_conf
 						uni.navigateTo({
@@ -992,9 +993,9 @@
 					} else if (data.code == 409) {
 						let order = data.data;
 						uni.showModal({
-							title: 'Tips',
+							title: _this.$t('tips'),
 							content: res.data.message,
-							confirmText: 'Pay the orther',
+							confirmText: _this.$t('pay_other'),
 							showCancel: false,
 							success: (res1) => {
 								if (res1.confirm) {
@@ -1008,9 +1009,9 @@
 
 					} else {
 						uni.showModal({
-							confirmText: 'OK',
+							confirmText: this.$t('ok'),
 							showCancel: false,
-							title: 'Error',
+							title: this.$t('error_title'),
 							content: res.data.message
 						})
 					}

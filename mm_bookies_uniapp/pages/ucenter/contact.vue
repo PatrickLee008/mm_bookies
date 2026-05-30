@@ -3,45 +3,45 @@
 		<!-- 顶部栏 -->
 		<view class="contact-header">
 			<text class="header-back-icon" @click="goBack">←</text>
-			<text class="header-title">Contact Us</text>
+			<text class="header-title">{{ $t('contact us') }}</text>
 			<text class="header-close-icon" @click="goBack">✕</text>
 		</view>
 
 		<scroll-view scroll-y style="height: calc(100vh - 88px);">
 			<view class="contact-content">
 				<!-- 标题部分 -->
-				<text class="contact-section-title">Contact</text>
-				<text class="contact-description">Explore our website for more information and updates!</text>
+				<text class="contact-section-title">{{ $t('Contact') }}</text>
+				<text class="contact-description">{{ $t('explore_website') }}</text>
 
 				<!-- 联系方式列表 -->
 				<view class="contact-item">
-					<text class="contact-label">Viber</text>
+					<text class="contact-label">{{ $t('viber') }}</text>
 					<view class="contact-value-row">
 						<text class="contact-value">{{ contactInfo.viber || '09789456123' }}</text>
 						<view class="copy-btn" @click="copyText(contactInfo.viber || '09789456123')">
-							<text class="copy-btn-text">Copy</text>
+							<text class="copy-btn-text">{{ $t('copy') }}</text>
 							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
 						</view>
 					</view>
 				</view>
 
 				<view class="contact-item">
-					<text class="contact-label">Telegram</text>
+					<text class="contact-label">{{ $t('telegram') }}</text>
 					<view class="contact-value-row">
 						<text class="contact-value">{{ contactInfo.telegram || '09789456123' }}</text>
 						<view class="copy-btn" @click="copyText(contactInfo.telegram || '09789456123')">
-							<text class="copy-btn-text">Copy</text>
+							<text class="copy-btn-text">{{ $t('copy') }}</text>
 							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
 						</view>
 					</view>
 				</view>
 
 				<view class="contact-item">
-					<text class="contact-label">Email</text>
+					<text class="contact-label">{{ $t('email') }}</text>
 					<view class="contact-value-row">
 						<text class="contact-value">{{ contactInfo.email || 'mmbookies@test.com' }}</text>
 						<view class="copy-btn" @click="copyText(contactInfo.email || 'mmbookies@test.com')">
-							<text class="copy-btn-text">Copy</text>
+							<text class="copy-btn-text">{{ $t('copy') }}</text>
 							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
 						</view>
 					</view>
@@ -91,19 +91,20 @@
 				return ''
 			},
 			copyText(text) {
+				const _this = this
 				// from tangjq--- 复制文本到剪贴板
 				uni.setClipboardData({
 					data: text,
 					success: function() {
 						uni.showToast({
-							title: 'Copied!',
+							title: _this.$t('copied'),
 							icon: 'success',
 							duration: 1500
 						})
 					},
 					fail: function() {
 						uni.showToast({
-							title: 'Copy failed',
+							title: _this.$t('copy_failed'),
 							icon: 'none',
 							duration: 1500
 						})

@@ -3,7 +3,7 @@
 		<!-- 顶部栏 -->
 		<view class="language-header">
 			<text class="header-back-icon" @click="goBack">←</text>
-			<text class="header-title">Change Language</text>
+			<text class="header-title">{{ $t('change_language') }}</text>
 			<text class="header-placeholder"></text>
 		</view>
 
@@ -18,7 +18,7 @@
 				</view>
 
 				<view class="language-item" @click="pickerChange('en')">
-					<text class="language-label">English</text>
+					<text class="language-label">{{ $t('English') }}</text>
 					<view class="radio-circle" :class="{ 'radio-selected': picker === 'en' }">
 						<view class="radio-dot" v-if="picker === 'en'"></view>
 					</view>

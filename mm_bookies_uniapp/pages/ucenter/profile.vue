@@ -3,7 +3,7 @@
 		<!-- 顶部栏 -->
 		<view class="profile-header">
 			<text class="header-back-icon" @click="goBack">←</text>
-			<text class="header-title">Edit Profile</text>
+			<text class="header-title">{{ $t('edit profile') }}</text>
 			<text class="header-placeholder"></text>
 		</view>
 
@@ -18,23 +18,23 @@
 
 				<!-- My ID -->
 				<view class="info-row">
-					<text class="info-label">My ID : {{ userInfo.id || '00001' }}</text>
+					<text class="info-label">{{ $t('my_id') }} : {{ userInfo.id || '00001' }}</text>
 				</view>
 
 				<!-- Phone No -->
 				<view class="phone-row">
-					<text class="phone-label">Phone No: {{ userInfo.phone || '0987654321' }}</text>
+					<text class="phone-label">{{ $t('phone_no') }}: {{ userInfo.phone || '0987654321' }}</text>
 					<image class="edit-icon" src="/static/icon/edit.png" mode="aspectFit" @click="editPhone"></image>
 				</view>
 
 				<!-- Change Password 按钮 -->
 				<view class="change-pwd-btn" @click="showChangePasswordModal">
-					<text class="change-pwd-text">Change Password</text>
+					<text class="change-pwd-text">{{ $t('Change password') }}</text>
 				</view>
 
 				<!-- Save 按钮 -->
 				<view class="save-btn">
-					<text class="save-btn-text">Save</text>
+					<text class="save-btn-text">{{ $t('save') }}</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -44,7 +44,7 @@
 			<view class="pwd-modal-content" @click.stop="">
 				<!-- 弹窗标题栏 -->
 				<view class="pwd-modal-header">
-					<text class="pwd-modal-title">Change Password</text>
+					<text class="pwd-modal-title">{{ $t('Change password') }}</text>
 				</view>
 
 				<!-- 输入表单 -->
@@ -52,19 +52,19 @@
 					<input
 						class="pwd-input"
 						type="password"
-						placeholder="Please enter your old password"
+						:placeholder="$t('enter_old_password')"
 						placeholder-class="pwd-placeholder"
 						v-model="oldPassword" />
 					<input
 						class="pwd-input"
 						type="password"
-						placeholder="Please enter your new password"
+						:placeholder="$t('enter_new_password')"
 						placeholder-class="pwd-placeholder"
 						v-model="newPassword" />
 					<input
 						class="pwd-input"
 						type="password"
-						placeholder="Please enter your new password"
+						:placeholder="$t('enter_new_password')"
 						placeholder-class="pwd-placeholder"
 						v-model="confirmPassword" />
 				</view>
@@ -72,10 +72,10 @@
 				<!-- 按钮组 -->
 				<view class="pwd-buttons">
 					<view class="pwd-cancel-btn" @click="hidePwdModal">
-						<text class="pwd-cancel-text">Cancel</text>
+						<text class="pwd-cancel-text">{{ $t('cancel') }}</text>
 					</view>
 					<view class="pwd-save-btn" @click="savePassword">
-						<text class="pwd-save-text">Save</text>
+						<text class="pwd-save-text">{{ $t('save') }}</text>
 					</view>
 				</view>
 			</view>
@@ -105,7 +105,7 @@
 			editPhone() {
 				uni.showToast({
 					icon: 'none',
-					title: 'Phone editing feature coming soon'
+					title: this.$t('phone_edit_coming_soon')
 				})
 			},
 			// from tangjq--- 显示修改密码弹窗
@@ -126,7 +126,7 @@
 				if (!_this.oldPassword || !_this.newPassword || !_this.confirmPassword) {
 					uni.showToast({
 						icon: 'none',
-						title: 'Please fill in all fields'
+						title: _this.$t('fill_all_fields')
 					})
 					return
 				}
@@ -134,13 +134,13 @@
 				if (_this.newPassword !== _this.confirmPassword) {
 					uni.showToast({
 						icon: 'none',
-						title: 'New passwords do not match'
+						title: _this.$t('new_passwords_no_match')
 					})
 					return
 				}
 
 				uni.showLoading({
-					title: 'Saving...',
+					title: _this.$t('saving'),
 					mask: true
 				})
 
@@ -152,14 +152,14 @@
 					if (res.statusCode === 200 && res.data.code === 200) {
 						uni.showToast({
 							icon: 'success',
-							title: 'Password changed successfully',
+							title: _this.$t('password_changed_success'),
 							duration: 2000
 						})
 						_this.hidePwdModal()
 					} else {
 						uni.showToast({
 							icon: 'none',
-							title: res.data.message || 'Failed to change password',
+							title: res.data.message || _this.$t('failed_change_password'),
 							duration: 2000
 						})
 					}
@@ -167,7 +167,7 @@
 					uni.hideLoading()
 					uni.showToast({
 						icon: 'none',
-						title: 'Network error',
+						title: _this.$t('network_error'),
 						duration: 2000
 					})
 				})

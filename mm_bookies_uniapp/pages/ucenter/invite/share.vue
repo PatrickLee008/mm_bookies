@@ -117,7 +117,7 @@
 			shareSystem() {
 				if (!this.canInvite) {
 					uni.showToast({
-						title: "You've reached the maximum invites",
+						title: this.$t('max_invites_reached'),
 						icon: 'none',
 						duration: 3000
 					});
@@ -126,13 +126,13 @@
 
 				if (navigator.share) {
 					navigator.share({
-						title: 'Join me on ONE X2!',
-						text: 'Click the link to get started!',
+						title: this.$t('share_title'),
+						text: this.$t('share_text'),
 						url: this.share_url
 					});
 				} else {
 					uni.showToast({
-						title: 'System share not supported',
+						title: this.$t('share_not_supported'),
 						icon: 'none'
 					});
 				}
@@ -140,7 +140,7 @@
 			shareFacebook() {
 				if (!this.canInvite) {
 					uni.showToast({
-						title: "You've reached the maximum invites",
+						title: this.$t('max_invites_reached'),
 						icon: 'none',
 						duration: 3000
 					});
@@ -151,7 +151,7 @@
 			shareTelegram() {
 				if (!this.canInvite) {
 					uni.showToast({
-						title: "You've reached the maximum invites",
+						title: this.$t('max_invites_reached'),
 						icon: 'none',
 						duration: 3000
 					});
@@ -162,7 +162,7 @@
 			shareLine() {
 				if (!this.canInvite) {
 					uni.showToast({
-						title: "You've reached the maximum invites",
+						title: this.$t('max_invites_reached'),
 						icon: 'none',
 						duration: 3000
 					});
@@ -174,18 +174,19 @@
 				// 检查是否可以邀请
 				if (!this.canInvite) {
 					uni.showToast({
-						title: "You've reached the maximum invites",
+						title: this.$t('max_invites_reached'),
 						icon: 'none',
 						duration: 3000
 					});
 					return;
 				}
 
+				const _this = this
 				uni.setClipboardData({
-					data: this.share_url,
+					data: _this.share_url,
 					success: function() {
 						uni.showToast({
-							title: 'Copied to clipboard',
+							title: _this.$t('copied_to_clipboard'),
 							icon: 'success'
 						});
 					},

@@ -3,6 +3,8 @@
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+			<!-- TODO: 替换为正确的缅甸文翻译 -->
+			<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 		</view>
 
 		<!-- 广告区域 -->
@@ -13,11 +15,11 @@
 		<!-- Login Form -->
 		<view class="login-form">
 			<!-- Welcome Text -->
-			<view class="welcome-text">Welcome to MM Bookies</view>
+			<view class="welcome-text">{{ $t('register_welcome') }}</view>
 
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': phone_error}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.phone" placeholder="Please enter phone number" maxlength="11" @blur="handle_phone_blur" @input="handle_phone_blur" />
+				<input class="input-field" :class="{'input-error': phone_error}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.phone" :placeholder="$t('login_enter_phone')" maxlength="11" @blur="handle_phone_blur" @input="handle_phone_blur" />
 				<view class="error-message" v-if="phone_error">
 					{{$t("r_input_number_error")}}
 				</view>
@@ -25,7 +27,7 @@
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}" type="text" :password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password" placeholder="Please enter your password" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
+				<input class="input-field" :class="{'input-error': password_error}" type="text" :password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password" :placeholder="$t('login_enter_password')" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
 				<view class="password-toggle" @click="togglePasswordVisibility">
 					<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
 				</view>
@@ -36,7 +38,7 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text" :password="!showConfirmPassword" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" placeholder="Please confirm your password" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
+				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text" :password="!showConfirmPassword" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" :placeholder="$t('register_confirm_password')" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
 				<view class="password-toggle" @click="toggleConfirmPasswordVisibility">
 					<uni-icons :type="showConfirmPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
 				</view>
@@ -45,31 +47,23 @@
 				</view>
 			</view>
 
-			<!-- Remember Me -->
-			<view class="remember-row">
-				<text class="remember-text">Remember me</text>
-				<view class="custom-switch" @click="toggleRememberMe">
-					<view class="switch-dot" :class="{'switch-dot-active': rememberMe}"></view>
-				</view>
-			</view>
-
 			<!-- Sign up Button -->
 			<view class="login-btn" @click="register()">
 				<text :class="loadding"></text>
-				<text>Sign up</text>
+				<text>{{ $t('sign_up') }}</text>
 			</view>
 
 			<!-- Login Link -->
 			<view class="register-link">
-				<text class="register-text">Already have an account? </text>
-				<text class="register-link-text" @click="toLogin()">Login</text>
-				<text class="register-text"> now.</text>
+				<text class="register-text">{{ $t('register_have_account') }}</text>
+				<text class="register-link-text" @click="toLogin()">{{ $t('login') }}</text>
+				<text class="register-text">{{ $t('register_now') }}</text>
 			</view>
 		</view>
 
 		<!-- Contact Support -->
 		<view class="contact-support">
-			<text class="contact-text">Contact Support</text>
+			<text class="contact-text">{{ $t('contact_support') }}</text>
 			<view class="social-icons">
 				<view class="social-icon facebook-icon">
 					<image class="icon-image" src="../../figma/login/facebook.png" mode="aspectFit"></image>
@@ -185,19 +179,19 @@
 						} else {
 							_this.loadding = '';
 							uni.showModal({
-								title: 'Tips!',
+								title: _this.$t('tips'),
 								content: _this.$t('account_repeat'),
 								showCancel: false,
-								confirmText: 'ok',
+								confirmText: _this.$t('ok'),
 							});
 						}
 					} else {
 						_this.loadding = '';
 						uni.showModal({
-							title: 'Error!',
+							title: _this.$t('error_title'),
 							content: res.data.message,
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 						});
 					}
 				})
@@ -215,7 +209,7 @@
 				if (adl) para.adlink_id = adl;
 
 				uni.showLoading({
-					title: "registering"
+					title: _this.$t('registering')
 				})
 
 				_this.$http.post('/app_user/add', para, (res) => {
@@ -226,10 +220,10 @@
 						_this.login();
 					} else {
 						uni.showModal({
-							title: 'Error!',
+							title: _this.$t('error_title'),
 							content: res.data.message,
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 						});
 					}
 				})
@@ -276,17 +270,17 @@
 						uni.setStorageSync('rigister_success', true);
 					} else if (res.statusCode == 400) {
 						uni.showModal({
-							title: 'Tips',
+							title: _this.$t('tips'),
 							content: _this.$t('wrong_password'),
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 						});
 					} else {
 						uni.showModal({
-							title: 'Tips',
+							title: _this.$t('tips'),
 							content: _this.language[res.data.message],
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 						});
 					}
 				})
@@ -405,7 +399,7 @@
 	.password-toggle {
 		position: absolute;
 		right: 20rpx;
-		top: 50%;
+		top: 42.5rpx;
 		transform: translateY(-50%);
 		width: 60rpx;
 		height: 60rpx;
@@ -420,11 +414,12 @@
 	}
 
 	.error-message {
-		position: absolute;
-		bottom: -25rpx;
-		left: 20rpx;
+		margin-top: 8rpx;
+		padding: 0 20rpx;
 		color: #ff6b6b;
 		font-size: 22rpx;
+		line-height: 1.3;
+		text-align: left;
 	}
 
 	.remember-row {

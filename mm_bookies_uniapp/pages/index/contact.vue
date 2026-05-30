@@ -53,7 +53,7 @@
 						<text class="height-22px">Phone</text>
 					</view>
 					<view class="flex-row myfont-12px">
-						<text>Hotline Phone</text>
+						<text>{{ $t('hotline_phone') }}</text>
 					</view>
 				</view>
 			</view>

@@ -5,7 +5,7 @@
 			<view class="padding">
 				<view class="title-text margin-tb-sm" style="margin-left: 0;">
 					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
-					{{'User Dashboard'}}
+					{{ $t('user_dashboard_title') }}
 				</view>
 
 				<!-- Total Revenue Card -->
@@ -76,7 +76,7 @@
 						</selector>
 					</view>
 					<view class="search-container">
-						<input type="text" v-model="searchKeyword" class="search-input-field" placeholder="Search"
+						<input type="text" v-model="searchKeyword" class="search-input-field" :placeholder="$t('search')"
 							@input="onSearch" @confirm="onSearch" />
 					</view>
 				</view>
@@ -95,16 +95,16 @@
 						</view>
 						<view class="user-info-row">
 							<view class="info-section">
-								<text class="info-label">Contribution</text>
+								<text class="info-label">{{ $t('contribution') }}</text>
 								<text class="info-value">{{getContributionText(user)}}</text>
 								<text v-if="getLastCompletedActivityText(user)"
 									class="info-secondary">{{getLastCompletedActivityText(user)}}</text>
 							</view>
 							<view class="info-section">
-								<text class="info-label text-right">Next Milestone</text>
+								<text class="info-label text-right">{{ $t('next_milestone') }}</text>
 								<text class="info-value text-right">{{getMilestoneText(user)}}</text>
 								<view class="user-activity-row text-right">
-									<text class="joined-text">Joined Date {{formatDate(user.register_time)}}</text>
+									<text class="joined-text">{{ $t('joined_date') }} {{formatDate(user.register_time)}}</text>
 								</view>
 							</view>
 						</view>

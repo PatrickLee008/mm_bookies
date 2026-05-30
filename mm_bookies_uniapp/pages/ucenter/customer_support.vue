@@ -3,15 +3,15 @@
 		<!-- 顶部栏 -->
 		<view class="support-header">
 			<text class="header-back-icon" @click="goBack">←</text>
-			<text class="header-title">Customer Support</text>
+			<text class="header-title">{{ $t('customer_support') }}</text>
 			<text class="header-close-icon" @click="goBack">✕</text>
 		</view>
 
 		<scroll-view scroll-y style="height: calc(100vh - 88px);">
 			<view class="support-content">
 				<!-- 标题部分 -->
-				<text class="support-main-title">Contact us via following for any support</text>
-				<text class="support-description">Explore our website for more information and updates!</text>
+				<text class="support-main-title">{{ $t('contact_us_via') }}</text>
+				<text class="support-description">{{ $t('explore_website') }}</text>
 
 				<!-- 支持渠道列表 -->
 				<view class="support-channel-section" v-for="(channel, channelIndex) in supportChannels" :key="channelIndex">

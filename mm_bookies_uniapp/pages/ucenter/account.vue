@@ -251,20 +251,20 @@
 						// })
 						uni.showModal({
 							// title: this.language['Change Password Success'],
-							title: 'Tips',
+							title: _this.$t('tips'),
 							content: tips,
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 							success: function(res) {
 								_this.show_set_password = false;
 							}
 						});
 					} else {
 						uni.showModal({
-							title: 'tips',
+							title: _this.$t('tips'),
 							content: tips,
 							showCancel: false,
-							confirmText: 'ok',
+							confirmText: _this.$t('ok'),
 							success: function(res) {}
 						});
 					}
@@ -272,11 +272,12 @@
 				})
 			},
 			copy() {
+				const _this = this
 				uni.setClipboardData({
-					data: this.userInfo.id,
+					data: _this.userInfo.id,
 					success: function() {
 						uni.showToast({
-							title: 'Copied to clipboard',
+							title: _this.$t('copied_to_clipboard'),
 							icon: 'success'
 						});
 					},

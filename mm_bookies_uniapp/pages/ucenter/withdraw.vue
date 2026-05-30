@@ -19,13 +19,13 @@
 					</view>
 					<view class="flex-column1 justify-center align-start width-45" @click="">
 						<view class="bank-title">{{card_list[0].acc_name}}</view>
-						<view>Account Name</view>
+						<view>{{ $t('account_ame') }}</view>
 						<view class="bank-title">{{card_list[0].acc_number}}</view>
-						<view>Account Number</view>
+						<view>{{ $t('account_number') }}</view>
 					</view>
 					<view class="flex-column1 justify-center align-center margin-right">
 						<image src="/static/icon/wallet/128.png" style="height: 60px;" mode="heightFix"></image>
-						<text class="myfont-12px">New</text>
+						<text class="myfont-12px">{{ $t('new_label') }}</text>
 					</view>
 				</view>
 			</view>
@@ -38,7 +38,7 @@
 			</view>
 			<view class="width-100"
 				style="font-family: __Inter_7be8ac, __Inter_l;font-weight: 600;color: black;padding: 0 20px;">
-				{{'Amount'}}
+				{{ $t('text_field_amount') }}
 			</view>
 			<view class="flex-column mybg-lprimary text-white width-100" style="position: relative">
 				<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount"
@@ -280,7 +280,7 @@
 				// 	return;
 				// }
 				uni.showLoading({
-					title: 'Withdrawing!'
+					title: _this.$t('withdrawing')
 				})
 				_this.$http.post('/withdraw/apply', para, (res) => {
 					uni.hideLoading()

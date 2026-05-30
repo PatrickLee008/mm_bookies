@@ -11,7 +11,7 @@
 			<view class="search-wrapper">
 				<view class="search-box">
 					<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
-					<input class="search-input" type="text" placeholder="Search" v-model="searchKeyword" />
+					<input class="search-input" type="text" :placeholder="$t('search')" v-model="searchKeyword" />
 					<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword" @tap="clearSearch"></image>
 				</view>
 				<view class="filter-button" @click="openFilterPopup">
@@ -63,7 +63,7 @@
 			<view class="filter-popup" @click.stop>
 				<!-- Filter Header -->
 				<view class="filter-header">
-					<text class="filter-title">Filter</text>
+					<text class="filter-title">{{ $t('filter') }}</text>
 				</view>
 
 				<!-- Filter Options -->
@@ -79,7 +79,7 @@
 				<!-- Confirm Button -->
 				<view class="filter-confirm">
 					<view class="filter-confirm-btn" @click="confirmFilter">
-						<text class="filter-confirm-text">Confirm</text>
+						<text class="filter-confirm-text">{{ $t('confirm') }}</text>
 					</view>
 				</view>
 			</view>
@@ -162,7 +162,7 @@
 				_this.loading = true
 
 				uni.showLoading({
-					title: 'Loading...'
+					title: _this.$t('loading_dots')
 				})
 
 				const para = {
@@ -198,7 +198,7 @@
 						_this.groupGamesByPlatform(_this.filteredGames)
 					} else {
 						uni.showToast({
-							title: res.data.message || 'Failed to load games',
+							title: res.data.message || _this.$t('failed_load_games'),
 							icon: 'none'
 						})
 					}
@@ -206,7 +206,7 @@
 					_this.loading = false
 					uni.hideLoading()
 					uni.showToast({
-						title: 'Network error',
+						title: _this.$t('network_error'),
 						icon: 'none'
 					})
 				})
@@ -258,7 +258,7 @@
 				const userInfo = _this.$store.state.userInfo
 				if (!userInfo || !userInfo.phone) {
 					uni.showToast({
-						title: 'Unable to get user information',
+						title: _this.$t('unable_get_user_info'),
 						icon: 'none'
 					})
 					return
@@ -266,7 +266,7 @@
 
 				// 显示加载中
 				uni.showLoading({
-					title: 'Loading game...',
+					title: _this.$t('loading_game'),
 					mask: true
 				})
 
@@ -290,7 +290,7 @@
 						// 如果是新会员（首次注册AWC），提示用户
 						if (isNewMember) {
 							uni.showToast({
-								title: 'Account created successfully',
+								title: _this.$t('account_created_success'),
 								icon: 'success',
 								duration: 1500
 							})
@@ -312,10 +312,10 @@
 							if (!newWindow) {
 								// 如果被拦截，提示用户或使用备用方案
 								uni.showModal({
-									title: 'Tips',
-									content: 'Please allow pop-ups for this site',
-									confirmText: 'Open Now',
-									cancelText: 'Cancel',
+									title: _this.$t('tips'),
+									content: _this.$t('allow_popups'),
+									confirmText: _this.$t('open_now'),
+									cancelText: _this.$t('cancel'),
 									success: (modalRes) => {
 										if (modalRes.confirm) {
 											// 用户确认后，跳转到webview页面
@@ -338,17 +338,17 @@
 
 					} else {
 						uni.showModal({
-							title: 'Error',
-							content: res.data.message || 'Failed to launch game',
+							title: _this.$t('error_title'),
+							content: res.data.message || _this.$t('failed_launch_game'),
 							showCancel: false,
-							confirmText: 'OK'
+							confirmText: _this.$t('ok')
 						})
 					}
 				}, (err) => {
 					uni.hideLoading()
 					console.error('launchGame error:', err)
 					uni.showToast({
-						title: 'Network error',
+						title: _this.$t('network_error'),
 						icon: 'none'
 					})
 				})
@@ -374,18 +374,18 @@
 					if (res.statusCode == 200 && res.data.code == 200) {
 						game.favorite = !isFavorite
 						uni.showToast({
-							title: isFavorite ? 'Removed from favorites' : 'Added to favorites',
+							title: isFavorite ? _this.$t('removed_from_favorites') : _this.$t('added_to_favorites'),
 							icon: 'success'
 						})
 					} else {
 						uni.showToast({
-							title: res.data.message || 'Operation failed',
+							title: res.data.message || _this.$t('operation_failed'),
 							icon: 'none'
 						})
 					}
 				}, (err) => {
 					uni.showToast({
-						title: 'Network error',
+						title: _this.$t('network_error'),
 						icon: 'none'
 					})
 				})

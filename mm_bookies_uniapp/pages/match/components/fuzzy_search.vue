@@ -5,7 +5,7 @@
 				<view class="flex-row mycolor-primary margin-tb-sm" style="">
 					<view class="cuIcon-back mycolor-info" @click="set_dialog_hide(true)"></view>
 					<view class="flex-row justify-between margin-right radius-6px padding-tb-xs padding-lr-sm">
-						<input class="width-100 text-left padding-right-sm myfont-12px" placeholder="Search"
+						<input class="width-100 text-left padding-right-sm myfont-12px" :placeholder="$t('search')"
 							placeholder-class="holder-class" v-model="search_query" @input="handle_search" />
 						<view
 							class="cuIcon-close round width-17px height-16px line-height-16px myfont-8px round mybg-info text-white"

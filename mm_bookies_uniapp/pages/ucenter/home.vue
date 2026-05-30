@@ -35,7 +35,7 @@
 		<view class="modal-overlay" v-if="profileModalVisible" @click="hideProfileModal">
 			<view class="modal-content profile-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title">Edit Profile</text>
+					<text class="modal-title">{{ $t('edit profile') }}</text>
 					<text class="modal-close" @click="hideProfileModal">✕</text>
 				</view>
 				<view class="modal-body">
@@ -48,23 +48,23 @@
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">My ID : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
+						<text class="profile-info-label">{{ $t('my_id') }} : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
 					<!-- Phone No -->
 					<view class="profile-phone-row">
-						<text class="profile-phone-label">Phone No: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
+						<text class="profile-phone-label">{{ $t('phone_no') }}: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
 						<image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image>
 					</view>
 
 					<!-- Change Password 按钮 -->
 					<view class="profile-change-pwd-btn" @click="showPasswordChangeModal">
-						<text class="profile-change-pwd-text">Change Password</text>
+						<text class="profile-change-pwd-text">{{ $t('Change password') }}</text>
 					</view>
 
 					<!-- Save 按钮 -->
 					<view class="profile-save-btn" @click="hideProfileModal">
-						<text class="profile-save-text">Save</text>
+						<text class="profile-save-text">{{ $t('save') }}</text>
 					</view>
 				</view>
 			</view>
@@ -74,42 +74,42 @@
 		<view class="modal-overlay" v-if="contactModalVisible" @click="hideContactModal">
 			<view class="modal-content contact-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title" style="text-align: left;">Contact Us</text>
+					<text class="modal-title" style="text-align: left;">{{ $t('contact us') }}</text>
 					<text class="modal-close" @click="hideContactModal">✕</text>
 				</view>
 				<view class="modal-body">
-					<text class="contact-section-title">Contact</text>
-					<text class="contact-description">Explore our website for more information and updates!</text>
+					<text class="contact-section-title">{{ $t('Contact') }}</text>
+					<text class="contact-description">{{ $t('explore_website') }}</text>
 
 					<!-- 联系方式列表 -->
 					<view class="contact-row-item">
-						<text class="contact-row-label">Viber</text>
+						<text class="contact-row-label">{{ $t('viber') }}</text>
 						<view class="contact-input-wrapper">
 							<text class="contact-input-value">09789456123</text>
 							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">Copy</text>
+								<text class="copy-button-text">{{ $t('copy') }}</text>
 								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
 							</view>
 						</view>
 					</view>
 
 					<view class="contact-row-item">
-						<text class="contact-row-label">Telegram</text>
+						<text class="contact-row-label">{{ $t('telegram') }}</text>
 						<view class="contact-input-wrapper">
 							<text class="contact-input-value">09789456123</text>
 							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">Copy</text>
+								<text class="copy-button-text">{{ $t('copy') }}</text>
 								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
 							</view>
 						</view>
 					</view>
 
 					<view class="contact-row-item">
-						<text class="contact-row-label">Email</text>
+						<text class="contact-row-label">{{ $t('email') }}</text>
 						<view class="contact-input-wrapper">
 							<text class="contact-input-value">mmbookies@test.com</text>
 							<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
-								<text class="copy-button-text">Copy</text>
+								<text class="copy-button-text">{{ $t('copy') }}</text>
 								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
 							</view>
 						</view>
@@ -122,13 +122,13 @@
 		<view class="modal-overlay" v-if="aboutModalVisible" @click="hideAboutModal">
 			<view class="modal-content about-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title" style="text-align: left;">About</text>
+					<text class="modal-title" style="text-align: left;">{{ $t('about') }}</text>
 					<text class="modal-close" @click="hideAboutModal">✕</text>
 				</view>
 				<view class="modal-body">
 					<!-- Rules 部分 -->
 					<view class="about-section">
-						<text class="about-section-title">Rules</text>
+						<text class="about-section-title">{{ $t('rules') }}</text>
 						<view class="about-rule-item">
 							<text class="rule-number">1.</text>
 							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
@@ -153,7 +153,7 @@
 
 					<!-- Regulation 部分 -->
 					<view class="about-section">
-						<text class="about-section-title">Regulation</text>
+						<text class="about-section-title">{{ $t('regulation') }}</text>
 						<view class="about-rule-item">
 							<text class="rule-number">1.</text>
 							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
@@ -183,7 +183,7 @@
 		<view class="modal-overlay" v-if="languageModalVisible" @click="hideLanguageModal">
 			<view class="modal-content language-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title">Change Language</text>
+					<text class="modal-title">{{ $t('change_language') }}</text>
 					<text class="modal-close" @click="hideLanguageModal">✕</text>
 				</view>
 				<view class="modal-body">
@@ -196,7 +196,7 @@
 					</view>
 
 					<view class="language-item" @click="selectLanguage('en')">
-						<text class="language-label">English</text>
+						<text class="language-label">{{ $t('English') }}</text>
 						<view class="radio-circle" :class="{ 'radio-selected': selectedLanguage === 'en' }">
 							<view class="radio-dot" v-if="selectedLanguage === 'en'"></view>
 						</view>
@@ -218,7 +218,7 @@
 
 					<!-- Confirm 按钮 -->
 					<view class="language-confirm-btn" @click="confirmLanguage()">
-						<text class="language-confirm-text">Confirm</text>
+						<text class="language-confirm-text">{{ $t('confirm') }}</text>
 					</view>
 				</view>
 			</view>
@@ -228,12 +228,12 @@
 		<view class="modal-overlay" v-if="customerSupportModalVisible" @click="hideCustomerSupportModal">
 			<view class="modal-content support-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title" style="text-align: left;">Customer Support</text>
+					<text class="modal-title" style="text-align: left;">{{ $t('customer_support') }}</text>
 					<text class="modal-close" @click="hideCustomerSupportModal">✕</text>
 				</view>
 				<view class="modal-body">
-					<text class="support-main-title">Contact us via following for any support</text>
-					<text class="support-description">Explore our website for more information and updates!</text>
+					<text class="support-main-title">{{ $t('contact_us_via') }}</text>
+					<text class="support-description">{{ $t('explore_website') }}</text>
 
 					<!-- 支持渠道列表 -->
 					<view class="support-channel-section">
@@ -275,13 +275,13 @@
 		<view class="modal-overlay" v-if="passwordChangeModalVisible" @click="hidePasswordChangeModal">
 			<view class="modal-content password-change-modal" @click.stop="">
 				<view class="modal-header">
-					<text class="modal-title">Change Password</text>
+					<text class="modal-title">{{ $t('Change password') }}</text>
 					<text class="modal-close" @click="hidePasswordChangeModal">✕</text>
 				</view>
 				<view class="modal-body">
 					<!-- Old Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
-						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" placeholder="Please enter your old password" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" />
+						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" :placeholder="$t('enter_old_password')" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" />
 						<view class="eye-icon" @click="show_old_password = !show_old_password">
 							<text :class="show_old_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -289,7 +289,7 @@
 
 					<!-- New Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
-						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" placeholder="Please enter your new password" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" />
+						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" :placeholder="$t('enter_new_password')" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" />
 						<view class="eye-icon" @click="show_new_password = !show_new_password">
 							<text :class="show_new_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -297,7 +297,7 @@
 
 					<!-- Confirm Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
-						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" placeholder="Please enter your new password" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" />
+						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" :placeholder="$t('enter_new_password')" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" />
 						<view class="eye-icon" @click="show_confirm_password = !show_confirm_password">
 							<text :class="show_confirm_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -308,12 +308,12 @@
 
 					<!-- Cancel 按钮 -->
 					<view class="pwd-cancel-btn" @click="hidePasswordChangeModal">
-						<text class="pwd-cancel-text">Cancel</text>
+						<text class="pwd-cancel-text">{{ $t('cancel') }}</text>
 					</view>
 
 					<!-- Save 按钮 -->
 					<view class="pwd-save-btn" @click="submitPasswordChange">
-						<text class="pwd-save-text">Save</text>
+						<text class="pwd-save-text">{{ $t('save') }}</text>
 					</view>
 				</view>
 			</view>
@@ -323,17 +323,17 @@
 		<view class="logout-modal" v-if="showLogoutConfirm" @click="hideLogoutModal">
 			<view class="logout-modal-content" @click.stop="">
 				<view class="logout-modal-header">
-					<text class="logout-modal-title">Log Out</text>
+					<text class="logout-modal-title">{{ $t('log_out') }}</text>
 				</view>
 				<view class="logout-modal-body">
-					<text class="logout-question">Are you sure you want to log out?</text>
+					<text class="logout-question">{{ $t('confirm_logout') }}</text>
 				</view>
 				<view class="logout-modal-buttons">
 					<view class="logout-btn-confirm" @click="logout">
-						<text class="logout-btn-text-red">Log Out</text>
+						<text class="logout-btn-text-red">{{ $t('log_out') }}</text>
 					</view>
 					<view class="logout-btn-cancel" @click="hideLogoutModal">
-						<text class="logout-btn-text-white">Cancel</text>
+						<text class="logout-btn-text-white">{{ $t('cancel') }}</text>
 					</view>
 				</view>
 			</view>
@@ -529,7 +529,7 @@
 					data: text,
 					success: () => {
 						uni.showToast({
-							title: 'Copied!',
+							title: this.$t('copied'),
 							icon: 'success',
 							duration: 1500
 						})
@@ -592,7 +592,7 @@
 					data: url,
 					success: () => {
 						uni.showToast({
-							title: 'Link copied',
+							title: this.$t('link_copied'),
 							icon: 'success'
 						})
 					}
@@ -617,10 +617,10 @@
 				// 检查是否登录
 				if (!_this.isLogin) {
 					uni.showModal({
-						title: 'Tips',
+						title: _this.$t('tips'),
 						content: _this.$t('please_sign_in_to_receive_the_coupon'),
 						showCancel: false,
-						confirmText: 'OK',
+						confirmText: _this.$t('ok'),
 						success: function(res) {
 							if (res.confirm) {
 								uni.navigateTo({
@@ -636,7 +636,7 @@
 				var userInfo = _this.$store.state.userInfo
 				if (!userInfo || !userInfo.phone) {
 					uni.showToast({
-						title: 'Unable to get user information',
+						title: _this.$t('unable_get_user_info'),
 						icon: 'none'
 					})
 					return
@@ -644,7 +644,7 @@
 
 				// 显示加载中
 				uni.showLoading({
-					title: 'Loading...'
+					title: _this.$t('loading_dots')
 				})
 
 				// 准备请求参数
@@ -664,7 +664,7 @@
 						// 如果是新会员，提示用户
 						if (isNewMember) {
 							uni.showToast({
-								title: 'Account created successfully',
+								title: _this.$t('account_created_success'),
 								icon: 'success',
 								duration: 2000
 							})
@@ -686,10 +686,10 @@
 							if (!newWindow) {
 								// 如果被拦截，提示用户或使用备用方案
 								uni.showModal({
-									title: 'Tips',
-									content: 'Please allow pop-ups for this site',
-									confirmText: 'Open Now',
-									cancelText: 'Cancel',
+									title: _this.$t('tips'),
+									content: _this.$t('allow_popups'),
+									confirmText: _this.$t('open_now'),
+									cancelText: _this.$t('cancel'),
 									success: (modalRes) => {
 										if (modalRes.confirm) {
 											// 用户确认后，跳转到webview页面
@@ -712,10 +712,10 @@
 
 					} else {
 						uni.showModal({
-							title: 'Error',
-							content: res.data.message || 'Unable to enter game lobby',
+							title: _this.$t('error_title'),
+							content: res.data.message || _this.$t('unable_enter_lobby'),
 							showCancel: false,
-							confirmText: 'OK'
+							confirmText: _this.$t('ok')
 						})
 					}
 				})
@@ -883,10 +883,10 @@
 
 				if (this.new_password === this.old_password) {
 					uni.showModal({
-						title: 'Tips',
+						title: this.$t('tips'),
 						content: this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password',
 						showCancel: false,
-						confirmText: 'OK'
+						confirmText: this.$t('ok')
 					})
 					return
 				}
@@ -898,7 +898,7 @@
 				}
 
 				uni.showLoading({
-					title: 'Saving...'
+					title: this.$t('saving')
 				})
 
 				_this.$http.post('/app_user/edit', para, (res) => {
@@ -910,20 +910,20 @@
 
 					if (res.statusCode == 200) {
 						uni.showModal({
-							title: 'Success',
-							content: tips || 'Password changed successfully',
+							title: this.$t('success_word'),
+							content: tips || this.$t('password_changed_success'),
 							showCancel: false,
-							confirmText: 'OK',
+							confirmText: this.$t('ok'),
 							success: function(modalRes) {
 								_this.hidePasswordChangeModal()
 							}
 						})
 					} else {
 						uni.showModal({
-							title: 'Error',
-							content: tips || 'Failed to change password',
+							title: this.$t('error_title'),
+							content: tips || this.$t('failed_change_password'),
 							showCancel: false,
-							confirmText: 'OK'
+							confirmText: this.$t('ok')
 						})
 					}
 				})

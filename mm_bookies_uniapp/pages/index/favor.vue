@@ -95,7 +95,7 @@
 			get_list() {
 				var _this = this;
 				uni.showLoading({
-					title: 'loading'
+					title: _this.$t('loading')
 				})
 				var para = {
 					page: _this.list_query.page,
@@ -110,7 +110,7 @@
 						uni.hideLoading();
 						if (res.data.items.length == 0) {
 							uni.showToast({
-								title: 'No available data to display.Please add the match to your favorites.',
+								title: _this.$t('no_favorite_data'),
 								icon: 'none'
 							})
 						}

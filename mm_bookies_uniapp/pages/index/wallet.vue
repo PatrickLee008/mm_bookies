@@ -14,14 +14,14 @@
 			</view>
 			<view class="flex-row justify-between">
 				<view class="info-rec" style="">
-					<view>Main Wallet</view>
+					<view>{{ $t('money') }}</view>
 					<view class="flex-row justify-between">
 						<text>{{userInfo.money}}</text>
 						<text class="myfont-10px">Ks</text>
 					</view>
 				</view>
 				<view class="info-rec" style="">
-					<view>Promotion Wallet</view>
+					<view>{{ $t('in_promo_wallet') }}</view>
 					<view class="flex-row justify-between">
 						<text>{{userInfo.money_promotion}}</text>
 						<text class="myfont-10px">Points</text>
@@ -48,7 +48,7 @@
 				<view class="flex-column1 justify-center align-center" @click="relaunch">
 					<image mode="widthFix" class="title-icon " src="/static/icon/wallet/reflesh.svg" />
 
-					<text class="mycolor-lprimary">{{'Refresh'}}</text>
+					<text class="mycolor-lprimary">{{ $t('refresh') }}</text>
 				</view>
 
 			</view>
@@ -63,15 +63,15 @@
 				<!-- <view class="cuIcon-calendar mycolor-info text-bold myfont-18px" @click="$refs.date_picker.show()">
 				</view> -->
 				<view class="filter-row">
-					<view class="text mycolor-primary">Type</view>
+					<view class="text mycolor-primary">{{ $t('Type') }}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
 				</view>
 				<view class="filter-row">
-					<view class="text mycolor-primary">Status</view>
+					<view class="text mycolor-primary">{{ $t('status') }}</view>
 					<selector :option_list.sync="status_list" @click_option="click_option"></selector>
 				</view>
 				<view class="filter-row">
-					<view class="text mycolor-primary line-height-34px">Period:
+					<view class="text mycolor-primary line-height-34px">{{ $t('period') }}:
 						{{date_range[0].show}}{{' - '}}{{date_range[1].show}}
 					</view>
 				</view>
@@ -86,13 +86,13 @@
 						fill="#A1A0A1"></path>
 				</svg>
 				<view class="filter-row gap-5px">
-					<view class="text mycolor-primary">Type</view>
+					<view class="text mycolor-primary">{{ $t('Type') }}</view>
 					<view class="cu-tag round sm tag">
 						<selector :option_list.sync="type_list" @click_option="click_option"></selector>
 					</view>
 				</view>
 				<view class="filter-row gap-5px">
-					<view class="text mycolor-primary">Status</view>
+					<view class="text mycolor-primary">{{ $t('status') }}</view>
 					<view class="cu-tag round sm tag">
 						<selector :option_list.sync="status_list" @click_option="click_option"></selector>
 					</view>
@@ -115,10 +115,10 @@
 					</view>
 					<view class="flex-row1">
 						<view class="flex-column1 align-start">
-							<text>Amount</text>
-							<text>Submit</text>
-							<text>Confirm</text>
-							<text>Remark</text>
+							<text>{{ $t('text_field_amount') }}</text>
+							<text>{{ $t('submit') }}</text>
+							<text>{{ $t('confirm') }}</text>
+							<text>{{ $t('remark') }}</text>
 						</view>
 						<view class="flex-column1 align-start">
 							<text>: {{numberFormat(element.amount)}}<text style="margin-left: 1px;">Ks</text></text>

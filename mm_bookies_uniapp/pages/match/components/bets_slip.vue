@@ -51,11 +51,11 @@
 					<view class="flex-column box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm"
 						v-if="mixed">
 						<view class="flex-row justify-between">
-							<view class="">Total Bet</view>
+							<view class="">{{ $t('total_bet') }}</view>
 							<view class="">{{match_list.length}}</view>
 						</view>
 						<view class="flex-row justify-between">
-							<view class="">Odds</view>
+							<view class="">{{ $t('odds') }}</view>
 							<view class="">{{Math.pow(2,match_list.length)}}</view>
 						</view>
 					</view>
@@ -64,13 +64,13 @@
 						<view class="flex-row justify-start">
 							<view class="cuIcon-warnfill round mybg-active padding-10px"></view>
 							<view class="flex-column margin-left-sm align-start gap-5px" style="align-items: start;">
-								<view class="text-light">{{'Balance (Main Wallet)'}}</view>
+								<view class="text-light">{{ $t('balance_main_wallet') }}</view>
 								<view>{{'10000000'}}</view>
 							</view>
 						</view>
 						<button class="cu-btn mybg-active mycolor-primary myfont-12px">
 							<view class="cuIcon-addressbook margin-right-sm"></view>
-							<view @click="">Deposit</view>
+							<view @click="">{{ $t('text_button_submit') }}</view>
 						</button>
 					</view>
 					<view class="flex-column box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
@@ -84,7 +84,7 @@
 							<button class="cu-btn mybg-active mycolor-primary myfont-12px"
 								@click="submit()">
 								<view class="cuIcon-addressbook margin-right-sm"></view>
-								<view>Betting</view>
+								<view>{{ $t('Betting') }}</view>
 							</button>
 						</view>
 						<view class="flex-row justify-start text-light text-black" style="">
@@ -229,10 +229,10 @@
 					uni.hideLoading();
 			
 					uni.showModal({
-						title: 'Tips',
+						title: _this.$t('tips'),
 						content: _this.language.single_max + " (" + _this.$store.state.configs.single_max + ")",
 						showCancel: false,
-						confirmText: 'ok',
+						confirmText: _this.$t('ok'),
 						success: function(res) {}
 					});
 					return;
@@ -240,10 +240,10 @@
 				if (_this.amount < parseInt(_this.$store.state.configs.single_min)) {
 					uni.hideLoading();
 					uni.showModal({
-						title: 'Tips',
+						title: _this.$t('tips'),
 						content: _this.language.single_min + " (" + _this.$store.state.configs.single_min + ")",
 						showCancel: false,
-						confirmText: 'ok',
+						confirmText: _this.$t('ok'),
 						success: function(res) {}
 					});
 			
@@ -302,7 +302,7 @@
 										content: _this.language.bettingSuccess,
 										title: tips,
 										showCancel: false,
-										confirmText: 'ok',
+										confirmText: _this.$t('ok'),
 										success: function() {
 											var userInfo = _this.$store.state.userInfo
 											userInfo.money = parseInt(userInfo.money) - parseInt(_this.amount);
@@ -324,7 +324,7 @@
 										title: 'tips',
 										content: tips,
 										showCancel: false,
-										confirmText: 'ok',
+										confirmText: _this.$t('ok'),
 										success: function(res) {}
 									});
 								}

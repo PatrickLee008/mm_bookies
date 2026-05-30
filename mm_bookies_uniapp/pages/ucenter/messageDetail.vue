@@ -6,7 +6,7 @@
 			<view class="flex-row justify-start align-center margin-bottom-sm">
 				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
 				<!-- <image :src="messageData.icon || '/static/icon/messages.png'" class="lblue2blue" style="height: 28px;" mode="heightFix"></image> -->
-				<text class="title-text">Message Details</text>
+				<text class="title-text">{{ $t('message_details') }}</text>
 			</view>
 			
 			<!-- 消息详情内容 -->
@@ -18,7 +18,7 @@
 							   style="height: 50px; width: 50px;" 
 							   mode="aspectFit"></image>
 					</view>
-					<text class="detail-title">{{ messageData.title || 'Push Message' }}</text>
+					<text class="detail-title">{{ messageData.title || $t('push_message') }}</text>
 					<text class="detail-time">{{ formatTime(messageData.timestamp) }}</text>
 					<view class="message-type-tag" v-if="messageData.type">
 						<text class="type-text">{{ getTypeLabel(messageData.type) }}</text>
@@ -28,21 +28,21 @@
 				<!-- 消息内容 -->
 				<view class="detail-content">
 					<text class="content-text" v-if="messageData.content">{{ messageData.content }}</text>
-					<text class="no-content-text" v-else>No content available</text>
+					<text class="no-content-text" v-else>{{ $t('no_content_available') }}</text>
 				</view>
 				
 				<!-- 消息元数据 -->
 				<view class="detail-meta" v-if="showMetadata">
 					<view class="meta-item">
-						<text class="meta-label">Message ID:</text>
+						<text class="meta-label">{{ $t('message_id') }}:</text>
 						<text class="meta-value">{{ messageData.messageId || messageData.id || 'N/A' }}</text>
 					</view>
 					<view class="meta-item" v-if="messageData.source">
-						<text class="meta-label">Source:</text>
+						<text class="meta-label">{{ $t('source_label') }}:</text>
 						<text class="meta-value">{{ messageData.source }}</text>
 					</view>
 					<view class="meta-item">
-						<text class="meta-label">Received:</text>
+						<text class="meta-label">{{ $t('received') }}:</text>
 						<text class="meta-value">{{ formatFullTime(messageData.timestamp) }}</text>
 					</view>
 				</view>
@@ -50,13 +50,13 @@
 				<!-- 操作按钮 -->
 				<view class="detail-actions">
 					<view class="action-btn primary-btn" @click="markAsRead" v-if="!messageData.isRead">
-						<text class="btn-text">Mark as Read</text>
+						<text class="btn-text">{{ $t('mark_as_read') }}</text>
 					</view>
 					<view class="action-btn secondary-btn" @click="deleteMessage">
-						<text class="btn-text">Delete</text>
+						<text class="btn-text">{{ $t('delete') }}</text>
 					</view>
 					<view class="action-btn secondary-btn" @click="toggleMetadata">
-						<text class="btn-text">{{ showMetadata ? 'Hide' : 'Show' }} Details</text>
+						<text class="btn-text">{{ showMetadata ? $t('hide') : $t('show') }} {{ $t('details') }}</text>
 					</view>
 				</view>
 			</view>
@@ -99,7 +99,7 @@
 					uni.$emit('message:read')
 					
 					uni.showToast({
-						title: 'Marked as read',
+						title: this.$t('marked_as_read'),
 						icon: 'success',
 						duration: 1500
 					})
@@ -107,7 +107,7 @@
 				} catch (error) {
 					console.error('[MessageDetail] 标记已读失败:', error)
 					uni.showToast({
-						title: 'Operation failed',
+						title: this.$t('operation_failed'),
 						icon: 'none'
 					})
 				}
@@ -116,8 +116,8 @@
 			// 删除消息
 			deleteMessage() {
 				uni.showModal({
-					title: 'Delete Message',
-					content: 'Are you sure you want to delete this message? This action cannot be undone.',
+					title: this.$t('delete_message'),
+					content: this.$t('confirm_delete_message'),
 					success: (res) => {
 						if (res.confirm) {
 							try {
@@ -128,7 +128,7 @@
 								uni.$emit('message:update')
 								
 								uni.showToast({
-									title: 'Message deleted',
+									title: this.$t('message_deleted'),
 									icon: 'success'
 								})
 								
@@ -140,7 +140,7 @@
 							} catch (error) {
 								console.error('[MessageDetail] 删除消息失败:', error)
 								uni.showToast({
-									title: 'Delete failed',
+									title: this.$t('delete failed'),
 									icon: 'none'
 								})
 							}
@@ -283,8 +283,8 @@
 					} else {
 						console.warn('[MessageDetail] 未找到对应的消息')
 						this.messageData = {
-							title: 'Message Not Found',
-							content: 'The requested message could not be found.',
+							title: this.$t('message_not_found'),
+							content: this.$t('message_not_found_content'),
 							timestamp: Date.now(),
 							type: 'error'
 						}
@@ -293,8 +293,8 @@
 					// 没有提供消息数据，显示错误信息
 					console.warn('[MessageDetail] 未提供消息数据')
 					this.messageData = {
-						title: 'No Message Data',
-						content: 'No message data provided.',
+						title: this.$t('no_message_data'),
+						content: this.$t('no_message_data_content'),
 						timestamp: Date.now(),
 						type: 'error'
 					}
@@ -310,8 +310,8 @@
 			} catch (error) {
 				console.error('[MessageDetail] 解析消息数据失败:', error)
 				this.messageData = {
-					title: 'Parse Error',
-					content: 'Failed to parse message data.',
+					title: this.$t('parse_error'),
+					content: this.$t('parse_error_content'),
 					timestamp: Date.now(),
 					type: 'error'
 				}

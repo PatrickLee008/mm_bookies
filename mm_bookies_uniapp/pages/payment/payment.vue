@@ -101,25 +101,25 @@
 					<text class="text-sm">Back to Home</text>
 				</button>
 			</view>
-			<view class="bottom-confirmation-bar" @click="">
-				<view class="flex-row1 align-center" v-if="!istimeout">
-					<image src="/static/image/pay/loading.png" class="loading-spinner" mode="aspectFit"></image>
-					<view class="confirm-text">{{$t('payment.confirming_payment')}}</view>
-				</view>
-
-				<block v-if="payInfo.orderStatus==1">
-					<view v-if="!istimeout">
-						<view class="countdown-time">
-							{{countdownDisplay}}
-						</view>
-					</view>
-					<text class="timeout-text" v-else>{{$t('payment.orderTimeoutTip')}}</text>
-				</block>
-				<block v-else-if="payInfo.orderStatus==2">
-					<view class="completed-text">Pay Completed</view>
-				</block>
-			</view>
 		</scroll-view>
+		<view class="bottom-confirmation-bar" @click="">
+			<view class="flex-row1 align-center" v-if="!istimeout">
+				<image src="/static/image/pay/loading.png" class="loading-spinner" mode="aspectFit"></image>
+				<view class="confirm-text">{{$t('payment.confirming_payment')}}</view>
+			</view>
+
+			<block v-if="payInfo.orderStatus==1">
+				<view v-if="!istimeout">
+					<view class="countdown-time">
+						{{countdownDisplay}}
+					</view>
+				</view>
+				<text class="timeout-text" v-else>{{$t('payment.orderTimeoutTip')}}</text>
+			</block>
+			<block v-else-if="payInfo.orderStatus==2">
+				<view class="completed-text">Pay Completed</view>
+			</block>
+		</view>
 		<view class="cu-modal" style="z-index: 998;" :class="modalName=='error_modal'?'show':''">
 			<view class="cu-dialog bg-white" style="border-radius: 12px;color: #FF0000;line-height: 1.3;">
 				<view class="flex-column">
@@ -531,6 +531,9 @@
 		justify-content: space-between;
 		gap: 15px;
 		padding: 10px 25px;
+		/* iOS 安全区适配：避免计时器被底部 Home 横条遮挡 */
+		padding-bottom: calc(10px + constant(safe-area-inset-bottom));
+		padding-bottom: calc(10px + env(safe-area-inset-bottom));
 		/* box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); */
 		z-index: 1;
 		border-top: 1px solid #e5e7eb;

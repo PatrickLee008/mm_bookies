@@ -8,7 +8,7 @@
 					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
 					<!-- 	<image src="/static/icon/messages.png" class="lblue2blue" style="height: 28px;" mode="heightFix">
 					</image> -->
-					<text class="title-text" style="">Messages</text>
+					<text class="title-text" style="">{{ $t('messages_title') }}</text>
 				</view>
 				<!-- 操作栏 -->
 				<view class="action-bar" v-if="messages.length > 0">
@@ -18,11 +18,10 @@
 							<text class="stats-text" v-if="unreadCount > 0"> · {{unreadCount}} unread</text>
 						</view>
 						<view class="action-buttons">
-							<text class="action-btn" @click="onRefresh">Refresh</text>
-							<text class="action-btn mark-read-btn" @click="markAllAsRead" v-if="hasUnreadMessages">Mark
-								All Read</text>
+							<text class="action-btn" @click="onRefresh">{{ $t('refresh') }}</text>
+							<text class="action-btn mark-read-btn" @click="markAllAsRead" v-if="hasUnreadMessages">{{ $t('mark_all_read') }}</text>
 							<text class="action-btn clear-btn" @click="clearAllMessages"
-								v-if="messages.length > 0">Clear</text>
+								v-if="messages.length > 0">{{ $t('clear') }}</text>
 						</view>
 					</view>
 				</view>
@@ -30,7 +29,7 @@
 				<!-- 加载状态 -->
 				<view class="loading-container" v-if="loading && !refreshing">
 					<view class="loading-spinner"></view>
-					<text class="loading-text">Loading...</text>
+					<text class="loading-text">{{ $t('loading_dots') }}</text>
 				</view>
 
 				<!-- 下拉刷新容器 -->
@@ -70,8 +69,8 @@
 				<view class="no-messages" v-if="messages.length === 0 && !loading">
 					<image src="/static/icon/messages.png"
 						style="height: 80px; width: 80px; margin-bottom: 16px; opacity: 0.3;" mode="aspectFit"></image>
-					<text class="no-messages-text">No Messages</text>
-					<text class="no-messages-tip">Real-time messages will appear after WebSocket connection</text>
+					<text class="no-messages-text">{{ $t('no_messages') }}</text>
+					<text class="no-messages-tip">{{ $t('realtime_msg_tip') }}</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -126,7 +125,7 @@
 					const formattedMessages = filteredMessages.map(msg => {
 						return {
 							id: msg.id || Date.now() + Math.random(),
-							title: msg.title || 'Push Message',
+							title: msg.title || this.$t('push_message'),
 							preview: this.truncateContent(msg.content || msg.message || '', 50),
 							content: msg.content || msg.message || '',
 							timestamp: msg.timestamp || Date.now(),
@@ -144,7 +143,7 @@
 				} catch (error) {
 					console.error('[MessageList] Load messages failed:', error)
 					uni.showToast({
-						title: 'Failed to load messages',
+						title: this.$t('failed_load_messages'),
 						icon: 'none'
 					})
 				} finally {
@@ -187,7 +186,7 @@
 					const messageData = {
 						id: message.id || message.originalMessage?.id,
 						messageId: message.originalMessage?.messageId || message.id,
-						title: message.title || 'Push Message',
+						title: message.title || this.$t('push_message'),
 						content: message.content || '',
 						timestamp: message.timestamp || Date.now(),
 						isRead: message.read || false,
@@ -205,7 +204,7 @@
 						fail: (error) => {
 							console.error('[MessageList] Navigation failed:', error)
 							uni.showToast({
-								title: 'Page navigation failed',
+								title: this.$t('page_nav_failed'),
 								icon: 'none'
 							})
 						}
@@ -213,7 +212,7 @@
 				} catch (error) {
 					console.error('[MessageList] Navigation error:', error)
 					uni.showToast({
-						title: 'Navigation error',
+						title: this.$t('navigation_error'),
 						icon: 'none'
 					})
 				}
@@ -272,14 +271,14 @@
 					uni.$emit('message:read')
 
 					uni.showToast({
-						title: 'All messages marked as read',
+						title: this.$t('all_marked_read'),
 						icon: 'success'
 					})
 
 				} catch (error) {
 					console.error('[MessageList] Mark all messages as read failed:', error)
 					uni.showToast({
-						title: 'Operation failed',
+						title: this.$t('operation_failed'),
 						icon: 'none'
 					})
 				}
@@ -295,8 +294,8 @@
 			// 清空所有消息
 			clearAllMessages() {
 				uni.showModal({
-					title: 'Confirm Clear',
-					content: 'Are you sure you want to clear all messages? This action cannot be undone.',
+					title: this.$t('confirm_clear'),
+					content: this.$t('confirm_clear_content'),
 					success: (res) => {
 						if (res.confirm) {
 							try {
@@ -311,14 +310,14 @@
 								uni.$emit('message:update')
 
 								uni.showToast({
-									title: 'All messages cleared',
+									title: this.$t('all_messages_cleared'),
 									icon: 'success'
 								})
 								// console.log('[MessageList] All messages cleared')
 							} catch (error) {
 								console.error('[MessageList] Clear messages failed:', error)
 								uni.showToast({
-									title: 'Clear failed',
+									title: this.$t('clear_failed'),
 									icon: 'none'
 								})
 							}
@@ -381,7 +380,7 @@
 					order: 'Order',
 					promotion: 'Promotion'
 				}
-				return typeMap[type] || 'Push Message'
+				return typeMap[type] || this.$t('push_message')
 			}
 		},
 
