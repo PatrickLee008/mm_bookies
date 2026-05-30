@@ -11,12 +11,17 @@ export default {
 			bet_type: {
 				'SINGLE_BODY': '1',
 				'SINGLE_GOAL': '2',
+				'SINGLE_CORRECT': '3',
 				'SINGLE_EVEN': '6',
+				'SINGLE_Digit': '8',
 				'SINGLE_WDL': '10',
 				'MIX_BODY': '4',
 				'MIX_GOAL': '5',
 				'MIX_EVEN': '7',
+				'SINGLE_Digit3D': '9',
 				'MIX_WDL': '11',
+				'SINGLE_BTTS': '18',
+				'MIX_BTTS': '19',
 			},
 			list_query: {
 				limit: 200,

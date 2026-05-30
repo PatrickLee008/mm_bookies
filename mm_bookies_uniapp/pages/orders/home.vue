@@ -85,7 +85,7 @@
 							</view>
 							<view class="info-row">
 								<text class="label">Type</text>
-								<text class="value">{{item.show_order_type || 'HDP'}}</text>
+								<text class="value">{{item.show_order_type}}</text>
 							</view>
 							<view class="info-row">
 								<text class="label">Bet</text>
@@ -101,7 +101,7 @@
 							</view>
 							<view class="info-row" v-if="current_page==='Ongoing'">
 								<text class="label">Potential Win Amount</text>
-								<text class="value value-amount">{{item.benefit}}</text>
+								<text class="value value-amount">{{item.benefit}} MMK</text>
 							</view>
 						</view>
 
@@ -133,7 +133,7 @@
 								</view>
 								<view class="info-row">
 									<text class="label">Type</text>
-									<text class="value">{{item.show_order_type || 'HDP'}}</text>
+									<text class="value">{{item.show_order_type}}</text>
 								</view>
 								<view class="info-row">
 									<text class="label">Bet</text>
@@ -165,7 +165,7 @@
 									</view>
 									<view class="info-row">
 										<text class="label">Type</text>
-										<text class="value">{{detail.show_order_type || 'HDP'}}</text>
+										<text class="value">{{detail.show_order_type}}</text>
 									</view>
 									<view class="info-row">
 										<text class="label">Bet</text>
@@ -218,7 +218,7 @@
 				<view class="padding-top-5vh flex-column align-center gap-5vh" v-show="history_list.length === 0">
 					<image src="/static/image/order/empty.svg" class="width-10vw height-10vw"></image>
 					<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
-						{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
+						{{$t(current_page ==='Ongoing'?'no_pending_bets':'no_settled_bets')}}
 					</view>
 					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #2F5D62;color: white;">
 						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
@@ -401,7 +401,7 @@
 						results.forEach(ele => {
 							ele = _this.parse_order(ele)
 							let money = _this.$toolbox.num_format(ele.BET_MONEY, 0, true)
-							if (_this.current_page === 'Settled') {
+							if (_this.current_page === 'Finished') {
 								let bonus = _this.$toolbox.num_format(ele.netwin_actual, 0, true)
 								// bonus = bonus < money ? bonus - money : bonus;
 								if (ele.bet_status === 'Cancel') {
@@ -415,7 +415,7 @@
 
 							_this.history_list.push(ele);
 						})
-						if (_this.current_page === 'Pending') {
+						if (_this.current_page === 'Ongoing') {
 							_this.total = res.data.total
 						}
 						if (results.length == 0) {
@@ -576,19 +576,20 @@
 				if (!attr.hasOwnProperty(typ)) return ''
 				let str = ''
 				let attr_val = String(attr[typ])
-				switch (true) {
-					case [this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr_val):
-						str = 'HANDICAP'
-						break
-					case [this.bet_type.SINGLE_GOAL, this.bet_type.MIX_GOAL].includes(attr_val):
-						str = attr.BET_TYPE == '1' ? this.$t('over') : this.$t('under');
-						break
-					case [this.bet_type.SINGLE_EVEN, this.bet_type.MIX_EVEN].includes(attr_val):
-						// str = 'EVEN'
-						break
-					case [this.bet_type.SINGLE_WDL].includes(attr_val):
-						// str = '1X2'
-						break
+				if ([this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr_val)) {
+					str = 'HANDICAP'
+				} else if ([this.bet_type.SINGLE_GOAL, this.bet_type.MIX_GOAL].includes(attr_val)) {
+					str = attr.BET_TYPE == '1' ? this.$t('over') : this.$t('under');
+				} else if ([this.bet_type.SINGLE_EVEN, this.bet_type.MIX_EVEN].includes(attr_val)) {
+					str = 'O/E'
+				} else if ([this.bet_type.SINGLE_CORRECT].includes(attr_val)) {
+					str = "Correct Score";
+				} else if ([this.bet_type.SINGLE_BTTS].includes(attr_val)) {
+					str = "BTTS"
+				} else if ([this.bet_type.SINGLE_WDL].includes(attr_val)) {
+					str = ""; // 已经处理在：calc_real_odds处理显示
+				} else {
+					str = "";
 				}
 				return str
 			},
@@ -614,10 +615,10 @@
 			},
 			calc_benefit(order, mix = false) {
 				let str = ''
-				if (this.current_page === 'Settled') {
+				if (this.current_page === 'Finished') {
 					//直接返回
 					str = order.BONUS
-					if (str < order.BET_MONEY) {
+					if (str < parseInt(order.BET_MONEY) && order.bet_status != 'Refund') {
 						// str = str - order.BET_MONEY
 						str = order.netwin_actual
 					}
@@ -628,10 +629,11 @@
 					} else {
 						let odds = parseFloat(order.BET_ODDS);
 						switch (order.ORDER_TYPE) {
-							case "10": //1x2，直接取赔率
-								break;
-							default: //其他，1+赔率
+							case "1": //HDP
+							case "2": //O/U
+							case "6": //O/E
 								odds = 1 + odds;
+								break;
 						}
 						str = parseFloat(odds) * parseInt(order.BET_MONEY)
 						// str = parseFloat(odds) * parseInt(order.BET_MONEY) * (1 - this.commission)
@@ -649,23 +651,44 @@
 			},
 			calc_real_odds(attr, typ = 'ORDER_TYPE') {
 				if (!attr.hasOwnProperty('ORDER_TYPE')) return ''
+				let attr_val = attr.ORDER_TYPE
 				let str = ''
-				// 胜平负盘
-				if ([this.bet_type.SINGLE_WDL].includes(attr.ORDER_TYPE)) {
-					let num_2_str = [, 'HOME', 'AWAY', 'DRAW']
-					return `1X2:${num_2_str[parseInt(attr.BET_TYPE)]}`
-				}
 				var DRAW_BUNKO = attr.DRAW_BUNKO == '0' ? '+' : '-';
-				if (attr.DRAW_ODDS == '0') {
-					return attr.LOSE_BALL_NUM + '=';
-				} else {
-					let body_attr = [this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr.ORDER_TYPE) ||
-						''
-					if (body_attr) {
-						body_attr = attr.LOSE_TEAM == '1' ? 'H' : 'A'
+				let body_attr = ''
+				if ([this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr_val)) {
+					if (attr.DRAW_ODDS == '0') {
+						return attr.LOSE_BALL_NUM + '=';
+					}
+					let body_attr = attr.LOSE_TEAM == '1' ? 'H' : 'A'
+					return `${attr.LOSE_BALL_NUM}(${DRAW_BUNKO}${attr.DRAW_ODDS})${body_attr}`;
+				} else if ([this.bet_type.SINGLE_GOAL, this.bet_type.MIX_GOAL].includes(attr_val)) {
+					if (attr.DRAW_ODDS == '0') {
+						return attr.LOSE_BALL_NUM + '=';
 					}
 					return `${attr.LOSE_BALL_NUM}(${DRAW_BUNKO}${attr.DRAW_ODDS})${body_attr}`;
+				} else if ([this.bet_type.SINGLE_EVEN, this.bet_type.MIX_EVEN].includes(attr_val)) {
+					str = attr.BET_TYPE == '1' ? this.$t('Odd') : this.$t('Even');
+				} else if ([this.bet_type.SINGLE_CORRECT].includes(attr_val)) {
+					str = attr.bet_type_info;
+				} else if ([this.bet_type.SINGLE_BTTS].includes(attr_val)) {
+					switch (attr.BET_TYPE) {
+						case "1":
+							str = "Both";
+							break;
+						case "2":
+							str = "One";
+							break;
+						case "3":
+							str = "No Goal";
+							break;
+					}
+				} else if ([this.bet_type.SINGLE_WDL].includes(attr_val)) {
+					let num_2_str = [, 'HOME', 'AWAY', 'DRAW']
+					str = `1X2:${num_2_str[parseInt(attr.BET_TYPE)]}`
+				} else {
+					str = "";
 				}
+				return str;
 			},
 		},
 		mounted() {
