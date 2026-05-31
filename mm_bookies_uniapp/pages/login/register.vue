@@ -15,11 +15,14 @@
 		<!-- Login Form -->
 		<view class="login-form">
 			<!-- Welcome Text -->
-			<view class="welcome-text">{{ $t('register_welcome') }}</view>
+			<view class="welcome-text">{{ $t('Welcome to MM Bookies') }}</view>
 
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': phone_error}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.phone" :placeholder="$t('login_enter_phone')" maxlength="11" @blur="handle_phone_blur" @input="handle_phone_blur" />
+				<input class="input-field" :class="{'input-error': phone_error}" type="number"
+					placeholder-class="input-placeholder" v-model="loginInfo.phone"
+					:placeholder="$t('Please Enter Username')" maxlength="11" @blur="handle_phone_blur"
+					@input="handle_phone_blur" />
 				<view class="error-message" v-if="phone_error">
 					{{$t("r_input_number_error")}}
 				</view>
@@ -27,9 +30,13 @@
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}" type="text" :password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password" :placeholder="$t('login_enter_password')" maxlength="32" @blur="handle_password_blur" @input="handle_password_blur" />
+				<input class="input-field" :class="{'input-error': password_error}" type="text"
+					:password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password"
+					:placeholder="$t('enter_password')" maxlength="32" @blur="handle_password_blur"
+					@input="handle_password_blur" />
 				<view class="password-toggle" @click="togglePasswordVisibility">
-					<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+					<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24"
+						color="rgba(255,255,255,0.8)"></uni-icons>
 				</view>
 				<view class="error-message" v-if="password_error">
 					{{$t("r_password_limit")}}
@@ -38,9 +45,13 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text" :password="!showConfirmPassword" placeholder-class="input-placeholder" v-model="loginInfo.confirm_password" :placeholder="$t('register_confirm_password')" maxlength="32" @blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
+				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text"
+					:password="!showConfirmPassword" placeholder-class="input-placeholder"
+					v-model="loginInfo.confirm_password" :placeholder="$t('confirm_password')" maxlength="32"
+					@blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
 				<view class="password-toggle" @click="toggleConfirmPasswordVisibility">
-					<uni-icons :type="showConfirmPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+					<uni-icons :type="showConfirmPassword ? 'eye' : 'eye-slash'" size="24"
+						color="rgba(255,255,255,0.8)"></uni-icons>
 				</view>
 				<view class="error-message" v-if="confirm_password_error">
 					{{$t("those_passwords")}}
@@ -50,20 +61,19 @@
 			<!-- Sign up Button -->
 			<view class="login-btn" @click="register()">
 				<text :class="loadding"></text>
-				<text>{{ $t('sign_up') }}</text>
+				<text>{{ $t('Sign up') }}</text>
 			</view>
 
 			<!-- Login Link -->
 			<view class="register-link">
-				<text class="register-text">{{ $t('register_have_account') }}</text>
+				<text class="register-text">{{ $t('Back to ') }}</text>
 				<text class="register-link-text" @click="toLogin()">{{ $t('login') }}</text>
-				<text class="register-text">{{ $t('register_now') }}</text>
 			</view>
 		</view>
 
 		<!-- Contact Support -->
 		<view class="contact-support">
-			<text class="contact-text">{{ $t('contact_support') }}</text>
+			<text class="contact-text">{{ $t('Contact service')}}</text>
 			<view class="social-icons">
 				<view class="social-icon facebook-icon">
 					<image class="icon-image" src="../../figma/login/facebook.png" mode="aspectFit"></image>
@@ -202,7 +212,7 @@
 					USER_PWD: this.loginInfo.password,
 					PHONE: this.loginInfo.phone,
 				}
-				
+
 				const defaultAgentId = uni.getStorageSync('default_r_aid');
 				if (defaultAgentId) para.agent_id = defaultAgentId;
 				const adl = uni.getStorageSync('default_adl');
@@ -246,7 +256,7 @@
 				let para = {
 					encryptedParams: encryptedParams
 				}
-				
+
 				const defaultAgentId = uni.getStorageSync('default_r_aid');
 				if (defaultAgentId) para.agent_id = defaultAgentId;
 				const adl = uni.getStorageSync('default_adl');
@@ -256,13 +266,13 @@
 					_this.loadding = '';
 					if (res.statusCode == 200) {
 						uni.setStorageSync('Authorization', res.data.token);
-						
+
 						// 登录成功后获取配置
 						const app = getApp()
 						if (app && app.getConfigs) {
 							app.getConfigs()
 						}
-						
+
 						uni.redirectTo({
 							url: '../match/home'
 						});

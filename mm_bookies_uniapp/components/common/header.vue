@@ -428,7 +428,7 @@
 
 	.login-btn,
 	.register-btn {
-		padding: 10px;
+		// padding: 10px;
 		border-radius: 8px;
 		font-size: 14px;
 		font-weight: bold;

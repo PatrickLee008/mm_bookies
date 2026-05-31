@@ -10,7 +10,7 @@
 		<scroll-view scroll-y style="height: calc(100vh - 88px);">
 			<view class="support-content">
 				<!-- 标题部分 -->
-				<text class="support-main-title">{{ $t('contact_us_via') }}</text>
+				<text class="support-main-title">{{ $t('contact us') }}</text>
 				<text class="support-description">{{ $t('explore_website') }}</text>
 
 				<!-- 支持渠道列表 -->
