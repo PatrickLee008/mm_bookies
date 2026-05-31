@@ -1292,7 +1292,7 @@
 						}
 					})
 
-					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] : [_this.bet_type.SINGLE_WDL, _this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, ]
+					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] : [_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, ]
 					server_matches.forEach(match => {
 						match.click_arr = []
 						match.show_image = true

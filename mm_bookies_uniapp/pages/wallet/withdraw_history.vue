@@ -21,7 +21,7 @@
 			<!-- 空状态 -->
 			<view v-if="!loading && filterRecordList(recordList).length === 0" class="empty-state">
 				<image src="/static/icon/history.png" mode="aspectFit" class="empty-icon"></image>
-				<text class="empty-text">No withdraw records</text>
+				<text class="empty-text">{{ $t('no_withdraw_records') }}</text>
 			</view>
 
 			<!-- 记录项 -->
@@ -47,15 +47,15 @@
 
 				<view class="record-content">
 					<view class="info-row">
-						<text class="label">Create Time:</text>
+						<text class="label">{{ $t('create_time_label') }}:</text>
 						<text class="value">{{formatTime(item.create_time)}}</text>
 					</view>
 					<view class="info-row" v-if="item.wallet_type">
-						<text class="label">Wallet Type:</text>
+						<text class="label">{{ $t('wallet_type_label') }}:</text>
 						<text class="value">{{item.wallet_type}}</text>
 					</view>
 					<view class="info-row" v-if="item.remarks">
-						<text class="label">Remarks:</text>
+						<text class="label">{{ $t('remarks_label') }}:</text>
 						<text class="value">{{item.remarks}}</text>
 					</view>
 				</view>
@@ -64,12 +64,12 @@
 			<!-- 加载更多 -->
 			<view v-if="loading" class="loading-more">
 				<text class="cuIcon-loading2 load-icon rotating"></text>
-				<text class="loading-text">Loading...</text>
+				<text class="loading-text">{{ $t('loading_dots') }}</text>
 			</view>
 
 			<!-- 没有更多 -->
 			<view v-if="!loading && hasMore === false && filterRecordList(recordList).length > 0" class="no-more">
-				<text>No more data</text>
+				<text>{{ $t('no_more_data') }}</text>
 			</view>
 		</scroll-view>
 	</view>

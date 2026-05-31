@@ -18,7 +18,7 @@
 
 				<!-- 添加银行账户按钮 -->
 				<view class="add-bank-btn" @click="show_add_modal('add')">
-					<text class="add-bank-text">Add Bank Account</text>
+					<text class="add-bank-text">{{ $t('add bank account') }}</text>
 				</view>
 			</view>
 
@@ -78,7 +78,7 @@
 
 			<!-- from tangjq--- Step 1 AUTO: 银行卡选择 -->
 			<view class="" style="margin-left: 10%;width: 80%;" v-if="current_progress==1 && chargeForm.charge_way==0">
-				<input class="search-rec" style="" placeholder=" Search" placeholder-class="cuIcon-search mycolor-info" v-model="card_search" @input="clean_acc" />
+				<input class="search-rec" style="" :placeholder="$t('search')" placeholder-class="cuIcon-search mycolor-info" v-model="card_search" @input="clean_acc" />
 				<view class="flex-row justify-between myfont-15px mycolor-primary margin-top-lg">
 					<view class="myfont-19px">{{$t('Select_your_bank')}}</view>
 					<view class="mybg-grey" style="padding: 0 6px;" v-if="card_list.length>0" @click="edit_card()">
@@ -94,16 +94,16 @@
 								<image class="height-50px width-50px" style="border-radius: 8px;" :src="`/static/icon/register/${card.bank_code}.png`"></image>
 							</view>
 							<view class="flex-column1 justify-center align-start myfont-11px margin-left">
-								<view class="myfont-12px text-bold text-black">Account Number</view>
+								<view class="myfont-12px text-bold text-black">{{ $t('account_number') }}</view>
 								<view>{{card.acc_number}}</view>
 								<view style="height: 2px;"></view>
-								<view class="myfont-12px text-bold text-black">Account Name</view>
+								<view class="myfont-12px text-bold text-black">{{ $t('account_ame') }}</view>
 								<view>{{card.acc_name}}</view>
 							</view>
 						</view>
 						<view class="width-70px">
 							<view class="height-70px flex-column text-white myfont-14px radius-right-6px" :class="card.is_default?'mybg-linfo':''" :style="card.is_default?'color:#666666':'background-color: #E02B2B;'" v-if="editing" @click="card.is_default?'':removeBank(card)">
-								{{'Remove'}}
+								{{ $t('remove') }}
 							</view>
 							<view class="flex-column1 align-center justify-center" v-else>
 								<view class="myfont-10px margin-bottom-xs" :class="!index?'mycolor-primary':''">
@@ -119,7 +119,7 @@
 				<view class="flex-row myfont-10px text-black height-70px radius-10px margin-top-lg" style="border: solid darkgray 1px;padding: 8px 20px;border-radius: 4px;" @click="show_add_modal('add')">
 					<text class="cuIcon-roundadd myfont-28px mycolor-lprimary" style="">
 					</text>
-					<text class="myfont-17px margin-left-lg text-black">{{'Add Bank Manually'}}</text>
+					<text class="myfont-17px margin-left-lg text-black">{{ $t('add_bank_manually') }}</text>
 				</view>
 
 				<view class="height-45px radius-10px margin-top flex-column" :class="acc_checked?'mybg-lprimary':'mybg-linfo'" @click="auto_submit()">
@@ -145,21 +145,21 @@
 						</view>
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
-							<view>Account Name</view>
+							<view>{{ $t('account_ame') }}</view>
 							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text class="cuIcon-copy mycolor-info text-light margin-left" @click="copy(agent_bankcard.rc_bank_account)"></text>
 							</view>
-							<view>Account Number</view>
+							<view>{{ $t('account_number') }}</view>
 						</view>
 					</view>
 				</view>
 
 				<!-- 金额显示 -->
 				<view class="flex-row justify-center margin-bottom text-black padding-lr" style="margin: 0px 0px 16px;font-family: __Inter_7be8ac, __Inter_Fallback_7be8ac;font-weight: 600;font-size: 0.875rem;line-height: 1.13;text-align: center;">
-					{{"The bank account can change anytime. Please do not save bank info and reuse it without checking on the 1x2 deposit page. Ensure the receiver's bank info before making a transfer."}}
+					{{ $t('bank_change_notice') }}
 				</view>
 				<view class="width-100 flex-column padding-lr-lg" v-if="chargeForm.charge_way">
 					<view class="text-center text-red myfont-13px" style="font-size: 1rem;line-height: 1.1;">
-						{{"Enter transaction id that matched with the uploaded slip."}}
+						{{ $t('enter_transaction_id') }}
 					</view>
 					<input class="width-100 margin-tb-sm height-30px radius-3px text-center" style="border: 2px solid #E0E0E0;" :style="transaction_disable?'background:rgb(241,241,241)':''" type="number" @input='' v-model="chargeForm.transaction_id" placeholder-class="text-white" maxlength="32" placeholder="" :disabled="transaction_disable">
 				</view>
@@ -171,7 +171,7 @@
 				<view class="flex-column" v-if="chargeForm.charge_way">
 					<!-- 提示 -->
 					<view class="tips" style="">
-						{{"Notice! For faster investigation and automatic processing, please upload the bank slip in English. Otherwise, customers have to enter the transaction ID that is shown on the bank slip manually. If the transaction ID is not matched, the deposit will be rejected."}}
+						{{ $t('upload_slip_notice') }}
 					</view>
 					<view class="bg-img padding-sm" @tap="ViewImage" :data-url="picture" style="text-align: center;position: relative;">
 						<image :src="picture" mode="aspectFill" style="width:80px;height:80px;border:1px dashed grey">
@@ -194,13 +194,13 @@
 			<view class="add-bank-dialog">
 				<!-- 标题栏 -->
 				<view class="dialog-header">
-					<text class="dialog-title">Bind Wallet Account</text>
+					<text class="dialog-title">{{ $t('bind_wallet_account') }}</text>
 					<text class="dialog-close" @click="modalName = ''">✕</text>
 				</view>
 
 				<!-- 副标题 -->
 				<view class="dialog-subtitle">
-					<text>Choose an account type to continue</text>
+					<text>{{ $t('choose_account_type') }}</text>
 				</view>
 
 				<!-- 银行图标选择 -->
@@ -214,20 +214,20 @@
 				<view class="dialog-form">
 					<!-- Account No -->
 					<view class="form-group">
-						<text class="form-label">Account No.</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="Account Phone Number" v-model="card_conf.acc_number" />
+						<text class="form-label">{{ $t('account_no') }}</text>
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('account_phone_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
-						<text class="form-label">User Name</text>
-						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Account Name" v-model="card_conf.acc_name" />
+						<text class="form-label">{{ $t('user_name') }}</text>
+						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 
 				<!-- Confirm 按钮 -->
 				<button class="confirm-btn" :class="add_disable?'disabled':''" @click="modal_type=='add'?add_card():auto_submit()" :disabled="add_disable">
-					Confirm
+					{{ $t('confirm') }}
 				</button>
 			</view>
 		</view>
@@ -237,17 +237,17 @@
 			<view class="deposit-modal-dialog">
 				<!-- 标题栏 -->
 				<view class="deposit-modal-header">
-					<text class="deposit-modal-title">Auto Deposit</text>
+					<text class="deposit-modal-title">{{ $t('auto_deposit') }}</text>
 					<text class="deposit-modal-close" @click="closeDepositModal">✕</text>
 				</view>
 
 				<!-- 用户账户信息 -->
 				<view class="user-account-section">
-					<text class="section-title">User Account</text>
+					<text class="section-title">{{ $t('user_account') }}</text>
 
 					<!-- Bank Type -->
 					<view class="info-row">
-						<text class="info-label">Bank Type</text>
+						<text class="info-label">{{ $t('bank type') }}</text>
 						<view class="bank-type-value">
 							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
 							<text class="bank-type-text">{{selectedCard.bank_code}}</text>
@@ -256,7 +256,7 @@
 
 					<!-- Account No -->
 					<view class="info-row">
-						<text class="info-label">Account No.</text>
+						<text class="info-label">{{ $t('account_no') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_number}}</text>
 						</view>
@@ -264,7 +264,7 @@
 
 					<!-- User Name -->
 					<view class="info-row">
-						<text class="info-label">User Name</text>
+						<text class="info-label">{{ $t('user_name') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_name}}</text>
 						</view>
@@ -276,7 +276,7 @@
 					<view class="amount-input-box">
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" placeholder="3,000" />
 					</view>
-					<text class="amount-hint">Minimum deposit amount is 3,000MMK.</text>
+					<text class="amount-hint">{{ $t('min_deposit_3000') }}</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
@@ -288,15 +288,15 @@
 
 				<!-- 支付渠道：仅支持 QR Pay -->
 				<view class="payment-channel-section">
-					<text class="section-title">Payment Channel</text>
+					<text class="section-title">{{ $t('payment_channel') }}</text>
 					<view class="payment-channel-single">
-						<text class="payment-channel-name">QR Pay</text>
+						<text class="payment-channel-name">{{ $t('qr_pay') }}</text>
 					</view>
 				</view>
 
 				<!-- Continue 按钮 -->
 				<button class="continue-btn" :disabled="amount_error" @click="depositSubmit()">
-					Continue
+					{{ $t('continue_btn') }}
 				</button>
 			</view>
 		</view>
@@ -306,29 +306,29 @@
 			<view class="transfer-tips-dialog">
 				<!-- 标题栏 -->
 				<view class="transfer-modal-header">
-					<text class="transfer-modal-title">Auto Deposit With Kpay</text>
+					<text class="transfer-modal-title">{{ $t('deposit_with_kpay') }}</text>
 					<text class="transfer-modal-close" @click="closeTipsModal">✕</text>
 				</view>
 
 				<!-- 金额信息 -->
 				<view class="tips-content">
 					<view class="tips-row">
-						<text class="tips-label">Transaction Amount :</text>
+						<text class="tips-label">{{ $t('transaction_amount') }} :</text>
 						<text class="tips-value">{{numberFormat(amount)}} MMK</text>
 					</view>
 					<view class="tips-row">
-						<text class="tips-label">Handling Fees</text>
+						<text class="tips-label">{{ $t('handling_fees') }}</text>
 						<text class="tips-value">0%</text>
 					</view>
 					<view class="tips-row highlight">
-						<text class="tips-label">Recieved Amount :</text>
+						<text class="tips-label">{{ $t('received_amount') }} :</text>
 						<text class="tips-value">{{numberFormat(amount)}} MMK</text>
 					</view>
 				</view>
 
 				<!-- Continue按钮 -->
 				<button class="tips-continue-btn" @click="continueFromTips">
-					Continue
+					{{ $t('continue_btn') }}
 				</button>
 			</view>
 		</view>
@@ -338,16 +338,16 @@
 			<view class="transfer-confirm-dialog">
 				<!-- 标题栏 -->
 				<view class="transfer-modal-header">
-					<text class="transfer-modal-title">Auto Deposit With Kpay</text>
+					<text class="transfer-modal-title">{{ $t('deposit_with_kpay') }}</text>
 					<text class="transfer-modal-close" @click="closeConfirmModal">✕</text>
 				</view>
 
 				<!-- User Account -->
 				<view class="confirm-section">
-					<text class="confirm-section-title">User Account</text>
+					<text class="confirm-section-title">{{ $t('user_account') }}</text>
 
 					<view class="confirm-row">
-						<text class="confirm-label">Bank Type</text>
+						<text class="confirm-label">{{ $t('bank type') }}</text>
 						<view class="confirm-bank-value">
 							<image class="confirm-bank-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
 							<text class="confirm-bank-text">Kpay</text>
@@ -355,14 +355,14 @@
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">Account No.</text>
+						<text class="confirm-label">{{ $t('account_no') }}</text>
 						<view class="confirm-value-box">
 							<text class="confirm-value-text">{{selectedCard.acc_number || 'none'}}</text>
 						</view>
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">User Name</text>
+						<text class="confirm-label">{{ $t('user_name') }}</text>
 						<view class="confirm-value-box">
 							<text class="confirm-value-text">{{selectedCard.acc_name || 'none'}}</text>
 						</view>
@@ -378,10 +378,10 @@
 
 				<!-- Payee Account -->
 				<view class="confirm-section">
-					<text class="confirm-section-title">Payee Account</text>
+					<text class="confirm-section-title">{{ $t('payee_account') }}</text>
 
 					<view class="confirm-row">
-						<text class="confirm-label">Bank Type</text>
+						<text class="confirm-label">{{ $t('bank type') }}</text>
 						<view class="confirm-bank-value">
 							<image class="confirm-bank-icon" :src="`/static/icon/register/${agent_bankcard.rc_bank_code || 'KBZ Pay'}.png`"></image>
 							<text class="confirm-bank-text">Kpay</text>
@@ -389,22 +389,22 @@
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">Account No.</text>
+						<text class="confirm-label">{{ $t('account_no') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_account || 'none'}}</text>
 							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
-								<text class="copy-btn-text">Copy</text>
+								<text class="copy-btn-text">{{ $t('copy') }}</text>
 								<text class="cuIcon-copy"></text>
 							</view>
 						</view>
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">User Name</text>
+						<text class="confirm-label">{{ $t('user_name') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_username || 'Payee'}}</text>
 							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
-								<text class="copy-btn-text">Copy</text>
+								<text class="copy-btn-text">{{ $t('copy') }}</text>
 								<text class="cuIcon-copy"></text>
 							</view>
 						</view>
@@ -414,11 +414,11 @@
 				<!-- Transfer Amount & Valid Period -->
 				<view class="transfer-info">
 					<view class="transfer-info-row">
-						<text class="transfer-info-label">Transfer Amount :</text>
+						<text class="transfer-info-label">{{ $t('transfer_amount') }} :</text>
 						<text class="transfer-info-value">{{numberFormat(amount)}} MMK</text>
 					</view>
 					<view class="transfer-info-row">
-						<text class="transfer-info-label">Valid Period</text>
+						<text class="transfer-info-label">{{ $t('valid_period') }}</text>
 						<text class="transfer-info-value">none</text>
 					</view>
 				</view>
@@ -430,17 +430,17 @@
 
 				<!-- 提示文字 -->
 				<view class="transfer-notice" v-if="!showContinueBtn">
-					<text class="transfer-notice-text">Please make sure to tap the "Copy" button besides Payee Account Number to transfer the Desired amount of Balance to deposit.</text>
+					<text class="transfer-notice-text">{{ $t('tap_copy_notice') }}</text>
 				</view>
 
 				<!-- Continue提示 -->
 				<view class="transfer-notice" v-if="showContinueBtn">
-					<text class="transfer-notice-text">Press continue to make your deposit transaction</text>
+					<text class="transfer-notice-text">{{ $t('press_continue_deposit') }}</text>
 				</view>
 
 				<!-- Continue按钮 -->
 				<button class="transfer-final-btn" v-if="showContinueBtn" @click="transferContinue">
-					Continue
+					{{ $t('continue_btn') }}
 				</button>
 			</view>
 		</view>
@@ -450,7 +450,7 @@
 			<view class="qrcode-dialog">
 				<!-- 标题栏 -->
 				<view class="qrcode-modal-header">
-					<text class="qrcode-modal-title">Auto Deposit With Kpay</text>
+					<text class="qrcode-modal-title">{{ $t('deposit_with_kpay') }}</text>
 					<text class="qrcode-modal-close" @click="closeQRCodeModal">✕</text>
 				</view>
 
@@ -463,24 +463,24 @@
 					<!-- Save QR按钮 -->
 					<button class="save-qr-btn" @click="$refs.qrcode._saveCode()">
 						<text class="save-qr-icon">↓</text>
-						<text class="save-qr-text">Save QR</text>
+						<text class="save-qr-text">{{ $t('save_qr') }}</text>
 					</button>
 				</view>
 
 				<!-- 提示文字 -->
 				<view class="qrcode-tips">
-					<text class="qrcode-tips-text">Scan the code with bank APP to make the payment. After payment is successful, wait for the automatic score.</text>
-					<text class="qrcode-tips-warning">Please use the same account to complete the payment.</text>
+					<text class="qrcode-tips-text">{{ $t('scan_qr_notice') }}</text>
+					<text class="qrcode-tips-warning">{{ $t('same_account_payment') }}</text>
 				</view>
 
 				<!-- Transfer Amount & Valid Period -->
 				<view class="qrcode-info">
 					<view class="qrcode-info-row">
-						<text class="qrcode-info-label">Transfer Amount :</text>
+						<text class="qrcode-info-label">{{ $t('transfer_amount') }} :</text>
 						<text class="qrcode-info-value">{{numberFormat(amount)}} MMK</text>
 					</view>
 					<view class="qrcode-info-row">
-						<text class="qrcode-info-label">Valid Period</text>
+						<text class="qrcode-info-label">{{ $t('valid_period') }}</text>
 						<text class="qrcode-info-value">none</text>
 					</view>
 				</view>
@@ -492,7 +492,7 @@
 
 				<!-- Continue按钮 -->
 				<button class="qrcode-continue-btn" v-if="showContinueBtn" @click="qrPayContinue">
-					Continue
+					{{ $t('continue_btn') }}
 				</button>
 			</view>
 		</view>
@@ -502,17 +502,17 @@
 			<view class="notice-dialog">
 				<!-- 标题栏 -->
 				<view class="notice-header">
-					<text class="notice-title">Notice</text>
+					<text class="notice-title">{{ $t('notice_title') }}</text>
 				</view>
 
 				<!-- 内容 -->
 				<view class="notice-content">
-					<text class="notice-text">Please Check your transaction status in Records after completing your transaction.</text>
+					<text class="notice-text">{{ $t('check_transaction_records') }}</text>
 				</view>
 
 				<!-- Confirm按钮 -->
 				<button class="notice-confirm-btn" @click="closeNoticeModal">
-					Confirm
+					{{ $t('confirm') }}
 				</button>
 			</view>
 		</view>
@@ -698,11 +698,12 @@
 				return dateFormatUtils.numFormat(number);
 			},
 			copy(account) {
+				const _this = this
 				uni.setClipboardData({
 					data: account,
 					success: function() {
 						uni.showToast({
-							title: 'Copied to clipboard',
+							title: _this.$t('copied_to_clipboard'),
 							icon: 'success'
 						});
 					},
@@ -717,10 +718,10 @@
 					let _this = this
 					if (_this.chargeForm.charge_way == 1 && _this.agent_no_bankcard) {
 						uni.showModal({
-							title: 'Tips',
-							content: 'Your agent no bankcard',
+							title: _this.$t('tips'),
+							content: _this.$t('agent_no_bankcard'),
 							showCancel: false,
-							confirmText: 'Back',
+							confirmText: _this.$t('back'),
 							success: res => {
 								if (res.confirm) {
 									_this.current_progress = 0
@@ -746,8 +747,8 @@
 			show_add_modal(modal_type) {
 				if (modal_type == 'add' && this.card_list.length >= 5) {
 					uni.showModal({
-						title: 'Tips',
-						content: 'Up to five bank accounts can be added',
+						title: this.$t('tips'),
+						content: this.$t('max_five_banks'),
 						showCancel: false,
 						confirmText: this.$t('confirm'),
 						success: res => {}
@@ -785,7 +786,7 @@
 				_this.$http.post('/bank_card/add', para, (res) => {
 					if (res.statusCode == 200) {
 						uni.showToast({
-							title: 'Saved Success',
+							title: _this.$t('saved_success'),
 							icon: 'success',
 							duration: 2000
 						})
@@ -815,7 +816,7 @@
 							_this.$http.post('/bank_card/delete', para, (res) => {
 								if (res.statusCode == 200) {
 									uni.showToast({
-										title: 'Removed Success',
+										title: _this.$t('removed_success'),
 										icon: 'success',
 										duration: 2000
 									})
@@ -861,7 +862,7 @@
 				let url = '/charge/order_image'
 				if (this.picture) {
 					uni.showLoading({
-						title: 'Upload Pic...'
+						title: _this.$t('upload_pic')
 					})
 					var con = {
 						url: url,
@@ -892,10 +893,10 @@
 								}
 								uni.hideLoading()
 								uni.showModal({
-									title: 'tips',
+									title: _this.$t('tips'),
 									content: tips,
 									showCancel: false,
-									confirmText: 'OK'
+									confirmText: _this.$t('ok')
 								})
 							}
 						}
@@ -903,7 +904,7 @@
 					_this.$http.uploadFile(con)
 				} else {
 					uni.showToast({
-						title: 'please upload the charge picture!',
+						title: _this.$t('upload_charge_pic'),
 						image: '../../static/icon/error.png',
 						duration: 2000
 					})
@@ -939,7 +940,7 @@
 			submit() {
 				var _this = this;
 				uni.showLoading({
-					title: 'Loading...'
+					title: _this.$t('loading_dots')
 				});
 				// 手动充值（MANUAL mode with image）
 				if (_this.chargeForm.charge_way && _this.picture) {
@@ -971,28 +972,28 @@
 									});
 								} else {
 									uni.showModal({
-										confirmText: 'OK',
+										confirmText: this.$t('ok'),
 										showCancel: false,
-										title: 'Error',
+										title: this.$t('error_title'),
 										content: data.message
 									});
 								}
 							} catch (e) {
 								uni.showModal({
-									confirmText: 'OK',
+									confirmText: this.$t('ok'),
 									showCancel: false,
-									title: 'Error',
-									content: 'Unknow error'
+									title: this.$t('error_title'),
+									content: this.$t('unknown_error')
 								});
 							}
 						},
 						fail: (err) => {
 							uni.hideLoading();
 							uni.showModal({
-								confirmText: 'OK',
+								confirmText: this.$t('ok'),
 								showCancel: false,
-								title: 'Error',
-								content: 'Upload Fail'
+								title: this.$t('error_title'),
+								content: this.$t('upload_fail')
 							});
 						}
 					});
@@ -1018,9 +1019,9 @@
 							});
 						} else {
 							uni.showModal({
-								confirmText: 'OK',
+								confirmText: this.$t('ok'),
 								showCancel: false,
-								title: 'Error',
+								title: this.$t('error_title'),
 								content: res.data.message
 							});
 						}
@@ -1050,7 +1051,7 @@
 					if (data.code == 200) {
 						let order = data.data;
 						uni.showToast({
-							title: "Success!"
+							title: _this.$t('success_excl')
 						})
 						_this.card_conf = {}
 						_this.modalName = ''
@@ -1064,9 +1065,9 @@
 						});
 					} else {
 						uni.showModal({
-							confirmText: 'OK',
+							confirmText: this.$t('ok'),
 							showCancel: false,
-							title: 'Error',
+							title: this.$t('error_title'),
 							content: res.data.message
 						})
 					}
@@ -1095,7 +1096,7 @@
 				const amountNum = parseInt(this.amount)
 				if (!amountNum || amountNum < 3000 || amountNum > 1000000) {
 					uni.showToast({
-						title: 'Please enter valid amount (3,000 - 1,000,000)',
+						title: this.$t('enter_valid_amount'),
 						icon: 'none'
 					})
 					return
@@ -1104,7 +1105,7 @@
 				// 验证账号
 				if (!this.chargeForm.acc_number) {
 					uni.showToast({
-						title: 'Account number missing',
+						title: this.$t('account_number_missing'),
 						icon: 'none'
 					})
 					return
@@ -1197,7 +1198,7 @@
 				para.card_id = this.selectedCard.id
 
 				uni.showLoading({
-					title: 'Loading...'
+					title: this.$t('loading_dots')
 				})
 
 				this.$http.post('/charge_apply/add', para, res => {
@@ -1217,9 +1218,9 @@
 						})
 					} else {
 						uni.showModal({
-							confirmText: 'OK',
+							confirmText: this.$t('ok'),
 							showCancel: false,
-							title: 'Error',
+							title: this.$t('error_title'),
 							content: res.data.message
 						})
 					}

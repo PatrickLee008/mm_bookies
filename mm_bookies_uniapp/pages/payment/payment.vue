@@ -27,7 +27,7 @@
 								<text class="margin-top text-red" v-else>{{$t('payment.orderTimeoutTip')}}</text>
 							</block>
 							<block v-else-if="payInfo.orderStatus==2">
-								<view class="text-green text-bold">Pay Completed</view>
+								<view class="text-green text-bold">{{ $t('pay_completed') }}</view>
 							</block>
 						</view>
 					</view> -->
@@ -51,7 +51,7 @@
 								<image src="/static/image/pay/download.png" mode="aspectFit" class=" margin-right-sm"
 									style="width: 15px;height: 15px;" />
 								<!-- <text class="cuIcon-down margin-right-sm"></text> -->
-								<text class="text-sm">Save QR Image</text>
+								<text class="text-sm">{{ $t('save_qr_image') }}</text>
 							</button>
 							<!-- <button v-if="payInfo.orderStatus==1" icon="download"
 							style="width: 140px;background-color: black;border: 0px;border-radius: 10px;" class="margin-top"
@@ -98,7 +98,7 @@
 			<view class="text-center padding">
 				<button class="cu-btn mybg-primary" @click="back_home">
 					<text class="cuIcon-home margin-right-sm"></text>
-					<text class="text-sm">Back to Home</text>
+					<text class="text-sm">{{ $t('back_to_home') }}</text>
 				</button>
 			</view>
 		</scroll-view>
@@ -117,7 +117,7 @@
 				<text class="timeout-text" v-else>{{$t('payment.orderTimeoutTip')}}</text>
 			</block>
 			<block v-else-if="payInfo.orderStatus==2">
-				<view class="completed-text">Pay Completed</view>
+				<view class="completed-text">{{ $t('pay_completed') }}</view>
 			</block>
 		</view>
 		<view class="cu-modal" style="z-index: 998;" :class="modalName=='error_modal'?'show':''">
@@ -217,9 +217,9 @@
 						// 请求成功但业务失败的情况
 						that.modalName = 'error_modal';
 						uni.showModal({
-							title: 'Tips',
-							content: res.data ? res.data.msg : 'Network error',
-							confirmText: 'OK',
+							title: that.$t('tips'),
+							content: res.data ? res.data.msg : that.$t('network_error'),
+							confirmText: that.$t('ok'),
 							showCancel: false
 						})
 					}
@@ -229,9 +229,9 @@
 					that.modalName = 'error_modal';
 					that.isload = true;
 					uni.showModal({
-						title: 'Network Error',
-						content: 'Please check your network connection and try again',
-						confirmText: 'OK',
+						title: that.$t('network_error'),
+						content: that.$t('check_network'),
+						confirmText: that.$t('ok'),
 						showCancel: false
 					});
 				});
@@ -247,10 +247,10 @@
 						if (that.payInfo.orderStatus == 2) {
 							//支付成功
 							uni.showModal({
-								title: 'Tips',
-								content: "Pay Completed. Back Home",
+								title: that.$t('tips'),
+								content: that.$t('pay_completed_back_home'),
 								showCancel: false,
-								confirmText: 'Back Home',
+								confirmText: that.$t('back_home_btn'),
 								success: function(res) {
 									uni.redirectTo({
 										url: "/?mix=0"
@@ -348,7 +348,7 @@
 
 				// 提示用户
 				uni.showToast({
-					title: 'qrcode photo download starting',
+					title: this.$t('qrcode_download_starting'),
 					icon: 'success'
 				});
 			},

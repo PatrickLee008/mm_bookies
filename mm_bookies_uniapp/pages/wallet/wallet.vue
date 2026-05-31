@@ -11,17 +11,17 @@
 			<view class="tab-selector">
 				<view class="tab-container">
 					<view class="tab-item" :class="{'active': tab_index === 0}" @click="handleTabClick(0)">
-						<text class="tab-text">Deposit</text>
+						<text class="tab-text">{{ $t('text_button_submit') }}</text>
 					</view>
 					<view class="tab-item" :class="{'active': tab_index === 1}" @click="handleTabClick(1)">
-						<text class="tab-text">Withdraw</text>
+						<text class="tab-text">{{ $t('whithdraw btn') }}</text>
 					</view>
 					<view class="tab-item" :class="{'active': tab_index === 2}" @click="handleTabClick(2)">
-						<text class="tab-text">Deposit History</text>
+						<text class="tab-text">{{ $t('deposit_history') }}</text>
 					</view>
 
 					<view class="tab-item" :class="{'active': tab_index === 3}" @click="handleTabClick(3)">
-						<text class="tab-text">Withdraw History</text>
+						<text class="tab-text">{{ $t('withdraw_history') }}</text>
 					</view>
 
 					<!-- from tangjq--- 底部滑动指示器 -->
@@ -52,7 +52,7 @@
 		<!-- from tangjq--- 悬浮的 Refresh 按钮 -->
 		<view class="refresh-btn-float" @click="relaunch">
 			<image class="refresh-icon" mode="widthFix" src="/static/icon/wallet/reflesh.svg" />
-			<text class="refresh-text">Refresh</text>
+			<text class="refresh-text">{{ $t('refresh') }}</text>
 		</view>
 	</view>
 </template>

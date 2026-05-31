@@ -264,9 +264,10 @@
 
 			_this.handleLaunchParams(option)
 
-			var lang = uni.getLocale();
+			// 读取用户已存的语种偏好；首次启动无偏好时默认缅甸语（不跟随系统语言）
+			var lang = uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm';
 			let langs = ['cn', 'en', 'mm', 'th']
-			lang = langs.includes(lang) ? lang : 'en'
+			lang = langs.includes(lang) ? lang : 'mm'
 			uni.removeStorageSync('noticed');
 			if (lang) {
 				config.language = language[lang]

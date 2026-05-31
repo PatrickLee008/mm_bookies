@@ -19,7 +19,7 @@
 
 				<!-- 添加银行账户按钮 -->
 				<view class="add-bank-btn" @click="show_add_modal('add')">
-					<text class="add-bank-text">Add Bank Account</text>
+					<text class="add-bank-text">{{ $t('add bank account') }}</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -29,17 +29,17 @@
 			<view class="withdraw-modal-dialog">
 				<!-- 标题栏 -->
 				<view class="withdraw-modal-header">
-					<text class="withdraw-modal-title">Withdraw</text>
+					<text class="withdraw-modal-title">{{ $t('whithdraw btn') }}</text>
 					<text class="withdraw-modal-close" @click="modalName = ''">✕</text>
 				</view>
 
 				<!-- 用户账户信息 -->
 				<view class="user-account-section">
-					<text class="section-title">User Account</text>
+					<text class="section-title">{{ $t('user_account') }}</text>
 
 					<!-- Bank Type -->
 					<view class="info-row">
-						<text class="info-label">Bank Type</text>
+						<text class="info-label">{{ $t('bank type') }}</text>
 						<view class="bank-type-value">
 							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
 							<text class="bank-type-text">{{selectedCard.bank_code}}</text>
@@ -48,7 +48,7 @@
 
 					<!-- Account No -->
 					<view class="info-row">
-						<text class="info-label">Account No.</text>
+						<text class="info-label">{{ $t('account_no') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_number}}</text>
 						</view>
@@ -56,7 +56,7 @@
 
 					<!-- User Name -->
 					<view class="info-row">
-						<text class="info-label">User Name</text>
+						<text class="info-label">{{ $t('user_name') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_name}}</text>
 						</view>
@@ -66,15 +66,15 @@
 				<!-- from tangjq--- 钱包信息部分 -->
 				<view class="wallet-info-section">
 					<view class="wallet-info-row">
-						<text class="wallet-info-label">Wallet Balance :</text>
+						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
 						<text class="wallet-info-value">{{userInfo.money || '0'}}</text>
 					</view>
 					<view class="wallet-info-row">
-						<text class="wallet-info-label">Amount Unlock :</text>
+						<text class="wallet-info-label">{{ $t('amount_unlock') }} :</text>
 						<text class="wallet-info-value">{{configs.amount_unlock || '0.00'}}</text>
 					</view>
 					<view class="wallet-info-row">
-						<text class="wallet-info-label">Turn Over Limit :</text>
+						<text class="wallet-info-label">{{ $t('turnover_limit_label') }} :</text>
 						<text class="wallet-info-value">{{configs.turnover_limit || '0.00'}}</text>
 					</view>
 				</view>
@@ -82,7 +82,7 @@
 				<!-- 金额输入 -->
 				<view class="amount-section">
 					<view class="amount-input-box">
-						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" placeholder="Please enter withdrawl amount" />
+						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_withdraw_amount')" />
 					</view>
 					<text class="amount-hint">Minimum withdrawal amount is {{configs.withdraw_min_limit || 5000}}MMK.</text>
 
@@ -96,7 +96,7 @@
 
 				<!-- Continue 按钮 -->
 				<button class="continue-btn" :disabled="amount_error" @click="withdrawSubmit()">
-					Continue
+					{{ $t('continue_btn') }}
 				</button>
 			</view>
 		</view>
@@ -106,13 +106,13 @@
 			<view class="add-bank-dialog">
 				<!-- 标题栏 -->
 				<view class="dialog-header">
-					<text class="dialog-title">Bind Wallet Account</text>
+					<text class="dialog-title">{{ $t('bind_wallet_account') }}</text>
 					<text class="dialog-close" @click="modalName = ''">✕</text>
 				</view>
 
 				<!-- 副标题 -->
 				<view class="dialog-subtitle">
-					<text>Choose an account type to continue</text>
+					<text>{{ $t('choose_account_type') }}</text>
 				</view>
 
 				<!-- 银行图标选择 -->
@@ -126,20 +126,20 @@
 				<view class="dialog-form">
 					<!-- Account No -->
 					<view class="form-group">
-						<text class="form-label">Account No.</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" placeholder="Account Phone Number" v-model="card_conf.acc_number" />
+						<text class="form-label">{{ $t('account_no') }}</text>
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('account_phone_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
-						<text class="form-label">User Name</text>
-						<input class="form-input" type="text" @input="set_add_disable()" placeholder="Account Name" v-model="card_conf.acc_name" />
+						<text class="form-label">{{ $t('user_name') }}</text>
+						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 
 				<!-- Confirm 按钮 -->
 				<button class="confirm-btn" :class="add_disable?'disabled':''" @click="add_card()" :disabled="add_disable">
-					Confirm
+					{{ $t('confirm') }}
 				</button>
 			</view>
 		</view>
@@ -246,7 +246,7 @@
 				// Validate card
 				if (!_this.selectedCard || !_this.selectedCard.id) {
 					uni.showToast({
-						title: 'Please select a bank card',
+						title: _this.$t('select_bank_card'),
 						icon: 'none'
 					})
 					return
@@ -258,7 +258,7 @@
 				}
 
 				uni.showLoading({
-					title: 'Withdrawing!'
+					title: _this.$t('withdrawing')
 				})
 
 				// Call withdraw API
@@ -291,10 +291,10 @@
 						}
 						_this.$nextTick(() => {
 							uni.showModal({
-								title: 'Tips',
+								title: _this.$t('tips'),
 								content: tips,
 								showCancel: false,
-								confirmText: 'OK',
+								confirmText: _this.$t('ok'),
 							});
 						});
 					}
@@ -334,7 +334,7 @@
 				_this.$http.post('/bank_card/add', para, (res) => {
 					if (res.statusCode == 200) {
 						uni.showToast({
-							title: 'Saved Success',
+							title: _this.$t('saved_success'),
 							icon: 'success',
 							duration: 2000
 						})
@@ -364,7 +364,7 @@
 							_this.$http.post('/bank_card/delete', para, (res) => {
 								if (res.statusCode == 200) {
 									uni.showToast({
-										title: 'Removed Success',
+										title: _this.$t('removed_success'),
 										icon: 'success',
 										duration: 2000
 									})
