@@ -265,6 +265,8 @@
 				status_list: [],
 				wallet_list: [],
 				date_range: [{}, {}],
+				date_filtered: false,
+				send_date: true,
 				report: {
 					all_stake: 0,
 					win: 0,
@@ -274,8 +276,9 @@
 		},
 		methods: {
 			copy(order) {
+				console.log(order)
 				uni.setClipboardData({
-					data: order.ID,
+					data: order.ID || order.id,
 					success: function() {
 						uni.showToast({
 							title: 'Order ID Copied to clipboard',
@@ -289,7 +292,7 @@
 						// });
 					}
 				});
-
+	
 			},
 			navi_to_single() {
 				uni.reLaunch({
@@ -306,6 +309,11 @@
 				// let start = arr[0]
 				// let end = arr[1]
 				this.date_range = arr
+				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
+					this.send_date = false
+				} else {
+					this.send_date = true
+				}
 				this.reset_list()
 				this.get_list()
 			},
@@ -321,10 +329,9 @@
 						}
 					})
 				}
-				let types = ['All', 'Single', 'Mixparlay']
+				let types = ['All', 'Single', 'Mixparlay', 'AWC']
 				let status = ['All', 'Pending', 'Win', 'Lose', 'Draw', 'Cancel', 'Refund', 'Rejected']
-				// let status = ['all', 'pending', 'win', 'lose', 'draw', ]
-				let wallets = ['All', 'Money', 'Promotion']
+				let wallets = ['All', 'Promotion', 'Money']
 				this.type_list = parse_list(types, 'bet_type')
 				this.status_list = parse_list(status, 'bet_status')
 				this.wallet_list = parse_list(wallets, 'pay_wallet')
@@ -332,6 +339,7 @@
 			page_change(page) {
 				if (this.$toolbox.click_too_fast(1)) return
 				this.current_page = page
+				this.date_filtered = false
 				this.reset_list()
 				this.get_list()
 			},
@@ -381,9 +389,9 @@
 					// status: _this.listQuery.status,
 					// order_type: _this.listQuery.type == 3 ? 3 : '',
 					// game_type: 1,
-					// start_time: '2025-12-01', // 测试
-					start_time: _this.date_range[0].value,
-					end_time: _this.date_range[1].value,
+					start_time: _this.send_date ? _this.date_range[0].value : '',
+					end_time: _this.send_date ? _this.date_range[1].value : '',
+					date_filtered: _this.date_filtered ? 1 : 0,
 					// is_mix: _this.listQuery.is_mix == 'Mixparlay' ? 1 : _this.listQuery.is_mix == 'Single' ? 0 : ''
 				};
 				// console.log(this.listQuery,paras)
@@ -399,28 +407,46 @@
 					if (res.statusCode == 200) {
 						var results = res.data.items;
 						results.forEach(ele => {
-							ele = _this.parse_order(ele)
-							let money = _this.$toolbox.num_format(ele.BET_MONEY, 0, true)
-							if (_this.current_page === 'Finished') {
-								let bonus = _this.$toolbox.num_format(ele.netwin_actual, 0, true)
+							let money = 0;
+							if (ele.platform_source != 'AWC') {
+								ele = _this.parse_order(ele)
+								money = _this.$toolbox.num_format(ele.BET_MONEY, 0, true)
+								_this.report.all_stake += money
+							}
+							if (_this.current_page === 'Settled') {
+								if (ele.platform_source == 'AWC') {
+									let bonus_main = _this.$toolbox.num_format(ele.net_main, 0, true)
+									let bonus_promo = _this.$toolbox.num_format(ele.net_promo, 0, true)
+									let bonus_actual = parseInt(bonus_main) + parseInt(bonus_promo)
+									_this.report.win += bonus_actual > 0 ? bonus_actual : 0;
+									_this.report.loss += bonus_actual < 0 ? bonus_actual : 0;
+									_this.history_list.push(ele);
+									return; // 跳过后续的普通订单处理逻辑
+								}
+								let bonus = _this.$toolbox.num_format(ele.netwin, 0, true)
 								// bonus = bonus < money ? bonus - money : bonus;
+								let bonus_actual = parseInt(bonus)
+								if (ele.netwin_actual < 0 && ele.bet_status != 'Refund') {
+									bonus_actual = parseInt(ele.netwin_actual)
+								}
 								if (ele.bet_status === 'Cancel') {
 									bonus = 0
 								}
-								_this.report.win += bonus > 0 ? bonus : 0;
-								_this.report.loss += bonus < 0 ? bonus : 0;
-
+								_this.report.win += bonus_actual > 0 ? bonus_actual : 0;
+								_this.report.loss += bonus_actual < 0 ? bonus_actual : 0;
+								// _this.report.win += bonus > 0 ? bonus : 0;
+								// _this.report.loss += bonus < 0 ? bonus : 0;
 							}
-							_this.report.all_stake += money
-
 							_this.history_list.push(ele);
 						})
 						if (_this.current_page === 'Ongoing') {
 							_this.total = res.data.total
 						}
-						if (results.length == 0) {
+						if (results.length < _this.listQuery.limit) {
 							_this.listQuery.end = true
-						} else {}
+						} else {
+							_this.listQuery.page++
+						}
 					}
 				})
 			},
@@ -473,9 +499,9 @@
 				ele.show_order_type = this.order_type_2_str(ele)
 				ele.order_time = this.parse_time(ele)
 				ele.bet_status = ele.bet_status ? ele.bet_status : `${this.current_page==='Ongoing'?'pending':''}`
-				ele.bet_status = ele.bet_status.replace('Half', '').replace('half', '')
+				// ele.bet_status = ele.bet_status.replace('Half', '').replace('half', '')
 				ele.status_img = `/static/image/order/${ele.bet_status.toLowerCase()}.svg`
-
+				// ele.MATCH_TIME = ele.MATCH_TIME ? ele.MATCH_TIME : ''
 				ele.order_type_desc = desc.replace('串', 'x')
 				return ele
 			},
@@ -483,6 +509,7 @@
 				// Map AppBetOrder fields to Order model fields for compatibility
 				if (order.mb_id) {
 					// This is an AppBetOrder, map to Order fields
+					let bet_type_subs = order.bet_type_sub ? order.bet_type_sub.split(':') : [];
 					const mappedOrder = {
 						// Basic identifiers
 						ID: order.id,
@@ -490,59 +517,60 @@
 						USER_ID: order.mb_id,
 						USER_NAME: order.mb_username,
 						AGENT_CODE: order.aid || '',
-
+	
 						// Match and game info
 						MATCH_ID: order.game_id,
 						ORDER_DESC: order.remarks || '',
 						LEAGUE: order.league || '',
-
+	
 						// Betting info - parse bet_type_sub format "ORDER_TYPE:BET_TYPE"
-						ORDER_TYPE: order.bet_type_sub ? order.bet_type_sub.split(':')[0] : '',
-						BET_TYPE: order.bet_type_sub ? order.bet_type_sub.split(':')[1] : '',
+						ORDER_TYPE: bet_type_subs.length > 0 ? bet_type_subs[0] : '',
+						BET_TYPE: bet_type_subs.length > 1 ? bet_type_subs[1] : order.bet_type_sub2,
 						BET_MONEY: order.stake,
 						BET_ODDS: order.odds,
-
+	
 						// Mix betting
 						IS_MIX: order.bet_type === 'Mixparlay' ? '1' : '0',
-
+	
 						// Status mapping
 						STATUS: '1', // Always valid for AppBetOrder
 						IS_WIN: order.bet_status === 'Win' ? '1' : order.bet_status === 'Lose' ? '0' : '2',
 						bet_status: order.bet_status,
-
+	
 						// Financial info
 						BONUS: order.netwin,
 						pay_wallet: order.pay_wallet,
-
+	
 						// Match odds info
 						DRAW_BUNKO: order.draw_bunko || '',
 						DRAW_ODDS: order.draw_odds || '',
 						LOSE_TEAM: order.lose_team || '',
 						LOSE_BALL_NUM: order.lose_ball_num || '',
-
+	
 						// Team names and scores from AppBetOrder
 						HOME: order.home || '',
 						AWAY: order.away || '',
-
+	
 						// Results (if available)
 						BET_HOST_TEAM_RESULT: order.home_score || '',
 						BET_GUEST_TEAM_RESULT: order.away_score || '',
-
+	
 						// Timestamps
 						CREATE_TIME: order.create_time,
-						MATCH_TIME: '', // Not directly available
-
+						MATCH_TIME: order.MATCH_TIME ? order.MATCH_TIME : '',
+						// MATCH_TIME: '', // Not directly available
+	
 						// Additional fields
 						main_order_id: order.id,
 						order_type_desc: order.bet_type === 'Mixparlay' ? `${order.order_count}串1` : '暂无',
 						ORDER_COUNT: order.order_count || 1,
-
+	
 						// Copy any other fields that might exist
 						...order
 					};
 					return mappedOrder;
 				}
-
+	
 				// If it's already an Order model, return as is
 				return order
 			},
@@ -554,24 +582,6 @@
 				score = score > -1 && score < 100 ? score : ''
 				return score
 			},
-			parse_time(order) {
-				const date = new Date(order.CREATE_TIME);
-
-				// 获取日期组件
-				const day = String(date.getDate()).padStart(2, '0');
-				const month = String(date.getMonth() + 1).padStart(2, '0');
-				const year = date.getFullYear();
-
-				// 获取时间组件并转换为12小时制
-				let hours = date.getHours();
-				const ampm = hours >= 12 ? 'PM' : 'AM';
-				hours = hours % 12;
-				hours = hours ? hours : 12; // 0点转换为12
-				const minutes = String(date.getMinutes()).padStart(2, '0');
-				const seconds = String(date.getSeconds()).padStart(2, '0');
-
-				return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
-			},
 			order_type_2_str(attr, typ = 'ORDER_TYPE') {
 				if (!attr.hasOwnProperty(typ)) return ''
 				let str = ''
@@ -579,18 +589,38 @@
 				if ([this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr_val)) {
 					str = 'HANDICAP'
 				} else if ([this.bet_type.SINGLE_GOAL, this.bet_type.MIX_GOAL].includes(attr_val)) {
-					str = attr.BET_TYPE == '1' ? this.$t('over') : this.$t('under');
+					str = 'O/U';
+					//str = attr.BET_TYPE == '1' ? this.$t('over') : this.$t('under');
 				} else if ([this.bet_type.SINGLE_EVEN, this.bet_type.MIX_EVEN].includes(attr_val)) {
 					str = 'O/E'
+					// str = attr.BET_TYPE == '1' ? this.$t('Odd') : this.$t('Even');
 				} else if ([this.bet_type.SINGLE_CORRECT].includes(attr_val)) {
 					str = "Correct Score";
 				} else if ([this.bet_type.SINGLE_BTTS].includes(attr_val)) {
+					// switch(attr.BET_TYPE){
+					// 	case "1":str="Both";break;
+					// 	case "2":str="One";break;
+					// 	case "3":str="No Goal";break;
+					// }
 					str = "BTTS"
 				} else if ([this.bet_type.SINGLE_WDL].includes(attr_val)) {
-					str = ""; // 已经处理在：calc_real_odds处理显示
+					// switch (attr.BET_TYPE) {
+					// 	case "1":
+					// 		str = "Home";
+					// 		break;
+					// 	case "2":
+					// 		str = "Away";
+					// 		break;
+					// 	case "3":
+					// 		str = "Draw";
+					// 		break;
+					// }
+					str = "1X2"; //已经处理在：calc_real_odds处理显示
 				} else {
 					str = "";
 				}
+				
+				// console.log("order_type_2_str", attr_val, str);
 				return str
 			},
 			calc_team_name(attr, typ = 'ORDER_TYPE') {
@@ -602,6 +632,7 @@
 						str = attr.BET_TYPE == '1' ? attr.HOME : attr.AWAY;
 						break
 					case [this.bet_type.SINGLE_GOAL, this.bet_type.MIX_GOAL].includes(attr_val):
+						str = attr.BET_TYPE == '1' ? this.$t('over') : this.$t('under');
 						break
 					case [this.bet_type.SINGLE_EVEN, this.bet_type.MIX_EVEN].includes(attr_val):
 						// str = 'EVEN'
@@ -685,11 +716,33 @@
 				} else if ([this.bet_type.SINGLE_WDL].includes(attr_val)) {
 					let num_2_str = [, 'HOME', 'AWAY', 'DRAW']
 					str = `1X2:${num_2_str[parseInt(attr.BET_TYPE)]}`
+					str = attr.odds;
 				} else {
 					str = "";
 				}
 				return str;
 			},
+			status_color(status) {
+				return status.indexOf('n') > -1 ? 'color:#60C07A' : 'color:#E52626'
+			},
+			parse_time(order) {
+				const date = new Date(order.CREATE_TIME);
+
+				// 获取日期组件
+				const day = String(date.getDate()).padStart(2, '0');
+				const month = String(date.getMonth() + 1).padStart(2, '0');
+				const year = date.getFullYear();
+
+				// 获取时间组件并转换为12小时制
+				let hours = date.getHours();
+				const ampm = hours >= 12 ? 'PM' : 'AM';
+				hours = hours % 12;
+				hours = hours ? hours : 12; // 0点转换为12
+				const minutes = String(date.getMinutes()).padStart(2, '0');
+				const seconds = String(date.getSeconds()).padStart(2, '0');
+
+				return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+			}
 		},
 		mounted() {
 			this.date_range = [this.getCurrentDate(0), this.getCurrentDate(0)]

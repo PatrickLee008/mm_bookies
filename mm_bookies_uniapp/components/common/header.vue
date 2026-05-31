@@ -93,8 +93,8 @@
 					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'history'}">History</text>
 				</view>
 
-				<!-- Deals -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)">
+				<!-- Deals 暂时隐藏优惠券功能-->
+				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)" v-if="false">
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'deals' ? '/static/icon/nav/deals_active.png' : '/static/icon/nav/deals.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
