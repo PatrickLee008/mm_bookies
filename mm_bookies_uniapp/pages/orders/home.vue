@@ -68,6 +68,10 @@
 					<view class="bet-card" v-if="item.IS_MIX == '0' || item.IS_MIX === false">
 						<!-- 卡片头部 -->
 						<view class="card-header">
+							<!-- from tangjq--- 已结算时右上角显示该场比赛输赢状态 -->
+							<view class="status-badge" :class="'badge-'+status_badge(item.bet_status).type" v-if="current_page==='Finished' && item.bet_status">
+								<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
+							</view>
 							<view class="header-match">
 								<text class="team-name">{{item.HOME}}</text>
 								<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
@@ -118,6 +122,10 @@
 						<!-- 单个比赛项 - 折叠时只显示一个 -->
 						<view v-if="!item.show_detail">
 							<view class="card-header">
+								<!-- from tangjq--- 已结算时右上角显示订单输赢状态 -->
+								<view class="status-badge" :class="'badge-'+status_badge(item.bet_status).type" v-if="current_page==='Finished' && item.bet_status">
+									<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
+								</view>
 								<view class="header-match">
 									<text class="team-name">{{item.HOME}}</text>
 									<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
@@ -150,6 +158,10 @@
 						<view v-else>
 							<view v-for="(detail,_index) in item.detail" :key="_index">
 								<view class="card-header">
+									<!-- from tangjq--- 已结算时右上角显示该场比赛输赢状态 -->
+									<view class="status-badge" :class="'badge-'+status_badge(detail.bet_status).type" v-if="current_page==='Finished' && detail.bet_status">
+										<text class="status-badge-text">{{status_badge(detail.bet_status).label}}</text>
+									</view>
 									<view class="header-match">
 										<text class="team-name">{{detail.HOME}}</text>
 										<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
@@ -725,6 +737,21 @@
 			status_color(status) {
 				return status.indexOf('n') > -1 ? 'color:#60C07A' : 'color:#E52626'
 			},
+			// from tangjq--- 根据bet_status计算右上角徽章的显示文本与配色类型
+			status_badge(status) {
+				const map = {
+					Pending: {	label: 'PENDING',	type: 'warn' },
+					Win: {		label: 'WIN',		type: 'win' },
+					Lose: {		label: 'LOSE',		type: 'lose' },
+					Draw: {		label: 'DRAW',		type: 'neutral' },
+					Cancel: {	label: 'CANCEL',	type: 'neutral' },
+					Refund: {	label: 'REFUND',	type: 'warn' },
+					Rejected: {	label: 'REJECTED',	type: 'lose' },
+					HalfWin: {	label: 'HALF WIN',	type: 'win' },
+					HalfLose: {	label: 'HALF LOSE',	type: 'lose' },
+				}
+				return map[status] || { label: String(status || '').toUpperCase(), type: 'neutral' }
+			},
 			parse_time(order) {
 				const date = new Date(order.CREATE_TIME);
 
@@ -862,6 +889,7 @@
 		flex-direction: column;
 		align-items: center;
 		position: relative;
+		overflow: hidden;
 	}
 
 	/* from tangjq--- 横向布局的比赛信息 */
@@ -943,6 +971,50 @@
 	.value-amount {
 		color: #2E7D7C;
 		font-weight: 700;
+	}
+
+	/* from tangjq--- 卡片右上角的输赢状态徽章（圆形 + 倾斜字体） */
+	.status-badge {
+		position: absolute;
+		top: -10upx;
+		right: -6upx;
+		width: 72upx;
+		height: 72upx;
+		border-radius: 50%;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 4upx 12upx rgba(0, 0, 0, 0.25);
+		transform: rotate(8deg);
+	}
+
+	.status-badge-text {
+		font-size: 18upx;
+		color: #FFFFFF;
+		font-weight: 800;
+		font-style: italic;
+		letter-spacing: 0upx;
+		line-height: 1;
+		text-align: center;
+		text-shadow: 0 1upx 2upx rgba(0, 0, 0, 0.2);
+		white-space: nowrap;
+	}
+
+	.badge-win {
+		background: radial-gradient(circle at 35% 35%, #6FE8D4 0%, #2CB5A0 60%, #1A8A7A 100%);
+	}
+
+	.badge-lose {
+		background: radial-gradient(circle at 35% 35%, #F07070 0%, #D32F2F 60%, #A51D1D 100%);
+	}
+
+	.badge-neutral {
+		background: radial-gradient(circle at 35% 35%, #B0BEC5 0%, #607D8B 60%, #3D5A66 100%);
+	}
+
+	.badge-warn {
+		background: radial-gradient(circle at 35% 35%, #FFB74D 0%, #F57C00 60%, #C56000 100%);
 	}
 
 	/* 结算状态条 */
