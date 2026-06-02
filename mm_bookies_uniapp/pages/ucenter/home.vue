@@ -232,7 +232,7 @@
 					<text class="modal-close" @click="hideCustomerSupportModal">✕</text>
 				</view>
 				<view class="modal-body">
-					<text class="support-main-title">{{ $t('contact_us_via') }}</text>
+					<text class="support-main-title">{{ $t('contact us') }}</text>
 					<text class="support-description">{{ $t('explore_website') }}</text>
 
 					<!-- 支持渠道列表 -->
@@ -323,14 +323,14 @@
 		<view class="logout-modal" v-if="showLogoutConfirm" @click="hideLogoutModal">
 			<view class="logout-modal-content" @click.stop="">
 				<view class="logout-modal-header">
-					<text class="logout-modal-title">{{ $t('log_out') }}</text>
+					<text class="logout-modal-title">{{ $t('logout') }}</text>
 				</view>
 				<view class="logout-modal-body">
 					<text class="logout-question">{{ $t('confirm_logout') }}</text>
 				</view>
 				<view class="logout-modal-buttons">
 					<view class="logout-btn-confirm" @click="logout">
-						<text class="logout-btn-text-red">{{ $t('log_out') }}</text>
+						<text class="logout-btn-text-red">{{ $t('logout') }}</text>
 					</view>
 					<view class="logout-btn-cancel" @click="hideLogoutModal">
 						<text class="logout-btn-text-white">{{ $t('cancel') }}</text>
@@ -371,7 +371,7 @@
 						},
 					},
 					{
-						title: "contact_us", // from tangjq--- 使用语言文件中的键名
+						title: "contact us", // from tangjq--- 使用语言文件中的键名
 						content: '',
 						method: 'showContactModal', // from tangjq--- 改为显示弹窗
 						args: [],

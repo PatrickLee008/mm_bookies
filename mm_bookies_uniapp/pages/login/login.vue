@@ -37,11 +37,14 @@
 			<!-- Login Form -->
 			<view class="login-form">
 				<!-- Welcome Text -->
-				<view class="welcome-text">{{ $t('login_welcome_back') }}</view>
+				<view class="welcome-text">{{ $t('Welcome Back') }}</view>
 
 				<!-- Phone Input Field -->
 				<view class="input-wrapper">
-					<input class="input-field" :class="{'input-error': phoneError}" type="number" placeholder-class="input-placeholder" v-model="loginInfo.account" :placeholder="$t('login_enter_phone')" maxlength="11" @blur="handlePhoneBlur" @input="handlePhoneBlur" />
+					<input class="input-field" :class="{'input-error': phoneError}" type="number"
+						placeholder-class="input-placeholder" v-model="loginInfo.account"
+						:placeholder="$t('Please Enter Username')" maxlength="11" @blur="handlePhoneBlur"
+						@input="handlePhoneBlur" />
 					<view class="error-message" v-if="phoneError">
 						{{$t("L_input_number_limit")}}
 					</view>
@@ -49,9 +52,13 @@
 
 				<!-- Password Input Field -->
 				<view class="input-wrapper">
-					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password" type="text" :password="!showPassword" placeholder-class="input-placeholder" :placeholder="$t('login_enter_password')" maxlength="32" @blur="handlePasswordBlur" @input="handlePasswordBlur" />
+					<input class="input-field" :class="{'input-error': passwordError}" v-model="loginInfo.password"
+						type="text" :password="!showPassword" placeholder-class="input-placeholder"
+						:placeholder="$t('enter_password')" maxlength="32" @blur="handlePasswordBlur"
+						@input="handlePasswordBlur" />
 					<view class="password-toggle" @click="togglePasswordVisibility">
-						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24" color="rgba(255,255,255,0.8)"></uni-icons>
+						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24"
+							color="rgba(255,255,255,0.8)"></uni-icons>
 					</view>
 					<view class="error-message" v-if="passwordError">
 						{{$t("L_password_limit")}}
@@ -60,7 +67,7 @@
 
 				<!-- Remember Me -->
 				<view class="remember-row">
-					<text class="remember-text">{{ $t('remember_me') }}</text>
+					<text class="remember-text">{{ $t('Remember me') }}</text>
 					<view class="custom-switch" @click="toggleRememberMe">
 						<view class="switch-dot" :class="{'switch-dot-active': loginInfo.rememberMe}"></view>
 					</view>
@@ -74,15 +81,15 @@
 
 				<!-- Register Link -->
 				<view class="register-link">
-					<text class="register-text">{{ $t('login_no_account') }}</text>
+					<text class="register-text">{{ $t("Don't have an account? ") }}</text>
 					<text class="register-link-text" @click="toRegister()">{{ $t('register_button') }}</text>
-					<text class="register-text">{{ $t('login_register_free') }}</text>
+					<!-- <text class="register-text">{{ $t('now for free') }}</text> -->
 				</view>
 			</view>
 
 			<!-- Contact Support -->
 			<view class="contact-support">
-				<text class="contact-text">{{ $t('contact_support') }}</text>
+				<text class="contact-text">{{ $t('Contact service') }}</text>
 				<view class="social-icons">
 					<view class="social-icon facebook-icon">
 						<image class="icon-image" src="../../figma/login/facebook.png" mode="aspectFit"></image>
@@ -307,7 +314,7 @@
 				var para = {
 					encryptedParams: encryptedParams
 				}
-				
+
 				const adl = uni.getStorageSync('default_adl');
 				if (adl) para.adlink_id = adl;
 
@@ -320,13 +327,13 @@
 							uni.removeStorageSync('loginInfo');
 						}
 						uni.setStorageSync('Authorization', res.data.token);
-						
+
 						// 登录成功后获取配置
 						const app = getApp()
 						if (app && app.getConfigs) {
 							app.getConfigs()
 						}
-						
+
 						uni.redirectTo({
 							url: '../match/home'
 						});
@@ -681,6 +688,7 @@
 	.register-link-text {
 		color: #50C8CE;
 		text-decoration: underline;
+		font-style: italic;
 		font-weight: 600;
 	}
 
@@ -688,6 +696,7 @@
 	.contact-support {
 		display: flex;
 		flex-direction: column;
+		font-style: italic;
 		align-items: center;
 		margin-top: 50rpx;
 		margin-bottom: 30rpx;
