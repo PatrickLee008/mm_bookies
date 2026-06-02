@@ -31,12 +31,12 @@
 						<view class="balance-item">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
 							<text class="balance-label">Balance</text>
-							<text class="balance-value">{{$toolbox.num_format(userInfo.money) || '100,000'}}</text>
+							<text class="balance-value">{{$toolbox.num_format(userInfo.money) || '0'}}</text>
 						</view>
 						<!-- Cash Out -->
 						<view class="balance-item">
 							<text class="cashout-label">Cash Out</text>
-							<text class="cashout-value">{{$toolbox.num_format(userInfo.withdraw_money) || '100,000'}}</text>
+							<text class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
 						</view>
 					</view>
 				</view>

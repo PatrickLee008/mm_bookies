@@ -84,6 +84,7 @@
 					<view class="amount-input-box">
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_withdraw_amount')" />
 					</view>
+					<text class="amount-hint">Current Turnover: {{userInfo.current_turnover_accumulated}} Ks | Rate Turnover: {{userInfo.required_turnover_accumulated}} Ks </text>
 					<text class="amount-hint">Minimum withdrawal amount is {{configs.withdraw_min_limit || 5000}}MMK.</text>
 
 					<!-- 快速金额选择 -->
