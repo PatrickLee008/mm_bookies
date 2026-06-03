@@ -48,7 +48,7 @@
 
 					<!-- Account No -->
 					<view class="info-row">
-						<text class="info-label">{{ $t('account_no') }}</text>
+						<text class="info-label">{{ $t('account_number') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_number}}</text>
 						</view>
@@ -56,7 +56,7 @@
 
 					<!-- User Name -->
 					<view class="info-row">
-						<text class="info-label">{{ $t('user_name') }}</text>
+						<text class="info-label">{{ $t('account_ame') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_name}}</text>
 						</view>
@@ -85,7 +85,7 @@
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_withdraw_amount')" />
 					</view>
 					<text class="amount-hint">Current Turnover: {{userInfo.current_turnover_accumulated}} Ks | Rate Turnover: {{userInfo.required_turnover_accumulated}} Ks </text>
-					<text class="amount-hint">Minimum withdrawal amount is {{configs.withdraw_min_limit || 5000}}MMK.</text>
+					<text class="amount-hint">Minimum withdrawal amount is {{configs.withdraw_min_limit || 5000}}Ks.</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
@@ -127,13 +127,13 @@
 				<view class="dialog-form">
 					<!-- Account No -->
 					<view class="form-group">
-						<text class="form-label">{{ $t('account_no') }}</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('account_phone_number')" v-model="card_conf.acc_number" />
+						<text class="form-label">{{ $t('account_number') }}</text>
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
-						<text class="form-label">{{ $t('user_name') }}</text>
+						<text class="form-label">{{ $t('account_ame') }}</text>
 						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
@@ -144,16 +144,31 @@
 				</button>
 			</view>
 		</view>
+		<!-- delete bank confirm dialog -->
+	<ConfirmDialog
+		:visible="showDeleteConfirm"
+		:title="$t('remove_bank_title') || 'Delete Bank Account'"
+		:message="$t('remove_bank_confirm')"
+		:confirmText="$t('Confirm')"
+		:cancelText="$t('Cancel')"
+		@confirm="confirmDeleteBank"
+		@cancel="showDeleteConfirm = false"
+	/>
 	</view>
+
 </template>
 
 <script>
 	// from tangjq--- Withdraw 组件,从 withdraw.vue 提取并简化
 	import config from '../../utils/config.js';
 	import dateFormatUtils from "../../utils/utils.js"
+import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	export default {
 		name: 'WalletWithdraw',
+		components: {
+			ConfirmDialog
+		},
 		data() {
 			return {
 				language: config.language,
@@ -167,35 +182,16 @@
 				card_conf: {},
 				selectedCard: {}, // from tangjq--- 选中的银行卡
 				withdraw_amount_list: [5000, 10000, 30000, 50000, 100000, 500000], // from tangjq--- 提现快速金额列表
-				bank_add_list: [{
-					bank_code: 'KBZ Pay',
-					label: 'KBZPay',
-					checked: true
-				}, {
-					bank_code: 'Wave Money',
-					label: 'WavePAY',
-					checked: false
-				}, {
-					bank_code: 'AYA',
-					label: 'AYA PAY',
-					checked: false,
-				}, {
-					bank_code: 'Citizen Pay',
-					label: 'Citizen Pay',
-					checked: false,
-				}, {
-					bank_code: 'UAB Pay',
-					label: 'UAB Pay',
-					checked: false,
-				}],
+				bank_add_list: [],
 				add_disable: true,
+				showDeleteConfirm: false,
+				deleteTargetBank: null,
 			}
 		},
 		watch: {
 			amount(val) {
 				const rawAmount = parseInt(this.amount)
-				const minLimit = this.configs['withdraw_min_limit'] ? parseInt(this.configs['withdraw_min_limit']) : 10000
-				this.amount_error = !(rawAmount >= minLimit && rawAmount <= 5000000)
+				this.amount_error = !(rawAmount >= this.configs.withdraw_min_limit && rawAmount <= this.configs.withdraw_max_limit)
 			}
 		},
 		methods: {
@@ -304,8 +300,9 @@
 			// from tangjq--- 显示添加银行卡弹窗
 			show_add_modal(type) {
 				this.modalName = 'add_modal'
+				const defaultBank = this.bank_add_list.length > 0 ? this.bank_add_list[0].bank_code : ''
 				this.card_conf = {
-					bank_code: 'KBZ Pay',
+					bank_code: defaultBank,
 					acc_number: '',
 					acc_name: '',
 				}
@@ -353,25 +350,50 @@
 			// from tangjq--- 删除银行卡
 			removeBank(bank) {
 				var _this = this;
-				uni.showModal({
-					content: `${this.$t('remove_bank_confirm')}`,
-					confirmText: this.$t('Confirm'),
-					cancelText: this.$t('Cancel'),
-					complete: function(res) {
-						if (res.confirm) {
-							var para = {
-								id: bank.id,
-							}
-							_this.$http.post('/bank_card/delete', para, (res) => {
-								if (res.statusCode == 200) {
-									uni.showToast({
-										title: _this.$t('removed_success'),
-										icon: 'success',
-										duration: 2000
-									})
-									_this.get_bank_card_list();
-								}
-							})
+				_this.deleteTargetBank = bank
+				_this.showDeleteConfirm = true
+			},
+			confirmDeleteBank() {
+				var _this = this;
+				_this.showDeleteConfirm = false
+				var bank = _this.deleteTargetBank
+				if (!bank) return
+				var para = { id: bank.id }
+				_this.$http.post('/bank_card/delete', para, (res) => {
+					if (res.statusCode == 200) {
+						uni.showToast({
+							title: _this.$t('removed_success'),
+							icon: 'success',
+							duration: 2000
+						})
+						_this.get_bank_card_list()
+					}
+				})
+				_this.deleteTargetBank = null
+			},
+			// 通过接口获取 admin 配置的可用银行列表并过滤 bank_add_list
+			loadAvailableBanks() {
+				var _this = this
+				_this.$http.get('/agent_bankcard/available_banks', { data: {} }, (res) => {
+					if (res.statusCode == 200 && res.data) {
+						const auto = res.data.auto || []
+						const manual = res.data.manual || []
+						// 合并 auto 和 manual 中的 bank_code，去重
+						const codes = new Set()
+						auto.forEach(b => codes.add(b.bank_code))
+						manual.forEach(b => codes.add(b.bank_code))
+						const availableCodes = Array.from(codes)
+			
+						const allBanks = [
+							{ bank_code: 'KBZ Pay', label: 'KBZPay', checked: true },
+							{ bank_code: 'Wave Money', label: 'WavePAY', checked: false },
+							{ bank_code: 'AYA', label: 'AYA PAY', checked: false },
+							{ bank_code: 'Citizen Pay', label: 'Citizen Pay', checked: false },
+							{ bank_code: 'UAB Pay', label: 'UAB Pay', checked: false },
+						]
+						_this.bank_add_list = allBanks.filter(bank => availableCodes.includes(bank.bank_code))
+						if (_this.bank_add_list.length > 0) {
+							_this.bank_add_list[0].checked = true
 						}
 					}
 				})
@@ -382,6 +404,7 @@
 			this.get_bank_card_list()
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 			this.configs = Object.assign({}, this.$store.state.configs)
+			this.loadAvailableBanks()
 			console.log(this.$store.state.configs);
 		},
 	}

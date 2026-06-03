@@ -214,13 +214,13 @@
 				<view class="dialog-form">
 					<!-- Account No -->
 					<view class="form-group">
-						<text class="form-label">{{ $t('account_no') }}</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('account_phone_number')" v-model="card_conf.acc_number" />
+						<text class="form-label">{{ $t('account_number') }}</text>
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
-						<text class="form-label">{{ $t('user_name') }}</text>
+						<text class="form-label">{{ $t('account_ame') }}</text>
 						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
@@ -256,7 +256,7 @@
 
 					<!-- Account No -->
 					<view class="info-row">
-						<text class="info-label">{{ $t('account_no') }}</text>
+						<text class="info-label">{{ $t('account_number') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_number}}</text>
 						</view>
@@ -264,7 +264,7 @@
 
 					<!-- User Name -->
 					<view class="info-row">
-						<text class="info-label">{{ $t('user_name') }}</text>
+						<text class="info-label">{{ $t('account_ame') }}</text>
 						<view class="info-value-box">
 							<text class="info-value-text">{{selectedCard.acc_name}}</text>
 						</view>
@@ -276,7 +276,7 @@
 					<view class="amount-input-box">
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" placeholder="3,000" />
 					</view>
-					<text class="amount-hint">{{ $t('min_deposit_3000') }}</text>
+					<text class="amount-hint">Minimum deposit amount is {{configs.deposit_min_limit}}Ks.</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
@@ -288,7 +288,7 @@
 
 				<!-- 支付渠道：仅支持 QR Pay -->
 				<view class="payment-channel-section">
-					<text class="section-title">{{ $t('payment_channel') }}</text>
+					<!-- <text class="section-title">{{ $t('payment_channel') }}</text> -->
 					<view class="payment-channel-single">
 						<text class="payment-channel-name">{{ $t('qr_pay') }}</text>
 					</view>
@@ -314,7 +314,7 @@
 				<view class="tips-content">
 					<view class="tips-row">
 						<text class="tips-label">{{ $t('transaction_amount') }} :</text>
-						<text class="tips-value">{{numberFormat(amount)}} MMK</text>
+						<text class="tips-value">{{numberFormat(amount)}} Ks</text>
 					</view>
 					<view class="tips-row">
 						<text class="tips-label">{{ $t('handling_fees') }}</text>
@@ -322,7 +322,7 @@
 					</view>
 					<view class="tips-row highlight">
 						<text class="tips-label">{{ $t('received_amount') }} :</text>
-						<text class="tips-value">{{numberFormat(amount)}} MMK</text>
+						<text class="tips-value">{{numberFormat(amount)}} Ks</text>
 					</view>
 				</view>
 
@@ -355,14 +355,14 @@
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">{{ $t('account_no') }}</text>
+						<text class="confirm-label">{{ $t('account_number') }}</text>
 						<view class="confirm-value-box">
 							<text class="confirm-value-text">{{selectedCard.acc_number || 'none'}}</text>
 						</view>
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">{{ $t('user_name') }}</text>
+						<text class="confirm-label">{{ $t('account_ame') }}</text>
 						<view class="confirm-value-box">
 							<text class="confirm-value-text">{{selectedCard.acc_name || 'none'}}</text>
 						</view>
@@ -389,7 +389,7 @@
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">{{ $t('account_no') }}</text>
+						<text class="confirm-label">{{ $t('account_number') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_account || 'none'}}</text>
 							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
@@ -400,7 +400,7 @@
 					</view>
 
 					<view class="confirm-row">
-						<text class="confirm-label">{{ $t('user_name') }}</text>
+						<text class="confirm-label">{{ $t('account_ame') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_username || 'Payee'}}</text>
 							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
@@ -415,7 +415,7 @@
 				<view class="transfer-info">
 					<view class="transfer-info-row">
 						<text class="transfer-info-label">{{ $t('transfer_amount') }} :</text>
-						<text class="transfer-info-value">{{numberFormat(amount)}} MMK</text>
+						<text class="transfer-info-value">{{numberFormat(amount)}} Ks</text>
 					</view>
 					<view class="transfer-info-row">
 						<text class="transfer-info-label">{{ $t('valid_period') }}</text>
@@ -477,7 +477,7 @@
 				<view class="qrcode-info">
 					<view class="qrcode-info-row">
 						<text class="qrcode-info-label">{{ $t('transfer_amount') }} :</text>
-						<text class="qrcode-info-value">{{numberFormat(amount)}} MMK</text>
+						<text class="qrcode-info-value">{{numberFormat(amount)}} Ks</text>
 					</view>
 					<view class="qrcode-info-row">
 						<text class="qrcode-info-label">{{ $t('valid_period') }}</text>
@@ -516,7 +516,18 @@
 				</button>
 			</view>
 		</view>
-	</view>
+
+	<!-- delete bank confirm dialog -->
+	<ConfirmDialog
+		:visible="showDeleteConfirm"
+		:title="$t('remove_bank_title') || 'Delete Bank Account'"
+		:message="$t('remove_bank_confirm')"
+		:confirmText="$t('Confirm')"
+		:cancelText="$t('Cancel')"
+		@confirm="confirmDeleteBank"
+		@cancel="showDeleteConfirm = false"
+	/>
+</view>
 </template>
 
 <script>
@@ -524,11 +535,13 @@
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
+import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	export default {
 		name: 'WalletDeposit',
 		components: {
-			tkiQrcode
+			tkiQrcode,
+			ConfirmDialog
 		},
 		data() {
 			return {
@@ -586,29 +599,11 @@
 				card_list: [],
 				current_progress: 0,
 				token: uni.getStorageSync('Authorization') || '',
-				bank_add_list: [{
-					bank_code: 'KBZ Pay',
-					label: 'KBZPay',
-					checked: true
-				}, {
-					bank_code: 'Wave Money',
-					label: 'WavePAY',
-					checked: false
-				}, {
-					bank_code: 'AYA',
-					label: 'AYA PAY',
-					checked: false,
-				}, {
-					bank_code: 'Citizen Pay',
-					label: 'Citizen Pay',
-					checked: false,
-				}, {
-					bank_code: 'UAB Pay',
-					label: 'UAB Pay',
-					checked: false,
-				}],
+				bank_add_list: [],
 				card_conf: {},
 				show_bank_list: false,
+				showDeleteConfirm: false,
+				deleteTargetBank: null,
 				add_disable: true,
 				modal_type: '',
 				editing: false,
@@ -620,7 +615,7 @@
 		watch: {
 			amount(val) {
 				const rawAmount = parseInt(this.amount)
-				this.amount_error = !(rawAmount >= 3000 && rawAmount <= 1000000)
+				this.amount_error = !(rawAmount >= this.configs.deposit_min_limit && rawAmount <= this.configs.deposit_max_limit)
 			},
 		},
 		computed: {
@@ -804,29 +799,29 @@
 			removeBank(bank) {
 				var _this = this;
 				if (_this.$toolbox.click_too_fast(.5)) return
-				uni.showModal({
-					content: `${this.$t('remove_bank_confirm')}`,
-					confirmText: this.$t('Confirm'),
-					cancelText: this.$t('Cancel'),
-					complete: function(res) {
-						if (res.confirm) {
-							var para = {
-								id: bank.id,
-							}
-							_this.$http.post('/bank_card/delete', para, (res) => {
-								if (res.statusCode == 200) {
-									uni.showToast({
-										title: _this.$t('removed_success'),
-										icon: 'success',
-										duration: 2000
-									})
-									_this.editing = false
-									_this.get_bank_card_list();
-								}
-							})
-						}
+				_this.deleteTargetBank = bank
+				_this.showDeleteConfirm = true
+			},
+			confirmDeleteBank() {
+				var _this = this;
+				_this.showDeleteConfirm = false
+				var bank = _this.deleteTargetBank
+				if (!bank) return
+				var para = {
+					id: bank.id,
+				}
+				_this.$http.post('/bank_card/delete', para, (res) => {
+					if (res.statusCode == 200) {
+						uni.showToast({
+							title: _this.$t('removed_success'),
+							icon: 'success',
+							duration: 2000
+						})
+						_this.editing = false
+						_this.get_bank_card_list()
 					}
 				})
+				_this.deleteTargetBank = null
 			},
 			get_bank_card_list() {
 				var _this = this;
@@ -1079,6 +1074,35 @@
 			},
 			set_info() {
 				this.userInfo = Object.assign({}, this.$store.state.userInfo)
+				this.configs = Object.assign({}, this.$store.state.configs)
+				this.loadAvailableBanks()
+			},
+			// 通过接口获取 admin 配置的可用银行列表并过滤 bank_add_list
+			loadAvailableBanks() {
+				var _this = this
+				_this.$http.get('/agent_bankcard/available_banks', { data: {} }, (res) => {
+					if (res.statusCode == 200 && res.data) {
+						const auto = res.data.auto || []
+						const manual = res.data.manual || []
+						// 合并 auto 和 manual 中的 bank_code，去重
+						const codes = new Set()
+						auto.forEach(b => codes.add(b.bank_code))
+						manual.forEach(b => codes.add(b.bank_code))
+						const availableCodes = Array.from(codes)
+
+						const allBanks = [
+							{ bank_code: 'KBZ Pay', label: 'KBZPay', checked: true },
+							{ bank_code: 'Wave Money', label: 'WavePAY', checked: false },
+							{ bank_code: 'AYA', label: 'AYA PAY', checked: false },
+							{ bank_code: 'Citizen Pay', label: 'Citizen Pay', checked: false },
+							{ bank_code: 'UAB Pay', label: 'UAB Pay', checked: false },
+						]
+						_this.bank_add_list = allBanks.filter(bank => availableCodes.includes(bank.bank_code))
+						if (_this.bank_add_list.length > 0) {
+							_this.bank_add_list[0].checked = true
+						}
+					}
+				})
 			},
 			openDepositModal(card) {
 				this.selectedCard = card

@@ -20,8 +20,8 @@
 
 			<!-- 空状态 -->
 			<view v-if="!loading && filterRecordList(recordList).length === 0" class="empty-state">
-				<image src="/static/icon/history.png" mode="aspectFit" class="empty-icon"></image>
-				<text class="empty-text">{{ $t('no_withdraw_records') }}</text>
+				<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
+				<text class="empty-text">{{ $t('no_withdraw_records') || 'No withdrawal records available at the moment. Please check back later.' }}</text>
 			</view>
 
 			<!-- 记录项 -->
