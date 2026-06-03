@@ -392,7 +392,7 @@
 					{
 						title: "contact us", // from tangjq--- 使用语言文件中的键名
 						content: '',
-						method: 'showContactModal', // from tangjq--- 改为显示弹窗
+						method: 'openCustomerService', // from tangjq--- 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/contact_lblue.png',
 						para: {},
@@ -752,7 +752,10 @@
 					}
 				})
 			},
-
+			// 打开客服 modal
+			openCustomerService() {
+				uni.$emit('open-customer-service-fullscreen');
+			},
 			// from tangjq--- About弹窗方法
 			showAboutModal() {
 				this.aboutModalVisible = true

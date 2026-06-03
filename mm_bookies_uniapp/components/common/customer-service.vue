@@ -552,7 +552,7 @@
 
 	/* 标题区域 */
 	.modal-header {
-		background: linear-gradient(135deg, #0C3569 0%, #1a4d8f 100%);
+		background: linear-gradient(135deg, #2F5D62 0%, #3c787d 100%);
 		padding: 8px 20px;
 		color: #ffffff;
 		display: flex;

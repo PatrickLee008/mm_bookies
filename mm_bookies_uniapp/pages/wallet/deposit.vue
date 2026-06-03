@@ -546,6 +546,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		data() {
 			return {
 				userInfo: {},
+				configs: {},
 				language: config.language,
 				picture: '',
 				modalName: '',

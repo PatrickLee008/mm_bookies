@@ -300,7 +300,19 @@
 							clearInterval(this.countdownTimer);
 							this.countdownTimer = null;
 						}
+						if (intervalSearch) {
+							clearInterval(intervalSearch);
+							intervalSearch = null;
+						}
 						this.istimeout = true;
+						// 自动跳转回充值页面
+						this.$nextTick(() => {
+							setTimeout(() => {
+								uni.redirectTo({
+									url: '/pages/wallet/wallet'
+								})
+							}, 2000)
+						})
 					}
 				}, 1000);
 			},

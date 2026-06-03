@@ -599,7 +599,7 @@
 	}
 
 	.continue-btn {
-		background-color: #0081ff;
+		background-color: #2F5D62;
 		color: white;
 		padding: 12px 20px;
 		border-radius: 8px;
