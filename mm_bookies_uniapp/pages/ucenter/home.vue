@@ -85,9 +85,16 @@
 					</view>
 
 					<text class="contact-section-title">{{ $t('Contact') }}</text>
-					<text class="contact-description">{{ $t('explore_website') }}</text>
+					<!-- 隐藏 contact-description -->
+					<text class="contact-description" v-if="false">{{ $t('explore_website') }}</text>
 
-					<!-- 联系方式列表 -->
+					<!-- 富文本显示 contact_us 内容 -->
+					<view class="contact-rich-text" v-if="$store.state.configs && $store.state.configs.contact_us">
+						<rich-text :nodes="contactUsRichText" @itemclick="handleRichTextClick"></rich-text>
+					</view>
+
+					<!-- 原来的联系方式列表，用 v-if="false" 隐藏 -->
+					<view v-if="false">
 					<view class="contact-row-item">
 						<text class="contact-row-label">{{ $t('viber') }}</text>
 						<view class="contact-input-wrapper">
@@ -119,6 +126,7 @@
 								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
 							</view>
 						</view>
+					</view>
 					</view>
 				</view>
 			</view>
@@ -497,6 +505,15 @@
 			}
 		},
 
+		computed: {
+			contactUsRichText() {
+				if (this.$store.state.configs && this.$store.state.configs.contact_us) {
+					return this.parseHtmlToNodes(this.$store.state.configs.contact_us)
+				}
+				return []
+			}
+		},
+
 		methods: {
 			// from tangjq--- 输入时清除密码错误信息
 			clearPasswordErrors() {
@@ -528,6 +545,92 @@
 			},
 			hideContactModal() {
 				this.contactModalVisible = false
+			},
+			// 富文本点击事件处理
+			handleRichTextClick(e) {
+				const node = e.detail.node
+				if (node && node.name === 'a' && node.attrs) {
+					const href = node.attrs.href
+					if (href) {
+						if (href.startsWith('http://') || href.startsWith('https://')) {
+							// #ifdef H5
+							window.open(href, '_blank')
+							// #endif
+							// #ifndef H5
+							uni.navigateTo({
+								url: `/pages/webview/index?url=${encodeURIComponent(href)}`
+							})
+							// #endif
+						} else if (href.startsWith('tel:')) {
+							const phoneNumber = href.replace('tel:', '')
+							uni.makePhoneCall({
+								phoneNumber: phoneNumber
+							})
+						}
+					}
+				}
+			},
+			// 解析 HTML 为 rich-text nodes 数组
+			parseHtmlToNodes(html) {
+				if (!html) return []
+				const nodes = []
+				let tempHtml = html
+				const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi
+				let lastIndex = 0
+				let match
+				while ((match = linkRegex.exec(tempHtml)) !== null) {
+					if (match.index > lastIndex) {
+						const textBefore = tempHtml.substring(lastIndex, match.index)
+						if (textBefore.trim()) {
+							nodes.push({
+								name: 'text',
+								attrs: {},
+								children: [{
+									type: 'text',
+									text: textBefore
+								}]
+							})
+						}
+					}
+					const href = match[1]
+					const linkText = match[2]
+					nodes.push({
+						name: 'a',
+						attrs: {
+							href: href,
+							style: 'color: #4fb3bf; text-decoration: underline;'
+						},
+						children: [{
+							type: 'text',
+							text: linkText
+						}]
+					})
+					lastIndex = match.index + match[0].length
+				}
+				if (lastIndex < tempHtml.length) {
+					const textAfter = tempHtml.substring(lastIndex)
+					if (textAfter.trim()) {
+						nodes.push({
+							name: 'text',
+							attrs: {},
+							children: [{
+								type: 'text',
+								text: textAfter
+							}]
+						})
+					}
+				}
+				if (nodes.length === 0) {
+					return [{
+						name: 'div',
+						attrs: {},
+						children: [{
+							type: 'text',
+							text: html
+						}]
+					}]
+				}
+				return nodes
 			},
 			openLiveChat() {
 				// from tangjq--- 根据用户登录状态拼接客服链接
@@ -1413,6 +1516,14 @@
 		line-height: 1.5;
 		display: block;
 		margin-bottom: 24px;
+	}
+
+	.contact-rich-text {
+		font-size: 14px;
+		color: #1e3a5f;
+		line-height: 1.8;
+		margin-bottom: 16px;
+		word-break: break-all;
 	}
 
 	.contact-row-item {
