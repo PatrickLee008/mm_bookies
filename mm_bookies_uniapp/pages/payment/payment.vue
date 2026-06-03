@@ -265,6 +265,13 @@
 						let timeout = this.payInfo.timeout;
 						if (timeout <= 0 || that.payInfo.orderStatus != 1) {
 							if (intervalSearch) clearInterval(intervalSearch);
+							that.istimeout = true;
+							// auto redirect back to deposit page
+							setTimeout(() => {
+								uni.redirectTo({
+									url: '/pages/wallet/wallet'
+								})
+							}, 2000)
 						}
 					} else {
 						that.payInfo = null;
