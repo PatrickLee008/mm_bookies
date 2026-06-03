@@ -242,7 +242,8 @@ def get_transfer_to(_str):
     支持缅甸语标签: "လွှဲပြောင်းရန်"
     """
     # KBZPay: 优先匹配掩码账号模式 "Name (******XXXX)" — 最可靠的特征
-    transfer_to = re.search(r"([A-Za-z]+(?:\s[A-Za-z]+)*)\s?\(\*{3,}\d+\)", _str)
+    # 使用 [ \\t] 而非 \\s，防止跨行匹配到 Transfer\\nThiha
+    transfer_to = re.search(r"([A-Za-z]+(?:[ \t]+[A-Za-z]+)*)[ \t]?\(\*{3,}\d+\)", _str)
     if transfer_to:
         return transfer_to[0].strip()
 
