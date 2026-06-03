@@ -47,10 +47,10 @@
 				<view class="login-prompt-content">
 					<text class="login-prompt-text">Please login to continue</text>
 					<view class="login-buttons">
-						<view class="login-btn" @click="goto('/pages/login/login')">
+						<view class="login-btn2" @click="goto('/pages/login/login')">
 							{{$t('signin_button')}}
 						</view>
-						<view class="register-btn" @click="goto('/pages/login/register')">
+						<view class="register-btn2" @click="goto('/pages/login/register')">
 							{{$t('register_button')}}
 						</view>
 					</view>
@@ -426,8 +426,8 @@
 		gap: 10px;
 	}
 
-	.login-btn,
-	.register-btn {
+	.login-btn2,
+	.register-btn2 {
 		// padding: 10px;
 		border-radius: 8px;
 		font-size: 14px;
@@ -435,14 +435,24 @@
 		cursor: pointer;
 		min-width: 100px;
 		text-align: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		width: 50%;
+		height: 40px;
+		border-radius: 4px;
+		font-size: 14px;
+		font-weight: bold;
+		box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.25);
 	}
 
-	.login-btn {
+	.login-btn2 {
 		background-color: #2F5D62;
 		color: white;
 	}
 
-	.register-btn {
+	.register-btn2 {
 		background-color: #5FB5BD;
 		color: white;
 	}
