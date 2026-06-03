@@ -382,6 +382,7 @@
 			this.get_bank_card_list()
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 			this.configs = Object.assign({}, this.$store.state.configs)
+			console.log(this.$store.state.configs);
 		},
 	}
 </script>

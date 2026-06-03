@@ -89,7 +89,7 @@
 					<text class="contact-description" v-if="false">{{ $t('explore_website') }}</text>
 
 					<!-- 富文本显示 contact_us 内容 -->
-					<view class="contact-rich-text" v-if="$store.state.configs && $store.state.configs.contact_us">
+					<view class="contact-rich-text" v-if="configs && configs.contact_us">
 						<rich-text :nodes="contactUsRichText" @itemclick="handleRichTextClick"></rich-text>
 					</view>
 
@@ -507,8 +507,9 @@
 
 		computed: {
 			contactUsRichText() {
-				if (this.$store.state.configs && this.$store.state.configs.contact_us) {
-					return this.parseHtmlToNodes(this.$store.state.configs.contact_us)
+				if (this.configs && this.configs.contact_us) {
+					let html = this.parseHtmlToNodes(this.configs.contact_us)
+					return html;
 				}
 				return []
 			}
@@ -574,52 +575,80 @@
 			parseHtmlToNodes(html) {
 				if (!html) return []
 				const nodes = []
-				let tempHtml = html
-				const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi
+				// 匹配 HTML 标签：支持普通标签和自闭合标签
+				const tagRegex = /<(\/?)(\w+)([^>]*?)(\/?)>/g
 				let lastIndex = 0
 				let match
-				while ((match = linkRegex.exec(tempHtml)) !== null) {
+				let currentParent = null // 当前打开的块级标签节点（如 p）
+
+				while ((match = tagRegex.exec(html)) !== null) {
+					// 处理标签之前的文本
 					if (match.index > lastIndex) {
-						const textBefore = tempHtml.substring(lastIndex, match.index)
-						if (textBefore.trim()) {
-							nodes.push({
-								name: 'text',
-								attrs: {},
-								children: [{
-									type: 'text',
-									text: textBefore
-								}]
-							})
+						const text = html.substring(lastIndex, match.index)
+						const textParts = this._parseUrlsInText(text)
+						if (currentParent && currentParent.children) {
+							currentParent.children.push(...textParts)
+						} else {
+							nodes.push(...textParts)
 						}
 					}
-					const href = match[1]
-					const linkText = match[2]
-					nodes.push({
-						name: 'a',
-						attrs: {
-							href: href,
-							style: 'color: #4fb3bf; text-decoration: underline;'
-						},
-						children: [{
-							type: 'text',
-							text: linkText
-						}]
-					})
+
+					const isClosing = match[1] === '/'
+					const tagName = match[2].toLowerCase()
+					const attrsStr = match[3]
+					const isSelfClosing = match[4] === '/'
+
+					if (tagName === 'br' || (isSelfClosing && tagName === 'br')) {
+						const brNode = { name: 'br', attrs: {} }
+						if (currentParent && currentParent.children) {
+							currentParent.children.push(brNode)
+						} else {
+							nodes.push(brNode)
+						}
+					} else if (isClosing) {
+						if (tagName === 'p' || tagName === 'div') {
+							currentParent = null
+						}
+					} else {
+						// 开标签
+						if (tagName === 'a') {
+							const hrefMatch = attrsStr.match(/href=["']([^"']+)["']/)
+							const href = hrefMatch ? hrefMatch[1] : ''
+							const aNode = {
+								name: 'a',
+								attrs: {
+									href: href,
+									style: 'color: #4fb3bf; text-decoration: underline;'
+								},
+								children: []
+							}
+							if (currentParent && currentParent.children) {
+								currentParent.children.push(aNode)
+							} else {
+								nodes.push(aNode)
+							}
+						} else if (tagName === 'p') {
+							const pNode = { name: 'p', attrs: {}, children: [] }
+							nodes.push(pNode)
+							currentParent = pNode
+						}
+						// 其他标签按需扩展
+					}
+
 					lastIndex = match.index + match[0].length
 				}
-				if (lastIndex < tempHtml.length) {
-					const textAfter = tempHtml.substring(lastIndex)
-					if (textAfter.trim()) {
-						nodes.push({
-							name: 'text',
-							attrs: {},
-							children: [{
-								type: 'text',
-								text: textAfter
-							}]
-						})
+
+				// 处理剩余文本
+				if (lastIndex < html.length) {
+					const text = html.substring(lastIndex)
+					const textParts = this._parseUrlsInText(text)
+					if (currentParent && currentParent.children) {
+						currentParent.children.push(...textParts)
+					} else {
+						nodes.push(...textParts)
 					}
 				}
+
 				if (nodes.length === 0) {
 					return [{
 						name: 'div',
@@ -631,6 +660,45 @@
 					}]
 				}
 				return nodes
+			},
+			// 将文本中的裸 URL 转为 <a> 节点
+			_parseUrlsInText(text) {
+				if (!text) return []
+				const parts = []
+				// 匹配以 http:// 或 https:// 开头的 URL
+				const urlRegex = /(https?:\/\/[^\s<>]+)/gi
+				let lastIdx = 0
+				let m
+
+				while ((m = urlRegex.exec(text)) !== null) {
+					if (m.index > lastIdx) {
+						const before = text.substring(lastIdx, m.index)
+						if (before) {
+							parts.push({ type: 'text', text: before })
+						}
+					}
+					parts.push({
+						name: 'a',
+						attrs: {
+							href: m[0],
+							style: 'color: #4fb3bf; text-decoration: underline;'
+						},
+						children: [{ type: 'text', text: m[0] }]
+					})
+					lastIdx = m.index + m[0].length
+				}
+
+				if (lastIdx < text.length) {
+					const after = text.substring(lastIdx)
+					if (after) {
+						parts.push({ type: 'text', text: after })
+					}
+				}
+
+				if (parts.length === 0 && text) {
+					parts.push({ type: 'text', text })
+				}
+				return parts
 			},
 			openLiveChat() {
 				// from tangjq--- 根据用户登录状态拼接客服链接
@@ -913,8 +981,8 @@
 			},
 			parseContact() {
 				this.contact = []
-				if (this.$store.state.configs.contact_us) {
-					let arr = this.$store.state.configs.contact_us.split('\n')
+				if (this.configs && this.configs.contact_us) {
+					let arr = this.configs.contact_us.split('\n')
 					arr.forEach((ele, index) => {
 						if (ele.indexOf('https') > -1) {
 							this.contact.push({
@@ -934,8 +1002,9 @@
 
 			// from tangjq--- Change Password 弹窗方法
 			showPasswordChangeModal() {
-				// 先关闭 Profile 弹窗
+				// from tangjq--- 先关闭 Profile 弹窗
 				this.hideProfileModal()
+				// from tangjq--- 打开密码修改弹窗
 				this.passwordChangeModalVisible = true
 				// from tangjq--- 重置表单
 				this.old_password = ''
@@ -1029,11 +1098,15 @@
 				}
 
 				if (this.new_password === this.old_password) {
-					uni.showModal({
-						title: this.$t('tips'),
-						content: this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password',
-						showCancel: false,
-						confirmText: this.$t('ok')
+					// from tangjq--- 先关闭弹窗，再显示错误提示，避免被遮挡
+					this.hidePasswordChangeModal()
+					this.$nextTick(() => {
+						uni.showModal({
+							title: _this.$t('tips'),
+							content: _this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password',
+							showCancel: false,
+							confirmText: _this.$t('ok')
+						})
 					})
 					return
 				}
@@ -1056,14 +1129,15 @@
 					}
 
 					if (res.statusCode == 200) {
-						uni.showModal({
-							title: _this.$t('success_word'),
-							content: tips || _this.$t('password_changed_success'),
-							showCancel: false,
-							confirmText: _this.$t('ok'),
-							success: function(modalRes) {
-								_this.hidePasswordChangeModal()
-							}
+						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
+						_this.hidePasswordChangeModal()
+						_this.$nextTick(() => {
+							uni.showModal({
+								title: _this.$t('success_word'),
+								content: tips || _this.$t('password_changed_success'),
+								showCancel: false,
+								confirmText: _this.$t('ok')
+							})
 						})
 					} else {
 						_this.password_error_message = tips || _this.$t('failed_change_password')
@@ -1076,7 +1150,14 @@
 				})
 			},
 		},
-		mounted() {},
+		onLoad() {
+		},
+		onShow() {
+		},
+		mounted() {
+			this.configs = Object.assign({}, this.$store.state.configs)
+			console.log(this.configs);
+		},
 		created() {}
 	}
 </script>
