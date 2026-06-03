@@ -297,7 +297,7 @@
 					<!-- Bet Time 和 Potential Winnings -->
 					<view class="bet-info-rows">
 						<view class="bet-info-row">
-							<text class="info-label">Bet Time</text>
+							<text class="info-label">{{$t('Bet Time')}}</text>
 							<text class="info-value">{{new Date().toLocaleString()}}</text>
 						</view>
 						<view class="bet-info-row">
@@ -332,10 +332,10 @@
 					<!-- Cancel 和 Confirm 按钮 -->
 					<view class="action-buttons">
 						<view class="cancel-btn" @click="hide_bets_slip = true">
-							<text class="cancel-text">Cancel</text>
+							<text class="cancel-text">{{$t('Cancel')}}</text>
 						</view>
 						<view class="confirm-btn-action" :class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}" @click="submit()">
-							<text class="confirm-text">Confirm</text>
+							<text class="confirm-text">{{$t('Confirm')}}</text>
 						</view>
 					</view>
 				</view>

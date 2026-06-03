@@ -84,23 +84,23 @@
 						<!-- 卡片内容 -->
 						<view class="card-content">
 							<view class="info-row">
-								<text class="label">Bet Time</text>
+								<text class="label">{{$t('Bet Time')}}<</text>
 								<text class="value">{{item.order_time}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">Type</text>
+								<text class="label">{{$t('Type')}}</text>
 								<text class="value">{{item.show_order_type}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">Bet</text>
+								<text class="label">{{$t('Bet')}}</text>
 								<text class="value">{{item.team_name}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">Odds</text>
+								<text class="label">{{$t('Odds')}}</text>
 								<text class="value">{{item.real_odds}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">Bet Amount</text>
+								<text class="label">{{$t('total bet amount')}}</text>
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row" v-if="current_page==='Ongoing'">
@@ -136,19 +136,19 @@
 							</view>
 							<view class="card-content">
 								<view class="info-row">
-									<text class="label">Bet Time</text>
+									<text class="label">{{$t('Bet Time')}}<</text>
 									<text class="value">{{item.order_time}}</text>
 								</view>
 								<view class="info-row">
-									<text class="label">Type</text>
+									<text class="label">{{$t('Type')}}</text>
 									<text class="value">{{item.show_order_type}}</text>
 								</view>
 								<view class="info-row">
-									<text class="label">Bet</text>
+									<text class="label">{{$t('Bet')}}</text>
 									<text class="value">{{item.team_name}}</text>
 								</view>
 								<view class="info-row">
-									<text class="label">Odds</text>
+									<text class="label">{{$t('Odds')}}</text>
 									<text class="value">{{item.real_odds}}</text>
 								</view>
 							</view>
@@ -172,19 +172,19 @@
 								</view>
 								<view class="card-content">
 									<view class="info-row">
-										<text class="label">Bet Time</text>
+										<text class="label">{{$t('Bet Time')}}<</text>
 										<text class="value">{{detail.order_time}}</text>
 									</view>
 									<view class="info-row">
-										<text class="label">Type</text>
+										<text class="label">{{$t('Type')}}</text>
 										<text class="value">{{detail.show_order_type}}</text>
 									</view>
 									<view class="info-row">
-										<text class="label">Bet</text>
+										<text class="label">{{$t('Bet')}}</text>
 										<text class="value">{{detail.team_name}}</text>
 									</view>
 									<view class="info-row">
-										<text class="label">Odds</text>
+										<text class="label">{{$t('Odds')}}</text>
 										<text class="value">{{detail.real_odds}}</text>
 									</view>
 								</view>
@@ -195,7 +195,7 @@
 						<!-- Parlay 底部汇总信息 -->
 						<view class="parlay-summary">
 							<view class="info-row">
-								<text class="label">Bet Amount</text>
+								<text class="label">{{$t('total bet amount')}}<</text>
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row">
