@@ -18,7 +18,7 @@
 				<view class="user-details">
 					<view class="user-id">
 						<view class="user-id-info">
-							<text class="id-label">My ID : </text>
+							<text class="id-label">{{ $t('my_id') }} : </text>
 							<text class="id-value">{{userInfo.id || ''}}</text>
 						</view>
 						<!-- 设置按钮 -->
@@ -30,12 +30,12 @@
 						<!-- Balance -->
 						<view class="balance-item">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<text class="balance-label">Balance</text>
+							<text class="balance-label">{{ $t('balance') }}</text>
 							<text class="balance-value">{{$toolbox.num_format(userInfo.money) || '0'}}</text>
 						</view>
 						<!-- Cash Out -->
 						<view class="balance-item">
-							<text class="cashout-label">Cash Out</text>
+							<text class="cashout-label">{{ $t('cash_out') }}</text>
 							<text class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
 						</view>
 					</view>
@@ -45,7 +45,7 @@
 			<!-- from tangjq--- 未登录状态 -->
 			<view class="user-info-card login-prompt-card" v-if="!isLogin">
 				<view class="login-prompt-content">
-					<text class="login-prompt-text">Please login to continue</text>
+					<text class="login-prompt-text">{{ $t('please_login') }}</text>
 					<view class="login-buttons">
 						<view class="login-btn2" @click="goto('/pages/login/login')">
 							{{$t('signin_button')}}
@@ -64,7 +64,7 @@
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'single' ? '/static/icon/nav/single_active.png' : '/static/icon/nav/single.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'single'}">Single</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'single'}">{{ $t('single') }}</text>
 				</view>
 
 				<!-- MPL -->
@@ -80,7 +80,7 @@
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'games' ? '/static/icon/nav/games_active.png' : '/static/icon/nav/games.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'games'}">E-Games</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'games'}">{{ $t('e_games') }}</text>
 				</view>
 
 				<!-- History -->
@@ -90,7 +90,7 @@
 						<!-- from tangjq--- 未读消息红点 -->
 						<view class="nav-badge" v-if="unreadMessageCount > 0">{{unreadMessageCount > 9 ? '9+' : unreadMessageCount}}</view>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'history'}">History</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'history'}">{{ $t('history') }}</text>
 				</view>
 
 				<!-- Deals 暂时隐藏优惠券功能-->
@@ -106,7 +106,7 @@
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'wallet' ? '/static/icon/nav/wallet_active.png' : '/static/icon/nav/wallet.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'wallet'}">Wallet</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'wallet'}">{{ $t('wallet') }}</text>
 				</view>
 			</view>
 		</view>

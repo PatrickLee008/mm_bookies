@@ -106,21 +106,35 @@ export default {
 </script>
 
 <style scoped>
+/* 确保页面全屏，覆盖状态栏 */
+page {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
 .webview-container {
 	width: 100%;
-	height: 100vh;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	height: 100%;
 }
+
+/* #ifdef APP-PLUS || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ */
+web-view {
+	width: 100%;
+	height: 100%;
+}
+/* #endif */
 
 /* #ifdef H5 */
 .h5-iframe {
 	width: 100%;
 	height: 100%;
 	border: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }
 
 .error-container {

@@ -64,7 +64,7 @@
 					<input
 						class="pwd-input"
 						type="password"
-						:placeholder="$t('enter_new_password')"
+						:placeholder="$t('enter_confirm_new_password')"
 						placeholder-class="pwd-placeholder"
 						v-model="confirmPassword" />
 				</view>
@@ -123,10 +123,27 @@
 			savePassword() {
 				let _this = this
 
-				if (!_this.oldPassword || !_this.newPassword || !_this.confirmPassword) {
+				// 分别验证各个字段
+				if (!_this.oldPassword) {
 					uni.showToast({
 						icon: 'none',
-						title: _this.$t('fill_all_fields')
+						title: _this.$t('old_password_required')
+					})
+					return
+				}
+
+				if (!_this.newPassword) {
+					uni.showToast({
+						icon: 'none',
+						title: _this.$t('new_password_required')
+					})
+					return
+				}
+
+				if (!_this.confirmPassword) {
+					uni.showToast({
+						icon: 'none',
+						title: _this.$t('confirm_password_required')
 					})
 					return
 				}
@@ -139,23 +156,36 @@
 					return
 				}
 
+				if (_this.newPassword === _this.oldPassword) {
+					uni.showToast({
+						icon: 'none',
+						title: _this.$t('The new password is the same as the old one'),
+						duration: 2000
+					})
+					return
+				}
+
 				uni.showLoading({
 					title: _this.$t('saving'),
 					mask: true
 				})
 
-				_this.$http.post('/user/changePassword', {
-					old_password: _this.oldPassword,
-					new_password: _this.newPassword
+				_this.$http.post('/app_user/edit', {
+					USER_PWD: _this.newPassword,
+					OLD_PASSWORD: _this.oldPassword
 				}, (res) => {
 					uni.hideLoading()
-					if (res.statusCode === 200 && res.data.code === 200) {
-						uni.showToast({
-							icon: 'success',
-							title: _this.$t('password_changed_success'),
-							duration: 2000
-						})
+					if (res.statusCode === 200) {
+						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePwdModal()
+						_this.$nextTick(() => {
+							uni.showModal({
+								title: _this.$t('success_word'),
+								content: res.data.message || _this.$t('password_changed_success'),
+								showCancel: false,
+								confirmText: _this.$t('ok')
+							})
+						})
 					} else {
 						uni.showToast({
 							icon: 'none',

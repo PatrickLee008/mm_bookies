@@ -1064,11 +1064,15 @@
 							url: `/pages/payment/payment?id=${order.out_order_id}`
 						});
 					} else {
-						uni.showModal({
-							confirmText: this.$t('ok'),
-							showCancel: false,
-							title: this.$t('error_title'),
-							content: res.data.message
+						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
+						_this.modalName = ''
+						_this.$nextTick(() => {
+							uni.showModal({
+								confirmText: this.$t('ok'),
+								showCancel: false,
+								title: this.$t('error_title'),
+								content: res.data.message
+							})
 						})
 					}
 				})
@@ -1217,11 +1221,15 @@
 							url: `/pages/payment/payment?id=${order.out_order_id}`
 						})
 					} else {
-						uni.showModal({
-							confirmText: this.$t('ok'),
-							showCancel: false,
-							title: this.$t('error_title'),
-							content: res.data.message
+						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
+						this.closeDepositModal()
+						this.$nextTick(() => {
+							uni.showModal({
+								confirmText: this.$t('ok'),
+								showCancel: false,
+								title: this.$t('error_title'),
+								content: res.data.message
+							})
 						})
 					}
 				})

@@ -11,38 +11,46 @@
 			<view class="contact-content">
 				<!-- 标题部分 -->
 				<text class="contact-section-title">{{ $t('Contact') }}</text>
-				<text class="contact-description">{{ $t('explore_website') }}</text>
+				<!-- 隐藏 contact-description -->
+				<text class="contact-description" v-if="false">{{ $t('explore_website') }}</text>
 
-				<!-- 联系方式列表 -->
-				<view class="contact-item">
-					<text class="contact-label">{{ $t('viber') }}</text>
-					<view class="contact-value-row">
-						<text class="contact-value">{{ contactInfo.viber || '09789456123' }}</text>
-						<view class="copy-btn" @click="copyText(contactInfo.viber || '09789456123')">
-							<text class="copy-btn-text">{{ $t('copy') }}</text>
-							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
-						</view>
-					</view>
+				<!-- 富文本显示 contact_us 内容 -->
+				<view class="contact-rich-text" v-if="$store.state.configs && $store.state.configs.contact_us">
+					<rich-text :nodes="contactUsRichText" @itemclick="handleRichTextClick"></rich-text>
 				</view>
 
-				<view class="contact-item">
-					<text class="contact-label">{{ $t('telegram') }}</text>
-					<view class="contact-value-row">
-						<text class="contact-value">{{ contactInfo.telegram || '09789456123' }}</text>
-						<view class="copy-btn" @click="copyText(contactInfo.telegram || '09789456123')">
-							<text class="copy-btn-text">{{ $t('copy') }}</text>
-							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
+				<!-- 原来的联系方式列表，用 v-if="false" 隐藏 -->
+				<view v-if="false">
+					<view class="contact-item">
+						<text class="contact-label">{{ $t('viber') }}</text>
+						<view class="contact-value-row">
+							<text class="contact-value">{{ contactInfo.viber || '09789456123' }}</text>
+							<view class="copy-btn" @click="copyText(contactInfo.viber || '09789456123')">
+								<text class="copy-btn-text">{{ $t('copy') }}</text>
+								<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
+							</view>
 						</view>
 					</view>
-				</view>
 
-				<view class="contact-item">
-					<text class="contact-label">{{ $t('email') }}</text>
-					<view class="contact-value-row">
-						<text class="contact-value">{{ contactInfo.email || 'mmbookies@test.com' }}</text>
-						<view class="copy-btn" @click="copyText(contactInfo.email || 'mmbookies@test.com')">
-							<text class="copy-btn-text">{{ $t('copy') }}</text>
-							<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
+					<view class="contact-item">
+						<text class="contact-label">{{ $t('telegram') }}</text>
+						<view class="contact-value-row">
+							<text class="contact-value">{{ contactInfo.telegram || '09789456123' }}</text>
+							<view class="copy-btn" @click="copyText(contactInfo.telegram || '09789456123')">
+								<text class="copy-btn-text">{{ $t('copy') }}</text>
+								<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
+							</view>
+						</view>
+					</view>
+
+					<view class="contact-item">
+						<text class="contact-label">{{ $t('email') }}</text>
+						<view class="contact-value-row">
+							<text class="contact-value">{{ contactInfo.email || 'mmbookies@test.com' }}</text>
+							<view class="copy-btn" @click="copyText(contactInfo.email || 'mmbookies@test.com')">
+								<text class="copy-btn-text">{{ $t('copy') }}</text>
+								<image class="copy-icon" src="/static/icon/copy.png" mode="aspectFit"></image>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -62,7 +70,118 @@
 		onLoad() {
 			this.loadContactInfo()
 		},
+		computed: {
+			contactUsRichText() {
+				// 将 contact_us 内容转换为 rich-text 组件所需的 nodes 格式
+				if (this.$store.state.configs && this.$store.state.configs.contact_us) {
+					return this.parseHtmlToNodes(this.$store.state.configs.contact_us)
+				}
+				return []
+			}
+		},
 		methods: {
+			// 富文本点击事件处理
+			handleRichTextClick(e) {
+				const node = e.detail.node
+				if (node && node.name === 'a' && node.attrs) {
+					const href = node.attrs.href
+					if (href) {
+						if (href.startsWith('http://') || href.startsWith('https://')) {
+							// 处理网页链接
+							// #ifdef H5
+							window.open(href, '_blank')
+							// #endif
+							// #ifndef H5
+							uni.navigateTo({
+								url: `/pages/webview/index?url=${encodeURIComponent(href)}`
+							})
+							// #endif
+						} else if (href.startsWith('tel:')) {
+							// 处理电话链接
+							const phoneNumber = href.replace('tel:', '')
+							uni.makePhoneCall({
+								phoneNumber: phoneNumber
+							})
+						}
+					}
+				}
+			},
+			// 解析 HTML 为 rich-text nodes 数组
+			parseHtmlToNodes(html) {
+				if (!html) return []
+				
+				// 简单的 HTML 解析器，提取 a 标签并保持其他内容
+				const nodes = []
+				let tempHtml = html
+				
+				// 正则匹配 a 标签
+				const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi
+				let lastIndex = 0
+				let match
+				
+				while ((match = linkRegex.exec(tempHtml)) !== null) {
+					// 添加链接前的文本
+					if (match.index > lastIndex) {
+						const textBefore = tempHtml.substring(lastIndex, match.index)
+						if (textBefore.trim()) {
+							nodes.push({
+								name: 'text',
+								attrs: {},
+								children: [{
+									type: 'text',
+									text: textBefore
+								}]
+							})
+						}
+					}
+					
+					// 添加链接节点
+					const href = match[1]
+					const linkText = match[2]
+					nodes.push({
+						name: 'a',
+						attrs: {
+							href: href,
+							style: 'color: #4fb3bf; text-decoration: underline;'
+						},
+						children: [{
+							type: 'text',
+							text: linkText
+						}]
+					})
+					
+					lastIndex = match.index + match[0].length
+				}
+				
+				// 添加剩余文本
+				if (lastIndex < tempHtml.length) {
+					const textAfter = tempHtml.substring(lastIndex)
+					if (textAfter.trim()) {
+						nodes.push({
+							name: 'text',
+							attrs: {},
+							children: [{
+								type: 'text',
+								text: textAfter
+							}]
+						})
+					}
+				}
+				
+				// 如果没有解析到任何节点，就把整个 HTML 作为一个文本节点
+				if (nodes.length === 0) {
+					return [{
+						name: 'div',
+						attrs: {},
+						children: [{
+							type: 'text',
+							text: html
+						}]
+					}]
+				}
+				
+				return nodes
+			},
 			goBack() {
 				uni.navigateBack()
 			},

@@ -54,7 +54,7 @@
 					<!-- Phone No -->
 					<view class="profile-phone-row">
 						<text class="profile-phone-label">{{ $t('phone_no') }}: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
-						<image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image>
+						<!-- <image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image> -->
 					</view>
 
 					<!-- Change Password 按钮 -->
@@ -78,6 +78,12 @@
 					<text class="modal-close" @click="hideContactModal">✕</text>
 				</view>
 				<view class="modal-body">
+					<!-- Live Chat 按钮 -->
+					<view class="live-chat-btn" @click="openLiveChat">
+						<text class="live-chat-text">{{ $t('welcome_to_live_chat') }}</text>
+						<text class="live-chat-arrow">➤</text>
+					</view>
+
 					<text class="contact-section-title">{{ $t('Contact') }}</text>
 					<text class="contact-description">{{ $t('explore_website') }}</text>
 
@@ -281,7 +287,7 @@
 				<view class="modal-body">
 					<!-- Old Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
-						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" :placeholder="$t('enter_old_password')" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" />
+						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" :placeholder="$t('enter_old_password')" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_old_password = !show_old_password">
 							<text :class="show_old_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -289,7 +295,7 @@
 
 					<!-- New Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
-						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" :placeholder="$t('enter_new_password')" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" />
+						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" :placeholder="$t('enter_new_password')" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_new_password = !show_new_password">
 							<text :class="show_new_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -297,7 +303,7 @@
 
 					<!-- Confirm Password 输入框 -->
 					<view class="pwd-input-wrapper" :class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
-						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" :placeholder="$t('enter_new_password')" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" />
+						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" :placeholder="$t('enter_confirm_new_password')" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_confirm_password = !show_confirm_password">
 							<text :class="show_confirm_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -323,7 +329,7 @@
 		<view class="logout-modal" v-if="showLogoutConfirm" @click="hideLogoutModal">
 			<view class="logout-modal-content" @click.stop="">
 				<view class="logout-modal-header">
-					<text class="logout-modal-title">{{ $t('logout') }}</text>
+					<text class="logout-modal-title">{{ $t('confirm_logout') }}</text>
 				</view>
 				<view class="logout-modal-body">
 					<text class="logout-question">{{ $t('confirm_logout') }}</text>
@@ -392,14 +398,6 @@
 						method: 'showLanguageModal', // from tangjq--- 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/language.png',
-						para: {},
-					},
-					{
-						title: "customer_support", // from tangjq--- 使用语言文件中的键名
-						content: '',
-						method: 'showCustomerSupportModal', // from tangjq--- 改为显示弹窗
-						args: [],
-						img: '../../static/icon/ucenter/support.png',
 						para: {},
 					},
 					{
@@ -500,6 +498,13 @@
 		},
 
 		methods: {
+			// from tangjq--- 输入时清除密码错误信息
+			clearPasswordErrors() {
+				this.old_password_error = false
+				this.new_password_error = false
+				this.confirm_password_error = false
+				this.password_error_message = ''
+			},
 			// from tangjq--- 显示Logout确认弹窗
 			showLogoutModal() {
 				this.showLogoutConfirm = true
@@ -523,6 +528,41 @@
 			},
 			hideContactModal() {
 				this.contactModalVisible = false
+			},
+			openLiveChat() {
+				// from tangjq--- 根据用户登录状态拼接客服链接
+				const baseUrl = 'https://chat.wellytalk.com/MDE5ZDA1MDItYzU3MC03YjYyLThkMGItMjQ4YTJjMjQ0ODkwfGQzZjQwNTg3NzExOTAzMjFmOWU4MWM4ZDZmMGM4ZDQ4YjAyNDg5ZjQyM2EyZjgyZjc2NmJmMjI2ZTdlM2MxMzA='
+				const params = []
+				const userInfo = this.$store.state.userInfo || {}
+
+				if (this.isLogin && userInfo.id) {
+					params.push(`user_id=${userInfo.id}`)
+					params.push(`user_name=${encodeURIComponent(userInfo.phone || userInfo.nick_name || '')}`)
+				} else {
+					// 游客模式：生成持久化的访客ID
+					let guestIdentity = null
+					try {
+						guestIdentity = JSON.parse(uni.getStorageSync('guest_cs_identity') || 'null')
+					} catch (e) {}
+					if (!guestIdentity || !guestIdentity.id) {
+						const rand = Math.random().toString(36).slice(2, 10).toUpperCase()
+						const ts = Date.now().toString(36).toUpperCase()
+						guestIdentity = {
+							id: `G_${ts}${rand}`,
+							name: `Guest_${Math.floor(Math.random() * 900000) + 100000}`
+						}
+						uni.setStorageSync('guest_cs_identity', JSON.stringify(guestIdentity))
+					}
+					params.push(`user_id=${guestIdentity.id}`)
+					params.push(`user_name=${encodeURIComponent(guestIdentity.name)}`)
+				}
+				params.push('website_name=mmbookies')
+
+				const url = `${baseUrl}?${params.join('&')}`
+				uni.navigateTo({
+					url: `/pages/webview/index?url=${encodeURIComponent(url)}`
+				})
+				this.hideContactModal()
 			},
 			copyToClipboard(text) {
 				uni.setClipboardData({
@@ -807,13 +847,9 @@
 			// from tangjq--- Old Password 输入框失焦处理
 			handleOldPasswordBlur() {
 				this.old_password_focused = false
-				if (!this.old_password) {
-					this.old_password_error = true
-					this.password_error_message = this.$t('required') || 'This field is required'
-				} else {
-					this.old_password_error = false
-					this.password_error_message = ''
-				}
+				// from tangjq--- 不在输入时显示错误提示，仅在提交时验证
+				this.old_password_error = false
+				this.password_error_message = ''
 			},
 			// from tangjq--- New Password 输入框失焦处理
 			handleNewPasswordBlur() {
@@ -856,22 +892,28 @@
 			submitPasswordChange() {
 				var _this = this
 
+				// from tangjq--- 清除之前的错误信息
+				_this.old_password_error = false
+				_this.new_password_error = false
+				_this.confirm_password_error = false
+				_this.password_error_message = ''
+
 				// from tangjq--- 表单验证
 				if (!this.old_password) {
 					this.old_password_error = true
-					this.password_error_message = this.$t('required') || 'Old password is required'
+					this.password_error_message = this.$t('old_password_required')
 					return
 				}
 
 				if (!this.new_password) {
 					this.new_password_error = true
-					this.password_error_message = this.$t('required') || 'New password is required'
+					this.password_error_message = this.$t('new_password_required')
 					return
 				}
 
 				if (!this.confirm_password) {
 					this.confirm_password_error = true
-					this.password_error_message = this.$t('required') || 'Please confirm your password'
+					this.password_error_message = this.$t('confirm_password_required')
 					return
 				}
 
@@ -910,22 +952,22 @@
 
 					if (res.statusCode == 200) {
 						uni.showModal({
-							title: this.$t('success_word'),
-							content: tips || this.$t('password_changed_success'),
+							title: _this.$t('success_word'),
+							content: tips || _this.$t('password_changed_success'),
 							showCancel: false,
-							confirmText: this.$t('ok'),
+							confirmText: _this.$t('ok'),
 							success: function(modalRes) {
 								_this.hidePasswordChangeModal()
 							}
 						})
 					} else {
-						uni.showModal({
-							title: this.$t('error_title'),
-							content: tips || this.$t('failed_change_password'),
-							showCancel: false,
-							confirmText: this.$t('ok')
-						})
+						_this.password_error_message = tips || _this.$t('failed_change_password')
+						_this.old_password_error = true
 					}
+				}, (err) => {
+					uni.hideLoading()
+					_this.password_error_message = _this.$t('network_error')
+					_this.old_password_error = true
 				})
 			},
 		},
@@ -1329,6 +1371,32 @@
 	}
 
 	/* Contact 弹窗样式 */
+	.live-chat-btn {
+		background: linear-gradient(135deg, #2F5D62, #5FB5BD);
+		border-radius: 12px;
+		padding: 16px 20px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 20px;
+		cursor: pointer;
+	}
+
+	.live-chat-btn:active {
+		opacity: 0.9;
+	}
+
+	.live-chat-text {
+		font-size: 15px;
+		font-weight: 600;
+		color: #fff;
+	}
+
+	.live-chat-arrow {
+		font-size: 20px;
+		color: #fff;
+	}
+
 	.contact-section-title {
 		font-size: 22px;
 		font-weight: 700;
