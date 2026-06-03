@@ -352,6 +352,8 @@
 				</view>
 			</view>
 		</view>
+		<!-- 客服按钮 -->
+		<customer-service></customer-service>
 	</view>
 </template>
 
@@ -359,9 +361,12 @@
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
 	import dateFormatUtils from "../../utils/utils.js"
+	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
-		components: {},
+		components: {
+			CustomerService,
+		},
 		name: "ucenter",
 		data() {
 			return {
