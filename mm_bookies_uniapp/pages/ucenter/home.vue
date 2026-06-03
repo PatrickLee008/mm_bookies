@@ -831,6 +831,8 @@
 
 			// from tangjq--- Change Password 弹窗方法
 			showPasswordChangeModal() {
+				// 先关闭 Profile 弹窗
+				this.hideProfileModal()
 				this.passwordChangeModalVisible = true
 				// from tangjq--- 重置表单
 				this.old_password = ''
