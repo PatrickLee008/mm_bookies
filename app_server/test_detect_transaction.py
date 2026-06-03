@@ -12,6 +12,13 @@
   - Wave Money (缅甸语/英语, 多种截图格式)
   - KBZPay (缅甸语/英语, 多种截图格式)
 
+提取字段:
+  - transaction_id: 交易ID
+  - amount: 金额 (Ks)
+  - order_time: 交易时间 (精确到秒, 如 2025-06-05 16:41:37)
+  - transfer_to: 转账对象 (如 Han Min Aung (******9133) / Hae Satin 9689023844 active)
+  - notes: 备注信息 (如 Salary / payment)
+
 使用方式:
   python test_detect_transaction.py <image_path>
 
@@ -227,6 +234,56 @@ def get_ks_order_time(_str):
     return None
 
 
+def get_transfer_to(_str):
+    """
+    从支付文本中提取转账对象 (Transfer To / To)
+    支持 KBZPay: "Transfer To Han Min Aung (******9133)"
+    支持 Wave:    "To Hae Satin 9689023844 active"
+    支持缅甸语标签: "လွှဲပြောင်းရန်"
+    """
+    # KBZPay 英文标签: "Transfer To\n..."
+    transfer_to = re.search(r"Transfer To\s*\n\s*(.+)", _str, re.IGNORECASE)
+    if transfer_to:
+        return transfer_to[1].strip()
+    # KBZPay 缅甸语标签: "လွှဲပြောင်းရန်\n..."
+    transfer_to = re.search(r"လွှဲပြောင်းရန်\s*\n\s*(.+)", _str)
+    if transfer_to:
+        return transfer_to[1].strip()
+    # Wave Money: "To\nName AccountNumber status"
+    transfer_to = re.search(r"^To\s*\n\s*(.+)", _str, re.MULTILINE | re.IGNORECASE)
+    if transfer_to:
+        return transfer_to[1].strip()
+    return None
+
+
+def get_notes(_str):
+    """
+    从支付文本中提取备注信息 (Notes / Note)
+    支持 KBZPay: "Notes Salary"
+    支持 Wave:    "Note payment"
+    支持缅甸语标签: "မှတ်ချက်"
+    """
+    # KBZPay 英文标签: "Notes\n..."
+    notes = re.search(r"Notes\s*\n\s*(.+)", _str, re.IGNORECASE)
+    if notes:
+        note_text = notes[1].strip()
+        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
+            return note_text
+    # Wave 英文标签: "Note\n..." (单数)
+    notes = re.search(r"Note\s*\n\s*(.+)", _str, re.IGNORECASE)
+    if notes:
+        note_text = notes[1].strip()
+        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
+            return note_text
+    # 缅甸语标签: "မှတ်ချက်\n..."
+    notes = re.search(r"မှတ်ချက်\s*\n\s*(.+)", _str)
+    if notes:
+        note_text = notes[1].strip()
+        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
+            return note_text
+    return None
+
+
 # ============================================================
 # OCR 文本重组（来自 ChargeController.regen_words）
 # ============================================================
@@ -270,7 +327,8 @@ def detect_myan(result_str):
     支持Wave Money和KBZPay两种支付方式，多种截图格式
 
     Returns:
-        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx'}]
+        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx',
+                'transfer_to': 'xxx', 'notes': 'xxx'}]
     """
     all_valid_trades = []
     logger.debug("detect_myan: it's wave")
@@ -294,12 +352,15 @@ def detect_myan(result_str):
             logger.debug(f"detect_myan: got translate result: {translate_str}")
 
             # 从翻译后的文本提取时间
-            order_time = re.search(r"(\d{2}) (\w+) (\d{4}) • (\d+:\d+) (am|pm)", translate_str)
+            order_time = re.search(r"(\d{1,2}) (\w+) (\d{4}) [•·] (\d+:\d+) (am|pm)", translate_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
                 order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况2: Wave单张安卓版
@@ -315,7 +376,10 @@ def detect_myan(result_str):
                 datetime_str = " ".join(order_time.groups())
                 order_time = datetime.strptime(datetime_str, '%b %d %Y %H:%M:%S %p')
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况3: Wave单张iOS版
@@ -341,12 +405,15 @@ def detect_myan(result_str):
             transaction_id = transaction_id[1]
             amount = amount_re[1].replace(",", "").replace(" ", "")
 
-            order_time = re.search(r"(\d{2}) (\w+) (\d{4}) • (\d{2}:\d{2}) (AM|PM)", result_str)
+            order_time = re.search(r"(\d{1,2}) (\w+) (\d{4}) [•·] (\d{1,2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
                 order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况5: Wave列表安卓版（可能包含多笔交易）
@@ -380,7 +447,9 @@ def detect_myan(result_str):
                 datetime_str = f"{order_time[1]} {order_time[2]}"
                 order_time = datetime.strptime(datetime_str, "%d/%m/%Y %H:%M:%S")
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
-                             'order_time': str(order_time.date()) if order_time else None}
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况7: 新版KBZPay安卓 (旧格式)
@@ -399,7 +468,10 @@ def detect_myan(result_str):
                 order_time = order_time[0]
                 order_time = datetime.strptime(order_time, "%d/%m/%Y %H:%M:%S")
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     logger.debug(f"detect_myan result: {all_valid_trades}")
@@ -430,7 +502,8 @@ def detect_en_new(result_str):
     支持Wave Money和KBZPay两种支付方式，多种截图格式
 
     Returns:
-        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx'}]
+        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx',
+                'transfer_to': 'xxx', 'notes': 'xxx'}]
     """
     all_valid_trades = []
 
@@ -446,12 +519,15 @@ def detect_en_new(result_str):
             transaction_id = transaction_id[1]
             amount = amount_re[1].replace(",", "").replace(" ", "")
 
-            order_time = re.search(r"(\d{2}) (\w+) (\d{4})\s?•?\s?(\d+:\d+) (AM|PM)", result_str)
+            order_time = re.search(r"(\d{1,2}) (\w+) (\d{4})\s?[•·]?\s?(\d+:\d+) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
                 order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况2: Wave单张安卓版
@@ -492,12 +568,15 @@ def detect_en_new(result_str):
             transaction_id = transaction_id[1]
             amount = int(amount_re[1].replace(",", "").replace(" ", ""))
 
-            order_time = re.search(r"(\d{2}) (\w+) (\d{4})\s?•?\s?(\d{2}:\d{2}) (AM|PM)", result_str)
+            order_time = re.search(r"(\d{1,2}) (\w+) (\d{4})\s?[•·]?\s?(\d{1,2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
                 order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况5: Wave单张iOS版 (另一种格式)
@@ -513,7 +592,10 @@ def detect_en_new(result_str):
                 datetime_str = " ".join(order_time.groups())
                 order_time = parse_datetime_flexible(datetime_str, ['%b %d %Y %H:%M:%S %p', '%B %d %Y %H:%M:%S %p'])
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # ==================== KBZPay 识别 ====================
@@ -536,7 +618,9 @@ def detect_en_new(result_str):
                 order_time = datetime.strptime(datetime_str, "%d/%m/%Y %H:%M:%S")
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
-                             'order_time': str(order_time.date()) if order_time else None}
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     # 情况7: 新版KBZPay安卓 (旧格式)
@@ -555,7 +639,10 @@ def detect_en_new(result_str):
                 order_time = order_time[0]
                 order_time = datetime.strptime(order_time, "%d/%m/%Y %H:%M:%S")
 
-            detect_result = {'transaction_id': transaction_id, 'amount': amount, 'order_time': str(order_time.date())}
+            detect_result = {'transaction_id': transaction_id, 'amount': amount,
+                             'order_time': str(order_time) if order_time else None,
+                             'transfer_to': get_transfer_to(result_str),
+                             'notes': get_notes(result_str)}
             all_valid_trades.append(detect_result)
 
     logger.debug(f"detect_en_new result: {all_valid_trades}")
@@ -589,7 +676,8 @@ def detect_transaction(image_bytes):
         image_bytes: 图片的字节内容（bytes）
 
     Returns:
-        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx'}]
+        list: [{'transaction_id': 'xxx', 'amount': 'xxx', 'order_time': 'xxx',
+                'transfer_to': 'xxx', 'notes': 'xxx'}]
     """
     t0 = time.time()
 
@@ -753,9 +841,13 @@ def main():
         else:
             print(f"✅ 成功识别到 {len(all_valid_trades)} 笔交易:\n")
             for i, trade in enumerate(all_valid_trades):
-                print(f"  [{i + 1}] 交易ID: {trade.get('transaction_id', 'N/A')}")
-                print(f"      金额:   {trade.get('amount', 'N/A')} Ks")
-                print(f"      时间:   {trade.get('order_time', 'N/A')}")
+                print(f"  [{i + 1}] 交易ID:     {trade.get('transaction_id', 'N/A')}")
+                print(f"      金额:       {trade.get('amount', 'N/A')} Ks")
+                print(f"      时间:       {trade.get('order_time', 'N/A')}")
+                if trade.get('transfer_to'):
+                    print(f"      转账对象:   {trade.get('transfer_to')}")
+                if trade.get('notes'):
+                    print(f"      备注:       {trade.get('notes')}")
                 print()
 
         print("-" * 40)
