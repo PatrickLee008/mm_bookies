@@ -773,7 +773,8 @@ def detect_transaction_from_file(image_path):
 # 调试模式配置（直接运行即生效，无需命令行参数）
 # ============================================================
 DEBUG_MODE = True           # True=调试模式, False=正常模式
-DEBUG_IMAGE = '/www/tmp/kbz01.jpg'  # 调试模式下的默认图片
+DEBUG_KBZ_IMAGE = '/www/tmp/kbz02.jpg'        # KBZPay 测试图片路径，例如: '/www/tmp/kbz01.jpg'
+DEBUG_WAVE_IMAGE = '/www/tmp/wave01.jpg'       # Wave Money 测试图片路径，例如: '/www/tmp/wave01.jpg'
 DEBUG_VERBOSE = True        # 调试模式下是否开启详细日志
 
 
@@ -781,9 +782,28 @@ def main():
     """命令行入口函数"""
     # --- 调试模式：直接运行 ---
     if DEBUG_MODE:
-        image_path = DEBUG_IMAGE
         verbose = DEBUG_VERBOSE
         show_color = False
+
+        # 收集有效的测试图片路径
+        test_images = []
+        if DEBUG_KBZ_IMAGE:
+            test_images.append(('KBZPay', DEBUG_KBZ_IMAGE))
+        if DEBUG_WAVE_IMAGE:
+            test_images.append(('Wave Money', DEBUG_WAVE_IMAGE))
+
+        if not test_images:
+            print("=" * 60)
+            print("  调试模式: 请填写 DEBUG_KBZ_IMAGE 和/或 DEBUG_WAVE_IMAGE 路径")
+            print("=" * 60)
+            sys.exit(0)
+
+        # 依次识别所有测试图片
+        for label, image_path in test_images:
+            print(f"\n{'=' * 60}")
+            print(f"  📱 支付方式: {label}")
+            print(f"{'=' * 60}")
+            _process_image(image_path, verbose, show_color)
     # --- 正常模式：命令行参数 ---
     else:
         if len(sys.argv) < 2:
@@ -803,7 +823,11 @@ def main():
         image_path = sys.argv[1]
         verbose = '--verbose' in sys.argv or '-v' in sys.argv
         show_color = '--color' in sys.argv
+        _process_image(image_path, verbose, show_color)
 
+
+def _process_image(image_path, verbose=False, show_color=False):
+    """处理单张图片并输出识别结果"""
     if verbose:
         logger.setLevel(logging.DEBUG)
         for handler in logger.handlers:
