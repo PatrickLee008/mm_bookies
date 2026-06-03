@@ -78,7 +78,7 @@
 					</view>
 					<view class="info-row" v-if="item.fail_reason && item.status=='Failed'">
 						<text class="label">{{$t('fail_reason') || 'Fail Reason'}}:</text>
-						<text class="value fail-reason">{{item.fail_reason}}</text>
+						<text class="value fail-reason">{{getFailReason(item.fail_reason)}}</text>
 					</view>
 				</view>
 
@@ -232,6 +232,16 @@
 					'Timeout': this.$t('timeout') || 'Timeout'
 				};
 				return statusMap[status] || status;
+			},
+
+			getFailReason(reason) {
+				if (!reason) return '';
+				// If the reason is an error code string longer than 50 chars,
+				// display a user-friendly message instead
+				if (reason.length > 50) {
+					return this.$t('order_failed') || 'Order failed';
+				}
+				return reason;
 			},
 
 			getStatusClass(status) {
