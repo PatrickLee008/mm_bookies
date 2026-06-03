@@ -204,7 +204,7 @@ def get_wave_order_time(_str):
     order_time = re.search(r"(\w+)\s(\d+)\s?,\s?(\d+) (\d{2}:\d{2}:\d{2}) (AM|PM)", _str)
     if order_time:
         datetime_str = " ".join(order_time.groups())
-        order_time = datetime.strptime(datetime_str, '%b %d %Y %H:%M:%S %p')
+        order_time = datetime.strptime(datetime_str, '%b %d %Y %I:%M:%S %p')
         return str(order_time.date())
     return None
 
@@ -216,7 +216,7 @@ def get_wave_order_time_myan(_str):
     order_time = re.search(r"(\w+)\s(\d+)\s?,\s?(\d+) (\d{2}:\d{2}:\d{2}) (AM|PM)", _str)
     if order_time:
         datetime_str = " ".join(order_time.groups())
-        order_time = datetime.strptime(datetime_str, '%b %d %Y %H:%M:%S %p')
+        order_time = datetime.strptime(datetime_str, '%b %d %Y %I:%M:%S %p')
         return str(order_time)
     return None
 
@@ -237,50 +237,81 @@ def get_ks_order_time(_str):
 def get_transfer_to(_str):
     """
     从支付文本中提取转账对象 (Transfer To / To)
-    支持 KBZPay: "Transfer To Han Min Aung (******9133)"
-    支持 Wave:    "To Hae Satin 9689023844 active"
+    支持 KBZPay: 掩码账号模式 "Thiha (******8254)"
+    支持 Wave:    "To\\nHae Satin active\\n9689023844" → "Hae Satin 9689023844"
     支持缅甸语标签: "လွှဲပြောင်းရန်"
     """
-    # KBZPay 英文标签: "Transfer To\n..."
-    transfer_to = re.search(r"Transfer To\s*\n\s*(.+)", _str, re.IGNORECASE)
+    # KBZPay: 优先匹配掩码账号模式 "Name (******XXXX)" — 最可靠的特征
+    transfer_to = re.search(r"([A-Za-z]+(?:\s[A-Za-z]+)*)\s?\(\*{3,}\d+\)", _str)
     if transfer_to:
-        return transfer_to[1].strip()
-    # KBZPay 缅甸语标签: "လွှဲပြောင်းရန်\n..."
+        return transfer_to[0].strip()
+
+    # Wave Money: "To\\n<name> <status>\\n<account_number>"
+    transfer_to = re.search(r"^To\s*\n\s*(.+?)\s*\n\s*(\d{7,})", _str, re.MULTILINE | re.IGNORECASE)
+    if transfer_to:
+        name_part = transfer_to[1].strip()
+        account_part = transfer_to[2].strip()
+        # 移除账户状态关键词 (active, inactive, suspended 等)
+        name_part = re.sub(r'\s+(?:active|inactive|suspended)$', '', name_part, flags=re.IGNORECASE)
+        return f"{name_part} {account_part}"
+
+    # KBZPay 缅甸语标签: "လွှဲပြောင်းရန်\\n..."
     transfer_to = re.search(r"လွှဲပြောင်းရန်\s*\n\s*(.+)", _str)
     if transfer_to:
         return transfer_to[1].strip()
-    # Wave Money: "To\nName AccountNumber status"
-    transfer_to = re.search(r"^To\s*\n\s*(.+)", _str, re.MULTILINE | re.IGNORECASE)
+
+    # KBZPay 英文标签（兜底）: "Transfer To\\n..."
+    transfer_to = re.search(r"Transfer To\s*\n\s*(.+)", _str, re.IGNORECASE)
     if transfer_to:
-        return transfer_to[1].strip()
+        val = transfer_to[1].strip()
+        # 过滤掉误匹配的标签行（OCR 列布局导致标签紧跟在 Transfer To 后面）
+        if val not in ('Amount', 'Notes', 'KBZ', 'Pay', 'E-Receipt', 'Transaction'):
+            return val
+
     return None
 
 
 def get_notes(_str):
     """
     从支付文本中提取备注信息 (Notes / Note)
-    支持 KBZPay: "Notes Salary"
-    支持 Wave:    "Note payment"
+    支持 KBZPay: "(****XXXX)\\n<amount>\\nBill\\nThank you" 模式
+    支持 Wave:    "WAVE\\npayment" 结尾模式
     支持缅甸语标签: "မှတ်ချက်"
     """
-    # KBZPay 英文标签: "Notes\n..."
-    notes = re.search(r"Notes\s*\n\s*(.+)", _str, re.IGNORECASE)
+    # KBZPay: 匹配 "(****XXXX)\\n<amount>\\n<notes>\\nThank you" 模式
+    notes = re.search(r"\(\*{3,}\d+\)\s*\n\s*-?[\d,]+\.\d+\s*Ks\s*\n\s*(.+?)\s*\n\s*Thank you", _str, re.IGNORECASE)
+    if notes:
+        return notes[1].strip()
+
+    # Wave: 匹配 "WAVE\\n<notes>" 结尾模式
+    notes = re.search(r"WAVE\s*\n\s*(.+?)\s*$", _str)
     if notes:
         note_text = notes[1].strip()
         if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
             return note_text
-    # Wave 英文标签: "Note\n..." (单数)
-    notes = re.search(r"Note\s*\n\s*(.+)", _str, re.IGNORECASE)
-    if notes:
-        note_text = notes[1].strip()
-        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
-            return note_text
-    # 缅甸语标签: "မှတ်ချက်\n..."
+
+    # 缅甸语标签: "မှတ်ချက်\\n..."
     notes = re.search(r"မှတ်ချက်\s*\n\s*(.+)", _str)
     if notes:
         note_text = notes[1].strip()
         if note_text and not re.match(r'^[\d\s,/.-]+$', note_text):
             return note_text
+
+    # 兜底: KBZPay "Notes\\n..." 和 Wave "Note\\n..."
+    notes = re.search(r"Notes\s*\n\s*(.+)", _str, re.IGNORECASE)
+    if notes:
+        note_text = notes[1].strip()
+        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text) \
+                and note_text not in ('KBZ', 'Pay', 'E-Receipt', 'Account'):
+            return note_text
+
+    notes = re.search(r"Note\s*\n\s*(.+)", _str, re.IGNORECASE)
+    if notes:
+        note_text = notes[1].strip()
+        if note_text and not re.match(r'^[\d\s,/.-]+$', note_text) \
+                and note_text not in ('KBZ', 'Pay', 'E-Receipt', 'Account'):
+            return note_text
+
     return None
 
 
@@ -355,7 +386,7 @@ def detect_myan(result_str):
             order_time = re.search(r"(\d{1,2}) (\w+) (\d{4}) [•·] (\d+:\d+) (am|pm)", translate_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
+                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %I:%M %p', '%d %B %Y %I:%M %p'])
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
@@ -374,7 +405,7 @@ def detect_myan(result_str):
             order_time = re.search(r"(\w+)\s(\d+)\s?,\s?(\d+) (\d{2}:\d{2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = datetime.strptime(datetime_str, '%b %d %Y %H:%M:%S %p')
+                order_time = datetime.strptime(datetime_str, '%b %d %Y %I:%M:%S %p')
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
@@ -408,7 +439,7 @@ def detect_myan(result_str):
             order_time = re.search(r"(\d{1,2}) (\w+) (\d{4}) [•·] (\d{1,2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
+                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %I:%M %p', '%d %B %Y %I:%M %p'])
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
@@ -522,7 +553,7 @@ def detect_en_new(result_str):
             order_time = re.search(r"(\d{1,2}) (\w+) (\d{4})\s?[•·]?\s?(\d+:\d+) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
+                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %I:%M %p', '%d %B %Y %I:%M %p'])
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
@@ -571,7 +602,7 @@ def detect_en_new(result_str):
             order_time = re.search(r"(\d{1,2}) (\w+) (\d{4})\s?[•·]?\s?(\d{1,2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %H:%M %p', '%d %B %Y %H:%M %p'])
+                order_time = parse_datetime_flexible(datetime_str, ['%d %b %Y %I:%M %p', '%d %B %Y %I:%M %p'])
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
@@ -590,7 +621,7 @@ def detect_en_new(result_str):
             order_time = re.search(r"(\w+)\s(\d{2})\s?,\s?(\d{4}) (\d{2}:\d{2}:\d{2}) (AM|PM)", result_str)
             if order_time:
                 datetime_str = " ".join(order_time.groups())
-                order_time = parse_datetime_flexible(datetime_str, ['%b %d %Y %H:%M:%S %p', '%B %d %Y %H:%M:%S %p'])
+                order_time = parse_datetime_flexible(datetime_str, ['%b %d %Y %I:%M:%S %p', '%B %d %Y %I:%M:%S %p'])
 
             detect_result = {'transaction_id': transaction_id, 'amount': amount,
                              'order_time': str(order_time) if order_time else None,
