@@ -144,8 +144,8 @@
 				// loginDisabled: false,
 				loadding: '',
 				loginInfo: {
-					account: '0955555555',
-					password: 'Aa123456',
+					account: '',
+					password: '',
 					rememberMe: true,
 				},
 

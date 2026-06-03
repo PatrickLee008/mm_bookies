@@ -1729,7 +1729,8 @@
 				const keyword = this.searchKeyword.toLowerCase().trim();
 				const hostTeam = (match.HOST_TEAM || '').toLowerCase();
 				const guestTeam = (match.GUEST_TEAM || '').toLowerCase();
-				return hostTeam.includes(keyword) || guestTeam.includes(keyword);
+				const leagueName = (match.LEAGUE || '').toLowerCase();
+				return hostTeam.includes(keyword) || guestTeam.includes(keyword) || leagueName.includes(keyword);
 			},
 			// from tangjq--- 判断联赛是否有匹配搜索的比赛
 			isLeagueMatchSearch(league) {
