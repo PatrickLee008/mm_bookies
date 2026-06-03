@@ -88,7 +88,7 @@
 			</view>
 
 			<!-- Contact Support -->
-			<view class="contact-support">
+			<view class="contact-support" v-if="false">
 				<text class="contact-text">{{ $t('Contact service') }}</text>
 				<view class="social-icons">
 					<view class="social-icon facebook-icon">
@@ -105,6 +105,9 @@
 
 			<!-- Version Info -->
 			<view class="version-info">{{version}}</view>
+			
+			<!-- 客服按钮 -->
+			<customer-service></customer-service>
 		</view>
 	</view>
 </template>
@@ -112,6 +115,7 @@
 <script>
 	import config from '../../utils/config.js'
 	import CryptoJS from 'crypto-js';
+	import CustomerService from '@/components/common/customer-service.vue'
 
 	// 验证码相关导入 - Commented out as requested
 	// import {
@@ -132,7 +136,9 @@
 
 
 	export default {
-		components: {},
+		components: {
+			CustomerService,
+		},
 		data() {
 			return {
 				// loginDisabled: false,
