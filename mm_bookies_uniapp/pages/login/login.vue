@@ -334,6 +334,11 @@
 						}
 						uni.setStorageSync('Authorization', res.data.token);
 
+						// 缓存用户信息（含时区 timezone），供时区转换等工具使用
+						if (res.data.data) {
+							uni.setStorageSync('user_info', res.data.data);
+						}
+
 						// 登录成功后获取配置
 						const app = getApp()
 						if (app && app.getConfigs) {

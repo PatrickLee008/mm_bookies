@@ -83,10 +83,10 @@
 
 						<!-- 卡片内容 -->
 						<view class="card-content">
-							<view class="info-row">
-								<text class="label">{{$t('Bet Time')}}<</text>
+							<!-- <view class="info-row">
+								<text class="label">{{$t('Bet Time')}}</text>
 								<text class="value">{{item.order_time}}</text>
-							</view>
+							</view> -->
 							<view class="info-row">
 								<text class="label">{{$t('Type')}}</text>
 								<text class="value">{{item.show_order_type}}</text>
@@ -135,10 +135,10 @@
 								<view class="match-time">{{item.order_time}}</view>
 							</view>
 							<view class="card-content">
-								<view class="info-row">
+								<!-- <view class="info-row">
 									<text class="label">{{$t('Bet Time')}}<</text>
 									<text class="value">{{item.order_time}}</text>
-								</view>
+								</view> -->
 								<view class="info-row">
 									<text class="label">{{$t('Type')}}</text>
 									<text class="value">{{item.show_order_type}}</text>
@@ -171,10 +171,10 @@
 									<view class="match-time">{{detail.order_time}}</view>
 								</view>
 								<view class="card-content">
-									<view class="info-row">
+									<!-- <view class="info-row">
 										<text class="label">{{$t('Bet Time')}}<</text>
 										<text class="value">{{detail.order_time}}</text>
-									</view>
+									</view> -->
 									<view class="info-row">
 										<text class="label">{{$t('Type')}}</text>
 										<text class="value">{{detail.show_order_type}}</text>
@@ -753,7 +753,10 @@
 				return map[status] || { label: String(status || '').toUpperCase(), type: 'neutral' }
 			},
 			parse_time(order) {
-				const date = new Date(order.CREATE_TIME);
+				// 先进行时区转换：从系统时区 (UTC+8) 转到用户时区
+				const convertedTime = dateFormatUtils.convertTimezone(order.CREATE_TIME);
+				// 将转换后的 YYYY-MM-DD HH:MM:SS 解析为 Date 对象
+				const date = dateFormatUtils.stringToDate(convertedTime);
 
 				// 获取日期组件
 				const day = String(date.getDate()).padStart(2, '0');
