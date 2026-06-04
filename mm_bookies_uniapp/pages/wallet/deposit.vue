@@ -55,7 +55,7 @@
 				<!-- 输入框 -->
 				<view class="flex-column mybg-lprimary text-white width-100" style="position: relative">
 					<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount" placeholder-class="text-white" maxlength="7" placeholder="">
-					<view class="limit">Minimum 3,000 and Maximum 1,000,000 Ks</view>
+					<view class="limit">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} and Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</view>
 				</view>
 				<!-- 快速选择 -->
 				<view style="display: flex;flex-direction: row;flex-wrap:wrap;justify-content:space-between;padding: 5px 40px;width: 100%;">
@@ -276,7 +276,7 @@
 					<view class="amount-input-box">
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" placeholder="3,000" />
 					</view>
-					<text class="amount-hint">Minimum deposit amount is {{configs.deposit_min_limit}}Ks.</text>
+					<text class="amount-hint">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} Ks, Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
@@ -616,7 +616,19 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		watch: {
 			amount(val) {
 				const rawAmount = parseInt(this.amount)
-				this.amount_error = !(rawAmount >= this.configs.deposit_min_limit && rawAmount <= this.configs.deposit_max_limit)
+				const minLimit = parseInt(this.configs.deposit_min_limit) || 3000;
+				const maxLimit = parseInt(this.configs.deposit_max_limit) || 1000000;
+				this.amount_error = !(rawAmount >= minLimit && rawAmount <= maxLimit)
+			},
+			// 监听系统配置变化，动态更新金额选择列表
+			configs: {
+				handler(val) {
+					if (val && (val.deposit_min_limit || val.deposit_max_limit)) {
+						this.amount_list = this.dynamicAmountList;
+					}
+				},
+				deep: true,
+				immediate: true
 			},
 		},
 		computed: {
@@ -640,6 +652,34 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				const minutes = Math.floor(this.countdown / 60)
 				const seconds = this.countdown % 60
 				return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:00`
+			},
+			// 动态生成金额选择列表，基于系统配置的 min/max 限额
+			dynamicAmountList() {
+				const min = parseInt(this.configs.deposit_min_limit) || 3000;
+				const max = parseInt(this.configs.deposit_max_limit) || 1000000;
+				const fixedList = [3000, 5000, 10000, 50000, 100000, 200000, 300000, 500000, 1000000];
+
+				if (!min || !max || min >= max) {
+					return fixedList;
+				}
+
+				// 从固定列表中筛选出在 min 和 max 之间的值（不包括两端）
+				const middleValues = fixedList.filter((value) => value > min && value < max);
+
+				// 从中间值中选择最多4个
+				let selectedMiddle = [];
+				if (middleValues.length <= 4) {
+					selectedMiddle = middleValues;
+				} else {
+					const step = middleValues.length / 4;
+					for (let i = 0; i < 4; i++) {
+						const index = Math.floor(i * step);
+						selectedMiddle.push(middleValues[index]);
+					}
+				}
+
+				// 组合：[最小值, 中间值, 最大值]
+				return [min, ...selectedMiddle, max];
 			},
 		},
 		methods: {
@@ -683,8 +723,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')
 				amount = amount ? parseInt(amount) : '0'
-				if (amount > 1000000) {
-					amount = 1000000
+				const maxLimit = parseInt(this.configs.deposit_max_limit) || 1000000;
+				if (amount > maxLimit) {
+					amount = maxLimit
 				}
 				this.$nextTick(function() {
 					this.$set(this, 'amount', amount)
@@ -1121,9 +1162,11 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			depositSubmit() {
 				if (this.$toolbox.click_too_fast(.5)) return
 
-				// 验证金额
+				// 验证金额（使用系统配置的动态限额）
 				const amountNum = parseInt(this.amount)
-				if (!amountNum || amountNum < 3000 || amountNum > 1000000) {
+				const minLimit = parseInt(this.configs.deposit_min_limit) || 3000;
+				const maxLimit = parseInt(this.configs.deposit_max_limit) || 1000000;
+				if (!amountNum || amountNum < minLimit || amountNum > maxLimit) {
 					uni.showToast({
 						title: this.$t('enter_valid_amount'),
 						icon: 'none'

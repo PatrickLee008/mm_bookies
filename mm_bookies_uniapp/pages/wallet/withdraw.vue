@@ -67,16 +67,16 @@
 				<view class="wallet-info-section">
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
-						<text class="wallet-info-value">{{userInfo.money || '0'}}</text>
+						<text class="wallet-info-value">{{$toolbox.num_format(userInfo.money)}}Ks</text>
 					</view>
-					<view class="wallet-info-row">
+					<!-- <view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('amount_unlock') }} :</text>
 						<text class="wallet-info-value">{{configs.amount_unlock || '0.00'}}</text>
 					</view>
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('turnover_limit_label') }} :</text>
 						<text class="wallet-info-value">{{configs.turnover_limit || '0.00'}}</text>
-					</view>
+					</view> -->
 				</view>
 
 				<!-- 金额输入 -->
@@ -84,8 +84,8 @@
 					<view class="amount-input-box">
 						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_withdraw_amount')" />
 					</view>
-					<text class="amount-hint">Current Turnover: {{userInfo.current_turnover_accumulated}} Ks | Rate Turnover: {{userInfo.required_turnover_accumulated}} Ks </text>
-					<text class="amount-hint">Minimum withdrawal amount is {{configs.withdraw_min_limit || 5000}}Ks.</text>
+					<text class="amount-hint">Current Turnover: {{numberFormat(userInfo.current_turnover_accumulated)}}Ks | Rate Turnover: {{numberFormat(userInfo.required_turnover_accumulated)}}Ks </text>
+					<text class="amount-hint">Minimum {{numberFormat(configs.withdraw_min_limit || 5000)}} Ks, Maximum {{numberFormat(configs.withdraw_max_limit || 5000000)}} Ks</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
@@ -181,7 +181,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				modalName: '',
 				card_conf: {},
 				selectedCard: {}, // from tangjq--- 选中的银行卡
-				withdraw_amount_list: [5000, 10000, 30000, 50000, 100000, 500000], // from tangjq--- 提现快速金额列表
+				withdraw_amount_list: [], // 提现快速金额列表（由系统配置动态生成）
 				bank_add_list: [],
 				add_disable: true,
 				showDeleteConfirm: false,
@@ -191,15 +191,58 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		watch: {
 			amount(val) {
 				const rawAmount = parseInt(this.amount)
-				this.amount_error = !(rawAmount >= this.configs.withdraw_min_limit && rawAmount <= this.configs.withdraw_max_limit)
-			}
+				const minLimit = parseInt(this.configs.withdraw_min_limit) || 5000;
+				const maxLimit = parseInt(this.configs.withdraw_max_limit) || 5000000;
+				this.amount_error = !(rawAmount >= minLimit && rawAmount <= maxLimit)
+			},
+			// 监听系统配置变化，动态更新提现金额选择列表
+			configs: {
+				handler(val) {
+					if (val && (val.withdraw_min_limit || val.withdraw_max_limit)) {
+						this.withdraw_amount_list = this.dynamicWithdrawAmountList;
+					}
+				},
+				deep: true,
+				immediate: true
+			},
+		},
+		computed: {
+			// 动态生成提现金额选择列表，基于系统配置的 min/max 限额
+			dynamicWithdrawAmountList() {
+				const min = parseInt(this.configs.withdraw_min_limit) || 5000;
+				const max = parseInt(this.configs.withdraw_max_limit) || 5000000;
+				const fixedList = [5000, 10000, 30000, 50000, 100000, 200000, 500000, 1000000];
+
+				if (!min || !max || min >= max) {
+					return fixedList;
+				}
+
+				// 从固定列表中筛选出在 min 和 max 之间的值（不包括两端）
+				const middleValues = fixedList.filter((value) => value > min && value < max);
+
+				// 从中间值中选择最多4个
+				let selectedMiddle = [];
+				if (middleValues.length <= 4) {
+					selectedMiddle = middleValues;
+				} else {
+					const step = middleValues.length / 4;
+					for (let i = 0; i < 4; i++) {
+						const index = Math.floor(i * step);
+						selectedMiddle.push(middleValues[index]);
+					}
+				}
+
+				// 组合：[最小值, 中间值, 最大值]
+				return [min, ...selectedMiddle, max];
+			},
 		},
 		methods: {
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')
 				amount = amount ? parseInt(amount) : '0'
-				if (amount > 5000000) {
-					amount = 5000000
+				const maxLimit = parseInt(this.configs.withdraw_max_limit) || 5000000;
+				if (amount > maxLimit) {
+					amount = maxLimit
 				}
 				this.$nextTick(function() {
 					this.$set(this, 'amount', amount)
@@ -229,12 +272,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			withdrawSubmit() {
 				var _this = this;
 
-				// Validate amount
+				// Validate amount（使用系统配置的动态限额）
 				const rawAmount = parseInt(_this.amount)
-				const minLimit = _this.configs['withdraw_min_limit'] ? parseInt(_this.configs['withdraw_min_limit']) : 5000
-				if (!rawAmount || rawAmount < minLimit || rawAmount > 5000000) {
+				const minLimit = parseInt(_this.configs.withdraw_min_limit) || 5000;
+				const maxLimit = parseInt(_this.configs.withdraw_max_limit) || 5000000;
+				if (!rawAmount || rawAmount < minLimit || rawAmount > maxLimit) {
 					uni.showToast({
-						title: `Please enter valid amount (${minLimit} - 5,000,000)`,
+						title: `Please enter valid amount (${_this.numberFormat(minLimit)} - ${_this.numberFormat(maxLimit)})`,
 						icon: 'none'
 					})
 					return

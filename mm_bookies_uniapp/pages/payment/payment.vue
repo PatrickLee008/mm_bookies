@@ -6,59 +6,51 @@
 		<scroll-view scroll-y class="payment-content">
 			<block>
 				<!-- <block v-if="isload && payInfo"> -->
+				<!-- 隐藏的二维码生成组件 -->
+				<view style="position: fixed; left: -9999px; top: 0;">
+					<tki-qrcode cid="qrcode2" ref="qrcode" :val="payInfo.qrcode"
+						loadingText="loading" v-if="!istimeout && payInfo.orderStatus==1" :size="250"
+						:onval="false" :loadMake="false" @result="resultPath" :usingComponents="true" />
+				</view>
+
+				<!-- 显示合成后的完整图片 -->
 				<view class=""
-					style="width: calc(100vw - 36px);margin: 10px 18px 0;border: 1px solid #D9D9D9;border-radius: 10px;">
-					<view class="top-image">
-						<image src="/static/icon/register/KBZ Pay.png" mode="aspectFit" class="logo"
-							style="width: 45px;" v-if="payInfo.paymentType=='KBZ'" />
-						<text v-if="payInfo.paymentType=='KBZ'" class="margin-left-sm">{{'KBZPay'}}</text>
-						<image src="/static/image/pay/wave-logo.svg" mode="aspectFit" class="logo"
-							v-if="payInfo.paymentType=='WaveMoney'" />
-					</view>
-					<!-- <view class="qrcode">
-						<view class="timeout">
-							<block v-if="payInfo.orderStatus==1">
-								<view v-if="!istimeout">
-									<view>{{$t('payment.timoutTip')}}</view>
-									<view class="time">
-										{{countdownDisplay}}
-									</view>
-								</view>
-								<text class="margin-top text-red" v-else>{{$t('payment.orderTimeoutTip')}}</text>
-							</block>
-							<block v-else-if="payInfo.orderStatus==2">
-								<view class="text-green text-bold">{{ $t('pay_completed') }}</view>
-							</block>
-						</view>
-					</view> -->
+					style="width: calc(100vw - 36px);margin: 10px 18px 0;border: 1px solid #D9D9D9;border-radius: 10px;overflow: hidden;">
 					<view class="qrcode">
-						<view class="image">
-							<tki-qrcode style="margin: 0 auto;" cid="qrcode2" ref="qrcode" :val="payInfo.qrcode"
-								loadingText="loading" v-if="!istimeout && payInfo.orderStatus==1" :size="250"
-								:onval="false" :loadMake="false" @result="resultPath" :usingComponents="true" />
-							<image src="/static/image/pay/qqqrcode2.png" mode="aspectFit" class="image2" v-else />
+						<!-- 合成图片展示区域 -->
+						<view class="image" style="padding: 10px;">
+							<!-- 加载中状态 -->
+							<view v-if="isCompositing" class="text-center" style="padding: 100px 0;">
+								<text>Generating QR Image...</text>
+							</view>
+
+							<!-- 显示合成图片 -->
+							<image
+								v-else-if="compositeImagePath && !compositeError"
+								:src="compositeImagePath"
+								mode="widthFix"
+								style="width: 100%; display: block; margin: 0 auto;"
+							/>
+
+							<!-- 默认图片（合成失败或超时） -->
+							<image
+								v-else
+								src="/static/image/pay/qqqrcode2.png"
+								mode="aspectFit"
+								class="image2"
+								style="width: 100%; display: block; margin: 0 auto;"
+							/>
 						</view>
-						<view class="money">
-							<text>{{$toolbox.formatCurrencyManual(payInfo.amount,'',0)}}</text><text
-								class="margin-left-sm">{{payInfo.curType}}</text>
-						</view>
-						<view class="due-date" v-if="formattedDueDate">
-							{{formattedDueDate}}
-						</view>
+
+						<!-- 保存按钮 -->
 						<block v-if="!istimeout">
-							<button class="cu-btn mybg-primary round margin-top height-27px" style="padding: 0 25px;"
+							<button class="cu-btn mybg-primary round margin-top margin-bottom height-27px" style="padding: 0 25px;"
 								@click="saveCode" v-if="payInfo.orderStatus==1">
 								<image src="/static/image/pay/download.png" mode="aspectFit" class=" margin-right-sm"
 									style="width: 15px;height: 15px;" />
-								<!-- <text class="cuIcon-down margin-right-sm"></text> -->
-								<text class="text-sm">{{ $t('save_qr_image') }}</text>
+								<text class="text-sm">Save QR Image</text>
 							</button>
-							<!-- <button v-if="payInfo.orderStatus==1" icon="download"
-							style="width: 140px;background-color: black;border: 0px;border-radius: 10px;" class="margin-top"
-							size="normal" type="primary" @click="saveCode" >
-							<image src="/static/image/pay/save.png" class="my-icon2"></image> Save QR</button> -->
 						</block>
-
 					</view>
 				</view>
 
@@ -149,6 +141,13 @@
 		<!--
 			<u-loading-page :loading="!isload"></u-loading-page>
 		-->
+
+		<!-- 隐藏的canvas用于图片合成 -->
+		<canvas
+			canvas-id="paymentCanvas"
+			id="paymentCanvas"
+			:style="{width: '400px', height: '600px', position: 'fixed', left: '-9999px', top: '0'}"
+		></canvas>
 	</view>
 </template>
 <script>
@@ -177,6 +176,9 @@
 				qrcode_path: '', //二维码地址
 				modalName: '',
 				formattedDueDate: '', // 格式化后的到期时间
+				compositeImagePath: '', // 合成后的完整图片路径
+				isCompositing: false, // 是否正在合成图片
+				compositeError: false, // 合成图片是否出错
 			};
 		},
 		onLoad(opt) {
@@ -340,40 +342,265 @@
 					.map(unit => unit.toString().padStart(2, '0'))
 					.join(':');
 			},
-			saveCode() {
-				// #ifdef H5
-				if (this.qrcode_path) {
-					this.saveBase64Image(this.qrcode_path);
+			async saveCode() {
+				try {
+					// 如果合成图片还未生成或生成失败，尝试重新生成
+					if (!this.compositeImagePath || this.compositeError) {
+						uni.showLoading({
+							title: 'Generating...',
+							mask: true
+						});
+						await this.generateCompositeImage();
+						uni.hideLoading();
+					}
+
+					// 检查是否有可用的图片
+					if (!this.compositeImagePath) {
+						uni.showToast({
+							title: 'No image available',
+							icon: 'none'
+						});
+						return;
+					}
+
+					const imagePath = this.compositeImagePath;
+
+					// #ifdef H5
+					// H5端下载
+					this.downloadImageH5(imagePath);
+					// #endif
+
+					// #ifndef H5
+					// App端和小程序保存到相册
+					uni.saveImageToPhotosAlbum({
+						filePath: imagePath,
+						success: () => {
+							uni.showToast({
+								title: 'Saved successfully',
+								icon: 'success'
+							});
+						},
+						fail: (err) => {
+							console.error('Save failed:', err);
+							uni.showToast({
+								title: 'Save failed',
+								icon: 'none'
+							});
+						}
+					});
+					// #endif
+
+				} catch (error) {
+					console.error('Save image failed:', error);
+					uni.showToast({
+						title: 'Failed to save image',
+						icon: 'none'
+					});
 				}
-				// #endif
-				// #ifndef H5
-				this.$refs.qrcode._saveCode();
-				// #endif
 			},
-			// 在methods中添加保存Base64图片的方法
-			saveBase64Image(base64Data) {
-				// 创建a标签
+			/**
+			 * H5端下载图片
+			 */
+			downloadImageH5(base64Data) {
 				const link = document.createElement('a');
 				link.href = base64Data;
-
-				// 设置下载文件名
 				const timestamp = new Date().getTime();
-				link.download = `recharge_${this.payInfo.amount}_${timestamp}.png`;
-
-				// 触发点击事件
+				link.download = `payment_qr_${this.payInfo.amount}_${timestamp}.png`;
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
-
-				// 提示用户
 				uni.showToast({
-					title: this.$t('qrcode_download_starting'),
+					title: 'Download started',
 					icon: 'success'
 				});
 			},
 			resultPath(res) {
 				this.qrcode_path = res;
+				// 二维码生成后，自动合成完整图片
+				this.generateCompositeImage();
 			},
+			/**
+			 * 合成完整的支付二维码图片（背景图 + 二维码 + 银行logo + 打星卡号）
+			 */
+			async compositePaymentImage() {
+				return new Promise((resolve, reject) => {
+					// 先加载底图获取其实际尺寸
+					this.loadImage('/static/image/pay/payment-qrcode-bg.jpg').then((bgImage) => {
+						const ctx = uni.createCanvasContext('paymentCanvas', this);
+
+						// 使用底图的实际尺寸作为Canvas尺寸
+						const canvasWidth = bgImage.width;
+						const canvasHeight = bgImage.height;
+
+						// 加载其他图片资源
+						const loadImages = [
+							this.loadImage(this.qrcode_path), // 二维码
+						];
+
+						// 根据paymentType加载对应的银行图标
+						let bankIconPath = null;
+						if (this.payInfo.paymentType === 'KBZ') {
+							bankIconPath = '/static/icon/register/KBZ Pay.png';
+						} else if (this.payInfo.paymentType === 'WaveMoney') {
+							bankIconPath = '/static/icon/register/Wave Money.png';
+						}
+
+						if (bankIconPath) {
+							loadImages.push(this.loadImage(bankIconPath));
+						}
+
+						Promise.all(loadImages).then((images) => {
+							const [qrImage, bankIcon] = images;
+
+							// 1. 绘制底图（使用实际尺寸）
+							ctx.drawImage(bgImage.path, 0, 0, canvasWidth, canvasHeight);
+
+							// 2. 绘制二维码（在白色矩形框内居中，下移10px）
+							const whiteBoxTop = canvasHeight * 0.243;
+							const whiteBoxBottom = canvasHeight * 0.725;
+							const whiteBoxHeight = whiteBoxBottom - whiteBoxTop;
+							const whiteBoxWidth = canvasWidth * 0.8125;
+
+							const padding = canvasWidth * 0.075;
+							const qrSize = Math.min(whiteBoxWidth - padding * 2, whiteBoxHeight - padding * 2, 500);
+
+							const qrX = (canvasWidth - qrSize) / 2;
+							const qrY = whiteBoxTop + (whiteBoxHeight - qrSize) / 2 + 30;
+
+							ctx.drawImage(qrImage.path, qrX, qrY, qrSize, qrSize);
+
+							// 3. 绘制银行图标（上移20px，带圆角5px裁剪）
+							const iconSize = Math.min(canvasWidth * 0.15, 120);
+							const iconX = (canvasWidth - iconSize) / 2;
+							const iconY = canvasHeight * 0.784;
+							if (bankIcon && bankIcon.path) {
+								const borderRadius = 5;
+
+								ctx.save();
+								ctx.beginPath();
+								ctx.moveTo(iconX + borderRadius, iconY);
+								ctx.lineTo(iconX + iconSize - borderRadius, iconY);
+								ctx.arc(iconX + iconSize - borderRadius, iconY + borderRadius, borderRadius, 1.5 * Math.PI, 2 * Math.PI);
+								ctx.lineTo(iconX + iconSize, iconY + iconSize - borderRadius);
+								ctx.arc(iconX + iconSize - borderRadius, iconY + iconSize - borderRadius, borderRadius, 0, 0.5 * Math.PI);
+								ctx.lineTo(iconX + borderRadius, iconY + iconSize);
+								ctx.arc(iconX + borderRadius, iconY + iconSize - borderRadius, borderRadius, 0.5 * Math.PI, Math.PI);
+								ctx.lineTo(iconX, iconY + borderRadius);
+								ctx.arc(iconX + borderRadius, iconY + borderRadius, borderRadius, Math.PI, 1.5 * Math.PI);
+								ctx.closePath();
+								ctx.clip();
+
+								ctx.drawImage(bankIcon.path, iconX, iconY, iconSize, iconSize);
+								ctx.restore();
+							}
+
+							// 4. 绘制账户号码文字（在银行logo下方，脱敏处理，字体加大2号）
+							const fontSize = Math.floor(canvasWidth * 0.035) + 2;
+							ctx.setFontSize(fontSize);
+							ctx.setFillStyle('#FFFFFF');
+							ctx.setTextAlign('center');
+							const rawAccount = this.payInfo.receiveAccount || 'Account Number';
+							const accountText = this.maskAccountNumber(rawAccount);
+							const accountY = iconY + iconSize + fontSize + 13;
+							ctx.fillText(accountText, canvasWidth / 2, accountY);
+
+							// 5. 执行绘制
+							ctx.draw(false, () => {
+								setTimeout(() => {
+									uni.canvasToTempFilePath({
+										canvasId: 'paymentCanvas',
+										destWidth: canvasWidth,
+										destHeight: canvasHeight,
+										fileType: 'png',
+										quality: 1,
+										success: (res) => {
+											this.compositeImagePath = res.tempFilePath;
+											resolve(res.tempFilePath);
+										},
+										fail: (err) => {
+											console.error('canvasToTempFilePath failed:', err);
+											reject(err);
+										}
+									}, this);
+								}, 500);
+							});
+						}).catch((err) => {
+							console.error('Load images failed:', err);
+							reject(err);
+						});
+					}).catch((err) => {
+						console.error('Load background image failed:', err);
+						reject(err);
+					});
+				});
+			},
+
+			/**
+			 * 银行卡账号脱敏处理（只保留后四位，前面用*替代）
+			 */
+			maskAccountNumber(accountNumber) {
+				if (!accountNumber || accountNumber === 'Account Number') {
+					return accountNumber;
+				}
+				const str = String(accountNumber);
+				if (str.length <= 4) {
+					return str;
+				}
+				const lastFour = str.slice(-4);
+				const maskedPart = '*'.repeat(str.length - 4);
+				return maskedPart + lastFour;
+			},
+
+			/**
+			 * 加载图片资源
+			 */
+			loadImage(src) {
+				return new Promise((resolve, reject) => {
+					// 如果是base64图片，直接返回
+					if (src && src.startsWith('data:image')) {
+						resolve({
+							path: src,
+							width: 250,
+							height: 250
+						});
+						return;
+					}
+
+					uni.getImageInfo({
+						src: src,
+						success: (res) => {
+							resolve(res);
+						},
+						fail: (err) => {
+							console.error('Load image failed:', src, err);
+							reject(err);
+						}
+					});
+				});
+			},
+
+			/**
+			 * 生成合成图片（内部调用）
+			 */
+			async generateCompositeImage() {
+				if (!this.qrcode_path || !this.payInfo) {
+					return;
+				}
+
+				try {
+					this.isCompositing = true;
+					this.compositeError = false;
+
+					const imagePath = await this.compositePaymentImage();
+					this.compositeImagePath = imagePath;
+				} catch (error) {
+					console.error('Failed to generate composite image:', error);
+					this.compositeError = true;
+				} finally {
+					this.isCompositing = false;
+				}
+			},
+
 			onChange(e) {
 				this.timeData = e;
 				if (e.minutes == 0 && e.seconds == 0) {
@@ -472,16 +699,16 @@
 
 	.qrcode {
 		text-align: center;
-		padding: 10px 50px;
+		padding: 10px 15px;
 	}
 
 	.qrcode .image {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		/* 垂直居中 */
-		width: 150px;
-		height: 150px;
+		width: 100%;
+		max-width: 100%;
+		height: auto;
 		background-color: #fff;
 		margin: 0 auto;
 		position: relative;
@@ -489,8 +716,9 @@
 	}
 
 	.qrcode .image2 {
-		width: 150px;
-		height: 150px;
+		width: 100%;
+		max-width: 100%;
+		height: auto;
 		margin-bottom: 10px;
 	}
 
