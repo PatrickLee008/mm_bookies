@@ -17,8 +17,8 @@
 
 			<!-- 主列表区域 -->
 			<view class="settings-list-container">
-				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)" v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)">
-					<text class="setting-item-text">{{$t(bar.title)}}</text>
+				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)" v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)" :class="{'setting-item-highlight': bar.highlight}">
+					<text class="setting-item-text" :class="{'setting-item-text-highlight': bar.highlight}">{{$t(bar.title)}}</text>
 				</view>
 
 				<!-- #ifdef APP-PLUS -->
@@ -350,6 +350,7 @@
 						args: [],
 						img: '../../static/icon/ucenter/contact_lblue.png',
 						para: {},
+						highlight: false, // 高亮提醒用户点击
 					},
 					{
 						title: "about us", // from tangjq--- 使用语言文件中的键名
@@ -358,6 +359,7 @@
 						args: [],
 						img: '../../static/icon/ucenter/about.png',
 						para: {},
+						highlight: false, // 高亮提醒用户点击
 					},
 					{
 						title: "language", // from tangjq--- 使用语言文件中的键名
@@ -1260,6 +1262,19 @@
 		font-size: 16px;
 		font-weight: 600;
 		color: #2F5D62;
+	}
+
+	/* 高亮提醒样式 - 联系我们、关于我们 */
+	.setting-item-highlight {
+		border-color: #5FB5BD;
+		background: linear-gradient(135deg, #fff 0%, #E8F4F5 100%);
+		box-shadow: 0 2px 8px rgba(47, 93, 98, 0.15);
+	}
+
+	.setting-item-text-highlight {
+		color: #5FB5BD;
+		font-weight: 700;
+		font-size: 17px;
 	}
 
 	.version-item {

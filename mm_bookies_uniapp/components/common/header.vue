@@ -72,7 +72,7 @@
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'mpl' ? '/static/icon/nav/mpl_active.png' : '/static/icon/nav/mpl.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'mpl'}">MPL</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'mpl'}">{{ $t('MPL') }}</text>
 				</view>
 
 				<!-- E-Games -->
@@ -296,10 +296,11 @@
 		background-color: white;
 		border-radius: 20px;
 		margin: 5px 15px 10px;
-		padding: 8px 10px;
+		padding: 10px 0px;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		height: 70px;
 	}
 
 	.user-avatar {
@@ -470,10 +471,13 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: flex-start;
 		gap: 8px;
 		cursor: pointer;
 		padding: 5px;
 		transition: all 0.3s;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.nav-icon-item:active {
@@ -522,6 +526,11 @@
 		font-size: 12px;
 		font-weight: 500;
 		transition: all 0.3s;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100%;
+		text-align: center;
 	}
 
 	.nav-label-active {

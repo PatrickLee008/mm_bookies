@@ -829,6 +829,18 @@
 			mix_max() {
 				return parseInt(this.configs.mix_max)
 			},
+			mix_min_count() {
+				if (!this.configs.hasOwnProperty('mix_min_count')) {
+					this.configs = this.$store.state.configs || uni.getStorageSync('config')
+				}
+				return parseInt(this.configs.mix_min_count) || 2
+			},
+			mix_max_count() {
+				if (!this.configs.hasOwnProperty('mix_max_count')) {
+					this.configs = this.$store.state.configs || uni.getStorageSync('config')
+				}
+				return parseInt(this.configs.mix_max_count) || 12
+			},
 			single_min() {
 				if (!this.configs.hasOwnProperty('single_min')) {
 					this.configs = this.$store.state.configs || uni.getStorageSync('config')
@@ -1182,6 +1194,15 @@
 
 				let select_restult = _this.match_ref.mixed ? !attr[`${type}_selected`] : true
 
+				// mix模式：选择时检查是否超出最大比赛数量限制
+				if (_this.match_ref.mixed && select_restult) {
+					let match_was_selected = match.ATTR.some(a => a.host_selected || a.guest_selected || a.draw_selected)
+					if (!match_was_selected && _this.bet_list.length >= _this.mix_max_count) {
+						_this.show_fail_popup(_this.$t('at_most_count').replace('xxx', _this.mix_max_count))
+						return
+					}
+				}
+
 				// 取消本场赛事其他attr已选项
 				match.ATTR.forEach(_attr => {
 					_this.reset_attr_select(_attr)
@@ -1453,11 +1474,11 @@
 				if (_this.amount < min) {
 					content = (_this.match_ref.mixed ? _this.$t('mix_min') : _this.$t('single_min')).replace('xxx', min);
 				}
-				if (_this.match_ref.mixed && _this.bet_list.length < 2) {
-					content = _this.$t('at_least_2_game')
+				if (_this.match_ref.mixed && _this.bet_list.length < _this.mix_min_count) {
+					content = _this.$t('at_least_count').replace('xxx', _this.mix_min_count)
 				}
-				if (_this.match_ref.mixed && _this.bet_list.length > 12) {
-					content = _this.$t('at_most_12_game')
+				if (_this.match_ref.mixed && _this.bet_list.length > _this.mix_max_count) {
+					content = _this.$t('at_most_count').replace('xxx', _this.mix_max_count)
 				}
 				if (content) {
 					// from tangjq--- 使用投注失败提示弹窗代替原来的 uni.showModal
