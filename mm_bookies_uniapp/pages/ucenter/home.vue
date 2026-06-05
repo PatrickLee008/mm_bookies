@@ -140,54 +140,8 @@
 					<text class="modal-close" @click="hideAboutModal">✕</text>
 				</view>
 				<view class="modal-body">
-					<!-- Rules 部分 -->
-					<view class="about-section">
-						<text class="about-section-title">{{ $t('rules') }}</text>
-						<view class="about-rule-item">
-							<text class="rule-number">1.</text>
-							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">2.</text>
-							<text class="rule-text">Terms of service for online betting platforms outlined here</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">3.</text>
-							<text class="rule-text">Common betting strategies used by successful gamblers</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">4.</text>
-							<text class="rule-text">Legal age and identification requirements for placing bets</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">5.</text>
-							<text class="rule-text">How to recognize and report suspicious betting activities</text>
-						</view>
-					</view>
-
-					<!-- Regulation 部分 -->
-					<view class="about-section">
-						<text class="about-section-title">{{ $t('regulation') }}</text>
-						<view class="about-rule-item">
-							<text class="rule-number">1.</text>
-							<text class="rule-text">Rules and regulation of mm bookies detail explained here</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">2.</text>
-							<text class="rule-text">Terms of service for online betting platforms outlined here</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">3.</text>
-							<text class="rule-text">Common betting strategies used by successful gamblers</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">4.</text>
-							<text class="rule-text">Legal age and identification requirements for placing bets</text>
-						</view>
-						<view class="about-rule-item">
-							<text class="rule-number">5.</text>
-							<text class="rule-text">How to recognize and report suspicious betting activities</text>
-						</view>
+					<view class="contact-rich-text" v-if="configs && configs.contact_us">
+						<rich-text :nodes="contactUsRichText" @itemclick="handleRichTextClick"></rich-text>
 					</view>
 				</view>
 			</view>
@@ -704,41 +658,6 @@
 					parts.push({ type: 'text', text })
 				}
 				return parts
-			},
-			openLiveChat() {
-				// from tangjq--- 根据用户登录状态拼接客服链接
-				const baseUrl = 'https://chat.wellytalk.com/MDE5ZDA1MDItYzU3MC03YjYyLThkMGItMjQ4YTJjMjQ0ODkwfGQzZjQwNTg3NzExOTAzMjFmOWU4MWM4ZDZmMGM4ZDQ4YjAyNDg5ZjQyM2EyZjgyZjc2NmJmMjI2ZTdlM2MxMzA='
-				const params = []
-				const userInfo = this.$store.state.userInfo || {}
-
-				if (this.isLogin && userInfo.id) {
-					params.push(`user_id=${userInfo.id}`)
-					params.push(`user_name=${encodeURIComponent(userInfo.phone || userInfo.nick_name || '')}`)
-				} else {
-					// 游客模式：生成持久化的访客ID
-					let guestIdentity = null
-					try {
-						guestIdentity = JSON.parse(uni.getStorageSync('guest_cs_identity') || 'null')
-					} catch (e) {}
-					if (!guestIdentity || !guestIdentity.id) {
-						const rand = Math.random().toString(36).slice(2, 10).toUpperCase()
-						const ts = Date.now().toString(36).toUpperCase()
-						guestIdentity = {
-							id: `G_${ts}${rand}`,
-							name: `Guest_${Math.floor(Math.random() * 900000) + 100000}`
-						}
-						uni.setStorageSync('guest_cs_identity', JSON.stringify(guestIdentity))
-					}
-					params.push(`user_id=${guestIdentity.id}`)
-					params.push(`user_name=${encodeURIComponent(guestIdentity.name)}`)
-				}
-				params.push('website_name=mmbookies')
-
-				const url = `${baseUrl}?${params.join('&')}`
-				uni.navigateTo({
-					url: `/pages/webview/index?url=${encodeURIComponent(url)}`
-				})
-				this.hideContactModal()
 			},
 			copyToClipboard(text) {
 				uni.setClipboardData({

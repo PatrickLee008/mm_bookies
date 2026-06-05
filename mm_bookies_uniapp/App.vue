@@ -570,4 +570,7 @@
 			transform: translateY(0px);
 		}
 	}
+	.blank{
+		padding:10px;
+	}
 </style>

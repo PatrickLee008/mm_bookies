@@ -33,7 +33,7 @@
 		</view>
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;" @scroll="handle_scroll" :style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;" @scroll="handle_scroll" :style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 广告图区域 -->
 			<view class="ad-banner-wrapper">
 				<image class="ad-banner-image" src="/static/image/single/match_ad.png" mode="aspectFill"></image>
@@ -288,7 +288,7 @@
 					<!-- from tangjq--- 投注选项 -->
 					<view class="bet-choice-row">
 						<text class="choice-team">{{bet_content(match_ref.bet_match)}}</text>
-						<text class="choice-type">Home</text>
+						<text class="choice-type"></text>
 					</view>
 				</view>
 
@@ -319,13 +319,13 @@
 
 					<!-- Minimum Bet Amount -->
 					<view class="min-bet-text">
-						<text>Minimum Bet Amount : {{match_ref.mixed?mix_min:single_min}}</text>
+						<text>Minimum Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_min:single_min)}}Ks</text>
 					</view>
 
 					<!-- 快捷金额按钮 -->
 					<view class="quick-amount-btns">
 						<view class="quick-btn" :class="{'quick-btn-selected': amount == amt}" v-for="(amt,index) in amount_list" :key='index' @click="set_amount(amt)">
-							<text>{{amt}}</text>
+							<text>{{$toolbox.num_format(amt)}}</text>
 						</view>
 					</view>
 
@@ -738,7 +738,17 @@
 						// duration: 2000
 					});
 				}
-			}
+			},
+			// 监听系统配置变化，动态更新金额选择列表
+			configs: {
+				handler(val) {
+					if (val && (val.single_min || val.single_max)) {
+						this.amount_list = this.dynamicAmountList;
+					}
+				},
+				deep: true,
+				immediate: true
+			},
 		},
 		computed: {
 			// 计算实际支付金额（考虑优惠券折扣）
@@ -839,6 +849,38 @@
 					return `calc(100vh - 85px)`
 				}
 				return '100vh'
+			},
+			// 动态生成金额选择列表，基于系统配置的 min/max 限额
+			dynamicAmountList() {
+				let min = parseInt(this.configs.single_min) || 3000;
+				let max = parseInt(this.configs.single_max) || 10000;
+				if(this.match_ref.mixed){
+					min = parseInt(this.configs.mix_min) || 3000;
+					max = parseInt(this.configs.mix_max) || 10000;
+				}
+				const fixedList = [3000, 5000, 10000];
+			
+				if (!min || !max || min >= max) {
+					return fixedList;
+				}
+			
+				// 从固定列表中筛选出在 min 和 max 之间的值（不包括两端）
+				const middleValues = fixedList.filter((value) => value > min && value < max);
+			
+				// 从中间值中选择最多4个
+				let selectedMiddle = [];
+				if (middleValues.length <= 4) {
+					selectedMiddle = middleValues;
+				} else {
+					const step = middleValues.length / 4;
+					for (let i = 0; i < 4; i++) {
+						const index = Math.floor(i * step);
+						selectedMiddle.push(middleValues[index]);
+					}
+				}
+			
+				// 组合：[最小值, 中间值, 最大值]
+				return [min, ...selectedMiddle, max];
 			},
 		},
 		methods: {

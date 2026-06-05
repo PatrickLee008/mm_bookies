@@ -99,10 +99,10 @@
 				<text class="loading-text">{{$t('loading') || 'Loading...'}}</text>
 			</view>
 			
-			<!-- 没有更多 -->
-			<view v-if="!loading && hasMore === false && recordList.length > 0" class="no-more">
+			<!-- 没有更多 不需要提示-->
+			<!-- <view v-if="!loading && hasMore === false && recordList.length > 0" class="no-more">
 				<text>{{$t('no_more_data') || 'No more data'}}</text>
-			</view>
+			</view> -->
 		</scroll-view>
 	</view>
 </template>

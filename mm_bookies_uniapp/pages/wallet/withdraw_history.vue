@@ -66,11 +66,11 @@
 				<text class="cuIcon-loading2 load-icon rotating"></text>
 				<text class="loading-text">{{ $t('loading_dots') }}</text>
 			</view>
-
-			<!-- 没有更多 -->
-			<view v-if="!loading && hasMore === false && filterRecordList(recordList).length > 0" class="no-more">
+			<view class="blank"></view>
+			<!-- 没有更多 不需要提示-->
+			<!-- <view v-if="!loading && hasMore === false && filterRecordList(recordList).length > 0" class="no-more">
 				<text>{{ $t('no_more_data') }}</text>
-			</view>
+			</view> -->
 		</scroll-view>
 	</view>
 </template>
