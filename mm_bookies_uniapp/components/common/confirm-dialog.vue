@@ -10,11 +10,11 @@
 				<text class="confirm-dialog-message">{{ message }}</text>
 			</view>
 			<!-- 按钮区域 -->
-			<view class="confirm-dialog-buttons">
-				<view class="confirm-dialog-btn-cancel" @click="handleCancel">
+			<view class="confirm-dialog-buttons" :class="{'single-btn': !showCancel}">
+				<view class="confirm-dialog-btn-cancel" v-if="showCancel" @click="handleCancel">
 					<text class="btn-cancel-text">{{ cancelText }}</text>
 				</view>
-				<view class="confirm-dialog-btn-confirm" @click="handleConfirm">
+				<view class="confirm-dialog-btn-confirm" :class="{'btn-ok': !showCancel}" @click="handleConfirm">
 					<text class="btn-confirm-text">{{ confirmText }}</text>
 				</view>
 			</view>
@@ -45,6 +45,10 @@
 			cancelText: {
 				type: String,
 				default: 'Cancel'
+			},
+			showCancel: {
+				type: Boolean,
+				default: true
 			}
 		},
 		methods: {
@@ -141,5 +145,16 @@
 		font-size: 15px;
 		font-weight: 600;
 		color: #fff;
+	}
+
+	/* 单按钮模式（OK提示框） */
+	.confirm-dialog-buttons.single-btn {
+		justify-content: center;
+	}
+
+	.confirm-dialog-btn-confirm.btn-ok {
+		flex: 0 1 auto;
+		min-width: 120px;
+		background: #2F5D62;
 	}
 </style>

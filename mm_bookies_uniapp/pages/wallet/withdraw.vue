@@ -154,6 +154,15 @@
 		@confirm="confirmDeleteBank"
 		@cancel="showDeleteConfirm = false"
 	/>
+	<!-- 提现结果提示弹窗（单按钮OK模式） -->
+	<ConfirmDialog
+		:visible="showResultDialog"
+		:title="resultDialogTitle"
+		:message="resultDialogMessage"
+		:confirmText="$t('ok')"
+		:showCancel="false"
+		@confirm="showResultDialog = false"
+	/>
 	</view>
 
 </template>
@@ -186,6 +195,10 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				add_disable: true,
 				showDeleteConfirm: false,
 				deleteTargetBank: null,
+				// 提现结果弹窗
+				showResultDialog: false,
+				resultDialogTitle: '',
+				resultDialogMessage: '',
 			}
 		},
 		watch: {
@@ -306,11 +319,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				_this.$http.post('/withdraw/apply', para, (res) => {
 					uni.hideLoading()
 					if (res.statusCode == 200) {
-						uni.showModal({
-							title: `${_this.$t('Congratulations')}`,
-							content: `${_this.$t('Amount')} (${_this.amount}). ${_this.$t('withdraw_success')}`,
-							showCancel: false,
-						})
+						_this.resultDialogTitle = _this.$t('Congratulations')
+						_this.resultDialogMessage = `${_this.$t('Amount')}: ${_this.numberFormat(_this.amount)} Ks\n${_this.$t('withdraw_success')}`
+						_this.showResultDialog = true
 
 						// Update user balance in store
 						var userInfo = _this.$store.state.userInfo
@@ -331,12 +342,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 							tips = res.data.message;
 						}
 						_this.$nextTick(() => {
-							uni.showModal({
-								title: _this.$t('tips'),
-								content: tips,
-								showCancel: false,
-								confirmText: _this.$t('ok'),
-							});
+							_this.resultDialogTitle = _this.$t('tips')
+							_this.resultDialogMessage = tips
+							_this.showResultDialog = true
 						});
 					}
 				})
