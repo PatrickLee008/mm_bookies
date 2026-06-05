@@ -6,6 +6,7 @@ var siteinfo = {
 	"payUrl": "http://payapi.1x2mmm.net", //支付中心
 	"wsUrl": "ws://8.213.214.83:8082", //WebSocket服务器
 	"awcImgUrl": "https://tttuat.apihub55.com", //awc图片前缀
+	"liveChatLink":"https://chat.wellytalk.com/MDE5ZDA1MDItYzU3MC03YjYyLThkMGItMjQ4YTJjMjQ0ODkwfGQzZjQwNTg3NzExOTAzMjFmOWU4MWM4ZDZmMGM4ZDQ4YjAyNDg5ZjQyM2EyZjgyZjc2NmJmMjI2ZTdlM2MxMzA=",
 	version: 'v2.0.1'
 };
 

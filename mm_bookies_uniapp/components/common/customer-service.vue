@@ -67,6 +67,7 @@
 
 <script>
 	import DraggableButton from '@/components/common/draggable-button.vue'
+	import siteinfo from '@/siteinfo'
 
 	export default {
 		name: 'CustomerService',
@@ -98,8 +99,7 @@
 			},
 			// 生成客服链接
 			customerServiceUrl() {
-				const baseUrl =
-					'https://chat.wellytalk.com/MDE5ZDA1MDItYzU3MC03YjYyLThkMGItMjQ4YTJjMjQ0ODkwfGQzZjQwNTg3NzExOTAzMjFmOWU4MWM4ZDZmMGM4ZDQ4YjAyNDg5ZjQyM2EyZjgyZjc2NmJmMjI2ZTdlM2MxMzA='
+				const baseUrl = siteinfo.liveChatLink;
 				const params = []
 
 				if (this.isLogin) {
