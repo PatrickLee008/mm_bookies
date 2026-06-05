@@ -308,6 +308,16 @@
 		</view>
 		<!-- 客服按钮 -->
 		<customer-service></customer-service>
+
+		<!-- 密码修改结果提示弹窗 -->
+		<ConfirmDialog
+			:visible="showPwdResultDialog"
+			:title="pwdResultDialogTitle"
+			:message="pwdResultDialogMessage"
+			:confirmText="$t('ok')"
+			:showCancel="false"
+			@confirm="showPwdResultDialog = false"
+		/>
 	</view>
 </template>
 
@@ -316,10 +326,12 @@
 	import language from '../../utils/language.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import CustomerService from '@/components/common/customer-service.vue'
+	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	export default {
 		components: {
 			CustomerService,
+			ConfirmDialog,
 		},
 		name: "ucenter",
 		data() {
@@ -463,6 +475,10 @@
 				show_new_password: false,
 				show_confirm_password: false,
 				password_error_message: '',
+				// 密码修改结果弹窗
+				showPwdResultDialog: false,
+				pwdResultDialogTitle: '',
+				pwdResultDialogMessage: '',
 			}
 		},
 
@@ -1030,12 +1046,9 @@
 					// from tangjq--- 先关闭弹窗，再显示错误提示，避免被遮挡
 					this.hidePasswordChangeModal()
 					this.$nextTick(() => {
-						uni.showModal({
-							title: _this.$t('tips'),
-							content: _this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password',
-							showCancel: false,
-							confirmText: _this.$t('ok')
-						})
+						_this.pwdResultDialogTitle = _this.$t('tips')
+						_this.pwdResultDialogMessage = _this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password'
+						_this.showPwdResultDialog = true
 					})
 					return
 				}
@@ -1061,21 +1074,27 @@
 						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePasswordChangeModal()
 						_this.$nextTick(() => {
-							uni.showModal({
-								title: _this.$t('success_word'),
-								content: tips || _this.$t('password_changed_success'),
-								showCancel: false,
-								confirmText: _this.$t('ok')
-							})
+							_this.pwdResultDialogTitle = _this.$t('success_word')
+							_this.pwdResultDialogMessage = tips || _this.$t('password_changed_success')
+							_this.showPwdResultDialog = true
 						})
 					} else {
-						_this.password_error_message = tips || _this.$t('failed_change_password')
-						_this.old_password_error = true
+						// 服务器返回错误，关闭弹窗后显示失败提示
+						_this.hidePasswordChangeModal()
+						_this.$nextTick(() => {
+							_this.pwdResultDialogTitle = _this.$t('tips')
+							_this.pwdResultDialogMessage = tips || _this.$t('failed_change_password')
+							_this.showPwdResultDialog = true
+						})
 					}
 				}, (err) => {
 					uni.hideLoading()
-					_this.password_error_message = _this.$t('network_error')
-					_this.old_password_error = true
+					_this.hidePasswordChangeModal()
+					_this.$nextTick(() => {
+						_this.pwdResultDialogTitle = _this.$t('tips')
+						_this.pwdResultDialogMessage = _this.$t('network_error')
+						_this.showPwdResultDialog = true
+					})
 				})
 			},
 		},

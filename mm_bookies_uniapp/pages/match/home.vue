@@ -150,8 +150,8 @@
 
 							<!-- from tangjq--- 展开/收起按钮，仅当有超过2个投注选项时显示 -->
 							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2" @click.stop="toggle_match_expand(match)">
-								<!-- <text style="color: white; margin-right: 5px;">{{ match.expanded ? '收起' : '展开' }}</text> -->
-								<view :class="match.expanded ? 'cuIcon-fold' : 'cuIcon-unfold'"></view>
+								<text style="color: white; margin-right: 5px;">{{ match.expanded ? '' : 'More' }}</text>
+								<view :class="match.expanded ? 'cuIcon-fold' : ''"></view>
 							</view>
 						</view>
 					</view>
