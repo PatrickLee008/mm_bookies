@@ -262,7 +262,7 @@
 				<view class="single-match-info" v-if="!match_ref.mixed && match_ref.bet_match">
 					<!-- from tangjq--- 比赛时间 -->
 					<view class="match-time-row">
-						<text class="match-time">{{match_ref.bet_match.SLIP_DATE || ''}}</text>
+						<text class="match-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
 					</view>
 
 					<!-- from tangjq--- 队伍图标和名称 -->
