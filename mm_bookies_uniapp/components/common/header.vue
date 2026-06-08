@@ -300,7 +300,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		height: 70px;
+		min-height: 70px;
 	}
 
 	.user-avatar {
@@ -434,13 +434,12 @@
 		font-size: 14px;
 		font-weight: bold;
 		cursor: pointer;
-		min-width: 100px;
+		min-width: 120px;
 		text-align: center;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		width: 50%;
 		height: 40px;
 		border-radius: 4px;
 		font-size: 14px;
