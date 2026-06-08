@@ -274,7 +274,7 @@
 		right: 0;
 		width: 100%;
 		background-color: #2F5D62;
-		padding-bottom: 15px;
+		// padding-bottom: 15px;
 		z-index: 1000;
 		// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
