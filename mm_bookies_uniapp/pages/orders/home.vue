@@ -141,12 +141,12 @@
 								</view> -->
 								<view class="info-row">
 									<text class="label">{{$t('Type')}}</text>
-									<text class="value">{{item.show_order_type}}</text>
+									<text class="value">MixParlay</text>
 								</view>
-								<view class="info-row">
+								<!-- <view class="info-row">
 									<text class="label">{{$t('Bet')}}</text>
-									<text class="value">{{item.team_name}}</text>
-								</view>
+									<text class="value">{{item.ORDER_COUNT}}X1</text>
+								</view> -->
 								<view class="info-row">
 									<text class="label">{{$t('Odds')}}</text>
 									<text class="value">{{item.real_odds}}</text>
@@ -731,6 +731,9 @@
 					str = attr.odds;
 				} else {
 					str = "";
+				}
+				if(attr.IS_MIX==1){
+					str = Math.pow(2, attr.ORDER_COUNT);
 				}
 				return str;
 			},
