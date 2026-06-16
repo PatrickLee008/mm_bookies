@@ -980,7 +980,7 @@
 <style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 220px;
+		height: 210px;
 		width: 100%;
 		flex-shrink: 0;
 	}

@@ -1,5 +1,5 @@
 <template>
-	<view class="mybg-grey page" :style="{'height':calc_page_height,}">
+	<view class="match-page-container" >
 		<!-- from tangjq--- 使用新的统一header组件 -->
 		<zw-header></zw-header>
 
@@ -436,12 +436,14 @@
 <style>
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 220px;
+		height: 210px;
 		width: 100%;
+		background-color: #2F5D62;
 	}
 
 	/* Search Container */
 	.search-container {
+		    padding: 10px;
 		background-color: #f5f5f5;
 	}
 

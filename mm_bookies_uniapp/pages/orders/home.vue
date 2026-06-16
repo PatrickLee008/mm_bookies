@@ -38,8 +38,8 @@
 			</view>
 		</view>
 
-		<view class="padding-sm bg-white">
-			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
+		<view class="padding-lr-sm bg-white">
+			<view class="flex-row flex-wrap justify-start filter padding-sm" style="">
 				<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
@@ -54,7 +54,7 @@
 					<selector :option_list.sync="wallet_list" @click_option="click_option"></selector>
 				</view>
 				<view class="filter-row">
-					<view class="text mycolor-primary line-height-34px">Period:
+					<view class="text mycolor-primary line-height-28px">Period:
 						{{date_range[0].show}}{{' - '}}{{date_range[1].show}}
 					</view>
 				</view>
@@ -789,7 +789,7 @@
 <style scoped lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 220px;
+		height: 210px;
 		width: 100%;
 		flex-shrink: 0;
 	}

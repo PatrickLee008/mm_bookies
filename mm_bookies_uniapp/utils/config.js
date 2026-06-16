@@ -6,6 +6,9 @@ const config = {
 	update_time_cd_3d: 60,
 	//常年置顶的联赛
 	leagues: [
+		'WORLD CUP 2026 AFRICA QUALIFIERS',
+		'WORLD CUP 2026 ASIA QUALIFIERS',
+		'WORLD CUP 2026 (IN CANADA, MEXICO & USA)',
 		'UEFA CHAMPIONS LEAGUE',
 		'SPAIN PRIMERA DIVISION',
 		'SPAIN LA LIGA',

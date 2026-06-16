@@ -406,6 +406,7 @@
 		flex-direction: column;
 		align-items: stretch;
 		padding: 20px;
+		height: 125px;
 	}
 
 	.login-prompt-content {
@@ -477,6 +478,7 @@
 		transition: all 0.3s;
 		flex: 1;
 		min-width: 0;
+		height: 75px;
 	}
 
 	.nav-icon-item:active {
