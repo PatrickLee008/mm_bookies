@@ -25,6 +25,12 @@ import websocketManager from './utils/websocket.js'
 import messageStorage from './utils/message-storage.js'
 Vue.prototype.$websocket = websocketManager;
 Vue.prototype.$messageStorage = messageStorage;
+
+// 消息实时弹窗提醒
+import messageNotificationManager from './utils/message-notification-manager.js'
+uni.$messageNotification = messageNotificationManager;
+Vue.prototype.$messageNotification = messageNotificationManager;
+Vue.component('message-notification', () => import('@/components/message-notification/message-notification.vue'));
 import DateRangePicker from './components/common/date-range-picker.vue'
 Vue.component('date-range-picker',DateRangePicker)
 

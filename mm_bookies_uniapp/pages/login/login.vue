@@ -339,6 +339,9 @@
 							uni.setStorageSync('user_info', res.data.data);
 						}
 
+						// 通知 App 登录成功，立即建立 WebSocket 连接并刷新未读消息
+						uni.$emit('user:login');
+
 						// 登录成功后获取配置
 						const app = getApp()
 						if (app && app.getConfigs) {

@@ -1,88 +1,154 @@
 <template name="messageCenter">
 	<view class="bg-white full-page">
 		<zw-header></zw-header>
-		<scroll-view class="padding" scroll-y style="height: calc(100vh - 120px);">
-			<!-- 消息列表视图 -->
-			<view class="message-list-container">
-				<view class="flex-row justify-start align-center margin-bottom-sm">
-					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
-					<!-- 	<image src="/static/icon/messages.png" class="lblue2blue" style="height: 28px;" mode="heightFix">
-					</image> -->
-					<text class="title-text" style="">{{ $t('messages_title') }}</text>
-				</view>
-				<!-- 操作栏 -->
-				<view class="action-bar" v-if="messages.length > 0">
-					<view class="flex-row justify-between align-center">
-						<view class="message-stats">
-							<text class="stats-text">Total {{messages.length}} messages</text>
-							<text class="stats-text" v-if="unreadCount > 0"> · {{unreadCount}} unread</text>
-						</view>
-						<view class="action-buttons">
-							<text class="action-btn" @click="onRefresh">{{ $t('refresh') }}</text>
-							<text class="action-btn mark-read-btn" @click="markAllAsRead" v-if="hasUnreadMessages">{{ $t('mark_all_read') }}</text>
-							<text class="action-btn clear-btn" @click="clearAllMessages"
-								v-if="messages.length > 0">{{ $t('clear') }}</text>
-						</view>
+		<!-- header 占位，防止内容被固定头部遮挡 -->
+		<view class="header-placeholder"></view>
+
+		<!-- 页面头部 -->
+		<view class="page-header">
+			<view class="header-left">
+				<text class="cuIcon-back" @click="back_to()"></text>
+				<text class="header-title">{{ $t('messages_title') }}</text>
+			</view>
+			<view class="header-right" v-if="unreadCount > 0">
+				<text class="mark-all-read-btn" @click="markAllAsRead">
+					<text class="cuIcon-check"></text> {{ $t('mark_all_read') }}
+				</text>
+			</view>
+		</view>
+
+		<!-- 消息过滤标签 -->
+		<view class="filter-tabs">
+			<view class="tab-item" :class="{'active': activeTab === 'all'}" @click="switchTab('all')">
+				<text class="tab-text">{{ $t('msg_tab_all') }}</text>
+				<view class="tab-underline" v-if="activeTab === 'all'"></view>
+			</view>
+			<view class="tab-item" :class="{'active': activeTab === 'unread'}" @click="switchTab('unread')">
+				<text class="tab-text">{{ $t('msg_tab_unread') }}</text>
+				<view class="tab-badge" v-if="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</view>
+				<view class="tab-underline" v-if="activeTab === 'unread'"></view>
+			</view>
+			<view class="tab-item" :class="{'active': activeTab === 'read'}" @click="switchTab('read')">
+				<text class="tab-text">{{ $t('msg_tab_read') }}</text>
+				<view class="tab-underline" v-if="activeTab === 'read'"></view>
+			</view>
+		</view>
+
+		<!-- 加载状态 -->
+		<view class="loading-container" v-if="loading && !refreshing">
+			<view class="loading-spinner"></view>
+			<text class="loading-text">{{ $t('msg_loading') }}</text>
+		</view>
+
+		<!-- 下拉刷新容器 -->
+		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
+			@refresherrefresh="onRefresh" :style="{ height: scrollHeight }">
+
+			<!-- 消息列表 -->
+			<view class="message-list">
+				<view v-for="(message, index) in messages" :key="message.id || index"
+					class="message-card"
+					:class="{'unread-card': !message.read}"
+					@click="viewMessageDetails(message)">
+					<!-- 未读指示条 -->
+					<view class="unread-indicator" v-if="!message.read"></view>
+
+					<!-- 卡片头部 -->
+					<view class="card-header">
+						<text class="header-text">{{ getMessageSource(message) }}</text>
+						<text class="message-time">{{ formatMessageTime(message.timestamp) }}</text>
+					</view>
+
+					<!-- 卡片内容 -->
+					<view class="card-body">
+						<text class="message-title">{{ message.title }}</text>
+						<text class="message-description">{{ message.preview }}</text>
 					</view>
 				</view>
+			</view>
+			<!-- 空状态 -->
+			<view class="no-messages" v-if="messages.length === 0 && !loading">
+				<image src="/static/icon/messages.png" style="height: 80px; width: 80px; margin-bottom: 16px; opacity: 0.3;"
+					mode="aspectFit"></image>
+				<text class="no-messages-text">{{ $t('no_messages') }}</text>
+				<text class="no-messages-tip">{{ $t('realtime_msg_tip') }}</text>
+			</view>
+			<!-- 底部安全区域占位 -->
+			<view style="height: 30px; width: 100%;"></view>
+		</scroll-view>
 
-				<!-- 加载状态 -->
-				<view class="loading-container" v-if="loading && !refreshing">
-					<view class="loading-spinner"></view>
-					<text class="loading-text">{{ $t('loading_dots') }}</text>
+		<!-- 消息详情弹窗 -->
+		<view class="modal-overlay" v-if="showDetailModal" @click="closeModal">
+			<view class="modal-content" @click.stop>
+				<!-- 弹窗头部 -->
+				<view class="modal-header">
+					<text class="modal-title">{{ $t('msg_details') }}</text>
+					<text class="cuIcon-close" @click="closeModal"></text>
 				</view>
 
-				<!-- 下拉刷新容器 -->
-				<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true"
-					:refresher-triggered="refreshing" @refresherrefresh="onRefresh" style="height: 400px;">
+				<!-- 弹窗内容 -->
+				<scroll-view class="modal-body" scroll-y>
+					<view class="detail-section">
+						<text class="detail-label">{{ $t('msg_title_label') }}:</text>
+						<text class="detail-title-text">{{ selectedMessage.title }}</text>
+					</view>
+					<view class="detail-divider"></view>
 
-					<view class="message-list">
-						<view v-for="(message, index) in messages" :key="message.id || index"
-							class="message-item flex-row align-center" :class="{ 'unread': !message.read }"
-							@click="viewMessageDetails(message)">
+					<view class="detail-section">
+						<text class="detail-label">{{ $t('msg_content_label') }}:</text>
+						<text class="detail-content-text">{{ selectedMessage.content || $t('msg_no_content') }}</text>
+					</view>
+					<view class="detail-divider"></view>
 
-							<view class="message-icon">
-								<image :src="message.icon" style="height: 40px; width: 40px;" mode="aspectFit"></image>
-								<view class="unread-badge" v-if="!message.read"></view>
-							</view>
-
-							<view class="message-content flex-1">
-								<view class="flex-row justify-between">
-									<text class="message-title"
-										:class="{ 'unread-title': !message.read }">{{message.title}}</text>
-								</view>
-								<text class="message-preview">{{message.preview}}</text>
-								<view class="message-meta flex-row justify-between align-center">
-									<view class="flex-row align-center" v-if="message.type">
-										<text class="message-type">{{getTypeLabel(message.type)}}</text>
-									</view>
-									<view class="message-time-wrapper">
-										<text class="message-time">{{formatTime(message.timestamp)}}</text>
-									</view>
-								</view>
-							</view>
+					<view class="detail-section">
+						<view class="detail-item">
+							<text class="detail-label">{{ $t('msg_from') }}:</text>
+							<text class="detail-value">{{ selectedMessage.source || 'System' }}</text>
+						</view>
+						<view class="detail-item">
+							<text class="detail-label">{{ $t('msg_type_label') }}:</text>
+							<text class="detail-value">{{ getTypeLabel(selectedMessage.type) }}</text>
+						</view>
+						<view class="detail-item">
+							<text class="detail-label">{{ $t('msg_time_label') }}:</text>
+							<text class="detail-value">{{ formatFullTime(selectedMessage.timestamp) }}</text>
 						</view>
 					</view>
 				</scroll-view>
 
-				<!-- 空状态 -->
-				<view class="no-messages" v-if="messages.length === 0 && !loading">
-					<image src="/static/icon/messages.png"
-						style="height: 80px; width: 80px; margin-bottom: 16px; opacity: 0.3;" mode="aspectFit"></image>
-					<text class="no-messages-text">{{ $t('no_messages') }}</text>
-					<text class="no-messages-tip">{{ $t('realtime_msg_tip') }}</text>
+				<!-- 弹窗底部操作 -->
+				<view class="modal-footer">
+					<!-- 跳转按钮 - 根据target_type和target_url显示 -->
+					<view class="modal-btn primary-btn"
+						  @click="handleMessageJump"
+						  v-if="shouldShowJumpButton()">
+						<text class="btn-text">{{ $t('msg_view_details') }}</text>
+					</view>
+
+					<view class="modal-btn primary-btn" @click="markAsRead" v-if="!selectedMessage.read">
+						<text class="btn-text">{{ $t('msg_mark_as_read') }}</text>
+					</view>
+					<view class="modal-btn primary-btn" @click="closeModal" v-else>
+						<text class="btn-text">{{ $t('msg_close') }}</text>
+					</view>
 				</view>
 			</view>
-		</scroll-view>
+		</view>
 	</view>
 </template>
 
 <script>
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
+	import {
+		getMessageList,
+		getUnreadCount,
+		markAsRead as apiMarkAsRead,
+		markAllAsRead as apiMarkAllAsRead,
+		deleteMessage as apiDeleteMessage
+	} from '../../utils/api/message.js'
 
 	export default {
-		components: {},
 		name: "messageCenter",
 		data() {
 			return {
@@ -90,7 +156,14 @@
 				language: config.language,
 				messages: [],
 				loading: false,
-				refreshing: false
+				refreshing: false,
+				showDetailModal: false,
+				selectedMessage: {},
+				currentPage: 1,
+				pageSize: 20,
+				hasMore: true,
+				activeTab: 'all', // 当前激活的标签：all, unread, read
+				unreadCount: 0 // 未读消息数量
 			}
 		},
 
@@ -98,54 +171,78 @@
 			hasUnreadMessages() {
 				return this.messages.some(msg => !msg.read)
 			},
-			unreadCount() {
-				return this.messages.filter(msg => !msg.read).length
+			// 列表滚动区域高度：视口高度 - header占位(210) - 页头(约50) - 标签(约45)
+			scrollHeight() {
+				return 'calc(100vh - 305px)'
 			}
 		},
 
 		methods: {
-			// 加载消息列表
-			loadMessages() {
+			// 从后端API加载消息列表
+			async loadMessages() {
+				this.messages = [];
 				try {
 					this.loading = true
-					// console.log('[MessageList] Starting to load message list')
+					// 检查用户是否已登录
+					if (!this.isLogin) {
+						this.messages = []
+						return
+					}
 
-					// 从本地存储获取WebSocket消息
-					const websocketMessages = uni.getStorageSync('websocket_messages') || []
-					// console.log(`[MessageList] Retrieved ${websocketMessages.length} messages from storage`)
+					// 构建查询参数，根据当前激活的标签过滤
+					const params = {
+						current: this.currentPage,
+						size: this.pageSize
+					}
 
-					// 过滤掉SYSTEM类型的消息（双重保险，虽然存储时已过滤）
-					const filteredMessages = websocketMessages.filter(msg => {
-						const messageType = (msg.messageType || msg.type || '').toUpperCase()
-						return messageType !== 'SYSTEM'
-					})
-					// console.log(`[MessageList] ${filteredMessages.length} non-system messages after filtering`)
+					// 根据标签添加 isRead 过滤条件
+					if (this.activeTab === 'unread') {
+						params.isRead = 0 // 未读
+					} else if (this.activeTab === 'read') {
+						params.isRead = 1 // 已读
+					}
+					// activeTab === 'all' 时不传 isRead，获取全部消息
 
-					// 转换消息格式以适配UI
-					const formattedMessages = filteredMessages.map(msg => {
-						return {
-							id: msg.id || Date.now() + Math.random(),
-							title: msg.title || this.$t('push_message'),
-							preview: this.truncateContent(msg.content || msg.message || '', 50),
-							content: msg.content || msg.message || '',
-							timestamp: msg.timestamp || Date.now(),
-							read: msg.isRead || false,
-							icon: this.getMessageIcon(msg.type || 'notification'),
-							type: msg.type || 'notification',
-							originalMessage: msg
-						}
-					})
+					// 从后端API获取消息列表
+					const response = await getMessageList(params)
+					if (response && response.records) {
+						// 转换后端消息格式为前端显示格式
+						this.messages = response.records.map(msg => ({
+							id: msg.id,
+							messageId: msg.messageId,
+							title: msg.title,
+							preview: this.truncateContent(msg.content, 50),
+							content: msg.content,
+							timestamp: new Date(msg.createTime).getTime(),
+							read: msg.isRead === 1,
+							icon: this.getMessageIcon(msg.messageType || 'NOTIFICATION'),
+							type: msg.messageType || 'NOTIFICATION',
+							source: msg.source || 'SYSTEM',
+							targetUrl: msg.targetUrl,
+							targetType: msg.targetType,
+							priority: msg.priority,
+							createTime: msg.createTime,
+							updateTime: msg.updateTime,
+							originalMessage: msg // 保留原始数据
+						}))
 
-					// 按时间倒序排列（最新消息在前）
-					this.messages = formattedMessages.sort((a, b) => b.timestamp - a.timestamp)
-					// console.log(`[MessageList] Formatting completed, ${this.messages.length} messages total`)
+						// 按时间倒序排列
+						this.messages.sort((a, b) => b.timestamp - a.timestamp)
+					} else {
+						this.messages = []
+					}
+
+					// 更新未读消息数量（用于标签角标显示）
+					await this.updateUnreadCount()
 
 				} catch (error) {
-					console.error('[MessageList] Load messages failed:', error)
+					console.error('[MessageList] Failed to load messages from backend:', error)
 					uni.showToast({
 						title: this.$t('failed_load_messages'),
-						icon: 'none'
+						icon: 'none',
+						duration: 2000
 					})
+					this.messages = []
 				} finally {
 					this.loading = false
 					this.refreshing = false
@@ -169,202 +266,326 @@
 				return iconMap[type] || '/static/icon/messages.png'
 			},
 
-			// 查看消息详情
+			// 获取消息来源
+			getMessageSource(message) {
+				return message.source || 'System'
+			},
+
+			// 查看消息详情（弹窗）
 			viewMessageDetails(message) {
-				// console.log('[MessageList] Viewing message details:', message.title)
+				this.selectedMessage = message
+				this.showDetailModal = true
 
 				// 标记为已读
 				if (!message.read) {
 					message.read = true
-
-					// 更新本地存储中的已读状态
 					this.updateMessageReadStatus(message)
+				}
+			},
+
+			// 关闭弹窗
+			closeModal() {
+				this.showDetailModal = false
+				this.selectedMessage = {}
+			},
+
+			// 标记为已读
+			async markAsRead() {
+				if (this.selectedMessage && !this.selectedMessage.read) {
+					this.selectedMessage.read = true
+					await this.updateMessageReadStatus(this.selectedMessage)
+
+					uni.showToast({
+						title: this.$t('msg_marked_read'),
+						icon: 'success',
+						duration: 1500
+					})
+				}
+			},
+
+			// 判断是否应该显示跳转按钮
+			shouldShowJumpButton() {
+				const message = this.selectedMessage
+				if (!message) return false
+
+				// 只有当target_type不是NONE且target_url存在时才显示跳转按钮
+				return message.targetType &&
+					   message.targetType !== 'NONE' &&
+					   message.targetUrl &&
+					   message.targetUrl.trim() !== ''
+			},
+
+			// 处理消息跳转
+			handleMessageJump() {
+				const message = this.selectedMessage
+				if (!message || !message.targetType || !message.targetUrl) {
+					return
 				}
 
 				try {
-					// 构建消息数据用于传递
-					const messageData = {
-						id: message.id || message.originalMessage?.id,
-						messageId: message.originalMessage?.messageId || message.id,
-						title: message.title || this.$t('push_message'),
-						content: message.content || '',
-						timestamp: message.timestamp || Date.now(),
-						isRead: message.read || false,
-						type: message.type || 'notification',
-						source: message.originalMessage?.source || 'WEBSOCKET',
-						icon: message.icon || '/static/icon/messages.png'
-					}
+					switch (message.targetType) {
+						case 'PAGE':
+							this.handlePageJump(message.targetUrl)
+							break
 
-					// 跳转到消息详情页面
-					uni.navigateTo({
-						url: `/pages/ucenter/messageDetail?messageData=${encodeURIComponent(JSON.stringify(messageData))}`,
-						success: () => {
-							// Navigation successful
-						},
-						fail: (error) => {
-							console.error('[MessageList] Navigation failed:', error)
+						case 'EXTERNAL':
+							this.handleExternalJump(message.targetUrl)
+							break
+
+						case 'NONE':
+						default:
 							uni.showToast({
-								title: this.$t('page_nav_failed'),
+								title: this.$t('msg_no_action'),
 								icon: 'none'
 							})
-						}
-					})
+							break
+					}
 				} catch (error) {
-					console.error('[MessageList] Navigation error:', error)
 					uni.showToast({
-						title: this.$t('navigation_error'),
+						title: this.$t('msg_nav_failed'),
 						icon: 'none'
 					})
 				}
 			},
 
-			// 更新消息已读状态
-			updateMessageReadStatus(message) {
-				try {
-					const messages = uni.getStorageSync('websocket_messages') || []
-					const targetMessage = messages.find(m =>
-						(m.id && m.id === message.originalMessage?.id) ||
-						(m.timestamp === message.originalMessage?.timestamp)
-					)
-
-					if (targetMessage) {
-						targetMessage.isRead = true
-						uni.setStorageSync('websocket_messages', messages)
-						// console.log('[MessageList] Message read status updated')
-
-						// 通知其他组件消息状态已更新
-						uni.$emit('message:read')
+			// 处理页面内部跳转（mm_bookies 无 $toolbox.navigateToPage，使用 uni 原生跳转 + 回退）
+			handlePageJump(route) {
+				uni.navigateTo({
+					url: route,
+					success: () => {
+						this.closeModal()
+					},
+					fail: () => {
+						// navigateTo 失败回退 switchTab / redirectTo
+						uni.switchTab({
+							url: route,
+							success: () => {
+								this.closeModal()
+							},
+							fail: () => {
+								uni.redirectTo({
+									url: route,
+									success: () => { this.closeModal() },
+									fail: () => {
+										uni.showToast({ title: this.$t('msg_nav_failed'), icon: 'none' })
+									}
+								})
+							}
+						})
 					}
+				})
+			},
+
+			// 处理外部链接跳转
+			handleExternalJump(targetUrl) {
+				try {
+					// #ifdef APP-PLUS
+					plus.runtime.openURL(targetUrl)
+					this.closeModal()
+					// #endif
+
+					// #ifdef H5
+					window.open(targetUrl, '_blank')
+					this.closeModal()
+					// #endif
 				} catch (error) {
-					console.error('[MessageList] Update message read status failed:', error)
+					uni.showToast({
+						title: this.$t('msg_nav_failed'),
+						icon: 'none'
+					})
 				}
 			},
 
-			// 主页面返回（和invite/index一样的实现）
+			// 删除消息（onex2 中此入口默认隐藏，保留实现以备启用）
+			deleteMessage() {
+				uni.showModal({
+					title: this.$t('confirm_clear'),
+					content: this.$t('confirm_clear_content'),
+					confirmText: this.$t('clear'),
+					success: async (res) => {
+						if (!res.confirm) return
+						try {
+							if (!this.isLogin || !this.selectedMessage.id) {
+								return
+							}
+
+							// 调用后端API删除消息
+							await apiDeleteMessage(this.selectedMessage.id)
+
+							// 从UI列表中移除
+							const index = this.messages.findIndex(m => m.id === this.selectedMessage.id)
+							if (index !== -1) {
+								this.messages.splice(index, 1)
+							}
+
+							this.closeModal()
+
+							// 通知其他组件消息已更新
+							uni.$emit('message:update')
+							uni.$emit('message:unreadUpdate', null)
+
+							this.updateUnreadCount()
+
+							uni.showToast({
+								title: this.$t('all_messages_cleared'),
+								icon: 'success'
+							})
+						} catch (error) {
+							uni.showToast({
+								title: this.$t('clear_failed'),
+								icon: 'none'
+							})
+						}
+					}
+				})
+			},
+
+			// 更新消息已读状态（调用后端API）
+			async updateMessageReadStatus(message) {
+				try {
+					if (!this.isLogin || !message.id) {
+						return
+					}
+
+					// 调用后端API标记消息为已读
+					await apiMarkAsRead(message.id)
+
+					// 触发全局事件，通知其他组件更新角标
+					uni.$emit('message:read')
+					uni.$emit('message:unreadUpdate', null)
+
+					// 更新本页未读数
+					this.updateUnreadCount()
+
+				} catch (error) {
+					console.error('[MessageList] Failed to mark message as read:', error)
+					uni.showToast({
+						title: this.$t('msg_failed_mark'),
+						icon: 'none',
+						duration: 2000
+					})
+				}
+			},
+
+			// 返回上一页
 			back_to() {
 				uni.navigateBack({
 					delta: 1
 				})
 			},
 
-			// 标记所有消息为已读
-			markAllAsRead() {
-				// console.log('[MessageList] Marking all messages as read')
+			// 切换标签
+			switchTab(tab) {
+				if (this.activeTab === tab) return // 避免重复点击
 
+				this.activeTab = tab
+				this.currentPage = 1 // 重置页码
+				this.loadMessages() // 重新加载消息
+			},
+
+			// 更新未读消息数量
+			async updateUnreadCount() {
 				try {
-					// 更新UI中的消息状态
-					this.messages.forEach(msg => {
-						msg.read = true
-					})
+					if (!this.isLogin) {
+						this.unreadCount = 0
+						return
+					}
 
-					// 更新本地存储中的所有非SYSTEM消息状态
-					const messages = uni.getStorageSync('websocket_messages') || []
-					messages.forEach(msg => {
-						// 只标记非SYSTEM消息为已读
-						if (msg.messageType !== 'SYSTEM') {
-							msg.isRead = true
-						}
-					})
-					uni.setStorageSync('websocket_messages', messages)
+					// 从后端API获取未读消息数
+					const count = await getUnreadCount()
+					this.unreadCount = count || 0
 
-					// 通知其他组件消息状态已更新
-					uni.$emit('message:read')
-
-					uni.showToast({
-						title: this.$t('all_marked_read'),
-						icon: 'success'
-					})
+					// 同步应用角标
+					// #ifdef APP-PLUS
+					plus.runtime.setBadgeNumber(this.unreadCount)
+					// #endif
 
 				} catch (error) {
-					console.error('[MessageList] Mark all messages as read failed:', error)
-					uni.showToast({
-						title: this.$t('operation_failed'),
-						icon: 'none'
-					})
+					this.unreadCount = 0
 				}
+			},
+
+			// 标记全部消息为已读
+			async markAllAsRead() {
+				if (!this.isLogin || this.unreadCount === 0) {
+					return
+				}
+
+				// 确认对话框（mm_bookies 无 $notice，使用 uni.showModal）
+				uni.showModal({
+					title: this.$t('mark_all_read'),
+					content: this.$t('msg_mark_all_confirm', { n: this.unreadCount }),
+					success: async (res) => {
+						if (!res.confirm) return
+
+						uni.showLoading({
+							title: this.$t('msg_processing'),
+							mask: true
+						})
+
+						try {
+							// 调用后端API标记全部为已读
+							await apiMarkAllAsRead()
+
+							// 刷新消息列表和未读数
+							await this.loadMessages()
+
+							// 触发全局事件，通知其他组件更新
+							uni.$emit('message:read')
+							uni.$emit('message:unreadUpdate', null)
+
+							uni.hideLoading()
+							uni.showToast({
+								title: this.$t('all_marked_read'),
+								icon: 'success',
+								duration: 2000
+							})
+						} catch (error) {
+							uni.hideLoading()
+							uni.showToast({
+								title: this.$t('msg_failed_mark'),
+								icon: 'none',
+								duration: 2000
+							})
+						}
+					}
+				})
 			},
 
 			// 下拉刷新
 			onRefresh() {
-				// console.log('[MessageList] Starting to refresh message list')
 				this.refreshing = true
-				this.loadMessages()
-			},
-
-			// 清空所有消息
-			clearAllMessages() {
-				uni.showModal({
-					title: this.$t('confirm_clear'),
-					content: this.$t('confirm_clear_content'),
-					success: (res) => {
-						if (res.confirm) {
-							try {
-								// 清空本地存储中的非SYSTEM消息，保留SYSTEM消息
-								const messages = uni.getStorageSync('websocket_messages') || []
-								const systemMessages = messages.filter(msg => msg.messageType === 'SYSTEM')
-								uni.setStorageSync('websocket_messages', systemMessages)
-
-								// 清空UI
-								this.messages = []
-								// 通知其他组件消息已更新
-								uni.$emit('message:update')
-
-								uni.showToast({
-									title: this.$t('all_messages_cleared'),
-									icon: 'success'
-								})
-								// console.log('[MessageList] All messages cleared')
-							} catch (error) {
-								console.error('[MessageList] Clear messages failed:', error)
-								uni.showToast({
-									title: this.$t('clear_failed'),
-									icon: 'none'
-								})
-							}
-						}
-					}
-				})
+				setTimeout(() => {
+					this.loadMessages()
+				}, 300)
 			},
 
 			// 设置消息监听器
 			setupMessageListeners() {
 				const _this = this
 
-				// 监听新消息
-				uni.$on('websocket:messageSaved', (message) => {
-					// console.log('[MessageList] New message notification received, refreshing list')
+				// 收到实时推送消息时，重新从后端API加载完整列表
+				uni.$on('websocket:messageSaved', () => {
 					_this.loadMessages()
 				})
 
-				// 监听消息更新
+				// 监听消息更新（已读、删除等操作）
 				uni.$on('message:update', () => {
-					// console.log('[MessageList] Message update notification received, refreshing list')
 					_this.loadMessages()
+				})
+
+				// 监听未读数更新
+				uni.$on('message:unreadUpdate', () => {
+					_this.updateUnreadCount()
 				})
 			},
 
-			// 格式化时间
-			formatTime(timestamp) {
-				const date = new Date(timestamp);
-				const now = new Date();
-				const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+			// 格式化完整时间
+			formatFullTime(timestamp) {
+				if (!timestamp) return 'N/A'
 
-				if (diffInDays === 0) {
-					// 今天，显示时分
-					return `${this.padZero(date.getHours())}:${this.padZero(date.getMinutes())}`;
-				} else if (diffInDays === 1) {
-					return this.language.yesterday;
-				} else if (diffInDays < 7) {
-					// 一周内，显示星期几
-					const weekdays = [this.language.sunday, this.language.monday, this.language.tuesday,
-						this.language.wednesday, this.language.thursday, this.language.friday,
-						this.language.saturday
-					];
-					return weekdays[date.getDay()];
-				} else {
-					// 超过一周，显示月日
-					return `${date.getMonth() + 1}/${date.getDate()}`;
-				}
+				const date = new Date(timestamp);
+				return `${date.getFullYear()}/${this.padZero(date.getMonth() + 1)}/${this.padZero(date.getDate())} ${this.padZero(date.getHours())}:${this.padZero(date.getMinutes())}`;
 			},
 
 			// 补零函数
@@ -380,12 +601,30 @@
 					order: 'Order',
 					promotion: 'Promotion'
 				}
-				return typeMap[type] || this.$t('push_message')
+				return typeMap[(type || '').toLowerCase()] || this.$t('push_message')
+			},
+
+			// 格式化消息时间（列表显示）
+			formatMessageTime(timestamp) {
+				if (!timestamp) return ''
+
+				const now = Date.now()
+				const diff = now - timestamp
+				const minutes = Math.floor(diff / 60000)
+				const hours = Math.floor(diff / 3600000)
+				const days = Math.floor(diff / 86400000)
+
+				if (minutes < 1) return this.$t('msg_just_now')
+				if (minutes < 60) return this.$t('msg_min_ago', { n: minutes })
+				if (hours < 24) return this.$t('msg_hour_ago', { n: hours })
+				if (days < 7) return this.$t('msg_day_ago', { n: days })
+
+				const date = new Date(timestamp)
+				return `${date.getMonth() + 1}/${date.getDate()} ${this.padZero(date.getHours())}:${this.padZero(date.getMinutes())}`
 			}
 		},
 
 		created() {
-			// console.log('[MessageList] Component created, starting initialization')
 			// 加载消息列表
 			this.loadMessages()
 			// 设置消息监听器
@@ -396,142 +635,270 @@
 		beforeDestroy() {
 			uni.$off('websocket:messageSaved')
 			uni.$off('message:update')
+			uni.$off('message:unreadUpdate')
 		}
 	}
 </script>
 
-<style lang="scss">
-	.message-list-container {
-		padding: 0;
+<style lang="scss" scoped>
+	.full-page {
+		min-height: 100vh;
+		background-color: #E1E1E1;
 	}
 
-	.title-bar {
-		padding: 16px 0;
-		border-bottom: 1px solid #EDEDED;
-		margin-bottom: 16px;
+	/* header 占位 */
+	.header-placeholder {
+		height: 210px;
+		width: 100%;
+		background-color: #2F5D62;
 	}
 
-	.title-text {
-		font-size: 18px;
+	.page-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 12px 10px;
 		font-weight: bold;
-		margin-left: 8px;
+		color: #2F5D62;
+		background-color: white;
 	}
 
-	.mark-all-read {
-		color: #007AFF;
+	.header-left {
+		display: flex;
+		align-items: center;
+	}
+
+	.header-right {
+		display: flex;
+		align-items: center;
+	}
+
+	.cuIcon-back {
+		font-size: 16px;
+		margin-right: 5px;
+	}
+
+	.header-title {
+		font-weight: 600;
+		font-size: 15px;
+		line-height: 22px;
+		letter-spacing: 0.5px;
+	}
+
+	.mark-all-read-btn {
+		display: flex;
+		align-items: center;
+		font-weight: 500;
+		font-size: 13px;
+		color: #2F5D62;
+		padding: 6px 12px;
+		background: #E8F0FE;
+		border-radius: 6px;
+
+		.cuIcon-check {
+			font-size: 14px;
+			margin-right: 4px;
+		}
+
+		&:active {
+			opacity: 0.7;
+			transform: scale(0.98);
+		}
+	}
+
+	/* 消息过滤标签 */
+	.filter-tabs {
+		display: flex;
+		background-color: white;
+		padding: 0 20px;
+		border-top: 1px solid #E5E7EB;
+		border-bottom: 1px solid #E5E7EB;
+		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+	}
+
+	.tab-item {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 0;
+		position: relative;
+
+		&:active {
+			opacity: 0.7;
+		}
+	}
+
+	.tab-text {
+		font-weight: 500;
 		font-size: 14px;
+		color: #8B8891;
+
+		.tab-item.active & {
+			color: #2F5D62;
+			font-weight: 700;
+		}
+	}
+
+	.tab-underline {
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 40px;
+		height: 3px;
+		background: #2F5D62;
+		border-radius: 2px 2px 0 0;
+		animation: slideIn 0.2s ease-out;
+	}
+
+	@keyframes slideIn {
+		from {
+			width: 0;
+		}
+
+		to {
+			width: 40px;
+		}
+	}
+
+	.tab-badge {
+		position: absolute;
+		top: 8px;
+		right: calc(50% - 35px);
+		background: #E52626;
+		color: white;
+		font-size: 10px;
+		font-weight: 600;
+		padding: 1px 5px;
+		border-radius: 10px;
+		min-width: 16px;
+		text-align: center;
+		line-height: 1.4;
+	}
+
+	.message-scroll {
+		background-color: #E1E1E1;
 	}
 
 	.message-list {
 		display: flex;
 		flex-direction: column;
+		gap: 12px;
+		padding: 12px 14px;
 	}
 
-	.message-item {
-		padding: 12px 0;
-		border-bottom: 1px solid #F5F5F5;
-		transition: background-color 0.2s;
+	.message-card {
+		background: #FFFFFF;
+		border-radius: 12px;
+		overflow: visible;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		transition: all 0.3s ease;
+		position: relative;
 
-		&:last-child {
-			border-bottom: none;
+		&.unread-card {
+			background: linear-gradient(135deg, #E8F0FE 0%, #F5F9FF 50%, #FFFFFF 100%);
+			box-shadow: 0 2px 16px rgba(47, 93, 98, 0.25);
+			border: 1px solid rgba(47, 93, 98, 0.1);
+
+			.card-header {
+				background: #2F5D62;
+				font-weight: 700;
+			}
+
+			.message-title {
+				font-weight: 700;
+				color: #2F5D62;
+			}
+
+			.message-description {
+				color: #4B5563;
+				font-weight: 500;
+			}
 		}
 
 		&:active {
-			background-color: #F5F5F5;
-		}
-
-		&.unread {
-			background-color: #FFF8E6;
+			transform: translateY(-2px) scale(0.98);
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 		}
 	}
 
-	.message-icon {
-		position: relative;
-		margin-right: 12px;
-	}
-
-	.unread-badge {
+	.unread-indicator {
 		position: absolute;
-		top: -2px;
-		right: -2px;
-		width: 10px;
-		height: 10px;
-		border-radius: 50%;
-		background-color: #FF3B30;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 6px;
+		background: #5FB5BD;
+		border-radius: 12px 0 0 12px;
+		animation: pulse 2s ease-in-out infinite;
+		box-shadow: 2px 0 8px rgba(95, 181, 189, 0.5);
 	}
 
-	.message-content {
-		overflow: hidden;
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+			width: 6px;
+		}
+		50% {
+			opacity: 0.9;
+			width: 8px;
+		}
 	}
 
-	.message-title {
-		font-size: 16px;
-		color: #333333;
-		font-weight: 500;
+	.card-header {
+		background: #2F5D62;
+		padding: 8px 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+		border-start-start-radius: 8px;
+		border-start-end-radius: 8px;
+	}
+
+	.header-text {
+		color: #FFFFFF;
+		font-size: 11px;
+		font-weight: 600;
+		opacity: 0.9;
+		letter-spacing: 0.3px;
 	}
 
 	.message-time {
-		font-size: 12px;
-		color: #999999;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 10px;
+		font-weight: 500;
 	}
 
-	.message-preview {
-		font-size: 14px;
-		color: #666666;
-		white-space: nowrap;
+	.card-body {
+		padding: 12px 16px;
+		background: transparent;
+	}
+
+	.message-title {
+		font-weight: 600;
+		font-size: 13px;
+		line-height: 1.4;
+		color: #2F5D62;
+		display: block;
+		margin-bottom: 6px;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		margin-top: 4px;
-		display: block;
+		white-space: nowrap;
 	}
 
-	.no-messages {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 60px 0;
-		color: #999999;
-		font-size: 16px;
-	}
-
-
-	/* 新增样式 */
-	.action-bar {
-		padding: 12px 10px;
-		background-color: #F8F9FA;
-		border-bottom: 1px solid #EDEDED;
-		margin-bottom: 8px;
-		border-radius: 5px;
-		box-shadow: 0px 1px 1px 0px #00000040;
-
-	}
-
-	.message-stats .stats-text {
+	.message-description {
+		font-weight: 400;
 		font-size: 12px;
-		color: #666666;
-	}
-
-	.action-buttons .action-btn {
-		font-size: 14px;
-		color: #007AFF;
-		margin-left: 16px;
-		padding: 4px 8px;
-		border-radius: 4px;
-		background-color: transparent;
-		transition: background-color 0.2s;
-	}
-
-	.action-buttons .action-btn:active {
-		background-color: rgba(0, 122, 255, 0.1);
-	}
-
-	.mark-read-btn {
-		color: #34C759 !important;
-	}
-
-	.clear-btn {
-		color: #FF3B30 !important;
+		line-height: 1.5;
+		color: #6B7280;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.loading-container {
@@ -540,13 +907,14 @@
 		align-items: center;
 		justify-content: center;
 		padding: 40px 0;
+		background-color: #E1E1E1;
 	}
 
 	.loading-spinner {
 		width: 20px;
 		height: 20px;
 		border: 2px solid #EDEDED;
-		border-top: 2px solid #007AFF;
+		border-top: 2px solid #2F5D62;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 8px;
@@ -567,26 +935,13 @@
 		color: #999999;
 	}
 
-	.message-scroll {
-		flex: 1;
-	}
-
-	.unread-title {
-		font-weight: bold;
-		color: #333333;
-	}
-
-	.message-meta {
-		margin-top: 4px;
-	}
-
-	.message-type {
-		font-size: 11px;
-		color: #007AFF;
-		background-color: rgba(0, 122, 255, 0.1);
-		padding: 2px 6px;
-		border-radius: 8px;
-		margin-right: 8px;
+	.no-messages {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 60px 0;
+		color: #999999;
 	}
 
 	.no-messages-text {
@@ -598,12 +953,149 @@
 	.no-messages-tip {
 		font-size: 14px;
 		color: #999999;
+		text-align: center;
 	}
 
-	.title-text {
+	/* 弹窗样式 */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 9999;
+		padding: 20px;
+	}
+
+	.modal-content {
+		background: #FFFFFF;
+		border-radius: 16px;
+		width: 100%;
+		max-width: 500px;
+		max-height: 80vh;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.modal-header {
+		padding: 10px 20px;
+		border-bottom: 1px solid #E5E7EB;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.modal-title {
 		font-size: 18px;
-		font-weight: bold;
-		color: #333333;
-		margin-left: 8px;
+		font-weight: 600;
+		color: #1F2937;
+	}
+
+	.cuIcon-close {
+		font-size: 24px;
+		color: #6B7280;
+	}
+
+	.modal-body {
+		flex: 1;
+		padding: 20px;
+		overflow-y: auto;
+	}
+
+	.detail-section {
+		margin-bottom: 20px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.detail-item {
+		display: flex;
+		justify-content: space-between;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.detail-label {
+		font-size: 14px;
+		font-weight: 600;
+		color: #6B7280;
+		display: block;
+	}
+
+	.detail-value {
+		font-size: 12px;
+		color: #1F2937;
+		text-align: right;
+	}
+
+	.detail-title-text {
+		font-size: 16px;
+		font-weight: 600;
+		color: #2F5D62;
+		line-height: 1.5;
+		display: block;
+		margin-top: 8px;
+	}
+
+	.detail-content-text {
+		font-size: 15px;
+		color: #2F5D62;
+		line-height: 1.6;
+		display: block;
+		margin-top: 8px;
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+
+	.detail-divider {
+		height: 1px;
+		background: #E5E7EB;
+		margin: 16px 0;
+	}
+
+	.modal-footer {
+		padding: 16px 20px;
+		border-top: 1px solid #E5E7EB;
+		display: flex;
+		gap: 12px;
+	}
+
+	.modal-btn {
+		flex: 1;
+		padding: 8px 16px;
+		border-radius: 8px;
+		text-align: center;
+		transition: all 0.2s;
+
+		&:active {
+			transform: scale(0.98);
+		}
+	}
+
+	.primary-btn {
+		background: #2F5D62;
+
+		.btn-text {
+			color: #FFFFFF;
+			font-weight: 600;
+			font-size: 14px;
+		}
+
+		&:active {
+			background: #244a4e;
+		}
+	}
+
+	.btn-text {
+		display: block;
 	}
 </style>

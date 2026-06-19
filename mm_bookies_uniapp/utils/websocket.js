@@ -15,6 +15,8 @@ class WebSocketManager {
     this.heartbeatTimer = null
     this.heartbeatInterval = 30000
     this.userId = null
+    this.token = null
+    this.isConnecting = false
     this.messageHandlers = []
     this.connectionStartTime = null
   }
@@ -26,34 +28,45 @@ class WebSocketManager {
    */
   connect(userId, token) {
     if (this.isConnected) {
+      console.log('[WebSocket] 已连接，跳过重复连接, userId:', this.userId)
+      return
+    }
+
+    if (this.isConnecting) {
+      console.log('[WebSocket] 正在连接中，跳过重复连接')
       return
     }
 
     if (!userId) {
-      // console.error('[WebSocket] User ID is required')
+      console.warn('[WebSocket] userId 为空，无法连接（请检查登录状态/用户信息）')
       return
     }
 
     this.userId = userId
-    this.url = `${siteinfo.wsUrl}/ws/push/${userId}?token=${token || ''}`
-    
-     // console.log(`[WebSocket] Connecting user: ${userId}`)
+    this.token = token || uni.getStorageSync('Authorization') || ''
+    this.isConnecting = true
+    const encodedToken = encodeURIComponent(this.token)
+    this.url = `${siteinfo.wsUrl}/ws/push/${userId}?token=${encodedToken}`
+
+    console.log('[WebSocket] 开始连接:', this.url)
 
     try {
       this.socketTask = uni.connectSocket({
         url: this.url,
         success: () => {
-          // Connection request sent successfully
+          console.log('[WebSocket] connectSocket 请求已发送')
         },
         fail: (err) => {
-          // console.error('[WebSocket] Connection request failed:', err)
+          console.error('[WebSocket] connectSocket 请求失败:', err)
+          this.isConnecting = false
           this.handleReconnect()
         }
       })
 
       this.setupEventListeners()
     } catch (error) {
-      // console.error('[WebSocket] Connection exception:', error)
+      console.error('[WebSocket] 连接异常:', error)
+      this.isConnecting = false
       this.handleReconnect()
     }
   }
@@ -66,12 +79,13 @@ class WebSocketManager {
 
     // 连接打开事件
     this.socketTask.onOpen((res) => {
-      // console.log('[WebSocket] Connection opened for user:', this.userId)
+      console.log('[WebSocket] ✅ 连接已建立, userId:', this.userId)
       this.isConnected = true
+      this.isConnecting = false
       this.reconnectCount = 0
       this.connectionStartTime = Date.now()
       this.startHeartbeat()
-      
+
       // 通知连接成功
       uni.$emit('websocket:connected', { userId: this.userId })
       this.triggerHandlers('connected', res)
@@ -79,20 +93,22 @@ class WebSocketManager {
 
     // 接收消息事件
     this.socketTask.onMessage((res) => {
+      console.log('[WebSocket] 📩 收到消息:', res.data)
       this.handleMessage(res.data)
     })
 
     // 连接关闭事件
     this.socketTask.onClose((res) => {
-      // console.log('[WebSocket] Connection closed:', res)
+      console.log('[WebSocket] 🔌 连接关闭, code:', res && res.code, res)
       this.isConnected = false
+      this.isConnecting = false
       this.connectionStartTime = null
       this.stopHeartbeat()
-      
+
       // 通知连接关闭
       uni.$emit('websocket:disconnected', res)
       this.triggerHandlers('disconnected', res)
-      
+
       // 非主动关闭时重连
       if (res.code !== 1000 && res.code !== 1001) {
         this.handleReconnect()
@@ -101,14 +117,15 @@ class WebSocketManager {
 
     // 连接错误事件
     this.socketTask.onError((res) => {
-      // console.error('[WebSocket] Connection error:', res)
+      console.error('[WebSocket] ❌ 连接错误:', res)
       this.isConnected = false
+      this.isConnecting = false
       this.connectionStartTime = null
-      
+
       // 通知连接错误
       uni.$emit('websocket:error', res)
       this.triggerHandlers('error', res)
-      
+
       this.handleReconnect()
     })
   }
@@ -120,22 +137,25 @@ class WebSocketManager {
   handleMessage(data) {
     try {
       const message = typeof data === 'string' ? JSON.parse(data) : data
-      
+
       // 处理心跳响应
       if (message.type === 'heartbeat' || message.title === 'Heartbeat') {
+        console.log('[WebSocket] 心跳响应')
         return
       }
-      
+
+      console.log('[WebSocket] 解析消息:', { type: message.type, title: message.title })
+
       // 处理Java后端消息格式
       if (message.title && message.content) {
         this.processServerMessage(message)
       }
-      
+
       // 触发消息处理器
       this.triggerHandlers('message', message)
-      
+
     } catch (error) {
-      // console.error('[WebSocket] Message parsing failed:', error)
+      console.error('[WebSocket] 消息解析失败:', error, data)
     }
   }
 
@@ -180,10 +200,14 @@ class WebSocketManager {
       messageType = 'NOTIFICATION'
     }
     
+    // 提取跳转信息（供弹窗 View Detail 使用），兼容顶层与 payload 两种位置
+    const targetType = message.targetType || message.target_type || actualPayload?.targetType || actualPayload?.target_type
+    const targetUrl = message.targetUrl || message.target_url || actualPayload?.targetUrl || actualPayload?.target_url
+
     // 构建标准化消息对象
     const standardMessage = {
       id: this.generateMessageId(),
-      messageId: actualPayload?.messageId || this.generateMessageId(),
+      messageId: actualPayload?.messageId || actualPayload?.id || this.generateMessageId(),
       userId: this.userId,
       title,
       content,
@@ -194,7 +218,9 @@ class WebSocketManager {
       isRead: false,
       receivedAt: Date.now(),
       deviceToken: this.getDeviceInfo().deviceId,
-      source: 'JAVA_BACKEND',
+      source: (actualPayload && actualPayload.source) || 'JAVA_BACKEND',
+      targetType: targetType,
+      targetUrl: targetUrl,
       status: 1 // 已推送
     }
     
@@ -272,19 +298,24 @@ class WebSocketManager {
    * @param {Object} message 消息对象
    */
   showNotification(message) {
-    // console.log('[WebSocket] Showing notification:', message.title)
-    
-    // 先显示Toast提示
+    // 更新应用角标
+    this.updateBadge()
+
+    // 优先使用全局消息弹窗组件展示（与 onex2 一致）
+    if (uni.$messageNotification && typeof uni.$messageNotification.show === 'function') {
+      console.log('[WebSocket] 触发消息弹窗:', message.title)
+      uni.$messageNotification.show([message])
+      return
+    }
+    console.warn('[WebSocket] 消息弹窗管理器不可用，回退 Toast/Modal')
+
+    // 兜底：弹窗管理器不可用时，退回 Toast + Modal
     uni.showToast({
       title: message.title || 'New message',
       icon: 'none',
       duration: 3000
     })
 
-    // 更新应用角标
-    this.updateBadge()
-    
-    // 如果有内容，延迟显示Modal弹窗，让用户看到详细信息
     if (message.content && message.content.trim()) {
       setTimeout(() => {
         uni.showModal({
@@ -295,14 +326,12 @@ class WebSocketManager {
           confirmText: 'View detail',
           success: (res) => {
             if (res.confirm) {
-              // 用户选择查看详情，可以跳转到消息页面
               this.navigateToMessagePage(message)
             }
-            // 无论如何都标记为已读
             this.markMessageAsRead(message.messageId)
           }
         })
-      }, 1500) // 延迟1.5秒显示，让Toast先显示完
+      }, 1500)
     }
   }
 
@@ -542,21 +571,18 @@ class WebSocketManager {
    */
   handleReconnect() {
     if (this.reconnectCount >= this.maxReconnectCount) {
-      // console.log('[WebSocket] Max reconnection attempts reached, stopping')
-      // uni.showToast({
-      //   title: 'Network connection failed',
-      //   icon: 'none'
-      // })
+      console.warn('[WebSocket] 已达最大重连次数，停止重连')
       return
     }
 
     this.reconnectCount++
-    // console.log(`[WebSocket] Reconnecting attempt ${this.reconnectCount}...`)
+    console.log(`[WebSocket] 第 ${this.reconnectCount} 次重连...`)
 
     this.reconnectTimer = setTimeout(() => {
       if (this.userId) {
-        const websocketToken = uni.getStorageSync('websocketToken') || ''
-        this.connect(this.userId, websocketToken)
+        // 使用登录态 token（Authorization）重连，而非已废弃的 websocketToken
+        const token = this.token || uni.getStorageSync('Authorization') || ''
+        this.connect(this.userId, token)
       }
     }, this.reconnectInterval)
   }
@@ -582,6 +608,7 @@ class WebSocketManager {
    */
   cleanup() {
     this.isConnected = false
+    this.isConnecting = false
     this.connectionStartTime = null
     this.userId = null
     this.stopHeartbeat()
@@ -670,6 +697,7 @@ class WebSocketManager {
   getStatus() {
     return {
       isConnected: this.isConnected,
+      isConnecting: this.isConnecting,
       userId: this.userId,
       reconnectCount: this.reconnectCount,
       connectionDuration: this.connectionStartTime ? Date.now() - this.connectionStartTime : 0

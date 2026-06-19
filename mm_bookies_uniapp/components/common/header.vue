@@ -21,9 +21,17 @@
 							<text class="id-label">{{ $t('my_id') }} : </text>
 							<text class="id-value">{{userInfo.id || ''}}</text>
 						</view>
-						<!-- 设置按钮 -->
-						<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
-							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+						<!-- 右侧操作区：消息铃铛 + 设置 -->
+						<view class="header-actions">
+							<!-- 消息铃铛入口：有未读时变红并摇动 -->
+							<view class="bell-btn" @click="goMessage">
+								<text class="cuIcon-notificationfill bell-icon" :class="{ 'bell-ring': unreadMessageCount > 0 }"></text>
+								<view class="bell-badge" v-if="unreadMessageCount > 0">{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}</view>
+							</view>
+							<!-- 设置按钮 -->
+							<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+							</view>
 						</view>
 					</view>
 					<view class="user-balance-row">
@@ -117,6 +125,7 @@
 	import {
 		mapGetters
 	} from 'vuex';
+	import { getUnreadCount } from '@/utils/api/message.js'
 
 	export default {
 		components: {},
@@ -224,25 +233,33 @@
 				})
 			},
 
-			// 更新未读消息数量
-			updateUnreadMessageCount() {
-				try {
-					const messages = uni.getStorageSync('websocket_messages') || []
-					this.unreadMessageCount = messages
-						.filter(m => m.messageType !== 'SYSTEM')
-						.filter(m => !m.isRead)
-						.length
-				} catch (error) {
-					console.error('[Header] 获取未读消息数量失败:', error)
-					this.unreadMessageCount = 0
+			// 跳转到消息中心
+			goMessage() {
+				if (!this.isLogin) {
+					uni.reLaunch({ url: '/pages/login/login' })
+					return
 				}
+				uni.navigateTo({ url: '/pages/ucenter/message' })
+			},
+
+			// 更新未读消息数量（改为从后端接口获取）
+			updateUnreadMessageCount() {
+				if (!uni.getStorageSync('Authorization')) {
+					this.unreadMessageCount = 0
+					return
+				}
+				getUnreadCount().then((count) => {
+					this.unreadMessageCount = count || 0
+				}).catch(() => {
+					this.unreadMessageCount = 0
+				})
 			},
 
 			// 设置WebSocket消息监听器
 			setupWebSocketMessageListener() {
 				const _this = this
 
-				uni.$on('websocket:messageSaved', (message) => {
+				uni.$on('websocket:messageSaved', () => {
 					_this.updateUnreadMessageCount()
 				})
 
@@ -253,6 +270,11 @@
 				uni.$on('message:update', () => {
 					_this.updateUnreadMessageCount()
 				})
+
+				// 弹窗组件/消息页标记已读后触发，重新拉取未读数
+				uni.$on('message:unreadUpdate', () => {
+					_this.updateUnreadMessageCount()
+				})
 			}
 		},
 
@@ -261,6 +283,7 @@
 			uni.$off('websocket:messageSaved')
 			uni.$off('message:read')
 			uni.$off('message:update')
+			uni.$off('message:unreadUpdate')
 		}
 	}
 </script>
@@ -399,6 +422,66 @@
 	.settings-icon {
 		width: 24px;
 		height: 24px;
+	}
+
+	/* 右侧操作区：铃铛 + 设置 */
+	.header-actions {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+
+	/* 消息铃铛 */
+	.bell-btn {
+		position: relative;
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.bell-icon {
+		font-size: 22px;
+		color: #2F5D62;
+		transform-origin: top center;
+	}
+
+	/* 有未读消息：变红 + 摇动 */
+	.bell-ring {
+		color: #FF4444;
+		animation: bellRing 1s ease-in-out infinite;
+	}
+
+	@keyframes bellRing {
+		0% { transform: rotate(0); }
+		15% { transform: rotate(16deg); }
+		30% { transform: rotate(-14deg); }
+		45% { transform: rotate(11deg); }
+		60% { transform: rotate(-8deg); }
+		75% { transform: rotate(4deg); }
+		100% { transform: rotate(0); }
+	}
+
+	/* 铃铛未读数角标 */
+	.bell-badge {
+		position: absolute;
+		top: -2px;
+		right: -2px;
+		min-width: 16px;
+		height: 16px;
+		padding: 0 4px;
+		border-radius: 8px;
+		background-color: #FF4444;
+		color: #ffffff;
+		font-size: 10px;
+		font-weight: bold;
+		line-height: 16px;
+		text-align: center;
+		border: 1px solid #ffffff;
 	}
 
 	/* from tangjq--- 未登录状态卡片 */

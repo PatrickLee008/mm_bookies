@@ -32,28 +32,28 @@
 		methods: {
 			// WebSocket 相关方法
 			initWebSocket() {
-				 //console.log('[App] Initializing WebSocket connection')
-				
+				console.log('[App] 初始化 WebSocket 连接...')
+
 				// 检查登录状态，只要有token就尝试连接
 				const token = uni.getStorageSync('Authorization')
-				
+
 				if (token) {
 					// 从store获取真实用户ID
 					const userId = this.getUserIdFromStore()
 					if (userId) {
-						// console.log(`[App] Starting WebSocket connection, User ID: ${userId}`)
+						console.log('[App] 开始连接 WebSocket, userId:', userId)
 						websocketManager.connect(userId, token)
 					} else {
-						// console.log('[App] User info not found, skipping WebSocket connection')
+						console.warn('[App] 未找到用户ID，跳过 WebSocket 连接（用户信息可能尚未加载）')
 					}
-					
+
 					// 注册全局消息监听器
 					this.setupWebSocketListeners()
 				} else {
-					// console.log('[App] Token not found, skipping WebSocket connection')
+					console.log('[App] 未登录（无 token），跳过 WebSocket 连接')
 				}
 			},
-			
+
 			// 从store获取用户ID
 			getUserIdFromStore() {
 				try {
@@ -61,18 +61,32 @@
 					if (userInfo && userInfo.id) {
 						return userInfo.id
 					}
-					
+
 					// 如果store中没有，尝试从本地存储获取
-					const storedUserInfo = uni.getStorageSync('userInfo')
+					// 注意：登录与 store 均保存到 'user_info'（带下划线），优先读取它
+					const storedUserInfo = uni.getStorageSync('user_info') || uni.getStorageSync('userInfo')
 					if (storedUserInfo && storedUserInfo.id) {
 						return storedUserInfo.id
 					}
-					
+
 					return null
 				} catch (error) {
-					console.error('[App] Get user ID failed:', error)
+					console.error('[App] 获取用户ID失败:', error)
 					return null
 				}
+			},
+
+			// 监听登录事件：登录成功后立即建立连接并刷新未读数
+			setupLoginListener() {
+				uni.$on('user:login', () => {
+					console.log('[App] 收到登录事件，准备建立 WebSocket 连接')
+					// 延迟一点等待 token / user_info 写入完成
+					setTimeout(() => {
+						this.initWebSocket()
+						// 通知 header 等刷新未读数
+						uni.$emit('message:unreadUpdate', null)
+					}, 1000)
+				})
 			},
 			
 			setupWebSocketListeners() {
@@ -108,14 +122,17 @@
 			
 			checkWebSocketConnection() {
 				const token = uni.getStorageSync('Authorization')
-				
+
 				if (token) {
 					const status = websocketManager.getStatus()
-					if (!status.isConnected) {
-						// console.log('[App] WebSocket not connected, attempting reconnection')
+					console.log('[App] 检查 WebSocket 连接状态:', status)
+					if (!status.isConnected && !status.isConnecting) {
 						const userId = this.getUserIdFromStore()
 						if (userId) {
+							console.log('[App] WebSocket 未连接，尝试重连, userId:', userId)
 							websocketManager.connect(userId, token)
+						} else {
+							console.warn('[App] 重连时未找到 userId')
 						}
 					}
 				}
@@ -264,6 +281,9 @@
 
 			_this.handleLaunchParams(option)
 
+			// 注册登录事件监听，登录后立即连接 WebSocket
+			_this.setupLoginListener()
+
 			// 读取用户已存的语种偏好；首次启动无偏好时默认缅甸语（不跟随系统语言）
 			var lang = uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm';
 			let langs = ['cn', 'en', 'mm', 'th']
@@ -400,9 +420,12 @@
 			
 			// 刷新配置信息
 			this.getConfigs()
-			
+
 			// 检查并恢复WebSocket连接
 			this.checkWebSocketConnection()
+
+			// 回到前台时刷新未读消息数（角标/铃铛）
+			uni.$emit('message:unreadUpdate', null)
 		},
 		onHide: function() {
 			// console.log('[App] App Hide - Application entered background')
@@ -417,6 +440,7 @@
 			// 清理WebSocket连接和监听器
 			websocketManager.close()
 			this.cleanupWebSocketListeners()
+			uni.$off('user:login')
 		}
 
 	}

@@ -3,6 +3,9 @@
 		<!-- from tangjq--- 使用新的统一header组件 -->
 		<zw-header></zw-header>
 
+		<!-- 实时消息弹窗提醒（全局挂载点） -->
+		<message-notification></message-notification>
+
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"></view>
 
