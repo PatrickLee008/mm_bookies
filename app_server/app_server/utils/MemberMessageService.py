@@ -98,7 +98,7 @@ class MemberMessageService:
         """
         title = 'Deposit Submitted'
         content = (
-            f'Your deposit request of {amount:.2f} MMK has been submitted successfully.\n'
+            f'Your deposit request of {amount:,.2f} MMK has been submitted successfully.\n'
             f'Order ID: {order_id}\n'
             f'Please wait for approval.'
         )
@@ -126,7 +126,7 @@ class MemberMessageService:
         """
         title = 'Withdrawal Submitted'
         content = (
-            f'Your withdrawal request of {amount:.2f} MMK has been submitted successfully.\n'
+            f'Your withdrawal request of {amount:,.2f} MMK has been submitted successfully.\n'
             f'Order ID: {order_id}\n'
             f'Please wait for processing.'
         )
@@ -239,7 +239,7 @@ class MemberMessageService:
         """
         title = 'Bet Placed Successfully'
         content = (
-            f'Your bet of {amount:.2f} MMK has been placed successfully.\n'
+            f'Your bet of {amount:,.2f} MMK has been placed successfully.\n'
             f'Order ID: {order_id}'
         )
         return MemberMessageService.send_to_member(
