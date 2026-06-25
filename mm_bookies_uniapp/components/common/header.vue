@@ -25,7 +25,7 @@
 						<view class="header-actions">
 							<!-- 消息铃铛入口：有未读时变红并摇动 -->
 							<view class="bell-btn" @click="goMessage">
-								<text class="cuIcon-notificationfill bell-icon" :class="{ 'bell-ring': unreadMessageCount > 0 }"></text>
+								<text class="cuIcon-noticefill bell-icon" :class="{ 'bell-ring': unreadMessageCount > 0 }"></text>
 								<view class="bell-badge" v-if="unreadMessageCount > 0">{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}</view>
 							</view>
 							<!-- 设置按钮 -->

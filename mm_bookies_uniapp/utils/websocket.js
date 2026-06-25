@@ -136,15 +136,21 @@ class WebSocketManager {
    */
   handleMessage(data) {
     try {
-      const message = typeof data === 'string' ? JSON.parse(data) : data
+      const raw = typeof data === 'string' ? JSON.parse(data) : data
 
       // 处理心跳响应
-      if (message.type === 'heartbeat' || message.title === 'Heartbeat') {
+      if (raw.type === 'heartbeat' || raw.title === 'Heartbeat') {
         console.log('[WebSocket] 心跳响应')
         return
       }
 
-      console.log('[WebSocket] 解析消息:', { type: message.type, title: message.title })
+      // 解包外层 envelope：服务端推送格式为 { type: 'message', data: {...实际消息...}, timestamp }
+      // 真正的 title/content/messageType 等字段位于 data 内部，需先取出再处理
+      const message = (raw.data && typeof raw.data === 'object' && (raw.data.title || raw.data.content))
+        ? raw.data
+        : raw
+
+      console.log('[WebSocket] 解析消息:', { type: raw.type, title: message.title })
 
       // 处理Java后端消息格式
       if (message.title && message.content) {
@@ -164,7 +170,7 @@ class WebSocketManager {
    * @param {Object} message 服务器消息 
    */
   processServerMessage(message) {
-    const { title, content, payload, data, timestamp, type, action } = message
+    const { title, content, payload, data, timestamp, type, action,source } = message
     
     // 处理payload数据，优先使用data字段（广播消息），然后使用payload字段
     const actualPayload = data || payload
@@ -218,7 +224,7 @@ class WebSocketManager {
       isRead: false,
       receivedAt: Date.now(),
       deviceToken: this.getDeviceInfo().deviceId,
-      source: (actualPayload && actualPayload.source) || 'JAVA_BACKEND',
+      source: source || (actualPayload && actualPayload.source) || 'System',
       targetType: targetType,
       targetUrl: targetUrl,
       status: 1 // 已推送

@@ -229,25 +229,12 @@ export default {
 			// 标记当前消息为已读
 			this.markCurrentAsRead()
 
+			const FALLBACK_URL = '/pages/ucenter/message'
+
 			// 根据 targetType 进行不同的跳转处理
 			if (message.targetType === 'PAGE' && message.targetUrl) {
-				// 内部页面跳转
-				try {
-					uni.navigateTo({
-						url: message.targetUrl,
-						fail: () => {
-							// navigateTo 失败回退到 switchTab / redirectTo
-							uni.switchTab({
-								url: message.targetUrl,
-								fail: () => {
-									uni.redirectTo({ url: message.targetUrl })
-								}
-							})
-						}
-					})
-				} catch (error) {
-					uni.showToast({ title: this.$t('msg_nav_failed'), icon: 'none' })
-				}
+				// 内部页面跳转：检查目标页面是否存在，不存在则统一跳转到消息中心
+				this.navigateToTargetPage(message.targetUrl, FALLBACK_URL)
 			} else if (message.targetType === 'EXTERNAL' && message.targetUrl) {
 				// 外部链接跳转
 				try {
@@ -263,13 +250,33 @@ export default {
 				}
 			} else {
 				// 默认跳转到消息中心
-				uni.navigateTo({ url: '/pages/ucenter/message' })
+				uni.navigateTo({ url: FALLBACK_URL })
 			}
 
 			this.$emit('viewDetail', message)
 
 			// 关闭通知
 			this.hide()
+		},
+
+		// 跳转到目标页面（带页面存在性检查与兜底）
+		navigateToTargetPage(url, fallbackUrl = '/pages/ucenter/message') {
+			// 目标页面明确不存在时，直接跳转到消息中心
+			if (this.$toolbox.page_exists(url) === false) {
+				console.warn('[MessageNotification] 目标页面不存在，跳转到消息中心:', url)
+				uni.navigateTo({ url: fallbackUrl })
+				return
+			}
+
+			// 页面存在或无法确定时：尝试跳转，失败再兜底到消息中心
+			uni.navigateTo({
+				url,
+				fail: (err) => {
+					console.warn('[MessageNotification] 目标页面跳转失败，跳转到消息中心:', url, err)
+					if (url === fallbackUrl) return
+					uni.navigateTo({ url: fallbackUrl })
+				}
+			})
 		},
 
 		// Swiper滑动事件

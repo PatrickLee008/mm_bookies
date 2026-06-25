@@ -359,6 +359,57 @@ export const toolbox = {
 
 		return currencySymbol + integerPart + decimalPart;
 	},
+	/**
+	 * 获取应用已注册的页面路径集合（兼容 H5 / App）
+	 * 读取 uni-app 运行时路由表，无法获取时返回空 Set
+	 * @returns {Set<String>} 形如 "pages/ucenter/message" 的路径集合（无前导斜杠、无参数）
+	 */
+	get_registered_pages() {
+		const pages = new Set();
+		const add = (p) => {
+			if (!p) return;
+			const path = String(p).replace(/^\//, '').split('?')[0].split('#')[0];
+			if (path) pages.add(path);
+		};
+		try {
+			// H5：vue-router 路由表
+			// eslint-disable-next-line no-undef
+			if (typeof __uniRoutes !== 'undefined' && Array.isArray(__uniRoutes)) {
+				// eslint-disable-next-line no-undef
+				__uniRoutes.forEach(r => {
+					if (!r) return;
+					add(r.path);
+					if (r.meta && r.meta.pagePath) add(r.meta.pagePath);
+				});
+			}
+		} catch (e) {}
+		try {
+			// App / 通用：__uniConfig.pages
+			// eslint-disable-next-line no-undef
+			if (typeof __uniConfig !== 'undefined' && __uniConfig && __uniConfig.pages) {
+				const cfg_pages = __uniConfig.pages;
+				if (Array.isArray(cfg_pages)) {
+					cfg_pages.forEach(p => add(typeof p === 'string' ? p : (p && p.path)));
+				} else {
+					Object.keys(cfg_pages).forEach(add);
+				}
+			}
+		} catch (e) {}
+		return pages;
+	},
+	/**
+	 * 检查页面（路由）是否已注册存在
+	 * @param {String} url 页面路径，可带参数，如 "/pages/index/wallet?id=1"
+	 * @returns {Boolean|null} true=存在，false=不存在，null=无法确定（路由表不可用）
+	 */
+	page_exists(url) {
+		if (!url) return false;
+		const path = String(url).replace(/^\//, '').split('?')[0].split('#')[0];
+		if (!path) return false;
+		const pages = this.get_registered_pages();
+		if (!pages || pages.size === 0) return null;
+		return pages.has(path);
+	},
 }
 
 export default toolbox;
