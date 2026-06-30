@@ -250,7 +250,7 @@
 							//支付成功
 							uni.showModal({
 								title: that.$t('tips'),
-								content: that.$t('pay_completed_back_home'),
+								content: that.$t('pay_completed'),
 								showCancel: false,
 								confirmText: that.$t('back_home_btn'),
 								success: function(res) {

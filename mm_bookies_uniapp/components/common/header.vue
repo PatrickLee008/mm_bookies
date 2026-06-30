@@ -51,7 +51,7 @@
 			</view>
 
 			<!-- from tangjq--- 未登录状态 -->
-			<view class="user-info-card login-prompt-card" v-if="!isLogin">
+			<view class="user-info-card login-prompt-card" v-else>
 				<view class="login-prompt-content">
 					<text class="login-prompt-text">{{ $t('please_login') }}</text>
 					<view class="login-buttons">
@@ -143,6 +143,7 @@
 				mounted: false,
 				unreadMessageCount: 0, // 未读消息数量
 				activeNav: '', // from tangjq--- 当前激活的导航项
+				headerHeight: 0, // 组件实际高度
 			}
 		},
 		computed: {
@@ -157,9 +158,15 @@
 			this.updateActiveNav();
 			this.updateUnreadMessageCount();
 			this.setupWebSocketMessageListener();
+			this.$nextTick(() => {
+				this.calculateHeaderHeight();
+			});
 		},
 		activated() {
 			this.updateActiveNav();
+			this.$nextTick(() => {
+				this.calculateHeaderHeight();
+			});
 		},
 		watch: {
 			// from tangjq--- 监听active prop变化
@@ -204,9 +211,22 @@
 							_this.$store.dispatch('saveUserInfo', res.data.data);
 							_this.userInfo = res.data.data
 							this.mounted = true
+							this.$nextTick(() => {
+								this.calculateHeaderHeight();
+							});
 						}
 					})
 				}
+			},
+
+			calculateHeaderHeight() {
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.new-header-wrapper').boundingClientRect((rect) => {
+					if (rect && rect.height) {
+						this.headerHeight = rect.height;
+						this.$emit('headerHeightChange', rect.height);
+					}
+				}).exec();
 			},
 
 			goto(url, limit_click) {

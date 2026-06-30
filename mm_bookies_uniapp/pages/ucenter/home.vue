@@ -1,9 +1,9 @@
 <template name="ucenter">
 	<view class="bg-white full-page">
-		<zw-header @doSomething=""></zw-header>
+		<zw-header @doSomething="" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<scroll-view scroll-y>
 			<!-- <view class="title-bar">
@@ -343,6 +343,7 @@
 				picker: '',
 				contact2: '',
 				contact: [],
+				headerHeight: 210, // 默认占位高度，等待 header 组件计算后更新
 				bar_list: [
 					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
@@ -493,6 +494,9 @@
 		},
 
 		methods: {
+			onHeaderHeightChange(height) {
+				this.headerHeight = height;
+			},
 			// from tangjq--- 输入时清除密码错误信息
 			clearPasswordErrors() {
 				this.old_password_error = false
@@ -1111,9 +1115,8 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- header占位元素样式 */
+	/* from tangjq--- header占位元素样式 - 高度由动态计算控制 */
 	.header-placeholder {
-		height: 210px;
 		width: 100%;
 		background-color: #2F5D62;
 	}
