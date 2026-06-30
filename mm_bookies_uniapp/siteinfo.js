@@ -19,7 +19,7 @@ if (process.env.NODE_ENV == 'development') {
 	siteinfo.payUrl = "http://payapi.1x2mmm.net";
 } else {
 	//测试环境
-
+	siteinfo.payUrl = "http://payapi.1x2mmm.net";
 }
 
 module.exports = siteinfo;

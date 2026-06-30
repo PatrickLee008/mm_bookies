@@ -5,7 +5,7 @@
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"></view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 250px);">
+		<scroll-view scroll-y>
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -48,7 +48,7 @@
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">{{ $t('my_id') }} : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
+						<text class="profile-info-label">{{ $t('my_phone') }} : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
 					<!-- Phone No -->
@@ -1118,6 +1118,12 @@
 		background-color: #2F5D62;
 	}
 
+	.main-scroll-view {
+		flex: 1;
+		height: 0;
+		background: #fff;
+	}
+	
 	.ucenter-page {
 		background: #2F5D62;
 		min-height: 100vh;

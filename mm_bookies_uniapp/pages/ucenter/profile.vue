@@ -18,7 +18,7 @@
 
 				<!-- My ID -->
 				<view class="info-row">
-					<text class="info-label">{{ $t('my_id') }} : {{ userInfo.id || '00001' }}</text>
+					<text class="info-label">{{ $t('my_phone') }} : {{ userInfo.id || '00001' }}</text>
 				</view>
 
 				<!-- Phone No -->

@@ -18,8 +18,8 @@
 				<view class="user-details">
 					<view class="user-id">
 						<view class="user-id-info">
-							<text class="id-label">{{ $t('my_id') }} : </text>
-							<text class="id-value">{{userInfo.id || ''}}</text>
+							<text class="id-label">{{ $t('my_phone') }} : </text>
+							<text class="id-value">{{userInfo.phone || ''}}</text>
 						</view>
 						<!-- 右侧操作区：消息铃铛 + 设置 -->
 						<view class="header-actions">
