@@ -207,24 +207,14 @@
 			},
 
 			toggleFilterOption(option) {
-				if (option.value === 'all') {
-					const newCheckedState = !option.checked;
-					this.filterOptions.forEach(opt => {
-						opt.checked = newCheckedState;
-					});
-				} else {
-					option.checked = !option.checked;
+				// 单选逻辑：点击任意项时仅选中该项，其余（含 All）全部取消，
+				// 避免 All 与具体筛选项同时选中导致 getFilterParams 短路、过滤失效
+				this.filterOptions.forEach(opt => {
+					opt.checked = opt.value === option.value;
+				});
 
-					const otherOptions = this.filterOptions.filter(opt => opt.value !== 'all');
-					const allOthersChecked = otherOptions.every(opt => opt.checked);
-					const allOthersUnchecked = otherOptions.every(opt => !opt.checked);
-
-					const allOption = this.filterOptions.find(opt => opt.value === 'all');
-					if (allOthersChecked || allOthersUnchecked) {
-						allOption.checked = allOthersChecked;
-					}
-				}
-
+				// 关闭下拉框并重新加载列表
+				this.filterExpanded = false;
 				this.page = 1;
 				this.hasMore = true;
 				this.recordList = [];

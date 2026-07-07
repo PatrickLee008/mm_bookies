@@ -26,63 +26,36 @@
 
 			<!-- 记录项 -->
 			<view v-for="(item, index) in filterRecordList(recordList)" :key="index" class="record-item">
-				<view class="record-header">
-					<view class="flex-row justify-between align-center">
-						<view class="flex-row1 align-center">
-							<image :src="`/static/icon/register/${item.mb_bank_code || 'KBZ Pay'}.png`"
-								mode="aspectFit" class="bank-icon"></image>
-							<view class="flex-column1 margin-left-sm">
-								<text class="bank-name">{{item.mb_bank_code || 'KBZ Pay'}}</text>
-								<text class="order-id">{{item.id}}</text>
-							</view>
-						</view>
-						<view class="flex-column1 align-end">
-							<text class="amount-text" :class="getAmountClass(item.status)">
-								{{item.status === 'Success' ? '+' : ''}}{{numberFormat(item.money)}} Ks
-							</text>
-							<text class="status-text" :class="getStatusClass(item.status)">
-								{{getStatusText(item.status)}}
-							</text>
-						</view>
+				<!-- 订单信息区 -->
+				<view class="record-body">
+					<!-- Order ID + 时间 -->
+					<view class="record-row">
+						<text class="order-id-label">Order ID : {{formatOrderId(item.id)}}</text>
+						<text class="record-date">{{formatTime(item.create_time)}}</text>
+					</view>
+					<!-- 支付渠道 -->
+					<view class="record-row">
+						<text class="row-label">{{$t('pay_channel') || 'Payment Channel'}} :</text>
+						<text class="row-value">{{formatPayChannel(item.pay_channel)}}</text>
+					</view>
+					<!-- 交易金额 -->
+					<view class="record-row">
+						<text class="row-label">{{$t('trans_amount') || 'Transaction Amount'}} :</text>
+						<text class="row-value amount-value">{{numberFormat(item.money)}} MMK</text>
+					</view>
+					<!-- 失败原因（失败时显示） -->
+					<view class="record-row" v-if="item.fail_reason && item.status=='Failed'">
+						<text class="row-label">{{$t('fail_reason') || 'Fail Reason'}} :</text>
+						<text class="row-value fail-reason">{{getFailReason(item.fail_reason)}}</text>
 					</view>
 				</view>
 
-				<view class="record-content">
-					<view class="info-row">
-						<text class="label">{{$t('create_time') || 'Create Time'}}:</text>
-						<text class="value">{{formatTime(item.create_time)}}</text>
-					</view>
-					<view class="info-row" v-if="item.pay_channel">
-						<text class="label">{{$t('pay_channel') || 'Pay Channel'}}:</text>
-						<text class="value">{{formatPayChannel(item.pay_channel)}}</text>
-					</view>
-					<view class="info-row" v-if="item.out_trade_no">
-						<text class="label">{{$t('trade_no') || 'Trade No'}}:</text>
-						<text class="value">{{item.out_trade_no}}</text>
-					</view>
-					<view class="info-row" v-if="item.mb_acc_name">
-						<text class="label">{{$t('payer_name') || 'Payer Name'}}:</text>
-						<text class="value">{{item.mb_acc_name}}</text>
-					</view>
-					<view class="info-row" v-if="item.mb_acc_number">
-						<text class="label">{{$t('payer_account') || 'Payer Account'}}:</text>
-						<text class="value">{{item.mb_acc_number}}</text>
-					</view>
-					<view class="info-row" v-if="item.receive_account_name">
-						<text class="label">{{$t('receiver_name') || 'Receiver Name'}}:</text>
-						<text class="value">{{item.receive_account_name}}</text>
-					</view>
-					<view class="info-row" v-if="item.receive_account">
-						<text class="label">{{$t('receiver_account') || 'Receiver Account'}}:</text>
-						<text class="value">{{item.receive_account}}</text>
-					</view>
-					<view class="info-row" v-if="item.fail_reason && item.status=='Failed'">
-						<text class="label">{{$t('fail_reason') || 'Fail Reason'}}:</text>
-						<text class="value fail-reason">{{getFailReason(item.fail_reason)}}</text>
-					</view>
+				<!-- 底部状态条 -->
+				<view class="status-bar" :class="getStatusClass(item.status)">
+					<text class="status-bar-text">{{getStatusText(item.status)}}</text>
 				</view>
 
-				<!-- 操作按钮 -->
+				<!-- 操作按钮（Pending 可继续支付） -->
 				<view class="record-actions" v-if="canContinuePayment(item)">
 					<view class="continue-btn" @click="continuePayment(item)">
 						<text class="cuIcon-play myfont-14px margin-right-xs"></text>
@@ -126,8 +99,6 @@
 				filterExpanded: false,
 				filterOptions: [
 					{ label: 'filter_all', value: 'all', checked: true },
-					{ label: 'filter_transfer', value: 'NFM2', type: 'channel', checked: false },
-					{ label: 'filter_qr_pay', value: 'TCPay', type: 'channel', checked: false },
 					{ label: 'filter_pending', value: 'Pending', type: 'status', checked: false },
 					{ label: 'filter_success', value: 'Success', type: 'status', checked: false },
 					{ label: 'filter_timeout', value: 'Timeout', type: 'status', checked: false },
@@ -204,10 +175,24 @@
 				}
 			},
 
+			// 格式化时间：dd/mm/yyyy HH:MM
 			formatTime(time) {
 				if (!time) return '';
-				const date = typeof time === 'string' ? new Date(time) : time;
-				return dateFormatUtils.formatTime(date);
+				const date = typeof time === 'string' ? new Date(time) : new Date(time);
+				if (isNaN(date.getTime())) return '';
+				const pad = (n) => (n < 10 ? '0' + n : '' + n);
+				const dd = pad(date.getDate());
+				const mm = pad(date.getMonth() + 1);
+				const yyyy = date.getFullYear();
+				const hh = pad(date.getHours());
+				const min = pad(date.getMinutes());
+				return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+			},
+
+			// Order ID 仅显示后 10 位
+			formatOrderId(id) {
+				if (id === null || id === undefined) return '';
+				return String(id).slice(-10);
 			},
 
 			numberFormat(number) {
@@ -290,24 +275,14 @@
 			},
 
 			toggleFilterOption(option) {
-				if (option.value === 'all') {
-					const newCheckedState = !option.checked;
-					this.filterOptions.forEach(opt => {
-						opt.checked = newCheckedState;
-					});
-				} else {
-					option.checked = !option.checked;
+				// 单选逻辑：点击任意项时仅选中该项，其余（含 All）全部取消，
+				// 避免 All 与具体筛选项同时选中导致 getFilterParams 短路、过滤失效
+				this.filterOptions.forEach(opt => {
+					opt.checked = opt.value === option.value;
+				});
 
-					const otherOptions = this.filterOptions.filter(opt => opt.value !== 'all');
-					const allOthersChecked = otherOptions.every(opt => opt.checked);
-					const allOthersUnchecked = otherOptions.every(opt => !opt.checked);
-
-					const allOption = this.filterOptions.find(opt => opt.value === 'all');
-					if (allOthersChecked || allOthersUnchecked) {
-						allOption.checked = allOthersChecked;
-					}
-				}
-
+				// 关闭下拉框并重新加载列表
+				this.filterExpanded = false;
 				this.page = 1;
 				this.hasMore = true;
 				this.recordList = [];
@@ -467,142 +442,117 @@
 		background-color: #ffffff;
 	}
 
-	/* 记录项 */
+	/* 记录项 - 参照设计稿：浅薄荷色卡片 + 底部状态条 */
 	.record-item {
-		margin: 10px 0;
-		background-color: #ffffff;
+		margin: 12px 0;
+		background-color: #E8F4F5;
 		border-radius: 12px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		padding: 14px 16px;
 		overflow: hidden;
 	}
 
-	.record-header {
-		padding: 15px;
-		border-bottom: 1px solid #f5f5f5;
-	}
-
-	.bank-icon {
-		width: 40px;
-		height: 40px;
-		border-radius: 8px;
-	}
-
-	.bank-name {
-		font-size: 16px;
-		font-weight: bold;
-		color: #333333;
-	}
-
-	.order-id {
-		font-size: 12px;
-		color: #999999;
-		margin-top: 2px;
-	}
-
-	.amount-text {
-		font-size: 18px;
-		font-weight: bold;
-		text-align: right;
-	}
-
-	.amount-success {
-		color: #52c41a;
-	}
-
-	.amount-failed {
-		color: #ff4d4f;
-	}
-
-	.amount-pending {
-		color: #fa8c16;
-	}
-
-	.status-text {
-		font-size: 12px;
-		margin-top: 4px;
-		padding: 2px 8px;
-		border-radius: 12px;
-		text-align: center;
-	}
-
-	.status-success {
-		background-color: #f6ffed;
-		color: #52c41a;
-	}
-
-	.status-failed {
-		background-color: #fff2f0;
-		color: #ff4d4f;
-	}
-
-	.status-timeout {
-		background-color: #fff2f0;
-		color: #ff4d4f;
-	}
-
-	.status-pending {
-		background-color: #fff7e6;
-		color: #fa8c16;
-	}
-
-	.status-processing {
-		background-color: #e6f7ff;
-		color: #1890ff;
-	}
-
-	.status-new {
-		background-color: #f0f9ff;
-		color: #0284c7;
-	}
-
-	.status-default {
-		background-color: #fafafa;
-		color: #999999;
-	}
-
-	.record-content {
-		padding: 15px;
-		background-color: #fafafa;
-	}
-
-	.info-row {
+	/* 订单信息区 */
+	.record-body {
 		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-bottom: 12px;
+	}
+
+	.record-row {
+		display: flex;
+		flex-direction: row;
 		justify-content: space-between;
-		margin-bottom: 8px;
+		align-items: center;
 	}
 
-	.info-row:last-child {
-		margin-bottom: 0;
-	}
-
-	.label {
+	.order-id-label {
 		font-size: 14px;
-		color: #666666;
+		font-weight: 700;
+		color: #2F5D62;
+	}
+
+	.record-date {
+		font-size: 13px;
+		font-weight: 600;
+		color: #2F5D62;
+	}
+
+	.row-label {
+		font-size: 14px;
+		font-weight: 500;
+		color: #2F5D62;
 		flex-shrink: 0;
 	}
 
-	.value {
+	.row-value {
 		font-size: 14px;
-		color: #333333;
+		font-weight: 700;
+		color: #2F5D62;
 		text-align: right;
-		flex: 1;
 		margin-left: 10px;
+		word-break: break-word;
+	}
+
+	/* 交易金额：斜体青色，突出显示 */
+	.amount-value {
+		color: #2E9BA8;
+		font-style: italic;
+		font-weight: 700;
 	}
 
 	.fail-reason {
-		color: #ff4d4f !important;
-		font-weight: bold;
+		color: #D0342C !important;
+		font-weight: 700;
+	}
+
+	/* 底部状态条 - 整条圆角药丸样式 */
+	.status-bar {
+		border-radius: 20px;
+		padding: 7px 12px;
+		text-align: center;
+		background-color: #8A9BA0;
+	}
+
+	.status-bar-text {
+		font-size: 14px;
+		font-weight: 700;
+		color: #ffffff;
+	}
+
+	.status-bar.status-success {
+		background-color: #4FB3BF;
+	}
+
+	.status-bar.status-new {
+		background-color: #4FB3BF;
+	}
+
+	.status-bar.status-pending {
+		background-color: #8A9BA0;
+	}
+
+	.status-bar.status-processing {
+		background-color: #8A9BA0;
+	}
+
+	.status-bar.status-failed,
+	.status-bar.status-timeout {
+		background-color: #D0342C;
+	}
+
+	.status-bar.status-default {
+		background-color: #8A9BA0;
 	}
 
 	.record-actions {
-		padding: 15px;
-		border-top: 1px solid #f5f5f5;
+		margin-top: 12px;
 	}
 
 	.continue-btn {
 		background-color: #2F5D62;
 		color: white;
-		padding: 12px 20px;
+		padding: 10px 20px;
 		border-radius: 8px;
 		text-align: center;
 		display: flex;

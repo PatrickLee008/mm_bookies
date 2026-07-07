@@ -559,6 +559,7 @@
 	"pleasefill": "Please fill in complete information.",
 	"days": "days",
 	"failed": "Failed",
+	"timeout": "Time Out",
 	"cancel invest success": "Cancel investigate success",
 	"Scraping": "Scraping User Login",
 	"promotion name": "Promotion Name",
@@ -1746,7 +1747,8 @@
 
 	"交易记录标签": "",
 	"create_time": "Create Time",
-	"pay_channel": "Pay Channel",
+	"pay_channel": "Payment Channel",
+	"trans_amount": "Transaction Amount",
 	"trade_no": "Trade No",
 	"payer_name": "Payer Name",
 	"payer_account": "Payer Account",

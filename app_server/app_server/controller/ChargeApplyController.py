@@ -379,6 +379,9 @@ def get_apply_list():
         end_time += ' 23:59:59'
         charge_list = charge_list.filter(ChargeApply.create_time <= end_time)
 
+    # LRC 剔除失败的订单
+    charge_list = charge_list.filter(ChargeApply.status != 'Failed')
+
     total_amount = charge_list.with_entities(func.sum(ChargeApply.money)).scalar() or 0
 
     charge_list = charge_list.offset((current_page - 1) * limit).limit(limit).all()
