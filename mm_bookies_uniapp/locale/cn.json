@@ -85,6 +85,7 @@
 	"filter_qr_pay": "QR Pay",
 	"filter_pending": "处理中",
 	"filter_success": "成功",
+	"filter_rejected": "已拒绝",
 	"filter_timeout": "超时",
 	"no rows": "没有行",
 	"showing": "显示中",

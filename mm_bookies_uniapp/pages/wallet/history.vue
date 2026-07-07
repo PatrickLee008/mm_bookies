@@ -177,10 +177,10 @@
 				}
 			},
 
-			// 格式化时间：dd/mm/yyyy HH:MM
 			formatTime(time) {
 				if (!time) return '';
-				const date = typeof time === 'string' ? new Date(time) : new Date(time);
+				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : new Date(convertedTime);
 				if (isNaN(date.getTime())) return '';
 				const pad = (n) => (n < 10 ? '0' + n : '' + n);
 				const dd = pad(date.getDate());

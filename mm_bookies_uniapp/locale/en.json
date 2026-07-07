@@ -85,6 +85,7 @@
 	"filter_qr_pay": "QR Pay",
 	"filter_pending": "Pending",
 	"filter_success": "Success",
+	"filter_rejected": "Rejected",
 	"filter_timeout": "Time out",
 	"no rows": "No rows",
 	"showing": "Showing",

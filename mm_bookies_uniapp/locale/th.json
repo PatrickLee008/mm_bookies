@@ -85,6 +85,7 @@
 	"filter_qr_pay": "QR Pay",
 	"filter_pending": "รอดำเนินการ",
 	"filter_success": "สำเร็จ",
+	"filter_rejected": "ถูกปฏิเสธ",
 	"filter_timeout": "หมดเวลา",
 	"no rows": "ไม่มีข้อมูล",
 	"showing": "กำลังแสดง",

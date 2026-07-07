@@ -95,9 +95,9 @@
 				filterExpanded: false,
 				filterOptions: [
 					{ label: 'filter_all', value: 'all', checked: true },
-					{ label: 'filter_pending', value: '0', type: 'status', checked: false },
-					{ label: 'filter_success', value: '1', type: 'status', checked: false },
-					{ label: 'filter_timeout', value: '2', type: 'status', checked: false },
+					{ label: 'filter_pending', value: 'Pending', type: 'status', checked: false },
+					{ label: 'filter_success', value: 'Success', type: 'status', checked: false },
+					{ label: 'filter_rejected', value: 'Rejected', type: 'status', checked: false },
 				],
 			}
 		},
@@ -176,7 +176,8 @@
 
 			formatTime(time) {
 				if (!time) return '';
-				const date = typeof time === 'string' ? new Date(time) : time;
+				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : convertedTime;
 				return dateFormatUtils.formatTime(date);
 			},
 
@@ -187,9 +188,9 @@
 			getStatusText(status) {
 				const s = String(status);
 				const statusMap = {
-					'0': 'Pending',
-					'1': 'Success',
-					'2': 'Failed',
+					'Pending': this.$t('processing') || 'Pending',
+					'Success': this.$t('success') || 'Success',
+					'Rejected': this.$t('Rejected') || 'Rejected',
 				};
 				return statusMap[s] || status;
 			},
@@ -197,9 +198,9 @@
 			getStatusClass(status) {
 				const s = String(status);
 				const classMap = {
-					'0': 'status-pending',
-					'1': 'status-success',
-					'2': 'status-failed',
+					'Pending': 'status-pending',
+					'Success': 'status-success',
+					'Rejected': 'status-failed',
 				};
 				return classMap[s] || 'status-default';
 			},
@@ -254,10 +255,9 @@
 					return {};
 				}
 
-				const statuses = checkedOptions.filter(opt => opt.type === 'status').map(opt => opt.value);
-
-				if (statuses.length > 0) {
-					params.statuses = statuses;
+				const statusOption = checkedOptions.find(opt => opt.type === 'status');
+				if (statusOption) {
+					params.status = statusOption.value;
 				}
 
 				return params;

@@ -74,7 +74,6 @@ def get_wallet_list():
     start_time = request.args.get('start_time')
     end_time = request.args.get('end_time')
     status = request.args.get('status')
-    statuses = request.args.getlist('statuses')
     type_filter = request.args.get('type')
     user_id = g.user.id
 
@@ -86,9 +85,7 @@ def get_wallet_list():
         if key_word:
             query = query.filter(model.mb_nickname.like(f"%{key_word}%"))
 
-        if statuses:
-            query = query.filter(model.status.in_(statuses))
-        elif status is not None:
+        if status is not None:
             query = query.filter(model.status == status)
 
         return query

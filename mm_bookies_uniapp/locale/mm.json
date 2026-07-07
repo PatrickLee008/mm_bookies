@@ -83,6 +83,7 @@
 	"filter_qr_pay": "QR Pay",
 	"filter_pending": "လုပ်ဆောင်ဆဲ",
 	"filter_success": "အောင်မြင်သည်",
+	"filter_rejected": "ငြင်းပယ်ခဲ့သည်",
 	"filter_timeout": "ငြင်းပယ်ခဲ့သည်",
 	"no rows": "အတန်းမရှိ။",
 	"showing": "သတ်တယ်။",
@@ -1783,6 +1784,7 @@
 	
 	"20260603新增：全局筛选出的硬编码英文转动态翻译": "",
 	"period": "ကာလ",
+	"Rejected": "ငြင်းပယ်ခဲ့သည်",
 	  "network_error": "ကွန်ရက် ချိတ်ဆက်မရ",
 	  "failed_load_games": "ဂိမ်းကို စတင်၍မရပါ",
 	  "failed_launch_game": "ဂိမ်းကို စတင်၍မရပါ",

@@ -53,8 +53,8 @@ class WithDraw(BaseSaasModel):
     process_time = Column(DATETIME, comment="实际处理完成时间")
 
     # 状态与日志
-    status = Column(String(32), nullable=False, server_default='new',
-                    comment="提现状态：new,processing,verify,reject,completed,failed")
+    status = Column(String(32), nullable=False, server_default='Pending',
+                    comment="提现状态：Pending,Success,Rejected")
     callback_log = Column(Text, comment="第三方回调日志（JSON格式）")
     order_log = Column(Text, comment="提现订单状态变更日志")
     slip = Column(Text, comment="付款凭证（如转账截图URL）")
