@@ -19,13 +19,13 @@
 		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
-			<view v-if="!loading && filterRecordList(recordList).length === 0" class="empty-state">
+			<view v-if="!loading && recordList.length === 0" class="empty-state">
 				<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
 				<text class="empty-text">{{ $t('no_withdraw_records') || 'No withdrawal records available at the moment. Please check back later.' }}</text>
 			</view>
 
 			<!-- 记录项 -->
-			<view v-for="(item, index) in filterRecordList(recordList)" :key="index" class="record-item">
+			<view v-for="(item, index) in recordList" :key="index" class="record-item">
 				<view class="record-header">
 					<view class="flex-row justify-between align-center">
 						<view class="flex-row1 align-center">
@@ -135,10 +135,12 @@
 				this.loading = true;
 
 				try {
+					const filterParams = this.getFilterParams();
 					const para = {
 						page: this.page,
 						limit: this.pageSize,
-						type: 'Withdraw'
+						type: 'Withdraw',
+						...filterParams
 					};
 
 					await new Promise((resolve, reject) => {
@@ -254,29 +256,11 @@
 
 				const statuses = checkedOptions.filter(opt => opt.type === 'status').map(opt => opt.value);
 
-				if (statuses.length > 0 && statuses.length < checkedOptions.length + 1) {
+				if (statuses.length > 0) {
 					params.statuses = statuses;
 				}
 
 				return params;
-			},
-
-			filterRecordList(records) {
-				const filterParams = this.getFilterParams();
-
-				if (Object.keys(filterParams).length === 0) {
-					return records;
-				}
-
-				return records.filter(record => {
-					let matchStatus = true;
-
-					if (filterParams.statuses && filterParams.statuses.length > 0) {
-						matchStatus = filterParams.statuses.includes(String(record.status));
-					}
-
-					return matchStatus;
-				});
 			},
 		},
 

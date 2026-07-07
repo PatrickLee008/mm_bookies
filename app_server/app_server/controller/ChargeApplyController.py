@@ -364,6 +364,9 @@ def get_apply_list():
     start_time = request.args.get('start_time')
     end_time = request.args.get('end_time')
 
+    statuses = request.args.getlist('statuses')
+    pay_channels = request.args.getlist('pay_channels')
+
     charge_list = ChargeApply.query.filter_by(mb_id=g.user.id)
 
     if key_word:
@@ -379,8 +382,13 @@ def get_apply_list():
         end_time += ' 23:59:59'
         charge_list = charge_list.filter(ChargeApply.create_time <= end_time)
 
-    # LRC 剔除失败的订单
-    charge_list = charge_list.filter(ChargeApply.status != 'Failed')
+    if statuses:
+        charge_list = charge_list.filter(ChargeApply.status.in_(statuses))
+    else:
+        charge_list = charge_list.filter(ChargeApply.status != 'Failed')
+
+    if pay_channels:
+        charge_list = charge_list.filter(ChargeApply.pay_channel.in_(pay_channels))
 
     total_amount = charge_list.with_entities(func.sum(ChargeApply.money)).scalar() or 0
 

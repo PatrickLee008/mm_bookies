@@ -19,13 +19,13 @@
 		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
-			<view v-if="!loading && filterRecordList(recordList).length === 0" class="empty-state">
+			<view v-if="!loading && recordList.length === 0" class="empty-state">
 				<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
 				<text class="empty-text">{{$t('no_charge_records') || 'No deposit records available at the moment. Please check back later.'}}</text>
 			</view>
 
 			<!-- 记录项 -->
-			<view v-for="(item, index) in filterRecordList(recordList)" :key="index" class="record-item">
+			<view v-for="(item, index) in recordList" :key="index" class="record-item">
 				<!-- 订单信息区 -->
 				<view class="record-body">
 					<!-- Order ID + 时间 -->
@@ -139,9 +139,11 @@
 				this.loading = true;
 
 				try {
+					const filterParams = this.getFilterParams();
 					const para = {
 						page: this.page,
-						limit: this.pageSize
+						limit: this.pageSize,
+						...filterParams
 					};
 
 					await new Promise((resolve, reject) => {
@@ -331,29 +333,6 @@
 				}
 
 				return params;
-			},
-
-			filterRecordList(records) {
-				const filterParams = this.getFilterParams();
-
-				if (Object.keys(filterParams).length === 0) {
-					return records;
-				}
-
-				return records.filter(record => {
-					let matchChannel = true;
-					let matchStatus = true;
-
-					if (filterParams.pay_channels && filterParams.pay_channels.length > 0) {
-						matchChannel = filterParams.pay_channels.includes(record.pay_channel);
-					}
-
-					if (filterParams.statuses && filterParams.statuses.length > 0) {
-						matchStatus = filterParams.statuses.includes(record.status);
-					}
-
-					return matchChannel && matchStatus;
-				});
 			},
 		},
 
