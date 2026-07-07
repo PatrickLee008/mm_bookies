@@ -1262,7 +1262,8 @@
 			},
 			show_bet_slip() {
 				let _this = this
-				_this.amount = _this.match_ref.mixed ? _this.mix_min : _this.single_min
+				// 点击赔率时不再自动预填最小投注金额，保持输入框为空，显示占位提示
+				_this.amount = ''
 				_this.promotion_code = ''
 				_this.hide_bets_slip = false
 				// 弹出下单框时也需要获取优惠券,因为有的优惠券可能初始金额就能用（支持single和mix）

@@ -42,15 +42,15 @@
 			<wallet-withdraw v-if="tab_index === 1"></wallet-withdraw>
 
 			<!-- from tangjq--- History 子组件 -->
-			<wallet-history v-if="tab_index === 2"></wallet-history>
+			<wallet-history v-if="tab_index === 2" ref="depositHistory"></wallet-history>
 
 
 			<!-- Withdraw History 子组件 -->
-			<wallet-withdraw-history v-if="tab_index === 3"></wallet-withdraw-history>
+			<wallet-withdraw-history v-if="tab_index === 3" ref="withdrawHistory"></wallet-withdraw-history>
 		</view>
 
-		<!-- from tangjq--- 悬浮的 Refresh 按钮 -->
-		<view class="refresh-btn-float" @click="relaunch">
+		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在充值/提现记录页签显示，点击刷新列表数据 -->
+		<view class="refresh-btn-float" v-if="tab_index === 2 || tab_index === 3" @click="refreshList">
 			<image class="refresh-icon" mode="widthFix" src="/static/icon/wallet/reflesh.svg" />
 			<text class="refresh-text">{{ $t('refresh') }}</text>
 		</view>
@@ -88,10 +88,12 @@
 		},
 
 		methods: {
-			relaunch() {
-				uni.reLaunch({
-					url: './wallet'
-				})
+			// from tangjq--- 刷新当前记录列表数据（仅在充值/提现记录页签有效），不再重新加载页面
+			refreshList() {
+				const historyRef = this.tab_index === 2 ? this.$refs.depositHistory : this.$refs.withdrawHistory
+				if (historyRef && typeof historyRef.refreshData === 'function') {
+					historyRef.refreshData()
+				}
 			},
 			goto(url) {
 				uni.navigateTo({
