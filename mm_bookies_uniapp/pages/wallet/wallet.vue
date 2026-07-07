@@ -11,10 +11,10 @@
 			<view class="tab-selector">
 				<view class="tab-container">
 					<view class="tab-item" :class="{'active': tab_index === 0}" @click="handleTabClick(0)">
-						<text class="tab-text">{{ $t('text_button_submit') }}</text>
+						<text class="tab-text">{{ $t('deposit') }}</text>
 					</view>
 					<view class="tab-item" :class="{'active': tab_index === 1}" @click="handleTabClick(1)">
-						<text class="tab-text">{{ $t('whithdraw btn') }}</text>
+						<text class="tab-text">{{ $t('withdraw') }}</text>
 					</view>
 					<view class="tab-item" :class="{'active': tab_index === 2}" @click="handleTabClick(2)">
 						<text class="tab-text">{{ $t('deposit_history') }}</text>

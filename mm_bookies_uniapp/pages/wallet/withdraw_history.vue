@@ -9,7 +9,7 @@
 		<!-- 下拉选项 -->
 		<view v-if="filterExpanded" class="filter-dropdown">
 			<view v-for="(option, index) in filterOptions" :key="index" class="filter-option" @click="toggleFilterOption(option)">
-				<text class="option-text">{{option.label}}</text>
+				<text class="option-text">{{ $t(option.label) }}</text>
 				<view class="option-radio" :class="{'active': option.checked}">
 					<view class="option-radio-inner" v-if="option.checked"></view>
 				</view>
@@ -94,10 +94,10 @@
 
 				filterExpanded: false,
 				filterOptions: [
-					{ label: 'All', value: 'all', checked: true },
-					{ label: 'Pending', value: '0', type: 'status', checked: false },
-					{ label: 'Success', value: '1', type: 'status', checked: false },
-					{ label: 'Failed', value: '2', type: 'status', checked: false },
+					{ label: 'filter_all', value: 'all', checked: true },
+					{ label: 'filter_pending', value: '0', type: 'status', checked: false },
+					{ label: 'filter_success', value: '1', type: 'status', checked: false },
+					{ label: 'filter_timeout', value: '2', type: 'status', checked: false },
 				],
 			}
 		},
@@ -243,7 +243,7 @@
 				}
 
 				if (checkedOptions.length === 1) {
-					return checkedOptions[0].label;
+					return this.$t(checkedOptions[0].label);
 				}
 
 				return `${checkedOptions.length} Selected`;

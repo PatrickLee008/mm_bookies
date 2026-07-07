@@ -9,7 +9,7 @@
 		<!-- 下拉选项 -->
 		<view v-if="filterExpanded" class="filter-dropdown">
 			<view v-for="(option, index) in filterOptions" :key="index" class="filter-option" @click="toggleFilterOption(option)">
-				<text class="option-text">{{option.label}}</text>
+				<text class="option-text">{{ $t(option.label) }}</text>
 				<view class="option-radio" :class="{'active': option.checked}">
 					<view class="option-radio-inner" v-if="option.checked"></view>
 				</view>
@@ -125,12 +125,12 @@
 
 				filterExpanded: false,
 				filterOptions: [
-					{ label: 'All', value: 'all', checked: true },
-					{ label: 'Transfer', value: 'NFM2', type: 'channel', checked: false },
-					{ label: 'QR Pay', value: 'TCPay', type: 'channel', checked: false },
-					{ label: 'Pending', value: 'Pending', type: 'status', checked: false },
-					{ label: 'Success', value: 'Success', type: 'status', checked: false },
-					{ label: 'Time Out', value: 'Timeout', type: 'status', checked: false },
+					{ label: 'filter_all', value: 'all', checked: true },
+					{ label: 'filter_transfer', value: 'NFM2', type: 'channel', checked: false },
+					{ label: 'filter_qr_pay', value: 'TCPay', type: 'channel', checked: false },
+					{ label: 'filter_pending', value: 'Pending', type: 'status', checked: false },
+					{ label: 'filter_success', value: 'Success', type: 'status', checked: false },
+					{ label: 'filter_timeout', value: 'Timeout', type: 'status', checked: false },
 				],
 			}
 		},
@@ -326,7 +326,7 @@
 				}
 
 				if (checkedOptions.length === 1) {
-					return checkedOptions[0].label;
+					return this.$t(checkedOptions[0].label);
 				}
 
 				return `${checkedOptions.length} Selected`;

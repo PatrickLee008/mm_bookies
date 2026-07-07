@@ -26,10 +26,10 @@
 			<view class="tab-selector">
 				<view class="tab-container">
 					<view class="tab-item" :class="{'active':current_page==='Ongoing'}" @click="page_change('Ongoing')">
-						<text class="tab-text">Ongoing</text>
+						<text class="tab-text">{{$t('Ongoing')}}</text>
 					</view>
 					<view class="tab-item" :class="{'active':current_page==='Finished'}" @click="page_change('Finished')">
-						<text class="tab-text">Finished</text>
+						<text class="tab-text">{{$t('Finished')}}</text>
 					</view>
 
 					<!-- from tangjq--- 底部滑动指示器 -->
@@ -188,14 +188,15 @@
 										<text class="value">{{detail.real_odds}}</text>
 									</view>
 								</view>
-								<view class="divider" v-if="_index < item.detail.length - 1"></view>
+								<view class="divider" ></view>
+								<!-- <view class="divider" v-if="_index < item.detail.length - 1"></view> -->
 							</view>
 						</view>
 
 						<!-- Parlay 底部汇总信息 -->
 						<view class="parlay-summary">
 							<view class="info-row">
-								<text class="label">{{$t('total bet amount')}}<</text>
+								<text class="label">{{$t('total bet amount')}}</text>
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row">
@@ -215,12 +216,16 @@
 							<text class="result-text" v-else>LOSE {{item.benefit}} MMK</text>
 						</view>
 
-						<!-- Parlay 折叠/展开按钮 -->
+						<!-- Parlay 折叠/展开按钮：文字左右两侧均显示细双箭头图标 -->
 						<view class="parlay-toggle" @click="show_detail(item)">
+							<view class="toggle-icon">
+								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+							</view>
 							<text class="parlay-label">Parlay {{item.ORDER_COUNT}} x 1</text>
 							<view class="toggle-icon">
-								<text v-if="!item.show_detail">▼</text>
-								<text v-else>▲</text>
+								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
 							</view>
 						</view>
 					</view>
@@ -687,7 +692,7 @@
 					// str = order.stake
 				}
 				//盈利添加+号
-				let plus = str > 0 ? '+' : ''
+				let plus = str > 0 ? '' : ''
 				// 增加千分号
 				str = this.$toolbox.num_format(str, 0)
 				return plus + str
@@ -1079,18 +1084,23 @@
 		font-size: 28upx;
 		color: #2E7D7C;
 		font-weight: 600;
-		margin-right: 16upx;
+		/* from tangjq--- 文字左右两侧留出箭头间距 */
+		margin: 0 16upx;
 	}
 
 	.toggle-icon {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 	}
 
-	.toggle-icon text {
-		font-size: 24upx;
+	/* from tangjq--- 细双箭头图标：两个细箭头(cuIcon)上下紧凑堆叠 */
+	.toggle-icon .arrow {
+		font-size: 22upx;
+		line-height: 0.55;
 		color: #2E7D7C;
+		font-weight: bold;
 	}
 
 	/* 分隔线 */

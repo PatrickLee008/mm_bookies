@@ -134,6 +134,26 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- Mark All Read 自定义确认弹窗（替代框架自带 uni.showModal，避免英文单词换行问题） -->
+		<view class="modal-overlay" v-if="showMarkAllModal" @click="showMarkAllModal = false">
+			<view class="confirm-modal" @click.stop>
+				<view class="confirm-header">
+					<text class="confirm-title">{{ $t('mark_all_read') }}</text>
+				</view>
+				<view class="confirm-body">
+					<text class="confirm-message">{{ $t('msg_mark_all_confirm', { n: unreadCount }) }}</text>
+				</view>
+				<view class="confirm-footer">
+					<view class="confirm-btn cancel-btn" @click="showMarkAllModal = false">
+						<text class="confirm-btn-text cancel-text">{{ $t('Cancel') }}</text>
+					</view>
+					<view class="confirm-btn ok-btn" @click="confirmMarkAllAsRead">
+						<text class="confirm-btn-text ok-text">{{ $t('Confirm') }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -158,6 +178,7 @@
 				loading: false,
 				refreshing: false,
 				showDetailModal: false,
+				showMarkAllModal: false, // 控制 Mark All Read 自定义确认弹窗
 				selectedMessage: {},
 				currentPage: 1,
 				pageSize: 20,
@@ -505,51 +526,52 @@
 				}
 			},
 
-			// 标记全部消息为已读
-			async markAllAsRead() {
+			// 标记全部消息为已读：打开自定义确认弹窗（替代框架自带 uni.showModal）
+			markAllAsRead() {
+				if (!this.isLogin || this.unreadCount === 0) {
+					return
+				}
+				this.showMarkAllModal = true
+			},
+
+			// 确认标记全部消息为已读
+			async confirmMarkAllAsRead() {
+				this.showMarkAllModal = false
+
 				if (!this.isLogin || this.unreadCount === 0) {
 					return
 				}
 
-				// 确认对话框（mm_bookies 无 $notice，使用 uni.showModal）
-				uni.showModal({
-					title: this.$t('mark_all_read'),
-					content: this.$t('msg_mark_all_confirm', { n: this.unreadCount }),
-					success: async (res) => {
-						if (!res.confirm) return
-
-						uni.showLoading({
-							title: this.$t('msg_processing'),
-							mask: true
-						})
-
-						try {
-							// 调用后端API标记全部为已读
-							await apiMarkAllAsRead()
-
-							// 刷新消息列表和未读数
-							await this.loadMessages()
-
-							// 触发全局事件，通知其他组件更新
-							uni.$emit('message:read')
-							uni.$emit('message:unreadUpdate', null)
-
-							uni.hideLoading()
-							uni.showToast({
-								title: this.$t('all_marked_read'),
-								icon: 'success',
-								duration: 2000
-							})
-						} catch (error) {
-							uni.hideLoading()
-							uni.showToast({
-								title: this.$t('msg_failed_mark'),
-								icon: 'none',
-								duration: 2000
-							})
-						}
-					}
+				uni.showLoading({
+					title: this.$t('msg_processing'),
+					mask: true
 				})
+
+				try {
+					// 调用后端API标记全部为已读
+					await apiMarkAllAsRead()
+
+					// 刷新消息列表和未读数
+					await this.loadMessages()
+
+					// 触发全局事件，通知其他组件更新
+					uni.$emit('message:read')
+					uni.$emit('message:unreadUpdate', null)
+
+					uni.hideLoading()
+					uni.showToast({
+						title: this.$t('all_marked_read'),
+						icon: 'success',
+						duration: 2000
+					})
+				} catch (error) {
+					uni.hideLoading()
+					uni.showToast({
+						title: this.$t('msg_failed_mark'),
+						icon: 'none',
+						duration: 2000
+					})
+				}
 			},
 
 			// 下拉刷新
@@ -1097,5 +1119,91 @@
 
 	.btn-text {
 		display: block;
+	}
+
+	/* Mark All Read 自定义确认弹窗 */
+	.confirm-modal {
+		background: #FFFFFF;
+		border-radius: 16px;
+		width: 100%;
+		max-width: 340px;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.confirm-header {
+		padding: 18px 20px 6px;
+		text-align: center;
+	}
+
+	.confirm-title {
+		font-size: 17px;
+		font-weight: 700;
+		color: #2F5D62;
+		line-height: 1.5;
+		word-break: break-word;
+		white-space: normal;
+	}
+
+	.confirm-body {
+		padding: 8px 20px 20px;
+	}
+
+	.confirm-message {
+		display: block;
+		font-size: 15px;
+		font-weight: 400;
+		color: #4B5563;
+		line-height: 1.6;
+		text-align: center;
+		word-break: break-word;
+		white-space: normal;
+	}
+
+	.confirm-footer {
+		display: flex;
+		flex-direction: row;
+		gap: 12px;
+		padding: 0 20px 20px;
+	}
+
+	.confirm-btn {
+		flex: 1;
+		padding: 10px 12px;
+		border-radius: 10px;
+		text-align: center;
+		transition: all 0.2s;
+
+		&:active {
+			transform: scale(0.98);
+		}
+	}
+
+	.cancel-btn {
+		background: #FFFFFF;
+		border: 1px solid #2F5D62;
+	}
+
+	.ok-btn {
+		background: #2F5D62;
+
+		&:active {
+			background: #244a4e;
+		}
+	}
+
+	.confirm-btn-text {
+		display: block;
+		font-size: 15px;
+		font-weight: 600;
+	}
+
+	.cancel-text {
+		color: #C8434C;
+	}
+
+	.ok-text {
+		color: #FFFFFF;
 	}
 </style>
