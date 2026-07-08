@@ -274,7 +274,7 @@
 				<!-- 金额输入 -->
 				<view class="amount-section">
 					<view class="amount-input-box">
-						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" placeholder="3,000" />
+						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_deposit_amount')" />
 					</view>
 					<text class="amount-hint">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} Ks, Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</text>
 
@@ -585,7 +585,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 					src: '/static/icon/register/Wave Money.png',
 					checked: true
 				}],
-				amount: 0.00,
+				amount: '',
 				amount_list: [3000, 5000, 10000, 100000, 500000, 1000000],
 				amount_error: true,
 				charge_way: [{
@@ -1151,13 +1151,15 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				this.chargeForm.acc_name = card.acc_name
 				this.chargeForm.acc_number = card.acc_number
 				this.chargeForm.bank_code = card.bank_code
-				this.amount = 0
 				this.modalName = 'deposit_modal'
+				this.$nextTick(() => {
+					this.amount = ''
+				})
 			},
 			closeDepositModal() {
 				this.modalName = ''
 				this.selectedCard = {}
-				this.amount = 0
+				this.amount = ''
 			},
 			depositSubmit() {
 				if (this.$toolbox.click_too_fast(.5)) return

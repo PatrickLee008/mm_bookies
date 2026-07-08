@@ -181,7 +181,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		data() {
 			return {
 				language: config.language,
-				amount: 0.00,
+				amount: '',
 				amount_error: true,
 				card_list: [],
 				userInfo: {},
@@ -278,7 +278,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			// from tangjq--- 选择银行卡，打开提现弹窗
 			selectCard(card) {
 				this.selectedCard = card
-				this.amount = 0
+				this.amount = ''
 				this.modalName = 'withdraw_modal'
 			},
 			// from tangjq--- 提现提交
@@ -330,7 +330,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						_this.userInfo = userInfo
 
 						// Reset and close modal
-						_this.amount = 0;
+						_this.amount = '';
 						_this.modalName = ''
 						_this.selectedCard = {}
 					} else {
