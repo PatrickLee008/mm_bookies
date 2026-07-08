@@ -83,7 +83,7 @@ class Config(object):
     DB_PASSWORD = get_env_required('DB_PASSWORD')
     DB_USER = get_env_required('DB_USER')
     PORT = get_env_int('PORT')
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%s:%s@%s:3306/%s?charset=utf8' % (
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://%s:%s@%s:3306/%s?charset=utf8mb4' % (
         DB_USER, DB_PASSWORD, DB_ADDRESS, DATABASE)
 
     # SQLAlchemy配置
