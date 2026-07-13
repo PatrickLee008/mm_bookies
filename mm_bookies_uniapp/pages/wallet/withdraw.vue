@@ -29,7 +29,7 @@
 			<view class="withdraw-modal-dialog">
 				<!-- 标题栏 -->
 				<view class="withdraw-modal-header">
-					<text class="withdraw-modal-title">{{ $t('whithdraw btn') }}</text>
+					<text class="withdraw-modal-title">{{ $t('Withdraw') }}</text>
 					<text class="withdraw-modal-close" @click="modalName = ''">✕</text>
 				</view>
 

@@ -38,8 +38,8 @@
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;" @scroll="handle_scroll" :style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 广告图区域 -->
-			<view class="ad-banner-wrapper">
-				<image class="ad-banner-image" src="/static/image/single/match_ad.png" mode="aspectFill"></image>
+			<view class="ad-banner-wrapper" v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+				<image class="ad-banner-image" :src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''" mode="aspectFill"></image>
 			</view>
 
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
@@ -699,6 +699,7 @@
 				show_coupon_dropdown: false, // 控制下拉框显示
 				use_promotion_wallet: false, // 是否优先使用Promotion Wallet
 				searchKeyword: '', // from tangjq--- 搜索关键字
+				advertisements: [], // from tangjq--- 广告列表
 			}
 		},
 		watch: {
@@ -1271,6 +1272,25 @@
 					_this.fetchAvailableCoupons()
 				}
 			},
+			getAdvertisements() {
+				var _this = this;
+				_this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'match',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						_this.advertisements = res.data.data.items || []
+					}
+				})
+			},
+			handleAdClick(ad) {
+				if (ad.link_url) {
+					uni.navigateTo({
+						url: ad.link_url
+					})
+				}
+			},
 			get_list() {
 				var _this = this;
 				uni.showLoading({
@@ -1831,6 +1851,7 @@
 			}
 			this.get_list()
 			this.show_login_toast()
+			this.getAdvertisements() // from tangjq--- 获取广告列表
 			let _this = this
 			if (_this.isLogin) {
 				_this.intervalId = setInterval(function() {

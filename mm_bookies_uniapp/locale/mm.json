@@ -1914,7 +1914,7 @@
 	  "user_name": "အသုံးပြုသူအမည်",
 	  "user_account": "အသုံးပြုသူအကောင့်",
 	  "account_no": "အကောင့်နံပါတ်",
-	  "wallet_balance": "ပိုက်ဆံအိတ်လက်ကျန်ငွေ",
+	  "wallet_balance": "လက်ကျန်ငွေ",
 	  "amount_unlock": "ပမာဏ လော့ဖွင့်ခြင်း",
 	  "turnover_limit_label": "လောင်းကြေးငွေ ကန့်သတ်ချက်",
 	  "continue_btn": "ဆက်လုပ်ပါ",
@@ -1994,7 +1994,7 @@
 	"payment_channel": "ငွေပေးချေမှုလမ်းကြောင်း",
 	"qr_pay": "QR Pay",
 	"continue_btn": "ဆက်လက်လုပ်ဆောင်ရန်",
-	"wallet_balance": "ပိုက်ဆံအိတ်လက်ကျန်",
+	"wallet_balance": "လက်ကျန်ငွေ",
 	"amount_unlock": "ထုတ်ယူနိုင်သောငွေပမာဏ",
 	"turnover_limit_label": "လည်ပတ်ငွေကန့်သတ်ချက်"
 }
