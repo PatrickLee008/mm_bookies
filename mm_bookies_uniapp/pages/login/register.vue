@@ -110,6 +110,7 @@
 					phone: '',
 					password: '',
 					confirm_password: '',
+					r_code: '',
 				},
 				loadding: '',
 				language: config.language,
@@ -224,6 +225,9 @@
 				if (defaultAgentId) para.agent_id = defaultAgentId;
 				const adl = uni.getStorageSync('default_adl');
 				if (adl) para.adlink_id = adl;
+				// 推荐码（来自邀请链接 ?iv= 或本地缓存），后端匹配 AppMember.r_code
+				const rCode = this.loginInfo.r_code || uni.getStorageSync('default_r_code');
+				if (rCode) para.r_code = rCode;
 
 				uni.showLoading({
 					title: _this.$t('registering')
@@ -234,6 +238,7 @@
 					uni.hideLoading();
 
 					if (res.statusCode == 200) {
+						uni.removeStorageSync('default_r_code');
 						_this.login();
 					} else {
 						uni.showModal({
@@ -319,6 +324,12 @@
 		},
 		onLoad(option) {
 			uni.removeStorageSync('login_success');
+			// 捕获邀请码（推荐链接 ?iv=xxx），用于注册时绑定推荐人
+			const iv = option && (option.iv || option.r_code)
+			if (iv) {
+				this.loginInfo.r_code = iv
+				uni.setStorageSync('default_r_code', iv)
+			}
 		},
 	}
 </script>

@@ -84,7 +84,7 @@
 				</view>
 
 				<!-- E-Games -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'games'}" @click="goto('/pages/index/game', 1)">
+				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'games'}" @click="goto('/pages/index/game', 1)" v-if="false">
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'games' ? '/static/icon/nav/games_active.png' : '/static/icon/nav/games.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
@@ -102,7 +102,7 @@
 				</view>
 
 				<!-- Deals 暂时隐藏优惠券功能-->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)" v-if="false">
+				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)" >
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'deals' ? '/static/icon/nav/deals_active.png' : '/static/icon/nav/deals.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>

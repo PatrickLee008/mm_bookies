@@ -1,204 +1,202 @@
 <template>
 	<view class="bg-white full-page">
 		<zw-header></zw-header>
-
-		<view class="title-bar" style="height: auto;">
-			<view class="flex-row justify-between" style="">
-				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
-				<view class="flex-row align-center" style="">
-					<image src="/static/icon/ucenter/invite.png" class="lblue2blue" style="height: 28px;"
-						mode="heightFix"></image>
-					<text class="title-text" style="">{{language.invite_friend}}</text>
-				</view>
-			</view>
-		</view>
-		<view class="qr-rec">
-			<canvas id="qrcode" canvas-id="qrcode" :style="{ width: `${size}px`, height: `${size}px` }"></canvas>
-		</view>
-		<view class="qr-rec" style="padding: 10px 25px;">
-			<text class="flex-column mycolor-primary myfont-14px text-bold">{{language.share_invite}}</text>
-			<view class="flex-row justify-around margin-top-sm">
-				<view class="flex-column1 align-center" @click="shareSystem()">
-					<view class="mybg-primary flex-column radius-50" style="width: 38px;height: 38px;">
-						<image mode="widthFix" class="width-38upx " src="/static/icon/share/share.svg" />
+		<scroll-view scroll-y class="padding-bottom app-safe-scroll">
+			<view class="title-bar" style="height: auto;">
+				<view class="flex-row justify-between" style="">
+					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
+					<view class="flex-row align-center" style="">
+						<image src="/static/icon/ucenter/invite.png" class="lblue2blue" style="height: 28px;"
+							mode="heightFix"></image>
+						<text class="title-text" style="">{{ language.invite_friend }}</text>
 					</view>
-					<text class="myfont-12px">{{language.share}}</text>
-				</view>
-				<view class="flex-column1 align-center" @click="shareFacebook()">
-					<image mode="widthFix" class="width-39px " src="/static/icon/share/facebook.svg" />
-					<text class="myfont-12px">{{language.facebook}}</text>
-				</view>
-				<view class="flex-column1 align-center" @click="shareTelegram()">
-					<image mode="widthFix" class="width-39px " src="/static/icon/share/telegram.svg" />
-					<text class="myfont-12px">{{language.telegram}}</text>
-				</view>
-				<view class="flex-column1 align-center" @click="shareLine()">
-					<image mode="widthFix" class="width-39px " src="/static/icon/share/line.svg" />
-					<text class="myfont-12px">{{language.line}}</text>
 				</view>
 			</view>
-		</view>
-		<view class="flex-column">
-			<text class="myfont-12px mycolor-primary text-bold">{{language.copy_link}}</text>
-			<text class="myfont-10px" style="color: #999; margin-top: 5px;">Invites: {{downlineCount}}/{{maxInvites}}</text>
-		</view>
-		<view class="copy-rec flex-row1 justify-between mycolor-dgray" :style="{ opacity: canInvite ? 1 : 0.5 }">
-			<text class="width-90 text-cut">{{share_url}}</text>
-			<view class="cuIcon-copy myfont-18px" :style="{ color: canInvite ? '#007aff' : '#ccc' }" @click="copy"></view>
-		</view>
-		<!-- <view class="flex-column justify-center" style="position: fixed;top: 45vh;">
-			<view class="flex-row align-center justify-center" style="">
-				<view class="myfont-20px mycolor-primary">{{language.is_coming_soon}}</view>
-			</view>
-		</view> -->
 
+			<!-- 加载中 -->
+			<view v-if="loading" class="flex-column align-center" style="padding: 60px 0;">
+				<view class="cu-load loading"></view>
+			</view>
+
+			<!-- 加载完成 -->
+			<view v-else>
+				<view class="qr-rec">
+					<view style="position: relative; display: inline-block;">
+						<canvas id="qrcode" canvas-id="qrcode"
+							:style="{ width: `${size}px`, height: `${size}px` }"></canvas>
+						<view v-if="!canInvite" class="qr-overlay">
+							<text class="qr-overlay-text">{{ $t('Limit Reached') }}</text>
+						</view>
+					</view>
+				</view>
+
+				<view class="qr-rec" style="padding: 10px 25px;">
+					<text class="flex-column mycolor-primary myfont-14px text-bold">{{ language.share_invite }}</text>
+					<view class="flex-row justify-around margin-top-sm">
+						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareSystem()">
+							<view class="mybg-primary flex-column radius-50" style="width: 38px;height: 38px;">
+								<image mode="widthFix" class="width-38upx" src="/static/icon/share/share.svg" />
+							</view>
+							<text class="myfont-12px">{{ language.share }}</text>
+						</view>
+						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareFacebook()">
+							<image mode="widthFix" class="width-39px" src="/static/icon/share/facebook.svg" />
+							<text class="myfont-12px">{{ language.facebook }}</text>
+						</view>
+						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareTelegram()">
+							<image mode="widthFix" class="width-39px" src="/static/icon/share/telegram.svg" />
+							<text class="myfont-12px">{{ language.telegram }}</text>
+						</view>
+						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareLine()">
+							<image mode="widthFix" class="width-39px" src="/static/icon/share/line.svg" />
+							<text class="myfont-12px">{{ language.line }}</text>
+						</view>
+					</view>
+				</view>
+
+				<view class="flex-column padding-lr">
+					<text class="myfont-12px mycolor-primary text-bold">{{ language.copy_link }}</text>
+					<text class="myfont-10px" style="color: #999; margin-top: 5px;">
+						{{ $t('Invites') }}: {{ downlineCount }}/{{ maxInvites }}
+					</text>
+				</view>
+				<view class="copy-rec flex-row1 justify-between mycolor-dgray" :style="{ opacity: canInvite ? 1 : 0.5 }">
+					<text class="width-90 text-cut" v-if="canInvite">{{ share_url }}</text>
+					<text class="width-100 text-cut" v-else>{{ $t("You've reached the maximum invites") }}</text>
+					<text class="cuIcon-copy myfont-20px mycolor-primary" @click="copy" v-if="canInvite"></text>
+				</view>
+			</view>
+
+			<view style="height: 30px; width: 100%;"></view>
+		</scroll-view>
 	</view>
 </template>
 
 <script>
-	import language from '@/utils/language.js'
 	import config from '@/utils/config.js'
 	import uQRCode from '@/uni_modules/Sansnn-uQRCode/js_sdk/u-qrcode';
+	import siteinfo from '@/siteinfo.js';
 
 	export default {
 		data() {
 			return {
 				language: config.language,
-				userInfo: null,
+				r_code: '',
 				size: 165,
 				share_url: '',
+				loading: true,
 				canInvite: true,
 				downlineCount: 0,
 				maxInvites: 10
 			}
 		},
-		onLoad() {
-			this.userInfo = Object.assign({}, this.$store.state.userInfo)
+		onLoad(option) {
+			this.r_code = (option && option.r_code) || ''
+			if (!this.r_code) {
+				const uinfo = this.$store.state.userInfo || {}
+				this.r_code = uinfo.r_code || ''
+			}
 			this.checkInviteLimit()
 		},
 		methods: {
 			back_to() {
-				uni.navigateBack({
-					delta: 1,
-				})
+				uni.navigateTo({ url: './index' })
 			},
 			checkInviteLimit() {
-				// 调用API检查邀请限制
-				this.$http.get('/activity/downline-count', {}, (res) => {
-					if (res.data.code === 200) {
-						this.downlineCount = res.data.downline_count
-						this.maxInvites = res.data.max_invites
-						this.canInvite = res.data.can_invite
-
-						// 如果可以邀请，生成二维码
-						if (this.canInvite) {
-							this.generate_qr_code()
-						}
-					} else {
-						console.error('Failed to check invite limit:', res.message)
-						// 默认允许邀请，避免阻塞用户
-						this.generate_qr_code()
+				let _this = this
+				_this.loading = true
+				_this.$http.get('/invitation_v2/downline-count', {}, (res) => {
+					let response = res.data
+					if (response && response.code === 200) {
+						_this.downlineCount = response.data.downline_count
+						_this.maxInvites = response.data.max_invites
+						_this.canInvite = response.data.can_invite
 					}
+					_this.generate_qr_code()
+					_this.loading = false
+				}, () => {
+					_this.generate_qr_code()
+					_this.loading = false
 				})
 			},
+			getSiteOrigin() {
+				// #ifdef H5
+				if (typeof window !== 'undefined' && window.location && window.location.origin) {
+					return window.location.origin
+				}
+				// #endif
+				try {
+					return siteinfo.apiUrl.replace('/api', '')
+				} catch (e) {
+					return 'https://m.mmbookies.com'
+				}
+			},
+			openUrl(url) {
+				// #ifdef H5
+				if (typeof window !== 'undefined') {
+					window.open(url);
+					return;
+				}
+				// #endif
+				// #ifdef APP-PLUS
+				plus.runtime.openURL(url);
+				// #endif
+			},
 			generate_qr_code() {
-				// let url = `${this.$http.baseUrl}/#/pages/login/register?iv=${this.userInfo.id}`
-				let url = `${window.location.origin}/#/pages/login/register?iv=${this.userInfo.id}`
 				let _this = this
+				let origin = _this.getSiteOrigin();
+				let url = `${origin}/#/pages/login/register?iv=${_this.r_code}`
 				_this.share_url = url
-				const ctx = uni.createCanvasContext('qrcode');
-				const uqrcode = new uQRCode({
-					text: url,
-					size: _this.size,
-				}, ctx);
-				uqrcode.make();
-				uqrcode.draw();
+				setTimeout(() => {
+					const ctx = uni.createCanvasContext('qrcode');
+					const uqrcode = new uQRCode({ text: url, size: _this.size }, ctx);
+					uqrcode.make();
+					uqrcode.draw();
+				}, 100)
+			},
+			limitToast() {
+				uni.showToast({
+					title: this.$t("You've reached the maximum invites"),
+					icon: 'none',
+					duration: 3000
+				});
 			},
 			shareSystem() {
-				if (!this.canInvite) {
-					uni.showToast({
-						title: this.$t('max_invites_reached'),
-						icon: 'none',
-						duration: 3000
-					});
-					return;
-				}
-
-				if (navigator.share) {
+				if (!this.canInvite) return this.limitToast();
+				// #ifdef H5
+				if (typeof navigator !== 'undefined' && navigator.share) {
 					navigator.share({
-						title: this.$t('share_title'),
-						text: this.$t('share_text'),
+						title: 'MM Bookies',
+						text: 'Click the link to get started!',
 						url: this.share_url
 					});
-				} else {
-					uni.showToast({
-						title: this.$t('share_not_supported'),
-						icon: 'none'
-					});
+					return;
 				}
+				// #endif
+				uni.setClipboardData({
+					data: this.share_url,
+					success: () => uni.showToast({ title: this.$t('copied_to_clipboard'), icon: 'success' })
+				});
 			},
 			shareFacebook() {
-				if (!this.canInvite) {
-					uni.showToast({
-						title: this.$t('max_invites_reached'),
-						icon: 'none',
-						duration: 3000
-					});
-					return;
-				}
-				window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.share_url)}`);
+				if (!this.canInvite) return this.limitToast();
+				this.openUrl(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.share_url)}`);
 			},
 			shareTelegram() {
-				if (!this.canInvite) {
-					uni.showToast({
-						title: this.$t('max_invites_reached'),
-						icon: 'none',
-						duration: 3000
-					});
-					return;
-				}
-				window.open(`https://t.me/share/url?url=${encodeURIComponent(this.share_url)}&text=Join me on ONE X2!`);
+				if (!this.canInvite) return this.limitToast();
+				this.openUrl(`https://t.me/share/url?url=${encodeURIComponent(this.share_url)}&text=MM Bookies`);
 			},
 			shareLine() {
-				if (!this.canInvite) {
-					uni.showToast({
-						title: this.$t('max_invites_reached'),
-						icon: 'none',
-						duration: 3000
-					});
-					return;
-				}
-				window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(this.share_url)}`);
+				if (!this.canInvite) return this.limitToast();
+				this.openUrl(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(this.share_url)}`);
 			},
 			copy() {
-				// 检查是否可以邀请
-				if (!this.canInvite) {
-					uni.showToast({
-						title: this.$t('max_invites_reached'),
-						icon: 'none',
-						duration: 3000
-					});
-					return;
-				}
-
-				const _this = this
+				if (!this.canInvite) return this.limitToast();
 				uni.setClipboardData({
-					data: _this.share_url,
-					success: function() {
-						uni.showToast({
-							title: _this.$t('copied_to_clipboard'),
-							icon: 'success'
-						});
-					},
-					fail: function() {
-						// uni.showToast({
-						//   title: '复制失败',
-						//   icon: 'none'
-						// });
-					}
+					data: this.share_url,
+					success: () => uni.showToast({ title: this.$t('copied_to_clipboard'), icon: 'success' })
 				});
 			}
-
 		}
 	}
 </script>
@@ -212,32 +210,49 @@
 		padding: 25px;
 		margin-top: 10px;
 		color: rgba(0, 0, 0, 0.87);
-		transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-		border-radius: 4px;
-		box-shadow: var(--Paper-shadow);
-		background-image: var(--Paper-overlay);
+		border-radius: 8px;
 		overflow: hidden;
-
 		text-align: center;
-		-webkit-box-align: center;
 		align-items: center;
 		margin-bottom: 10px;
-		background-color: rgb(255, 255, 255);
+		background-color: #ffffff;
 		box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 	}
 
 	.copy-rec {
 		width: 95%;
 		margin-left: 2.5%;
-		transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-		border-radius: 4px;
-		box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12);
+		border-radius: 8px;
 		overflow: hidden;
-		background-color: rgb(237, 236, 241);
+		background-color: #eef5f6;
 		text-align: center;
-		-webkit-box-align: center;
 		align-items: center;
 		box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;
 		padding: 15px 15px;
+		margin-top: 6px;
+	}
+
+	.qr-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0, 0, 0, 0.6);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 4px;
+	}
+
+	.qr-overlay-text {
+		color: white;
+		font-size: 14px;
+		font-weight: bold;
+	}
+
+	.grayscale {
+		filter: grayscale(100%);
+		opacity: 0.5;
 	}
 </style>

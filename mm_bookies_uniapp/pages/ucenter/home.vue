@@ -357,6 +357,16 @@
 						},
 					},
 					{
+						title: "invite_friend", // 邀请好友入口
+						content: '',
+						method: 'goto',
+						args: ['/pages/ucenter/invite/index'],
+						img: '../../static/icon/ucenter/invite.png',
+						para: {
+							need_login: true
+						},
+					},
+					{
 						title: "contact us", // from tangjq--- 使用语言文件中的键名
 						content: '',
 						method: 'openCustomerService', // from tangjq--- 改为显示弹窗
