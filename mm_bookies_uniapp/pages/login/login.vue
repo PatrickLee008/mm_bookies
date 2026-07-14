@@ -1,22 +1,19 @@
 <template>
 	<view>
-		<!-- from tangjq--- 启动界面 -->
+		<!-- from tangjq--- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
 		<view class="splash-screen" v-if="showSplash">
-			<!-- Skip 按钮 -->
-			<view class="skip-button" @click="closeSplash">
+			<!-- Skip 按钮（由 enable_skip_button 控制） -->
+			<view class="skip-button" @click="closeSplash" v-if="enableSkipButton">
 				<text class="skip-text">{{ $t('skip') }} {{ splashCountdown }}</text>
 			</view>
 
-			<!-- 标题图片 -->
-			<view class="splash-title-container">
-				<image class="splash-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
-				<!-- TODO: 替换为正确的缅甸文翻译 -->
-				<text class="splash-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
-			</view>
+			<!-- 开屏广告图片 -->
+			<image class="splash-ad-image" :src="splashImageUrl" mode="aspectFill"></image>
 
-			<!-- 主体图片 -->
-			<view class="splash-body-container">
-				<image class="splash-body-image" src="../../figma/login/skip_body.png" mode="widthFix"></image>
+			<!-- 动作按钮（由 enable_action_button 控制） -->
+			<view class="splash-action-button" v-if="enableActionButton && actionButtonLabel"
+				@click="onSplashAction">
+				<text class="splash-action-text">{{ actionButtonLabel }}</text>
 			</view>
 		</view>
 
@@ -114,6 +111,7 @@
 
 <script>
 	import config from '../../utils/config.js'
+	import siteinfo from '../../siteinfo.js'
 	import CryptoJS from 'crypto-js';
 	import CustomerService from '@/components/common/customer-service.vue'
 
@@ -165,10 +163,16 @@
 
 				showPassword: false,
 				show_x: false,
-				// from tangjq--- 启动界面相关数据
-				showSplash: true,
+				// from tangjq--- 开屏广告相关数据（由后端配置驱动）
+				showSplash: false,
 				splashCountdown: 5,
-				splashTimer: null
+				displayDuration: 5,
+				splashTimer: null,
+				splashImageUrl: '',
+				enableSkipButton: true,
+				enableActionButton: false,
+				actionButtonLabel: '',
+				actionButtonRoute: ''
 			};
 		},
 		computed: {
@@ -388,8 +392,9 @@
 			// updateImageCode() {
 			// 	this.mcaptcha.refresh()
 			// },
-			// from tangjq--- 启动界面相关方法
+			// from tangjq--- 开屏广告相关方法
 			startSplashTimer() {
+				this.clearSplashTimer()
 				this.splashTimer = setInterval(() => {
 					this.splashCountdown--
 					if (this.splashCountdown <= 0) {
@@ -397,30 +402,77 @@
 					}
 				}, 1000)
 			},
-			closeSplash() {
+			clearSplashTimer() {
 				if (this.splashTimer) {
 					clearInterval(this.splashTimer)
 					this.splashTimer = null
 				}
-				this.showSplash = false
-
-				// from tangjq--- 保存本次启动页面关闭的时间戳
-				const currentTime = new Date().getTime()
-				uni.setStorageSync('splash_last_shown_time', currentTime)
 			},
-			// from tangjq--- 检查是否应该显示启动页面（5分钟内不重复显示）
+			closeSplash() {
+				this.clearSplashTimer()
+				this.showSplash = false
+				// 记录本次关闭时间（5分钟内不重复显示）
+				uni.setStorageSync('splash_last_shown_time', new Date().getTime())
+			},
+			// 检查是否应显示开屏（5分钟内不重复），再向后端拉取配置
 			checkShouldShowSplash() {
-				const lastShownTime = uni.getStorageSync("splash_last_shown_time")
+				const lastShownTime = uni.getStorageSync('splash_last_shown_time')
 				const currentTime = new Date().getTime()
-				const FIVE_MINUTES = 5 * 60 * 1000 // from tangjq--- 5分钟 = 300000毫秒
-
-				// from tangjq--- 如果有上次显示时间，且距离当前时间不超过5分钟，则跳过启动页面
+				const FIVE_MINUTES = 5 * 60 * 1000
 				if (lastShownTime && (currentTime - lastShownTime < FIVE_MINUTES)) {
 					this.showSplash = false
-				} else {
-					// from tangjq--- 否则显示启动页面，并启动倒计时
-					this.showSplash = true
-					this.startSplashTimer()
+					return
+				}
+				this.fetchSplashConfig()
+			},
+			// 拉取后端开屏配置：是否启用（列表非空）、显示时长、图片、跳过/动作按钮
+			fetchSplashConfig() {
+				let _this = this
+				const tenant_id = (siteinfo && siteinfo.tenant_id) || '10000'
+				_this.$http.get('/splash_screen/get_active', {
+					data: { tenant_id }
+				}, (res) => {
+					const ok = res.statusCode === 200 && res.data && res.data.code === 200
+					const list = ok && res.data.data ? res.data.data.splash_screens : null
+					if (list && list.length > 0 && list[0].image_url) {
+						_this.applySplashConfig(list[0])
+						_this.showSplash = true
+						_this.startSplashTimer()
+					} else {
+						// 未配置或已禁用 → 不显示开屏，直接进入登录页
+						_this.showSplash = false
+					}
+				}, () => {
+					_this.showSplash = false
+				})
+			},
+			applySplashConfig(cfg) {
+				// 显示时长限制在 1-10 秒
+				let d = parseInt(cfg.display_duration, 10)
+				if (!d || d < 1) d = 5
+				if (d > 10) d = 10
+				this.displayDuration = d
+				this.splashCountdown = d
+				this.splashImageUrl = this.resolveSplashImage(cfg.image_url)
+				// 后端 to_dict 已将 TINYINT 转为布尔
+				this.enableSkipButton = cfg.enable_skip_button !== false
+				this.enableActionButton = cfg.enable_action_button === true
+				this.actionButtonLabel = cfg.action_button_label || ''
+				this.actionButtonRoute = cfg.action_button_route || ''
+			},
+			resolveSplashImage(url) {
+				if (!url) return ''
+				if (/^https?:\/\//i.test(url)) return url
+				let base = (siteinfo && siteinfo.imgUrl) || ''
+				if (url.charAt(0) !== '/') url = '/' + url
+				return base + url
+			},
+			onSplashAction() {
+				const route = this.actionButtonRoute
+				this.closeSplash()
+				// 仅对完整页面路径做跳转，避免未登录时跳转异常
+				if (route && route.charAt(0) === '/') {
+					uni.navigateTo({ url: route })
 				}
 			},
 			toggleRememberMe() {
@@ -505,6 +557,35 @@
 	.splash-body-image {
 		width: 100%;
 		height: auto;
+	}
+
+	/* 开屏广告图片：铺满全屏 */
+	.splash-ad-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	/* 开屏动作按钮 */
+	.splash-action-button {
+		position: absolute;
+		bottom: 120rpx;
+		left: 50%;
+		transform: translateX(-50%);
+		min-width: 300rpx;
+		height: 80rpx;
+		padding: 0 40rpx;
+		background-color: #2A6268;
+		border-radius: 40rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 10000;
+	}
+
+	.splash-action-text {
+		color: #FFFFFF;
+		font-size: 30rpx;
+		font-weight: 600;
 	}
 
 	/* 原有登录页面样式 */

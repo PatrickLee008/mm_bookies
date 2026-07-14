@@ -106,7 +106,7 @@
 					<view class="nav-icon-wrapper">
 						<image :src="activeNav === 'deals' ? '/static/icon/nav/deals_active.png' : '/static/icon/nav/deals.png'" class="nav-icon" mode="aspectFit"></image>
 					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'deals'}">Deals</text>
+					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'deals'}">{{ $t('Coupon') }}</text>
 				</view>
 
 				<!-- Wallet -->
