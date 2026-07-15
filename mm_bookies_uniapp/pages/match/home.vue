@@ -22,8 +22,10 @@
 		<view class="new-header-wrapper">
 			<view class="new-search-bar">
 				<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
-				<input class="search-input" type="text" placeholder="Search" v-model="searchKeyword" @input="handleSearchInput" />
-				<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword" @tap="clearSearch"></image>
+				<input class="search-input" type="text" placeholder="Search" v-model="searchKeyword"
+					@input="handleSearchInput" />
+				<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword"
+					@tap="clearSearch"></image>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
 				<view class="filter-icon">
@@ -36,18 +38,25 @@
 		</view>
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;" @scroll="handle_scroll" :style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
+			@scroll="handle_scroll"
+			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 广告图区域 -->
-			<view class="ad-banner-wrapper" v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
-				<image class="ad-banner-image" :src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''" mode="aspectFill"></image>
+			<view class="ad-banner-wrapper" v-for="(ad, index) in advertisements" :key="index"
+				@click="handleAdClick(ad)">
+				<image class="ad-banner-image" :src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''"
+					mode="aspectFill"></image>
 			</view>
 
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
-			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index" v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
+			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"
+				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
 				<!-- 联赛标题栏 -->
 				<view class="new-league-header" @click="league.show_match = !league.show_match">
 					<view class="league-left">
-						<image class="league-icon" src="https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png" mode="aspectFit"></image>
+						<image class="league-icon"
+							src="https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png"
+							mode="aspectFit"></image>
 						<text class="league-name">{{league.name}}</text>
 					</view>
 					<view class="league-right">
@@ -55,10 +64,12 @@
 					</view>
 				</view>
 
-				<transition name="match-animation" class="width-100" @before-enter="beforeEnter" @enter="enter" @leave="leave">
+				<transition name="match-animation" class="width-100" @before-enter="beforeEnter" @enter="enter"
+					@leave="leave">
 					<view v-show="league.show_match" class="width-100">
 						<!-- 比赛卡片 -->
-						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index" v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
+						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index"
+							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
 							<!-- 日期时间行 -->
 							<view class="match-datetime">
 								{{match.MD_DDMM}} {{match.MD_HHMM}} {{match.MD_NOON}}
@@ -67,13 +78,17 @@
 							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
 							<view class="match-teams">
 								<view class="team-section">
-									<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo" @error="error_pic(match,'home')" />
-									<text class="team-name" :class="{'text-red':match.LOSE_TEAM ==='1',}">{{match.HOST_TEAM}}</text>
+									<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
+										@error="error_pic(match,'home')" />
+									<text class="team-name"
+										:class="{'text-red':match.LOSE_TEAM ==='1',}">{{match.HOST_TEAM}}</text>
 								</view>
 								<text class="vs-text">vs</text>
 								<view class="team-section">
-									<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo" @error="error_pic(match,'away')" />
-									<text class="team-name" :class="{'text-red':match.LOSE_TEAM ==='2',}">{{match.GUEST_TEAM}}</text>
+									<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
+										@error="error_pic(match,'away')" />
+									<text class="team-name"
+										:class="{'text-red':match.LOSE_TEAM ==='2',}">{{match.GUEST_TEAM}}</text>
 								</view>
 							</view>
 
@@ -81,46 +96,61 @@
 							<view class="new-bet-options">
 								<!-- 循环显示所有投注选项，前2个始终显示，其余根据expanded状态显示 -->
 								<template v-for="(attr, attr_index) in match.ATTR">
-									<view class="bet-row" v-if="!attr.disabled && (attr_index < 2 || match.expanded)" :key="attr_index">
+									<view class="bet-row" v-if="!attr.disabled && (attr_index < 2 || match.expanded)"
+										:key="attr_index">
 										<!-- HDP类型 -->
-										<template v-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_BODY || attr.MATCH_ATTR_TYPE == bet_type.MIX_BODY">
+										<template
+											v-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_BODY || attr.MATCH_ATTR_TYPE == bet_type.MIX_BODY">
 											<view class="bet-type-label">
 												<text>H</text>
 												<text>D</text>
 												<text>P</text>
 											</view>
 											<view class="bet-buttons">
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.host_selected,}"
+													@click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Home</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 												<view class="bet-odds">
 													<text>{{calc_real_odds(attr)}}</text>
 												</view>
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.guest_selected,}"
+													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Away</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 											</view>
 										</template>
 
 										<!-- O/U类型 -->
-										<template v-else-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_GOAL || attr.MATCH_ATTR_TYPE == bet_type.MIX_GOAL">
+										<template
+											v-else-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_GOAL || attr.MATCH_ATTR_TYPE == bet_type.MIX_GOAL">
 											<view class="bet-type-label">
 												<text>O</text>
 												<text>U</text>
 											</view>
 											<view class="bet-buttons">
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.host_selected,}"
+													@click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Over</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 												<view class="bet-odds">
 													<text>{{attr.LOSE_BALL_NUM}}+{{attr.DRAW_ODDS}}</text>
 												</view>
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.guest_selected,}"
+													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Under</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
 											</view>
 										</template>
@@ -133,17 +163,26 @@
 												<text>2</text>
 											</view>
 											<view class="bet-buttons bet-buttons-three">
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.host_selected,}" @click="betClick('host',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.host_selected,}"
+													@click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Home</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
 												</view>
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.draw_selected,}" @click="betClick('draw',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.draw_selected,}"
+													@click="betClick('draw',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Draw</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.DRAW_ODDS)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.DRAW_ODDS)}}</text>
 												</view>
-												<view class="bet-btn bet-btn-small" :class="{'bet-btn-selected':attr.guest_selected,}" @click="betClick('guest',index,_index,attr_index,attr)">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.guest_selected,}"
+													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Away</text>
-													<text class="bet-odds-small" v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
 												</view>
 											</view>
 										</template>
@@ -152,7 +191,8 @@
 							</view>
 
 							<!-- from tangjq--- 展开/收起按钮，仅当有超过2个投注选项时显示 -->
-							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2" @click.stop="toggle_match_expand(match)">
+							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2"
+								@click.stop="toggle_match_expand(match)">
 								<text style="color: white; margin-right: 5px;">{{ match.expanded ? '' : 'More' }}</text>
 								<view :class="match.expanded ? 'cuIcon-fold' : 'cuIcon-unfold'"></view>
 							</view>
@@ -190,19 +230,24 @@
 					<!-- 比赛信息卡片 -->
 					<view class="detail-match-card">
 						<view class="detail-datetime">
-							{{match_ref.match_detail.MD_DDMM}} {{match_ref.match_detail.MD_HHMM}} {{match_ref.match_detail.MD_NOON}}
+							{{match_ref.match_detail.MD_DDMM}} {{match_ref.match_detail.MD_HHMM}}
+							{{match_ref.match_detail.MD_NOON}}
 						</view>
 						<view class="detail-teams">
 							<view class="detail-team">
-								<image :src="match_ref.match_detail.home_logo" lazy-load class="detail-team-logo" @error="error_pic(match_ref.match_detail,'home')"></image>
-								<text class="detail-team-name" :class="{'text-red':match_ref.match_detail.LOSE_TEAM ==='1',}">
+								<image :src="match_ref.match_detail.home_logo" lazy-load class="detail-team-logo"
+									@error="error_pic(match_ref.match_detail,'home')"></image>
+								<text class="detail-team-name"
+									:class="{'text-red':match_ref.match_detail.LOSE_TEAM ==='1',}">
 									{{match_ref.match_detail.HOST_TEAM}}
 								</text>
 							</view>
 							<text class="detail-vs">vs</text>
 							<view class="detail-team">
-								<image :src="match_ref.match_detail.away_logo" lazy-load class="detail-team-logo" @error="error_pic(match_ref.match_detail,'away')"></image>
-								<text class="detail-team-name" :class="{'text-red':match_ref.match_detail.LOSE_TEAM ==='2',}">
+								<image :src="match_ref.match_detail.away_logo" lazy-load class="detail-team-logo"
+									@error="error_pic(match_ref.match_detail,'away')"></image>
+								<text class="detail-team-name"
+									:class="{'text-red':match_ref.match_detail.LOSE_TEAM ==='2',}">
 									{{match_ref.match_detail.GUEST_TEAM}}
 								</text>
 							</view>
@@ -232,15 +277,18 @@
 						<view class="mix-match-item" v-for="(match,index) in bet_list" :key='index'>
 							<!-- from tangjq--- 比赛时间 -->
 							<view class="mix-match-datetime">
-								<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}} {{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
+								<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}}
+									{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
 							</view>
 
 							<view class="mix-match-info">
 								<!-- from tangjq--- 队伍对阵 -->
 								<view class="mix-match-row mix-teams-row">
-									<text class="mix-team-name" :class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
+									<text class="mix-team-name"
+										:class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
 									<text class="mix-vs">vs</text>
-									<text class="mix-team-name" :class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
+									<text class="mix-team-name"
+										:class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
 								</view>
 
 								<!-- from tangjq--- 投注类型和赔率 -->
@@ -265,27 +313,37 @@
 				<view class="single-match-info" v-if="!match_ref.mixed && match_ref.bet_match">
 					<!-- from tangjq--- 比赛时间 -->
 					<view class="match-time-row">
-						<text class="match-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
+						<text
+							class="match-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
 					</view>
 
 					<!-- from tangjq--- 队伍图标和名称 -->
 					<view class="teams-row">
 						<view class="team-section">
-							<image class="team-logo" :src="match_ref.bet_match.show_image ? match_ref.bet_match.home_logo : ''" lazy-load mode="aspectFit" @error="error_pic(match_ref.bet_match,'home')"></image>
-							<text class="team-name" :class="{'text-red':match_ref.bet_match.LOSE_TEAM=='1'}">{{match_ref.bet_match.HOST_TEAM}}</text>
+							<image class="team-logo"
+								:src="match_ref.bet_match.show_image ? match_ref.bet_match.home_logo : ''" lazy-load
+								mode="aspectFit" @error="error_pic(match_ref.bet_match,'home')"></image>
+							<text class="team-name"
+								:class="{'text-red':match_ref.bet_match.LOSE_TEAM=='1'}">{{match_ref.bet_match.HOST_TEAM}}</text>
 						</view>
 						<text class="vs-text">VS</text>
 						<view class="team-section">
-							<image class="team-logo" :src="match_ref.bet_match.show_image ? match_ref.bet_match.away_logo : ''" lazy-load mode="aspectFit" @error="error_pic(match_ref.bet_match,'away')"></image>
-							<text class="team-name" :class="{'text-red':match_ref.bet_match.LOSE_TEAM=='2'}">{{match_ref.bet_match.GUEST_TEAM}}</text>
+							<image class="team-logo"
+								:src="match_ref.bet_match.show_image ? match_ref.bet_match.away_logo : ''" lazy-load
+								mode="aspectFit" @error="error_pic(match_ref.bet_match,'away')"></image>
+							<text class="team-name"
+								:class="{'text-red':match_ref.bet_match.LOSE_TEAM=='2'}">{{match_ref.bet_match.GUEST_TEAM}}</text>
 						</view>
 					</view>
 
 					<!-- from tangjq--- 投注类型详情 -->
 					<view class="bet-detail-row">
-						<text class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : 'O/U')}}</text>
-						<text class="bet-odds">{{match_ref.bet_match.sa ? (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
-						<text class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
+						<text
+							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : 'O/U')}}</text>
+						<text
+							class="bet-odds">{{match_ref.bet_match.sa ? (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
+						<text
+							class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
 					</view>
 
 					<!-- from tangjq--- 投注选项 -->
@@ -311,13 +369,34 @@
 
 					<!-- Wallet -->
 					<view class="wallet-row">
-						<text class="wallet-label">Wallet</text>
+						<text class="wallet-label">{{$t('balance')}} ({{$t('main_wallet')}})</text>
 						<text class="wallet-value">{{$toolbox.num_format($store.state.userInfo.money)}}</text>
+					</view>
+
+					<!-- Promotion Wallet -->
+					<view class="wallet-row">
+						<view class="flex-row align-center" style="gap: 8px;">
+							<text class="wallet-label">{{$t('promotion_wallet')}}</text>
+							<text
+								class="wallet-value">{{$toolbox.num_format($store.state.userInfo.money_promotion || 0)}}</text>
+						</view>
+						<view class="flex-row justify-end align-center" style="gap: 5px;"
+							@click="togglePromotionWallet">
+							<text class="wallet-label"
+								style="font-size: 10px; line-height: 1.2;">{{$t('use_promotion_wallet')}}</text>
+							<view class="custom-checkbox" :class="{
+									'custom-checkbox-checked': use_promotion_wallet,
+									'custom-checkbox-disabled': !canUsePromotionWallet
+								}">
+								<view v-if="use_promotion_wallet" class="custom-checkbox-icon cuIcon-check"></view>
+							</view>
+						</view>
 					</view>
 
 					<!-- 输入框 -->
 					<view class="bet-amount-input">
-						<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum" class="amount-input" />
+						<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum"
+							class="amount-input" />
 					</view>
 
 					<!-- Minimum Bet Amount -->
@@ -327,7 +406,8 @@
 
 					<!-- 快捷金额按钮 -->
 					<view class="quick-amount-btns">
-						<view class="quick-btn" :class="{'quick-btn-selected': amount == amt}" v-for="(amt,index) in amount_list" :key='index' @click="set_amount(amt)">
+						<view class="quick-btn" :class="{'quick-btn-selected': amount == amt}"
+							v-for="(amt,index) in amount_list" :key='index' @click="set_amount(amt)">
 							<text>{{$toolbox.num_format(amt)}}</text>
 						</view>
 					</view>
@@ -337,7 +417,9 @@
 						<view class="cancel-btn" @click="hide_bets_slip = true">
 							<text class="cancel-text">{{$t('Cancel')}}</text>
 						</view>
-						<view class="confirm-btn-action" :class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}" @click="submit()">
+						<view class="confirm-btn-action"
+							:class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}"
+							@click="submit()">
 							<text class="confirm-text">{{$t('Confirm')}}</text>
 						</view>
 					</view>
@@ -346,15 +428,20 @@
 		</view>
 
 		<!-- from tangjq--- 保留原有复杂逻辑的下单详情（隐藏，用于保持逻辑） -->
-		<scroll-view scroll-y class="dialog-wrapper mycolor-primary slip" v-show="false" @tap.prevent="" style="height: 100%; display: none;">
+		<scroll-view scroll-y class="dialog-wrapper mycolor-primary slip" v-show="false" @tap.prevent=""
+			style="height: 100%; display: none;">
 			<view style="background: none;line-height: 1.2;">
-				<view class="flex-row text-bold box-shadow padding bg-white mycolor-primary" @click="hide_bets_slip = true" style="position: sticky;top: 0;overflow-y: overlay;z-index: 16;" v-if="match_ref.mixed">
+				<view class="flex-row text-bold box-shadow padding bg-white mycolor-primary"
+					@click="hide_bets_slip = true" style="position: sticky;top: 0;overflow-y: overlay;z-index: 16;"
+					v-if="match_ref.mixed">
 					<view class="cuIcon-back mycolor-info"></view>
 					<view class="width-100">{{'Bets Slip'}}</view>
 				</view>
 				<!-- 混合 -->
-				<view class="flex-column padding-xs text-bold bg-white mycolor-primary" v-show="match_ref.mixed" style="min-height: calc(100vh - 750upx - 62px - 42.5px);justify-content: start;">
-					<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs" style="height: auto;" v-for="(match,index) in bet_list" :key='index'>
+				<view class="flex-column padding-xs text-bold bg-white mycolor-primary" v-show="match_ref.mixed"
+					style="min-height: calc(100vh - 750upx - 62px - 42.5px);justify-content: start;">
+					<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs" style="height: auto;"
+						v-for="(match,index) in bet_list" :key='index'>
 						<view class="padding-sm flex-column myfont-12px gap-5px">
 							<view class="flex-row justify-between">
 								<view :class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</view>
@@ -362,7 +449,8 @@
 							</view>
 							<view class="flex-row justify-between">
 								<view :class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</view>
-								<view class="">{{calc_real_odds(match.sa,'bn')}}<text class="text-red">{{calc_real_odds(match.sa,'bo')}}</text>{{calc_real_odds(match.sa,'ha')}}
+								<view class="">{{calc_real_odds(match.sa,'bn')}}<text
+										class="text-red">{{calc_real_odds(match.sa,'bo')}}</text>{{calc_real_odds(match.sa,'ha')}}
 								</view>
 							</view>
 							<view class="flex-row justify-between">
@@ -371,7 +459,9 @@
 							</view>
 						</view>
 						<view class="flex-row justify-between mybg-primary padding-sm radius-6px">
-							<view class="cuIcon-deletefill round bg-white mycolor-primary myfont-10px width-20px height-18px line-height-18px" @click="remove_select(match)">
+							<view
+								class="cuIcon-deletefill round bg-white mycolor-primary myfont-10px width-20px height-18px line-height-18px"
+								@click="remove_select(match)">
 							</view>
 							<view class="flex-row  justify-end">
 								<text class="mycolor-active">{{bet_content(match)}}</text>
@@ -382,17 +472,22 @@
 				</view>
 				<!-- 单笔 -->
 				<view v-if="!match_ref.mixed" class="single-mask" @click="hide_bets_slip = true"></view>
-				<view class="text-bold flex-column bg-white padding-lr-sm" style="bottom: 0;overflow-y: overlay;z-index: 17;display:none;" :style="{'position':match_ref.mixed?'sticky':'fixed'}">
+				<view class="text-bold flex-column bg-white padding-lr-sm"
+					style="bottom: 0;overflow-y: overlay;z-index: 17;display:none;"
+					:style="{'position':match_ref.mixed?'sticky':'fixed'}">
 					<view class="flex-column padding-xs single-bottom dialig-bottom" v-if="!match_ref.mixed">
 						<view class="margin-top-sm mybg-primary row-line"></view>
 						<view class="flex-row gap-5px justify-center margin-tb-xs myfont-11px">
-							<text class="" :class="{'text-red':match_ref.bet_match.LOSE_TEAM=='1',}">{{match_ref.bet_match.HOST_TEAM}}</text>
+							<text class=""
+								:class="{'text-red':match_ref.bet_match.LOSE_TEAM=='1',}">{{match_ref.bet_match.HOST_TEAM}}</text>
 							<text class="text-light">vs</text>
-							<text :class="{'text-red':match_ref.bet_match.LOSE_TEAM=='2',}">{{match_ref.bet_match.GUEST_TEAM}}</text>
+							<text
+								:class="{'text-red':match_ref.bet_match.LOSE_TEAM=='2',}">{{match_ref.bet_match.GUEST_TEAM}}</text>
 						</view>
 					</view>
 					<view v-if="!match_ref.mixed" class="width-100">
-						<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+						<view
+							class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 							<view class="flex-row justify-between">
 								<view class="flex-column" style="align-items: start;">
 									<view class="">{{bet_content(match_ref.bet_match)}}</view>
@@ -400,7 +495,8 @@
 								</view>
 								<view class="flex-column" style="align-items: end;">
 									<view class="">{{calc_detail_odds(match_ref.bet_match.sa)}}</view>
-									<view class="">{{calc_real_odds(match_ref.bet_match.sa,'bn')}}<text class="text-red">{{calc_real_odds(match_ref.bet_match.sa,'bo')}}</text>{{calc_real_odds(match_ref.bet_match.sa,'ha')}}
+									<view class="">{{calc_real_odds(match_ref.bet_match.sa,'bn')}}<text
+											class="text-red">{{calc_real_odds(match_ref.bet_match.sa,'bo')}}</text>{{calc_real_odds(match_ref.bet_match.sa,'ha')}}
 									</view>
 								</view>
 							</view>
@@ -419,7 +515,9 @@
 						</view> -->
 					</view>
 					<view class="flex-column padding-tb-xs dialig-bottom">
-						<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm" v-if="match_ref.mixed">
+						<view
+							class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm"
+							v-if="match_ref.mixed">
 							<view class="flex-row justify-between">
 								<view class="">Total Bet</view>
 								<view class="">{{bet_list.length}}</view>
@@ -430,37 +528,45 @@
 							</view>
 						</view>
 						<view v-show="bet_main">
-							<view class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+							<view
+								class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-start">
 
-									<view class="mybg-active round width-75upx height-65upx align-center flex-column" style="">
-										<image mode="widthFix" class="width-20px " src="/static/image/single/wallet-bet.svg"></image>
+									<view class="mybg-active round width-75upx height-65upx align-center flex-column"
+										style="">
+										<image mode="widthFix" class="width-20px "
+											src="/static/image/single/wallet-bet.svg"></image>
 									</view>
-									<view class="flex-column margin-left-sm align-start gap-5px" style="align-items: start;">
+									<view class="flex-column margin-left-sm align-start gap-5px"
+										style="align-items: start;">
 										<view class="text-light">{{$t('balance')}} ({{$t('main_wallet')}})</view>
 										<view>{{$toolbox.num_format($store.state.userInfo.money)}}</view>
 									</view>
 								</view>
-								<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-30vw" @click="to_deposit()">
-									<image mode="widthFix" class="width-20px margin-right-xs" src="/static/image/single/deposit.svg"></image>
+								<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-30vw"
+									@click="to_deposit()">
+									<image mode="widthFix" class="width-20px margin-right-xs"
+										src="/static/image/single/deposit.svg"></image>
 									<view>{{$t('deposit')}}</view>
 								</button>
 							</view>
 							<!-- Promotion Wallet 显示 -->
-							<view class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+							<view
+								class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-start align-center">
 									<view class="mybg-active round width-33px height-65upx align-center flex-column">
-										<image mode="widthFix" class="width-20px" src="/static/image/single/wallet-bet.svg"></image>
+										<image mode="widthFix" class="width-20px"
+											src="/static/image/single/wallet-bet.svg"></image>
 									</view>
 									<view class="flex-column1 margin-left-sm align-start gap-5px">
-										<view class="text-light">Promotion Wallet</view>
+										<view class="text-light">{{$t('promotion_wallet')}}</view>
 										<view>{{$toolbox.num_format($store.state.userInfo.money_promotion || 0)}}</view>
 									</view>
 								</view>
 								<view class="flex-row1 align-center justify-end" @click="togglePromotionWallet">
 									<view class="flex-row align-center gap-5px" style="cursor: pointer;">
 										<text class="myfont-10px text-light width-100px" style="line-height: 1.2;">
-											Use Promotion Wallet
+											{{$t('use_promotion_wallet')}}
 										</text>
 										<!-- 自定义checkbox -->
 										<view class="custom-checkbox" :class="{
@@ -474,18 +580,25 @@
 									</view>
 								</view>
 							</view>
-							<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+							<view
+								class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-between">
-									<view class="flex-row justify-between margin-right radius-6px padding-tb-xs padding-lr-sm" style="border: 1px grey solid;">
-										<input class="width-100 text-left padding-right-sm" type="number" @input="inputNum" v-model="amount" />
+									<view
+										class="flex-row justify-between margin-right radius-6px padding-tb-xs padding-lr-sm"
+										style="border: 1px grey solid;">
+										<input class="width-100 text-left padding-right-sm" type="number"
+											@input="inputNum" v-model="amount" />
 
 
-										<image class="width-20px height-20px" src="/static/image/single/close.svg" @click="clearAmount()">
+										<image class="width-20px height-20px" src="/static/image/single/close.svg"
+											@click="clearAmount()">
 											<!-- @click="amount=match_ref.mixed?mix_min:single_min"> -->
 										</image>
 									</view>
-									<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-35vw" @click="submit()">
-										<image mode="widthFix" class="width-20px margin-right-xs" src="/static/image/single/ball.svg"></image>
+									<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-35vw"
+										@click="submit()">
+										<image mode="widthFix" class="width-20px margin-right-xs"
+											src="/static/image/single/ball.svg"></image>
 										<view class="">{{$t('betting')}}</view>
 									</button>
 								</view>
@@ -496,47 +609,65 @@
 
 									<!-- 下拉选择框主体 -->
 									<view class="coupon-select-wrapper" @click="toggleCouponDropdown">
-										<view class="coupon-select-input padding-sm radius-6px" :class="show_coupon_dropdown ? 'mybg-active text-black' : 'mybg-primary'" style="border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
+										<view class="coupon-select-input padding-sm radius-6px"
+											:class="show_coupon_dropdown ? 'mybg-active text-black' : 'mybg-primary'"
+											style="border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
 											<!-- 左侧内容区 -->
 											<view class="flex-row1 align-center" style="flex: 1; min-width: 0;">
-												<view v-if="selected_coupon" style="display: flex; flex-direction: row; align-items: center;">
-													<text class="text-bold myfont-12px" style="white-space: nowrap;">{{selected_coupon.coupon_name}}</text>
-													<text class="myfont-10px text-light margin-left-sm flex-row1" style="white-space: nowrap;">
+												<view v-if="selected_coupon"
+													style="display: flex; flex-direction: row; align-items: center;">
+													<text class="text-bold myfont-12px"
+														style="white-space: nowrap;">{{selected_coupon.coupon_name}}</text>
+													<text class="myfont-10px text-light margin-left-sm flex-row1"
+														style="white-space: nowrap;">
 														(-{{$toolbox.num_format(selected_coupon.bonus_amount)}} MMK)
 													</text>
 												</view>
 												<view v-else class="text-light myfont-12px flex-row1">
 													<text v-if="loading_coupons">{{$t('Loading Coupons')}}...</text>
-													<text v-else-if="available_coupons.length > 0">{{`${$t('Select Coupon')}(${available_coupons.length})`}}
+													<text
+														v-else-if="available_coupons.length > 0">{{`${$t('Select Coupon')}(${available_coupons.length})`}}
 													</text>
 													<text v-else>{{$t('No Available Coupons')}}</text>
 												</view>
 											</view>
 											<!-- 右侧图标区 -->
-											<view style="display: flex; flex-direction: row; align-items: center; flex-shrink: 0; margin-left: 10px;">
-												<view v-if="selected_coupon" class="cuIcon-close myfont-12px" @click.stop="clearCouponSelection" style="padding: 2px 5px;"></view>
-												<view class="cuIcon-unfold myfont-12px" :class="show_coupon_dropdown ? 'rotate-180' : ''" style="padding: 2px 5px;"></view>
+											<view
+												style="display: flex; flex-direction: row; align-items: center; flex-shrink: 0; margin-left: 10px;">
+												<view v-if="selected_coupon" class="cuIcon-close myfont-12px"
+													@click.stop="clearCouponSelection" style="padding: 2px 5px;"></view>
+												<view class="cuIcon-unfold myfont-12px"
+													:class="show_coupon_dropdown ? 'rotate-180' : ''"
+													style="padding: 2px 5px;"></view>
 											</view>
 										</view>
 									</view>
 
 									<!-- 下拉选项列表 -->
-									<view v-if="show_coupon_dropdown" class="coupon-dropdown-list mybg-grey radius-6px" style="position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
+									<view v-if="show_coupon_dropdown" class="coupon-dropdown-list mybg-grey radius-6px"
+										style="position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
 											   max-height: 150px; overflow-y: auto; margin-top: 5px;
 											   box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-										<view v-for="(coupon, index) in available_coupons" :key="index" @click="selectCoupon(coupon)" class="coupon-dropdown-item flex-row justify-between padding-sm" :class="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id ? 'mybg-active text-black' : ''" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+										<view v-for="(coupon, index) in available_coupons" :key="index"
+											@click="selectCoupon(coupon)"
+											class="coupon-dropdown-item flex-row justify-between padding-sm"
+											:class="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id ? 'mybg-active text-black' : ''"
+											style="border-bottom: 1px solid rgba(255,255,255,0.1);">
 											<view class="flex-column align-start gap-2px" style="flex: 1;">
 												<text class="text-bold myfont-12px">{{coupon.coupon_name}}</text>
 												<text class="myfont-10px text-light">
 													{{$t('bonus')}}: {{$toolbox.num_format(coupon.bonus_amount)}} MMK
 												</text>
-												<text v-if="coupon.min_bet_required > 0" class="myfont-9px text-light">{{`${$t('Min Bet')}: ${$toolbox.num_format(coupon.min_bet_required)}MMK`}}
+												<text v-if="coupon.min_bet_required > 0"
+													class="myfont-9px text-light">{{`${$t('Min Bet')}: ${$toolbox.num_format(coupon.min_bet_required)}MMK`}}
 												</text>
 												<!-- <text v-if="coupon.min_bet_required > 0" class="myfont-9px text-light">
 													{{$t('min_bet')}}: {{$toolbox.num_format(coupon.min_bet_required)}} MMK
 												</text> -->
 											</view>
-											<view v-if="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id" class="cuIcon-check mycolor-active myfont-14px"></view>
+											<view
+												v-if="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id"
+												class="cuIcon-check mycolor-active myfont-14px"></view>
 										</view>
 									</view>
 								</view>
@@ -544,17 +675,21 @@
 								<view class="flex-row justify-start text-light text-black text-left" style="">
 									<view>
 										<text>{{$t('minimum_bet')}}</text>
-										<text class="padding-lr-xs text-bold mycolor-primary">{{match_ref.mixed?mix_min:single_min}}</text>
+										<text
+											class="padding-lr-xs text-bold mycolor-primary">{{match_ref.mixed?mix_min:single_min}}</text>
 										<text>{{$t('to')}}</text>
-										<text class="padding-lr-xs text-bold mycolor-primary">{{match_ref.mixed?mix_max:single_max}}</text>
+										<text
+											class="padding-lr-xs text-bold mycolor-primary">{{match_ref.mixed?mix_max:single_max}}</text>
 										<text>MMK{{$t('until')}}.</text>
 									</view>
 								</view>
 								<view class="flex-row justify-between align-center ">
-									<view>{{$t('potential')}}<text class="margin-left-sm myfont-20px ">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
+									<view>{{$t('potential')}}<text
+											class="margin-left-sm myfont-20px ">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
 									</view>
 									<!-- 实际支付金额显示 -->
-									<view class="myfont-10px">Actual Payment<text class="margin-left-sm myfont-20px ">{{$toolbox.num_format(actualPaymentAmount)}}</text>
+									<view class="myfont-10px">Actual Payment<text
+											class="margin-left-sm myfont-20px ">{{$toolbox.num_format(actualPaymentAmount)}}</text>
 									</view>
 									<!-- <view class="flex-column align-end">
 										<text class="text-light myfont-10px">Actual Payment</text>
@@ -565,7 +700,8 @@
 									<view>{{$t('non_maximum_wining_limit')}}</view>
 								</view>
 							</view>
-							<view class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+							<view
+								class="flex-column detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-start text-light">
 									<view>{{$t('quick_bets')}}</view>
 								</view>
@@ -573,7 +709,8 @@
 									<view>{{$t('select_bet')}}</view>
 								</view>
 								<view class="flex-row justify-between text-light">
-									<button class="cu-btn mybg-primary width-31" @click="set_amount(i)" v-for="(i,index) in amount_list" :key='index'>{{i}}</button>
+									<button class="cu-btn mybg-primary width-31" @click="set_amount(i)"
+										v-for="(i,index) in amount_list" :key='index'>{{i}}</button>
 								</view>
 							</view>
 						</view>
@@ -600,8 +737,10 @@
 		</scroll-view>
 
 		<login-modal ref='login_modal' :hidden.sync="hide_login_modal"></login-modal>
-		<league-filter ref='league_filter' :hidden.sync="hide_league_filter" :tomorrow='tomorrow' :league_list.sync='league_list'></league-filter>
-		<fuzzy-search ref='fuzzy_search' :hidden.sync="hide_fuzzy_search" :league_list.sync='league_list'></fuzzy-search>
+		<league-filter ref='league_filter' :hidden.sync="hide_league_filter" :tomorrow='tomorrow'
+			:league_list.sync='league_list'></league-filter>
+		<fuzzy-search ref='fuzzy_search' :hidden.sync="hide_fuzzy_search"
+			:league_list.sync='league_list'></fuzzy-search>
 
 		<!-- from tangjq--- 投注成功提示弹窗 -->
 		<view class="success-popup-wrapper" v-show="!hide_success_popup" @click="hide_success_popup = true">
@@ -613,7 +752,9 @@
 
 				<!-- 成功提示内容 -->
 				<view class="success-popup-content">
-					<image class="success-popup-image" src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800" mode="aspectFill"></image>
+					<image class="success-popup-image"
+						src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800" mode="aspectFill">
+					</image>
 					<text class="success-popup-subtitle">Betting Success</text>
 				</view>
 
@@ -719,8 +860,9 @@
 						this.$store.state.userInfo.money_promotion || 0, 0, true));
 
 					let message = 'Promotion wallet balance is insufficient for this bet amount';
-					if (promotionBalance < this.single_min) {
-						message = `Promotion wallet balance must be at least ${this.single_min} MMK`;
+					let min_limit = this.match_ref.mixed ? this.mix_min : this.single_min
+					if (promotionBalance < min_limit) {
+						message = `Promotion wallet balance must be at least ${min_limit} MMK`;
 					}
 
 					uni.showToast({
@@ -783,8 +925,9 @@
 					return false;
 				}
 
-				// 条件2: 优惠钱包余额必须大于等于single最小下单金额
-				if (promotionBalance < this.single_min) {
+				// 条件2: 优惠钱包余额必须大于等于最小下单金额（参考onex2_test，区分single/mix模式）
+				let min_limit = this.match_ref.mixed ? this.mix_min : this.single_min
+				if (promotionBalance < min_limit) {
 					return false;
 				}
 
@@ -870,19 +1013,19 @@
 			dynamicAmountList() {
 				let min = parseInt(this.configs.single_min) || 3000;
 				let max = parseInt(this.configs.single_max) || 10000;
-				if(this.match_ref.mixed){
+				if (this.match_ref.mixed) {
 					min = parseInt(this.configs.mix_min) || 3000;
 					max = parseInt(this.configs.mix_max) || 10000;
 				}
 				const fixedList = [3000, 5000, 10000];
-			
+
 				if (!min || !max || min >= max) {
 					return fixedList;
 				}
-			
+
 				// 从固定列表中筛选出在 min 和 max 之间的值（不包括两端）
 				const middleValues = fixedList.filter((value) => value > min && value < max);
-			
+
 				// 从中间值中选择最多4个
 				let selectedMiddle = [];
 				if (middleValues.length <= 4) {
@@ -894,7 +1037,7 @@
 						selectedMiddle.push(middleValues[index]);
 					}
 				}
-			
+
 				// 组合：[最小值, 中间值, 最大值]
 				return [min, ...selectedMiddle, max];
 			},
@@ -1020,8 +1163,9 @@
 						if (requiredAmount < 0) requiredAmount = 0;
 					}
 
-					if (promotionBalance < this.single_min) {
-						message = `Promotion wallet balance must be at least ${this.single_min} MMK`;
+					let min_limit = this.match_ref.mixed ? this.mix_min : this.single_min
+					if (promotionBalance < min_limit) {
+						message = `Promotion wallet balance must be at least ${min_limit} MMK`;
 					} else if (promotionBalance < requiredAmount) {
 						message =
 							`Promotion wallet balance (${this.$toolbox.num_format(promotionBalance)}) is less than required amount (${this.$toolbox.num_format(requiredAmount)})`;
@@ -1175,6 +1319,7 @@
 					let own = sa.MATCH_ATTR_TYPE == '10' ? 0 : 1
 					str = (parseFloat(odds) + own) * parseInt(this.amount)
 				}
+				if (!str) return 0
 				return str
 			},
 			set_amount(amount) {
@@ -1379,7 +1524,8 @@
 						}
 					})
 
-					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] : [_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, ]
+					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] :
+						[_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, ]
 					server_matches.forEach(match => {
 						match.click_arr = []
 						match.show_image = true
@@ -1436,7 +1582,8 @@
 					// from tangjq--- 使用Vue.set确保expanded属性是响应式的
 					_this.league_list.forEach((league, league_index) => {
 						league.match_list.forEach((match, match_index) => {
-							Vue.set(_this.league_list[league_index].match_list[match_index], 'expanded', false)
+							Vue.set(_this.league_list[league_index].match_list[match_index], 'expanded',
+								false)
 						})
 					})
 					_this.$nextTick(() => {
@@ -1634,7 +1781,8 @@
 									_this.show_success_popup();
 								} else {
 									// from tangjq--- 服务器返回错误，显示投注失败提示
-									var errorMsg = (res.data && res.data.message) ? _this.$t(res.data.message) : 'Betting failed, please try again'
+									var errorMsg = (res.data && res.data.message) ? _this.$t(res.data
+										.message) : 'Betting failed, please try again'
 									_this.show_fail_popup(errorMsg);
 								}
 							}, (err) => {
@@ -1646,7 +1794,8 @@
 					} else {
 						// from tangjq--- 赔率检查失败，显示错误提示
 						uni.hideLoading();
-						var errorMsg = (res.data && res.data.message) ? _this.$t(res.data.message) : 'Failed to check odds, please try again'
+						var errorMsg = (res.data && res.data.message) ? _this.$t(res.data.message) :
+							'Failed to check odds, please try again'
 						_this.show_fail_popup(errorMsg);
 					}
 				}, (err) => {

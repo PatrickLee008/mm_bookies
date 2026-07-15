@@ -9,15 +9,13 @@
 		<view class="title-bar">
 			<!-- Coupon / Promotion 顶部切换 -->
 			<view class="type-toggle" v-if="isLogin">
-				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }"
-					@click="change_type('coupon')">
+				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
 					<text>{{ $t('coupon') }}</text>
 				</view>
 				<view class="type-btn" :class="{ 'active': activity_type === 'promotion' }"
 					@click="change_type('promotion')">
 					<text>{{ $t('Promotion_title') }}</text>
-					<view class="promo-count-badge"
-						v-if="activity_type !== 'promotion' && promotionCount > 0">
+					<view class="promo-count-badge" v-if="activity_type !== 'promotion' && promotionCount > 0">
 						{{ promotionCount > 99 ? '99+' : promotionCount }}
 					</view>
 				</view>
@@ -31,43 +29,31 @@
 				<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
 					@click="submit_code">{{ $t('Claim') }}</view>
 			</view>
-
-			<!-- Tab选择器（仅 Coupon） -->
-			<view class="tab-selector" v-if="isLogin && activity_type === 'coupon'">
-				<view class="tab-container" ref="container">
-					<view v-for="(item, index) in tabs" :key="index" class="tab-item"
-						:class="{ 'active': tab_index === index }" @click="handleTabClick(index)">
-						<text class="tab-text">{{ $t(item) }}</text>
-					</view>
-					<!-- 底部滑动指示器 -->
-					<view class="slide-indicator" :style="{
-			          width: indicator_width + 'px',
-			          transform: `translateX(${indicator_offset}px)`
-			        }"></view>
-				</view>
-			</view>
 		</view>
 
 		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
-					<!-- 当前进行中的优惠券活动 -->
+					<!-- 当前进行中的优惠券活动（随页面滚动） -->
 					<view class="current-activity-box" v-if="currentActivity.has_activity">
 						<view class="ca-title-row">
 							<text class="ca-title">{{ currentActivity.activity_name || 'Coupon Activity' }}</text>
-							<text class="ca-status" :class="'ca-status-' + (currentActivity.status || '').toLowerCase()">
+							<text class="ca-status"
+								:class="'ca-status-' + (currentActivity.status || '').toLowerCase()">
 								{{ currentActivity.status || '-' }}
 							</text>
 						</view>
 						<view class="ca-credit">
 							<text class="ca-credit-label">Credit</text>
-							<text class="ca-credit-value">{{ $toolbox.num_format(currentActivity.bonus_amount || 0) }}</text>
+							<text
+								class="ca-credit-value">{{ $toolbox.num_format(currentActivity.bonus_amount || 0) }}</text>
 						</view>
 						<view class="ca-stats">
 							<view class="ca-stat">
 								<text class="ca-stat-label">Turnover</text>
-								<text class="ca-stat-value">{{ $toolbox.num_format(currentActivity.total_stake || 0) }}</text>
+								<text
+									class="ca-stat-value">{{ $toolbox.num_format(currentActivity.total_stake || 0) }}</text>
 							</view>
 							<view class="ca-stat">
 								<text class="ca-stat-label">Promo Balance</text>
@@ -75,6 +61,21 @@
 									{{ currentActivity.status === 'Active' ? $toolbox.num_format(currentActivity.money_promotion || 0) : '-' }}
 								</text>
 							</view>
+						</view>
+					</view>
+
+					<!-- Tab选择器（仅 Coupon，在当前活动卡片下方，随页面滚动） -->
+					<view class="tab-selector" v-if="isLogin && activity_type === 'coupon'">
+						<view class="tab-container" ref="container">
+							<view v-for="(item, index) in tabs" :key="index" class="tab-item"
+								:class="{ 'active': tab_index === index }" @click="handleTabClick(index)">
+								<text class="tab-text">{{ $t(item) }}</text>
+							</view>
+							<!-- 底部滑动指示器 -->
+							<view class="slide-indicator" :style="{
+					          width: indicator_width + 'px',
+					          transform: `translateX(${indicator_offset}px)`
+					        }"></view>
 						</view>
 					</view>
 
@@ -96,7 +97,8 @@
 								</view>
 								<view class="info-line">
 									<text class="info-label">Used</text>
-									<text class="info-val">{{ `${coupon.used_count || 0}${coupon.usage_limit ? '/' + coupon.usage_limit : ''}` }}</text>
+									<text
+										class="info-val">{{ `${coupon.used_count || 0}${coupon.usage_limit ? '/' + coupon.usage_limit : ''}` }}</text>
 								</view>
 							</view>
 							<view class="coupon-bonus">
@@ -105,9 +107,11 @@
 							</view>
 						</view>
 						<view class="coupon-card-footer">
-							<text class="expire-time" v-if="coupon.expire_time">Expires: {{ formatDateTime(coupon.expire_time) }}</text>
+							<text class="expire-time" v-if="coupon.expire_time">Expires:
+								{{ formatDateTime(coupon.expire_time) }}</text>
 							<text class="expire-time" v-else>-</text>
-							<view class="claim-action-btn" v-if="coupon.status === 'Unused'" @click="claimCoupon(coupon)">
+							<view class="claim-action-btn" v-if="coupon.status === 'Unused'"
+								@click="claimCoupon(coupon)">
 								{{ $t('Claim') }}
 							</view>
 							<text class="status-text" v-else>{{ $t(coupon.status) }}</text>
@@ -149,7 +153,8 @@
 								K {{ $toolbox.num_format(promo.min_amount) }}
 							</text>
 							<text class="promo-amount" v-else>
-								K {{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
+								K
+								{{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
 							</text>
 							<view v-if="promo.status === 'Available'" class="promo-status-btn">{{ promo.status }}</view>
 							<text v-else class="promo-status-text"
@@ -217,8 +222,10 @@
 
 					<!-- 奖励 -->
 					<view class="detail-bonus-box">
-						<text class="detail-bonus-title">+ {{ $toolbox.num_format(selectedCoupon.bonus_amount) }} Bonus</text>
-						<text class="detail-bonus-desc">Min bet required: {{ selectedCoupon.min_bet_required || 0 }}</text>
+						<text class="detail-bonus-title">+ {{ $toolbox.num_format(selectedCoupon.bonus_amount) }}
+							Bonus</text>
+						<text class="detail-bonus-desc">Min bet required:
+							{{ selectedCoupon.min_bet_required || 0 }}</text>
 					</view>
 
 					<!-- 详情描述 -->
@@ -270,10 +277,12 @@
 						<view class="promo-countdown-block"
 							v-if="selectedPromotion.end_time_full && isWithin48Hours(selectedPromotion.end_time_full)">
 							<text class="detail-info-label">Ends In</text>
-							<view class="ends-in"><count-down :count_time="selectedPromotion.end_time_full"></count-down></view>
+							<view class="ends-in"><count-down
+									:count_time="selectedPromotion.end_time_full"></count-down></view>
 						</view>
 						<text class="detail-info-label">Promotion Period</text>
-						<text class="detail-info-value">{{ selectedPromotion.period_start_time }} - {{ selectedPromotion.period_end_time }}</text>
+						<text class="detail-info-value">{{ selectedPromotion.period_start_time }} -
+							{{ selectedPromotion.period_end_time }}</text>
 					</view>
 
 					<!-- 条款 -->
@@ -293,27 +302,34 @@
 							<text class="detail-section-title">Turnover Progress</text>
 							<view class="progress-row">
 								<text class="progress-label">Required</text>
-								<text class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_turnover || 0) }} / {{ $toolbox.num_format(selectedPromotion.required_turnover || 0) }}</text>
+								<text
+									class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_turnover || 0) }}
+									/ {{ $toolbox.num_format(selectedPromotion.required_turnover || 0) }}</text>
 							</view>
 							<view class="progress-bar-container">
-								<view class="progress-bar-fill" :style="{ width: (selectedPromotion.turnover_progress || 0) + '%' }"></view>
+								<view class="progress-bar-fill"
+									:style="{ width: (selectedPromotion.turnover_progress || 0) + '%' }"></view>
 							</view>
 						</view>
 						<view class="detail-description-section" v-if="selectedPromotion.required_netwin > 0">
 							<text class="detail-section-title">Net Win Progress</text>
 							<view class="progress-row">
 								<text class="progress-label">Required</text>
-								<text class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_netwin || 0) }} / {{ $toolbox.num_format(selectedPromotion.required_netwin || 0) }}</text>
+								<text
+									class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_netwin || 0) }}
+									/ {{ $toolbox.num_format(selectedPromotion.required_netwin || 0) }}</text>
 							</view>
 						</view>
 						<view class="detail-bonus-box">
 							<view class="progress-row">
 								<text class="detail-bonus-desc">Max Withdrawal</text>
-								<text class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.max_withdrawal || 0) }}</text>
+								<text
+									class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.max_withdrawal || 0) }}</text>
 							</view>
 							<view class="progress-row">
 								<text class="detail-bonus-title">Promo Wallet</text>
-								<text class="detail-bonus-title">{{ $toolbox.num_format(selectedPromotion.promo_wallet_balance || 0) }}</text>
+								<text
+									class="detail-bonus-title">{{ $toolbox.num_format(selectedPromotion.promo_wallet_balance || 0) }}</text>
 							</view>
 						</view>
 					</view>
@@ -322,20 +338,24 @@
 					<view class="detail-bonus-box" v-else>
 						<view class="progress-row" v-if="selectedPromotion.participation_amount_type === 'Fixed'">
 							<text class="detail-bonus-desc">Participation Amount</text>
-							<text class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }}</text>
+							<text
+								class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }}</text>
 						</view>
 						<view class="progress-row" v-else>
 							<text class="detail-bonus-desc">Participation Range</text>
-							<text class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }} ~ {{ $toolbox.num_format(selectedPromotion.max_amount) }}</text>
+							<text class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }} ~
+								{{ $toolbox.num_format(selectedPromotion.max_amount) }}</text>
 						</view>
 						<view class="progress-row">
 							<text class="detail-bonus-title">Reward</text>
-							<text class="detail-bonus-title">{{ formatRewardAmount(selectedPromotion.reward_amount, selectedPromotion.reward_amount_type) }}</text>
+							<text
+								class="detail-bonus-title">{{ formatRewardAmount(selectedPromotion.reward_amount, selectedPromotion.reward_amount_type) }}</text>
 						</view>
 					</view>
 
 					<!-- 不可参与原因 -->
-					<view class="ineligibility" v-if="selectedPromotion.status === 'Available' && selectedPromotion.ineligibility_reason">
+					<view class="ineligibility"
+						v-if="selectedPromotion.status === 'Available' && selectedPromotion.ineligibility_reason">
 						<text>{{ selectedPromotion.ineligibility_reason }}</text>
 					</view>
 				</scroll-view>
@@ -370,13 +390,15 @@
 							<input type="digit" class="join-input" v-model="joinAmount" placeholder="0"
 								@input="handleAmountInput" />
 						</view>
-						<text class="join-range-hint">Min: K {{ $toolbox.num_format(selectedPromotion.min_amount) }} ~ Max: K {{ $toolbox.num_format(selectedPromotion.max_amount) }}</text>
+						<text class="join-range-hint">Min: K {{ $toolbox.num_format(selectedPromotion.min_amount) }} ~
+							Max: K {{ $toolbox.num_format(selectedPromotion.max_amount) }}</text>
 					</view>
 					<view v-else>
 						<text class="join-hint-label">Participation Amount:</text>
 						<view class="join-amount-display">
 							<text class="join-currency">K</text>
-							<text class="join-fixed-value">{{ $toolbox.num_format(selectedPromotion.min_amount) }}</text>
+							<text
+								class="join-fixed-value">{{ $toolbox.num_format(selectedPromotion.min_amount) }}</text>
 						</view>
 					</view>
 				</view>
@@ -480,7 +502,9 @@
 		methods: {
 			// ==================== 通用 ====================
 			goto(url) {
-				uni.navigateTo({ url })
+				uni.navigateTo({
+					url
+				})
 			},
 			formatDateTime(timeStr, sep = '/') {
 				if (!timeStr) return ''
@@ -600,16 +624,23 @@
 					status: statusParam
 				}
 				_this.loading = true
-				uni.showLoading({ title: 'Loading...', mask: true })
-				_this.$http.get('/coupon/history', { data: params }, (res) => {
+				uni.showLoading({
+					title: 'Loading...',
+					mask: true
+				})
+				_this.$http.get('/coupon/history', {
+					data: params
+				}, (res) => {
 					uni.hideLoading()
 					_this.loading = false
 					if (res.statusCode === 200 && res.data.code === 200) {
 						let coupons = res.data.data.history || []
-						// 若存在进行中的活动，将对应 Used 记录标记为 Active
-						if (_this.tab_index === 1 && _this.currentActivity.status === 'Active' && _this.currentActivity.coupon_id) {
+						// 若存在进行中的活动，将对应 Used 记录标记为 Active（参考onex2_test逻辑）
+						if (_this.tab_index === 1 && _this.currentActivity.status === 'Active' && _this
+							.currentActivity.coupon_id) {
 							coupons.forEach(c => {
-								if (c.status === 'Used' && c.coupon_id === _this.currentActivity.coupon_id) {
+								if (c.status === 'Used' && c.coupon_id === _this.currentActivity
+									.coupon_id) {
 									c.status = 'Active'
 								}
 							})
@@ -622,13 +653,21 @@
 						}
 					} else {
 						if (!isLoadMore) _this.list = []
-						uni.showToast({ icon: 'none', title: res.data.message || 'Failed to load coupons', duration: 2000 })
+						uni.showToast({
+							icon: 'none',
+							title: res.data.message || 'Failed to load coupons',
+							duration: 2000
+						})
 					}
 				}, () => {
 					uni.hideLoading()
 					_this.loading = false
 					if (!isLoadMore) _this.list = []
-					uni.showToast({ icon: 'none', title: 'Network error', duration: 2000 })
+					uni.showToast({
+						icon: 'none',
+						title: 'Network error',
+						duration: 2000
+					})
 				})
 			},
 
@@ -644,7 +683,11 @@
 				let _this = this
 				let code = (_this.key_word || '').trim()
 				if (!code) {
-					uni.showToast({ icon: 'none', title: _this.$t('Enter coupon code'), mask: true })
+					uni.showToast({
+						icon: 'none',
+						title: _this.$t('Enter coupon code'),
+						mask: true
+					})
 					return
 				}
 				uni.showModal({
@@ -653,7 +696,9 @@
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
-						if (r.confirm) _this.redeemCoupon({ coupon_code: code })
+						if (r.confirm) _this.redeemCoupon({
+							coupon_code: code
+						})
 					}
 				})
 			},
@@ -666,18 +711,27 @@
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
-						if (r.confirm) _this.redeemCoupon({ coupon_id: coupon.coupon_id || coupon.id })
+						if (r.confirm) _this.redeemCoupon({
+							coupon_id: coupon.coupon_id || coupon.id
+						})
 					}
 				})
 			},
 			redeemCoupon(params) {
 				let _this = this
-				uni.showLoading({ title: params.coupon_code ? 'Processing...' : 'Claiming...', mask: true })
+				uni.showLoading({
+					title: params.coupon_code ? 'Processing...' : 'Claiming...',
+					mask: true
+				})
 				_this.$http.post('/coupon/redeem', params, (res) => {
 					uni.hideLoading()
 					const data = res.data
 					if (res.statusCode === 200 && data.code === 200) {
-						uni.showToast({ icon: 'success', title: 'Coupon claimed successfully', duration: 2000 })
+						uni.showToast({
+							icon: 'success',
+							title: 'Coupon claimed successfully',
+							duration: 2000
+						})
 						if (params.coupon_code) _this.key_word = ''
 						if (_this.showDetailModal) _this.closeDetailModal()
 						_this.getCurrentActivity()
@@ -692,7 +746,11 @@
 					}
 				}, () => {
 					uni.hideLoading()
-					uni.showToast({ icon: 'none', title: 'Network error', duration: 2000 })
+					uni.showToast({
+						icon: 'none',
+						title: 'Network error',
+						duration: 2000
+					})
 				})
 			},
 			openDetailModal(coupon) {
@@ -709,7 +767,10 @@
 				if (!this.selectedCoupon || !this.selectedCoupon.p_code) return
 				uni.setClipboardData({
 					data: this.selectedCoupon.p_code,
-					success: () => uni.showToast({ title: 'Copied!', icon: 'success' })
+					success: () => uni.showToast({
+						title: 'Copied!',
+						icon: 'success'
+					})
 				})
 			},
 			getHeaderClass(status) {
@@ -723,7 +784,11 @@
 				try {
 					const cfg = typeof configStr === 'string' ? JSON.parse(configStr) : configStr
 					if (cfg.type === 'All') {
-						out.push({ icon: '✅', label: 'All Games', detail: '' })
+						out.push({
+							icon: '✅',
+							label: 'All Games',
+							detail: ''
+						})
 						return out
 					}
 					if (cfg.scenarios && Array.isArray(cfg.scenarios)) {
@@ -731,10 +796,19 @@
 							if (!sc.enabled) return
 							if (sc.type === '1x2' && sc.config) {
 								const bt = sc.config.bet_types || []
-								out.push({ icon: '⚽', label: '1x2 Sports Betting', detail: bt.length ? bt.join(', ') : 'All Bet Types' })
+								out.push({
+									icon: '⚽',
+									label: '1x2 Sports Betting',
+									detail: bt.length ? bt.join(', ') : 'All Bet Types'
+								})
 							} else if (sc.type === 'Egame' && sc.config) {
-								const ps = (sc.config.platforms || []).map(p => typeof p === 'string' ? p : (p.platform_name || p.platform || p.name)).filter(Boolean)
-								out.push({ icon: '🎮', label: 'E-Gaming', detail: ps.length ? ps.join(', ') : '' })
+								const ps = (sc.config.platforms || []).map(p => typeof p === 'string' ? p : (p
+									.platform_name || p.platform || p.name)).filter(Boolean)
+								out.push({
+									icon: '🎮',
+									label: 'E-Gaming',
+									detail: ps.length ? ps.join(', ') : ''
+								})
 							}
 						})
 					}
@@ -794,12 +868,21 @@
 				_this.promotion_list_end = false
 				if (!silent) {
 					_this.loading = true
-					uni.showLoading({ title: 'Loading...', mask: true })
+					uni.showLoading({
+						title: 'Loading...',
+						mask: true
+					})
 				}
 				_this.$http.get('/promotion/list', {
-					data: { page: _this.promotion_page, page_size: _this.promotion_page_size }
+					data: {
+						page: _this.promotion_page,
+						page_size: _this.promotion_page_size
+					}
 				}, (res) => {
-					if (!silent) { uni.hideLoading(); _this.loading = false }
+					if (!silent) {
+						uni.hideLoading();
+						_this.loading = false
+					}
 					if (res.statusCode === 200 && res.data.code === 200) {
 						const promotions = res.data.data.promotions || []
 						const pagination = res.data.data.pagination || {}
@@ -812,10 +895,22 @@
 						_this.promotion_list = promotions.map(p => _this.mapPromotion(p))
 					} else {
 						_this.promotion_list = []
-						if (!silent) uni.showToast({ icon: 'none', title: res.data.message || 'Failed to load promotions', duration: 2000 })
+						if (!silent) uni.showToast({
+							icon: 'none',
+							title: res.data.message || 'Failed to load promotions',
+							duration: 2000
+						})
 					}
 				}, () => {
-					if (!silent) { uni.hideLoading(); _this.loading = false; uni.showToast({ icon: 'none', title: 'Network error', duration: 2000 }) }
+					if (!silent) {
+						uni.hideLoading();
+						_this.loading = false;
+						uni.showToast({
+							icon: 'none',
+							title: 'Network error',
+							duration: 2000
+						})
+					}
 					_this.promotion_list = _this.promotion_list || []
 				})
 			},
@@ -823,7 +918,10 @@
 				let _this = this
 				if (_this.promotion_list_end) return
 				_this.$http.get('/promotion/list', {
-					data: { page: _this.promotion_page, page_size: _this.promotion_page_size }
+					data: {
+						page: _this.promotion_page,
+						page_size: _this.promotion_page_size
+					}
 				}, (res) => {
 					if (res.statusCode === 200 && res.data.code === 200) {
 						const promotions = res.data.data.promotions || []
@@ -833,7 +931,8 @@
 						} else {
 							_this.promotion_page++
 						}
-						_this.promotion_list = _this.promotion_list.concat(promotions.map(p => _this.mapPromotion(p)))
+						_this.promotion_list = _this.promotion_list.concat(promotions.map(p => _this.mapPromotion(
+							p)))
 					}
 				}, () => {})
 			},
@@ -846,7 +945,11 @@
 			showPromotionDetail(promo) {
 				let _this = this
 				if (promo.status === 'Available' && promo.can_participate === false && promo.ineligibility_reason) {
-					uni.showModal({ title: _this.$t('title_alert'), content: promo.ineligibility_reason, showCancel: false })
+					uni.showModal({
+						title: _this.$t('title_alert'),
+						content: promo.ineligibility_reason,
+						showCancel: false
+					})
 					return
 				}
 				_this.selectedPromotion = promo
@@ -876,7 +979,8 @@
 								turnover_progress: d.turnover_percentage || 0,
 								achieved_netwin: d.netwin_progress || 0,
 								required_netwin: d.netwin_requirement || 0,
-								max_withdrawal: d.max_withdrawal_limit || _this.selectedPromotion.max_withdrawal || 0,
+								max_withdrawal: d.max_withdrawal_limit || _this.selectedPromotion
+									.max_withdrawal || 0,
 								promo_wallet_balance: uinfo.money_promotion || 0,
 								can_end: d.can_end || false
 							})
@@ -905,19 +1009,31 @@
 				} else {
 					amount = parseFloat(_this.joinAmount)
 					if (!_this.joinAmount || amount <= 0) {
-						uni.showToast({ title: 'Please enter a valid amount', icon: 'none' })
+						uni.showToast({
+							title: 'Please enter a valid amount',
+							icon: 'none'
+						})
 						return
 					}
 					if (promo.min_amount && amount < promo.min_amount) {
-						uni.showToast({ title: `Minimum amount is K ${_this.$toolbox.num_format(promo.min_amount)}`, icon: 'none' })
+						uni.showToast({
+							title: `Minimum amount is K ${_this.$toolbox.num_format(promo.min_amount)}`,
+							icon: 'none'
+						})
 						return
 					}
 					if (promo.max_amount && amount > promo.max_amount) {
-						uni.showToast({ title: `Maximum amount is K ${_this.$toolbox.num_format(promo.max_amount)}`, icon: 'none' })
+						uni.showToast({
+							title: `Maximum amount is K ${_this.$toolbox.num_format(promo.max_amount)}`,
+							icon: 'none'
+						})
 						return
 					}
 				}
-				uni.showLoading({ title: 'Processing...', mask: true })
+				uni.showLoading({
+					title: 'Processing...',
+					mask: true
+				})
 				_this.$http.post('/promotion/participate', {
 					promotion_id: promo.id,
 					participation_amount: amount
@@ -926,15 +1042,27 @@
 					if (res.statusCode === 200 && res.data.code === 200) {
 						_this.closeJoinPromotionModal()
 						setTimeout(() => _this.closePromotionDetail(), 100)
-						uni.showToast({ title: res.data.message || 'Successfully joined!', icon: 'success', duration: 2000 })
+						uni.showToast({
+							title: res.data.message || 'Successfully joined!',
+							icon: 'success',
+							duration: 2000
+						})
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
 					} else {
-						uni.showModal({ title: _this.$t('title_alert'), content: res.data.message || 'Failed to join promotion', showCancel: false })
+						uni.showModal({
+							title: _this.$t('title_alert'),
+							content: res.data.message || 'Failed to join promotion',
+							showCancel: false
+						})
 					}
 				}, () => {
 					uni.hideLoading()
-					uni.showToast({ icon: 'none', title: 'Network error', duration: 2000 })
+					uni.showToast({
+						icon: 'none',
+						title: 'Network error',
+						duration: 2000
+					})
 				})
 			},
 			showEndPromotionDialog() {
@@ -954,24 +1082,41 @@
 				const promo = _this.selectedPromotion
 				if (!promo) return
 				const promotionId = promo.id
-				uni.showLoading({ title: 'Processing...', mask: true })
-				_this.$http.post('/promotion/end', { promotion_id: promotionId }, (res) => {
+				uni.showLoading({
+					title: 'Processing...',
+					mask: true
+				})
+				_this.$http.post('/promotion/end', {
+					promotion_id: promotionId
+				}, (res) => {
 					uni.hideLoading()
 					if (res.statusCode === 200 && res.data.code === 200) {
 						_this.closePromotionDetail()
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
-						uni.showModal({ title: 'Success', content: 'Promotion ended successfully', showCancel: false })
+						uni.showModal({
+							title: 'Success',
+							content: 'Promotion ended successfully',
+							showCancel: false
+						})
 					} else {
 						let msg = res.data.message || 'Failed to end promotion'
 						if (res.data.data && res.data.data.unmet_conditions) {
 							msg = 'Cannot end promotion:\n' + res.data.data.unmet_conditions.join('\n')
 						}
-						uni.showModal({ title: _this.$t('title_alert'), content: msg, showCancel: false })
+						uni.showModal({
+							title: _this.$t('title_alert'),
+							content: msg,
+							showCancel: false
+						})
 					}
 				}, () => {
 					uni.hideLoading()
-					uni.showToast({ icon: 'none', title: 'Network error', duration: 2000 })
+					uni.showToast({
+						icon: 'none',
+						title: 'Network error',
+						duration: 2000
+					})
 				})
 			},
 		},
@@ -1005,6 +1150,7 @@
 		border-radius: 20px 20px 0 0;
 		flex-shrink: 0;
 		padding-top: 6px;
+		padding-bottom: 6px;
 	}
 
 	.main-scroll-view {
@@ -1146,7 +1292,7 @@
 
 	/* 列表容器 */
 	.list-container {
-		padding: 12px 15px;
+		padding: 0 15px 12px;
 		background: #ffffff;
 	}
 
@@ -1179,9 +1325,18 @@
 		background: #4fb3bf;
 	}
 
-	.ca-status-active { background: #2ba84a; }
-	.ca-status-completed { background: #4fb3bf; }
-	.ca-status-cancelled, .ca-status-expired { background: #9eacb5; }
+	.ca-status-active {
+		background: #2ba84a;
+	}
+
+	.ca-status-completed {
+		background: #4fb3bf;
+	}
+
+	.ca-status-cancelled,
+	.ca-status-expired {
+		background: #9eacb5;
+	}
 
 	.ca-credit {
 		display: flex;
@@ -1247,8 +1402,13 @@
 		align-items: center;
 	}
 
-	.header-unused { background: #2F5D62; }
-	.header-expired { background: #8B8891; }
+	.header-unused {
+		background: #2F5D62;
+	}
+
+	.header-expired {
+		background: #8B8891;
+	}
 
 	.coupon-card-title {
 		font-size: 15px;
@@ -1350,7 +1510,9 @@
 		font-weight: bold;
 	}
 
-	.claim-action-btn:active { opacity: 0.85; }
+	.claim-action-btn:active {
+		opacity: 0.85;
+	}
 
 	.status-text {
 		font-size: 13px;
@@ -1414,7 +1576,9 @@
 		color: #8B8891;
 	}
 
-	.promo-label-mt { margin-top: 4px; }
+	.promo-label-mt {
+		margin-top: 4px;
+	}
 
 	.promo-period {
 		font-size: 12px;
