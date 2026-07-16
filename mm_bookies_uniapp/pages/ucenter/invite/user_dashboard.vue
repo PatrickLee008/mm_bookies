@@ -1,7 +1,8 @@
 <template>
-	<view class="bg-white app-safe-page">
+	<view class="invite-page">
 		<zw-header></zw-header>
-		<scroll-view class="user-scroll app-safe-scroll" scroll-y>
+		<view class="invite-header-placeholder"></view>
+		<scroll-view class="user-scroll invite-scroll" scroll-y>
 			<view class="padding">
 				<view class="title-text margin-tb-sm" style="margin-left: 0;">
 					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
@@ -297,6 +298,25 @@
 </script>
 
 <style lang="scss">
+	.invite-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background: #ffffff;
+		overflow: hidden;
+	}
+
+	.invite-header-placeholder {
+		width: 100%;
+		height: 210px;
+		flex-shrink: 0;
+	}
+
+	.invite-scroll {
+		flex: 1;
+		height: 0;
+	}
+
 	.financial-stats {
 		display: flex;
 		flex-direction: row;

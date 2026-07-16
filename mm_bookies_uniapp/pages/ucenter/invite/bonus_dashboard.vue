@@ -1,7 +1,8 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="invite-page">
 		<zw-header></zw-header>
-		<scroll-view scroll-y class="padding-bottom app-safe-scroll">
+		<view class="invite-header-placeholder"></view>
+		<scroll-view scroll-y class="padding-bottom invite-scroll">
 			<view class="flex-column1 align-start text-bold" style="line-height: 1;">
 				<text class="title-text margin-tb" style="">
 					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
@@ -246,6 +247,25 @@
 </script>
 
 <style lang="scss">
+	.invite-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background: #ffffff;
+		overflow: hidden;
+	}
+
+	.invite-header-placeholder {
+		width: 100%;
+		height: 210px;
+		flex-shrink: 0;
+	}
+
+	.invite-scroll {
+		flex: 1;
+		height: 0;
+	}
+
 	.filter {
 		background-color: #f8f9fa;
 		border-radius: 8px;
