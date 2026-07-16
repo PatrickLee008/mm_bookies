@@ -1,7 +1,11 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="invite-page">
 		<zw-header></zw-header>
-		<scroll-view class="padding" scroll-y style="height: calc(100vh - 120px);">
+		
+		<!-- header 占位元素，防止内容被固定顶栏遮挡（参考 coupon 页布局） -->
+		<view class="invite-header-placeholder"></view>
+
+		<scroll-view class="padding invite-scroll" scroll-y>
 			<!-- 标题 -->
 			<view class="flex-row justify-start align-center" style="">
 				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
@@ -634,6 +638,26 @@
 </script>
 
 <style lang="scss">
+	/* 页面骨架：固定顶栏占位 + 弹性滚动区（参考 pages/index/coupon.vue） */
+	.invite-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		background: #ffffff;
+		overflow: hidden;
+	}
+
+	.invite-header-placeholder {
+		width: 100%;
+		height: 210px;
+		flex-shrink: 0;
+	}
+
+	.invite-scroll {
+		flex: 1;
+		height: 0;
+	}
+
 	.white-rec {
 		display: flex;
 		align-items: center;
