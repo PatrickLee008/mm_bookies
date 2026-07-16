@@ -42,14 +42,24 @@
 							/>
 						</view>
 
-						<!-- 保存按钮 -->
+						<!-- 保存按钮 + 复制收款号码 -->
 						<block v-if="!istimeout">
-							<button class="cu-btn mybg-primary round margin-top margin-bottom height-27px" style="padding: 0 25px;"
-								@click="saveCode" v-if="payInfo.orderStatus==1">
-								<image src="/static/image/pay/download.png" mode="aspectFit" class=" margin-right-sm"
-									style="width: 15px;height: 15px;" />
-								<text class="text-sm">Save QR Image</text>
-							</button>
+							<view class="flex-column align-center" v-if="payInfo.orderStatus==1">
+								<button class="cu-btn mybg-primary round margin-top height-27px" style="padding: 0 25px;"
+									@click="saveCode">
+									<image src="/static/image/pay/download.png" mode="aspectFit" class=" margin-right-sm"
+										style="width: 15px;height: 15px;" />
+									<text class="text-sm">Save QR Image</text>
+								</button>
+								<!-- 收款电话号码 + 复制按钮 -->
+								<view class="deposit-phone-row margin-tb" v-if="payInfo.receiveAccount">
+									<text class="deposit-phone-value">{{ payInfo.receiveAccount }}</text>
+									<button class="cu-btn sm mybg-primary round deposit-copy-btn" @click="copyCardNo">
+										<text class="cuIcon-copy margin-right-xs"></text>
+										<text class="text-sm">{{ $t('copy') }}</text>
+									</button>
+								</view>
+							</view>
 						</block>
 					</view>
 				</view>
@@ -608,10 +618,14 @@
 				}
 			},
 			copyCardNo() {
+				let _this = this
 				uni.setClipboardData({
 					data: this.payInfo.receiveAccount,
 					success: function() {
-						console.log('copy success');
+						uni.showToast({
+							title: _this.$t('copied_to_clipboard') || 'Copied',
+							icon: 'success'
+						})
 					}
 				});
 			},
@@ -700,6 +714,27 @@
 	.qrcode {
 		text-align: center;
 		padding: 10px 15px;
+	}
+
+	/* 收款电话号码 + 复制按钮 */
+	.deposit-phone-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+
+	.deposit-phone-value {
+		font-size: 15px;
+		font-weight: 700;
+		color: #2F5D62;
+		letter-spacing: 1px;
+	}
+
+	.deposit-copy-btn {
+		height: 26px;
+		padding: 0 12px;
 	}
 
 	.qrcode .image {

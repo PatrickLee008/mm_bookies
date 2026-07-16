@@ -1873,7 +1873,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.payment-channel-btn.selected {
-		background-color: #4FB3BF;
+		background-color: #2F5D62;
+		border: 2px solid #4FB3BF;
+		box-sizing: border-box;
 	}
 
 	.payment-channel-single {
@@ -1883,16 +1885,19 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		margin-top: 12px;
 	}
 
+	/* 仅有一个支付渠道时，默认即为选中态：主色填充 + 亮色描边，明显区别于未选中 */
 	.payment-channel-name {
 		flex: 1;
 		height: 35px;
-		background-color: #4FB3BF;
+		background-color: #2F5D62;
+		border: 2px solid #4FB3BF;
+		box-sizing: border-box;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		font-size: 14px;
-		font-weight: 600;
+		font-weight: 700;
 		color: #fff;
 	}
 

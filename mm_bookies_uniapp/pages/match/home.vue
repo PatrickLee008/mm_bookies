@@ -22,7 +22,7 @@
 		<view class="new-header-wrapper">
 			<view class="new-search-bar">
 				<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
-				<input class="search-input" type="text" placeholder="Search" v-model="searchKeyword"
+				<input class="search-input" type="text" :placeholder="$t('search_by_team')" v-model="searchKeyword"
 					@input="handleSearchInput" />
 				<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword"
 					@tap="clearSearch"></image>

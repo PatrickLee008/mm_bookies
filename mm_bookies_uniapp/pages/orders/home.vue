@@ -73,10 +73,10 @@
 								<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
 							</view>
 							<view class="header-match">
-								<text class="team-name">{{item.HOME}}</text>
+								<text class="team-name" :class="{ 'team-give': give_team_side(item) === 'H' }">{{item.HOME}}</text>
 								<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
 								<text class="score-text" v-else>{{item.SCORE}}</text>
-								<text class="team-name">{{item.AWAY}}</text>
+								<text class="team-name" :class="{ 'team-give': give_team_side(item) === 'A' }">{{item.AWAY}}</text>
 							</view>
 							<view class="match-time">{{item.order_time}}</view>
 						</view>
@@ -104,7 +104,7 @@
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row" v-if="current_page==='Ongoing'">
-								<text class="label">Potential Win Amount</text>
+								<text class="label">{{$t('Potential Win Amount')}}</text>
 								<text class="value value-amount">{{item.benefit}} MMK</text>
 							</view>
 						</view>
@@ -127,10 +127,10 @@
 									<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
 								</view>
 								<view class="header-match">
-									<text class="team-name">{{item.HOME}}</text>
+									<text class="team-name" :class="{ 'team-give': give_team_side(item) === 'H' }">{{item.HOME}}</text>
 									<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
 									<text class="score-text" v-else>{{item.SCORE}}</text>
-									<text class="team-name">{{item.AWAY}}</text>
+									<text class="team-name" :class="{ 'team-give': give_team_side(item) === 'A' }">{{item.AWAY}}</text>
 								</view>
 								<view class="match-time">{{item.order_time}}</view>
 							</view>
@@ -163,12 +163,13 @@
 										<text class="status-badge-text">{{status_badge(detail.bet_status).label}}</text>
 									</view>
 									<view class="header-match">
-										<text class="team-name">{{detail.HOME}}</text>
+										<text class="team-name" :class="{ 'team-give': give_team_side(detail) === 'H' }">{{detail.HOME}}</text>
 										<text class="vs-text" v-if="current_page==='Ongoing'">VS</text>
 										<text class="score-text" v-else>{{detail.SCORE}}</text>
-										<text class="team-name">{{detail.AWAY}}</text>
+										<text class="team-name" :class="{ 'team-give': give_team_side(detail) === 'A' }">{{detail.AWAY}}</text>
 									</view>
-									<view class="match-time">{{detail.order_time}}</view>
+									<!-- 混合投注展开后，仅第一场显示下注日期 -->
+									<view class="match-time" v-if="_index === 0">{{detail.order_time}}</view>
 								</view>
 								<view class="card-content">
 									<!-- <view class="info-row">
@@ -200,11 +201,11 @@
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row">
-								<text class="label">Total Match</text>
+								<text class="label">{{$t('Total Match')}}</text>
 								<text class="value">{{item.ORDER_COUNT}}</text>
 							</view>
 							<view class="info-row" v-if="current_page==='Ongoing'">
-								<text class="label">Potential Win Amount</text>
+								<text class="label">{{$t('Potential Win Amount')}}</text>
 								<text class="value value-amount">{{item.benefit}} MMK</text>
 							</view>
 						</view>
@@ -661,6 +662,16 @@
 				}
 				return str
 			},
+			// 仅 HANDICAP(让球)类型：让球方(odd given team)球队名称显示红色，其余类型球队名称保持原色
+			// LOSE_TEAM=='1' 主队为让球方，否则客队为让球方
+			give_team_side(attr) {
+				if (!attr || !attr.hasOwnProperty('ORDER_TYPE')) return ''
+				let attr_val = attr.ORDER_TYPE
+				if ([this.bet_type.SINGLE_BODY, this.bet_type.MIX_BODY].includes(attr_val)) {
+					return attr.LOSE_TEAM == '1' ? 'H' : 'A'
+				}
+				return ''
+			},
 			calc_benefit(order, mix = false) {
 				let str = ''
 				if (this.current_page === 'Finished') {
@@ -919,6 +930,11 @@
 		font-weight: 600;
 		text-align: center;
 		flex-shrink: 1;
+	}
+
+	/* 让球方（odd given team）球队名称显示为红色 */
+	.team-give {
+		color: #FF4D4F !important;
 	}
 
 	/* from tangjq--- 主队名称使用青绿色 */
