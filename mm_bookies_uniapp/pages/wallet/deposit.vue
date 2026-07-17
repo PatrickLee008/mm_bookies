@@ -1889,7 +1889,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.payment-channel-name {
 		flex: 1;
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #4FB3BF;
 		border: 2px solid #4FB3BF;
 		box-sizing: border-box;
 		border-radius: 12px;
