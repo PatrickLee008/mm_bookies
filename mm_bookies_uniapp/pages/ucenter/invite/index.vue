@@ -8,8 +8,8 @@
 		<scroll-view class="padding invite-scroll" scroll-y>
 			<!-- 标题 -->
 			<view class="flex-row justify-start align-center" style="">
-				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
-				<image src="/static/icon/ucenter/invite.png" class="lblue2blue" style="height: 28px;" mode="heightFix">
+				<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
+				<image src="/static/icon/ucenter/referral.svg" class="lblue2blue" style="height: 28px;" mode="heightFix">
 				</image>
 				<text class="title-text" style="">{{ language.invite_friend }}</text>
 			</view>
@@ -643,19 +643,23 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #ffffff;
+		background: #2F5D62;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 210px;
+		height: 190px;
 		flex-shrink: 0;
 	}
 
 	.invite-scroll {
 		flex: 1;
 		height: 0;
+		border-radius: 20px 20px 0 0;
+		background: #ffffff;
+		position: relative;
+		z-index: 1;
 	}
 
 	.white-rec {

@@ -18,33 +18,44 @@
 				<view class="user-details">
 					<view class="user-id">
 						<view class="user-id-info">
-							<text class="id-label">{{ $t('my_phone') }} : </text>
+							<text class="id-label">My ID : </text>
 							<text class="id-value">{{userInfo.phone || ''}}</text>
 						</view>
 						<!-- 右侧操作区：消息铃铛 + 设置 -->
 						<view class="header-actions">
 							<!-- 消息铃铛入口：有未读时变红并摇动 -->
 							<view class="bell-btn" @click="goMessage">
-								<text class="cuIcon-noticefill bell-icon" :class="{ 'bell-ring': unreadMessageCount > 0 }"></text>
-								<view class="bell-badge" v-if="unreadMessageCount > 0">{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}</view>
+								<image src="/static/icon/nav/notification.svg" class="bell-icon"
+									:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
+								<view class="bell-badge" v-if="unreadMessageCount > 0">
+									{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
+								</view>
 							</view>
 							<!-- 设置按钮 -->
 							<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
-								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit">
+								</image>
 							</view>
 						</view>
 					</view>
 					<view class="user-balance-row">
-						<!-- Balance -->
 						<view class="balance-item">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<text class="balance-label">{{ $t('balance') }}</text>
-							<text class="balance-value">{{$toolbox.num_format(userInfo.money) || '0'}}</text>
+							<text
+								class="balance-value myfont-18px text-bold">{{$toolbox.num_format(userInfo.money) || '0'}}</text>
 						</view>
-						<!-- Cash Out -->
-						<view class="balance-item">
-							<text class="cashout-label">{{ $t('cash_out') }}</text>
-							<text class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
+						<view class="secondary-balance-row">
+							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+							<view class="balance-item">
+								<text class="cashout-label">Promo</text>
+								<text
+									class="cashout-value">{{$toolbox.num_format(userInfo.money_promotion) || '0'}}</text>
+							</view>
+							<view class="balance-item" style="margin-left: 12px;">
+								<text class="cashout-label">{{ $t('cash_out') }}</text>
+								<text
+									class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -65,57 +76,12 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- 导航图标区域 -->
-			<view class="nav-icons-bar">
-				<!-- Single -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'single'}" @click="goto('/pages/match/home?mix=0', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'single' ? '/static/icon/nav/single_active.png' : '/static/icon/nav/single.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'single'}">{{ $t('single') }}</text>
+			<view class="header-page-row">
+				<view class="header-back" @click="goBack">
+					<image src="/static/icon/basic/back.svg" mode="aspectFit"></image>
+					<text>{{$t('Back')}}</text>
 				</view>
-
-				<!-- MPL -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'mpl'}" @click="goto('/pages/match/home?mix=1', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'mpl' ? '/static/icon/nav/mpl_active.png' : '/static/icon/nav/mpl.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'mpl'}">{{ $t('MPL') }}</text>
-				</view>
-
-				<!-- E-Games -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'games'}" @click="goto('/pages/index/game', 1)" v-if="false">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'games' ? '/static/icon/nav/games_active.png' : '/static/icon/nav/games.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'games'}">{{ $t('e_games') }}</text>
-				</view>
-
-				<!-- History -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'history'}" @click="goto('/pages/orders/home', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'history' ? '/static/icon/nav/history_active.png' : '/static/icon/nav/history.png'" class="nav-icon" mode="aspectFit"></image>
-						<!-- from tangjq--- 未读消息红点 -->
-						<view class="nav-badge" v-if="unreadMessageCount > 0">{{unreadMessageCount > 9 ? '9+' : unreadMessageCount}}</view>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'history'}">{{ $t('history') }}</text>
-				</view>
-
-				<!-- Deals 暂时隐藏优惠券功能-->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)" >
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'deals' ? '/static/icon/nav/deals_active.png' : '/static/icon/nav/deals.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'deals'}">{{ $t('Coupon') }}</text>
-				</view>
-
-				<!-- Wallet -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'wallet'}" @click="goto('/pages/wallet/wallet', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'wallet' ? '/static/icon/nav/wallet_active.png' : '/static/icon/nav/wallet.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'wallet'}">{{ $t('wallet') }}</text>
-				</view>
+				<text class="header-page-title">{{ $t(pageTitle) }}</text>
 			</view>
 		</view>
 	</view>
@@ -125,7 +91,9 @@
 	import {
 		mapGetters
 	} from 'vuex';
-	import { getUnreadCount } from '@/utils/api/message.js'
+	import {
+		getUnreadCount
+	} from '@/utils/api/message.js'
 
 	export default {
 		components: {},
@@ -150,6 +118,35 @@
 			currentRoute() {
 				const pages = getCurrentPages();
 				return pages.length ? pages[pages.length - 1].route : '';
+			},
+			pageTitle() {
+				const titles = {
+					'pages/match/home': 'single',
+					'pages/orders/home': 'sistory',
+					'pages/index/coupon': 'Deals',
+					'pages/wallet/wallet': 'wallet',
+					'pages/index/game': 'E-Games',
+					'pages/index/contact': 'Contact',
+					'pages/ucenter/home': 'setting',
+					'pages/ucenter/account': 'Account',
+					'pages/ucenter/invite/index': 'Referral',
+					'pages/ucenter/invite/share': 'Share',
+					'pages/ucenter/language': 'Language',
+					'pages/ucenter/bonus': 'Bonus',
+					'pages/ucenter/download': 'Download',
+					'pages/ucenter/message': 'Messages',
+					'pages/ucenter/invite/bonus_dashboard': 'Bonus Dashboard',
+					'pages/ucenter/invite/user_dashboard': 'User Dashboard',
+					'pages/ucenter/withdraw': 'Withdraw',
+					'pages/ucenter/charge': 'Deposit',
+					'pages/payment/payment': 'Payment'
+				}
+				const pages = getCurrentPages()
+				const current = pages.length ? pages[pages.length - 1] : null
+				if (current && current.route === 'pages/match/home' && current.options.mix === '1') {
+					return 'MPL'
+				}
+				return titles[this.currentRoute] || ''
 			}
 		},
 		created() {},
@@ -256,10 +253,36 @@
 			// 跳转到消息中心
 			goMessage() {
 				if (!this.isLogin) {
-					uni.reLaunch({ url: '/pages/login/login' })
+					uni.reLaunch({
+						url: '/pages/login/login'
+					})
 					return
 				}
-				uni.navigateTo({ url: '/pages/ucenter/message' })
+				uni.navigateTo({
+					url: '/pages/ucenter/message'
+				})
+			},
+
+			goBack() {
+				if (this.currentRoute === 'pages/match/home') {
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+					return
+				}
+				const pages = getCurrentPages()
+				if (pages.length > 1) {
+					uni.navigateBack({
+						delta: 1,
+						fail: () => uni.reLaunch({
+							url: '/pages/index/index'
+						})
+					})
+					return
+				}
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
 			},
 
 			// 更新未读消息数量（改为从后端接口获取）
@@ -334,16 +357,45 @@
 		font-weight: bold;
 	}
 
+	.header-page-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 42px;
+		padding: 0 20px;
+		font-size: 14px;
+		color: #ffffff;
+	}
+
+	.header-back {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-weight: 700;
+	}
+
+	.header-back image {
+		width: 18px;
+		height: 18px;
+		filter: brightness(0) invert(1);
+	}
+
+	.header-page-title {
+		color: #35b6c2;
+		font-weight: 700;
+	}
+
 	/* from tangjq--- 用户信息卡片 */
 	.user-info-card {
 		background-color: white;
 		border-radius: 20px;
 		margin: 5px 15px 10px;
-		padding: 10px 0px;
+		padding: 5px 12px 10px;
+		box-sizing: border-box;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		min-height: 70px;
+		min-height: 90px;
 	}
 
 	.user-avatar {
@@ -355,7 +407,7 @@
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
-		margin-right: 15px;
+		margin-right: 10px;
 		flex-shrink: 0;
 	}
 
@@ -383,25 +435,30 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		flex: 1;
+		min-width: 0;
+		font-size: 15px;
 	}
 
 	.id-label {
 		color: #2F5D62;
-		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.id-value {
 		color: #2F5D62;
-		font-size: 14px;
+		// font-size: 14px;
 		font-weight: bold;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-balance-row {
 		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 15px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 3px;
 	}
 
 	.balance-item {
@@ -409,11 +466,19 @@
 		flex-direction: row;
 		align-items: center;
 		gap: 5px;
+		white-space: nowrap;
+	}
+
+	.secondary-balance-row {
+		display: flex;
+		align-items: center;
+		gap: 5px;
 	}
 
 	.coin-icon {
 		width: 18px;
 		height: 18px;
+		margin-right: 7px;
 	}
 
 	.balance-label,
@@ -465,8 +530,8 @@
 	}
 
 	.bell-icon {
-		font-size: 22px;
-		color: #2F5D62;
+		width: 22px;
+		height: 22px;
 		transform-origin: top center;
 	}
 
@@ -477,13 +542,33 @@
 	}
 
 	@keyframes bellRing {
-		0% { transform: rotate(0); }
-		15% { transform: rotate(16deg); }
-		30% { transform: rotate(-14deg); }
-		45% { transform: rotate(11deg); }
-		60% { transform: rotate(-8deg); }
-		75% { transform: rotate(4deg); }
-		100% { transform: rotate(0); }
+		0% {
+			transform: rotate(0);
+		}
+
+		15% {
+			transform: rotate(16deg);
+		}
+
+		30% {
+			transform: rotate(-14deg);
+		}
+
+		45% {
+			transform: rotate(11deg);
+		}
+
+		60% {
+			transform: rotate(-8deg);
+		}
+
+		75% {
+			transform: rotate(4deg);
+		}
+
+		100% {
+			transform: rotate(0);
+		}
 	}
 
 	/* 铃铛未读数角标 */
@@ -508,15 +593,16 @@
 	.login-prompt-card {
 		flex-direction: column;
 		align-items: stretch;
-		padding: 20px;
-		height: 125px;
+		justify-content: center;
+		padding: 10px 14px;
+		height: 90px;
 	}
 
 	.login-prompt-content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 15px;
+		gap: 6px;
 	}
 
 	.login-prompt-text {
@@ -544,7 +630,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		height: 40px;
+		height: 32px;
 		border-radius: 4px;
 		font-size: 14px;
 		font-weight: bold;

@@ -2034,7 +2034,7 @@
 <style>
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 190px;
 		width: 100%;
 		background-color: #2F5D62;
 	}
@@ -2093,7 +2093,7 @@
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
 		height: 100vh;
-		background: white;
+		background: #2F5D62;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -2103,6 +2103,7 @@
 		/* height: calc(100vh - env(safe-area-inset-bottom)); */
 		flex: 1;
 		min-height: 0;
+		background: #ffffff;
 	}
 
 	.dialog-wrapper {
@@ -2271,7 +2272,8 @@
 		align-items: center;
 		padding: 10px;
 		gap: 10px;
-		background-color: #f5f5f5;
+		background-color: #ffffff;
+		border-radius: 20px 20px 0 0;
 		flex-shrink: 0;
 	}
 

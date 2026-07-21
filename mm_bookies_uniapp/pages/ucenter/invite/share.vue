@@ -5,9 +5,9 @@
 		<scroll-view scroll-y class="padding-bottom invite-scroll">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
-					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
+					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
 					<view class="flex-row align-center" style="">
-						<image src="/static/icon/ucenter/invite.png" class="lblue2blue" style="height: 28px;"
+						<image src="/static/icon/ucenter/referral.svg" class="lblue2blue" style="height: 28px;"
 							mode="heightFix"></image>
 						<text class="title-text" style="">{{ language.invite_friend }}</text>
 					</view>
@@ -207,19 +207,23 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #ffffff;
+		background: #2F5D62;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 210px;
+		height: 190px;
 		flex-shrink: 0;
 	}
 
 	.invite-scroll {
 		flex: 1;
 		height: 0;
+		border-radius: 20px 20px 0 0;
+		background: #ffffff;
+		position: relative;
+		z-index: 1;
 	}
 
 	.qr-rec {

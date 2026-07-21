@@ -157,7 +157,7 @@
 <style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 190px;
 		width: 100%;
 	}
 

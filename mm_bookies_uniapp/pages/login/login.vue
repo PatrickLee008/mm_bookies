@@ -387,7 +387,7 @@
 						}
 
 						uni.redirectTo({
-							url: '../match/home'
+							url: '/pages/index/index'
 						});
 						uni.setStorageSync('login_success', true)
 						return

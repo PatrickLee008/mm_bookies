@@ -1,11 +1,11 @@
 <template name="ucenter">
-	<view class="bg-white full-page">
+	<view class="bg-white full-page ucenter-page">
 		<zw-header @doSomething="" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<scroll-view scroll-y>
+		<scroll-view class="ucenter-content-scroll" scroll-y>
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -361,7 +361,7 @@
 						content: '',
 						method: 'goto',
 						args: ['/pages/ucenter/invite/index'],
-						img: '../../static/icon/ucenter/invite.png',
+						img: '../../static/icon/ucenter/referral.svg',
 						para: {
 							need_login: true
 						},
@@ -428,7 +428,7 @@
 					// 	content: '',
 					// 	method: 'goto',
 					// 	args: ['/pages/ucenter/invite/index'],
-					// 	img: '../../static/icon/ucenter/invite.png',
+					// 	img: '../../static/icon/ucenter/referral.svg',
 					// 	para: {
 					// 		need_login: true
 					// 	},
@@ -1129,6 +1129,7 @@
 	.header-placeholder {
 		width: 100%;
 		background-color: #2F5D62;
+		flex-shrink: 0;
 	}
 
 	.main-scroll-view {
@@ -1136,10 +1137,22 @@
 		height: 0;
 		background: #fff;
 	}
+
+	.ucenter-content-scroll {
+		flex: 1;
+		height: 0;
+		background: #fff;
+		border-radius: 20px 20px 0 0;
+		position: relative;
+		z-index: 1;
+	}
 	
 	.ucenter-page {
 		background: #2F5D62;
 		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 
 	/* 顶部栏 */

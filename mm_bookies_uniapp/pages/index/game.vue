@@ -436,7 +436,7 @@
 <style>
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 190px;
 		width: 100%;
 		background-color: #2F5D62;
 	}

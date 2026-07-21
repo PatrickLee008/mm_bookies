@@ -1,394 +1,475 @@
 <template>
-	<view class="mybg-grey full-page" style="background-image: url(../../static/image/index_bg.jpg);background-repeat: no-repeat;background-size: 100% 100%;">
-		<cu-custom>
-			<block slot="content">INNWA BET</block>
-		</cu-custom>
-		<view>
-			<swiper class="box-shadow myrect screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="false" :circular="true" :autoplay="true" interval="3000" duration="500" style="border-radius: 13px;">
-				<swiper-item v-for="(item,index) in swiperList" :key="index">
-					<image style="border-radius: 13px;" :src="item.url" mode="scaleToFill" v-if="item.type=='image'">
-					</image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-				</swiper-item>
-			</swiper>
-		</view>
+	<view class="home-page">
+		<view class="home-top">
+			<image class="home-logo" src="../../figma/login/title.png" mode="widthFix"></image>
+			<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 
-		<view class="myrect box-shadow flex-row bg-white padmar" style="width: 90vw;">
-			<!-- <image class="icon" src="../../static/image/notice.png"></image> -->
-			<uni-notice-bar backgroundColor="white" color="black" :speed="speed" scrollable="true" :text="notice" style="margin-bottom: 0;font-weight: bold;"></uni-notice-bar>
-		</view>
-		<scroll-view>
-			<view class="myrect box-shadow bg-white padmar">
-				<view class="flex-row" style="justify-content: space-between;">
-					<view class="flex-row">
-						<!-- <image class="my-icon-plus" src="../../static/image/tocenter.png"></image> -->
-						<text class="myfont-bold" style="line-height: 40px;">{{userInfo.nick_name}}</text>
-					</view>
-					<!-- <image style="width: 14px;height: 10px;float: right;margin: 13px 10px;" src="../../static/image/fanhui(5).png"></image> -->
+			<view class="user-info-card">
+				<view class="user-avatar">
+					<image src="/static/icon/nav/user_avatar.png" class="avatar-img" mode="aspectFill"></image>
 				</view>
-				<view class="mybg-red flex-row" style="padding: 5vw 2vw 5vw 2vw;border-radius: 5px;align-items: center;width: 96%;margin-left: 2%;">
-					<view class="flex-column">
-						<view class="myfont-bold padding-col" style="font-size: 18px;">{{userInfo.total_withdraw}}</view>
-						<view class="myfont padding-col">{{language.totalCashOut}}</view>
+				<view class="user-details">
+					<view class="user-id">
+						<view class="user-id-info">
+							<text class="id-label">My ID : </text>
+							<text class="id-value">{{ userInfo.phone || userInfo.nick_name || '' }}</text>
+						</view>
+						<view class="header-actions">
+							<view class="bell-btn" @click="goMessage">
+								<image src="/static/icon/nav/notification.svg" class="bell-icon"
+									:class="{ 'bell-ring': unreadCount > 0 }" mode="aspectFit"></image>
+								<view class="bell-badge" v-if="unreadCount > 0">
+									{{ unreadCount > 99 ? '99+' : unreadCount }}
+								</view>
+							</view>
+							<view class="settings-btn" @click="goto('/pages/ucenter/home')">
+								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit">
+								</image>
+							</view>
+						</view>
 					</view>
-					<view style="height: 5vh;width: 1px;background-color: rgb(190,150,150);"></view>
-					<view class="flex-column">
-						<view class="myfont-bold padding-col" style="font-size: 18px;">{{userInfo.money}}</view>
-						<view class="myfont padding-col">{{language.balance}}</view>
+					<view class="user-balance-row">
+						<view class="balance-item">
+							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+							<text
+								class="balance-value myfont-18px text-bold">{{ $toolbox.num_format(userInfo.money || 0) }}</text>
+						</view>
+						<view class="secondary-balance-row">
+							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+							<view class="balance-item">
+								<text class="cashout-label">Promo</text>
+								<text
+									class="cashout-value">{{ $toolbox.num_format(userInfo.money_promotion || 0) }}</text>
+							</view>
+							<view class="balance-item" style="margin-left: 12px;">
+								<text class="cashout-label">Cash Out</text>
+								<text
+									class="cashout-value">{{ $toolbox.num_format(userInfo.total_withdraw || 0) }}</text>
+							</view>
+						</view>
 					</view>
 				</view>
 			</view>
-			<view class="myrect flex-row" style="line-height: 20px;width: 90vw;margin: 3vw 5vw;justify-content: space-between;">
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/mixed')">
-					<!-- <image class="pic" src="../../static/image/mixbet.png"></image> -->
-					<text class="myfont-bold mycolor-red">{{language.mixed}}</text>
+
+			<view class="home-nav">
+				<view class="nav-item" @click="goto('/pages/match/home?mix=0')">
+					<image src="/static/icon/nav/single.png" mode="aspectFit"></image><text>{{$t('single')}}</text>
 				</view>
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/home')">
-					<!-- <image class="pic" src="../../static/image/zuqiu.png"></image> -->
-					<text class="text-bold text-yellow">{{language.single}}</text>
+				<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
+					<image src="/static/icon/nav/mpl.png" mode="aspectFit"></image><text>{{$t('mixparlay')}}</text>
 				</view>
-				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="goto(navi2D3D=='3D'? 'number/3d-number-bet' : 'number/number-bet')"> -->
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('number/3d-number-bet')">
-					<!-- <image class="pic" src="../../static/image/2D3D.png"></image> -->
-					<text class="text-purple text-bold">2D/3D</text>
+				<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
+					<image class="referral-icon" src="/static/icon/ucenter/referral.svg" mode="aspectFit"></image>
+					<text>{{$t('Referral')}}</text>
+				</view>
+				<view class="nav-item" @click="goto('/pages/orders/home')">
+					<image src="/static/icon/nav/history.png" mode="aspectFit"></image><text>{{$t('history')}}</text>
+				</view>
+				<view class="nav-item" @click="goto('/pages/index/coupon')">
+					<image src="/static/icon/nav/deals.png" mode="aspectFit"></image><text>{{$t('Deals')}}</text>
+				</view>
+				<view class="nav-item" @click="goto('/pages/wallet/wallet')">
+					<image src="/static/icon/nav/wallet.png" mode="aspectFit"></image><text>{{$t('wallet')}}</text>
 				</view>
 			</view>
-			<view class="myrect flex-row" style="width: 90vw;margin: 3vw 5vw;justify-content: space-between;align-items: flex-start;">
+		</view>
 
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="to_score_link" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/score.png"></image> -->
-					<text class="text-blue text-bold">{{language.score}}</text>
-				</view>
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('orders/home')" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/zhangdan_.png"></image> -->
-					<text class="text-green text-bold" style="padding: 0 8px 0 8px;">{{language.myBet}}</text>
-				</view>
-				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/score')" :style="{'min-height':dyHeight()}"> -->
-
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('ucenter/home')" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/jingjiren_icon.png"></image> -->
-					<text class="text-orange text-bold" style="padding: 0 8px 0 8px;">{{language.ucenter}}</text>
-				</view>
+		<scroll-view scroll-y class="home-scroll">
+			<view class="news-section" v-if="advertisements.length">
+				<text class="section-title">News &amp; Promotions</text>
+				<swiper class="promotion-swiper" :circular="true" :autoplay="true" interval="3500" duration="500"
+					indicator-dots>
+					<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+						<image class="promotion-image"
+							:src="ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url" mode="aspectFill">
+						</image>
+					</swiper-item>
+				</swiper>
 			</view>
 		</scroll-view>
-
-		<uni-popup ref="popup" type="center">
-			<view class="bg-white text-bold text-center dialogsTitle">{{temp.title}}</view>
-			<scroll-view scroll-y class="bg-white">
-				<view class="bg-white dialogs text-center span_box">
-					<view class="words_span">{{temp.content}}</view>
-				</view>
-			</scroll-view>
-		</uni-popup>
-
+		<customer-service></customer-service>
 	</view>
 </template>
 
 <script>
-	import match from '../match/home.vue'
-	import orders from '../orders/home.vue'
-	import ucenter from '../ucenter/home.vue'
-	import config from '../../utils/config.js'
-	import dateFormatUtils from "../../utils/utils.js"
-	import uniPopup from "@/components/uni-popup/uni-popup.vue";
-
+	import CustomerService from '@/components/common/customer-service.vue'
+	import {
+		getUnreadCount
+	} from '@/utils/api/message.js'
 
 	export default {
 		components: {
-			match,
-			orders,
-			ucenter
+			CustomerService
 		},
 		data() {
 			return {
-				cardCur: 0,
-				// swiperList:[],
-				swiperList: [],
-				dotStyle: false,
-				towerStart: 0,
-				direction: '',
-				temp: {},
 				userInfo: {},
-				language: config.language,
-				speed: 8,
-				contact: '',
-				about: '',
-				notice: '',
-				navi2D3D: null,
-				loading: false,
+				unreadCount: 0,
+				advertisements: []
 			}
 		},
 		methods: {
-			developingTips() {
-				uni.showModal({
-					title: this.$t('tips'),
-					content: this.$t('coming_soon'),
-					confirmText: this.$t('ok'),
-					cancelText: this.$t('cancel'),
+			goto(url) {
+				uni.navigateTo({
+					url
 				})
 			},
-			numberFormat(num) {
-				return dateFormatUtils.numFormat(num)
-			},
-			dyHeight() {
-				return this.language.lang == 'mm' ? '160px' : ''
-			},
-			goto(name) {
-				// this.music.play_dede()
+			goMessage() {
 				uni.navigateTo({
-					url: '/pages/' + name,
-					animationType: 'slide-in-right',
-					animationDuration: 100
+					url: '/pages/ucenter/message'
+				})
+			},
+			updateUnreadCount() {
+				if (!uni.getStorageSync('Authorization')) {
+					this.unreadCount = 0
+					return
+				}
+				getUnreadCount().then((count) => {
+					this.unreadCount = count || 0
+				}).catch(() => {
+					this.unreadCount = 0
 				})
 			},
 			getUserInfo() {
-				var _this = this;
-				_this.loading = true;
-				if (uni.getStorageSync("Authorization")) {
-					_this.$http.get('/app_user/user_info', {}, (res) => {
-						_this.loading = false;
-						if (res.statusCode == 200) {
-							_this.$store.dispatch('saveUserInfo', res.data.data);
-							_this.userInfo = res.data.data
-						}
-					})
-				}
-			},
-			to_score_link() {
-				const url = "https://innwasport.com";
-				// 在 App 端调用原生浏览器
-				// #ifdef APP-PLUS
-				plus.runtime.openURL(url);
-				// #endif
-
-				// 在 H5 端用新标签页打开
-				// #ifdef H5
-				window.open(url, "_blank");
-				// #endif
-			},
-			getNotice() {
-				var _this = this;
-				_this.$http.get('/notice/get', {}, (res) => {
-					if (res.statusCode == 200) {
-						_this.notice = '';
-						res.data.items.forEach(element => {
-							_this.notice += '[' + element.TITLE + ']' + element.CONTENT + '           ';
-						})
+				this.$http.get('/app_user/user_info', {}, (res) => {
+					if (res.statusCode === 200) {
+						this.userInfo = res.data.data || {}
+						this.$store.dispatch('saveUserInfo', this.userInfo)
 					}
 				})
 			},
-			getImage() {
-				var _this = this;
-				_this.$http.get('/up_image/get', {}, (res) => {
-					if (res.statusCode == 200) {
-						_this.swiperList = []
-						res.data.items.forEach(element => {
-							_this.swiperList.push({
-								id: element.ID,
-								type: 'image',
-								url: 'http://img.innwabet.net/' + element.ADDRESS
-							})
-						})
+			getAdvertisements() {
+				const _this = this
+				this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'index',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						_this.advertisements = res.data.data.items || []
 					}
 				})
 			},
-			showDialogs(title) {
-				// this.music.play_dede()
-				this.temp = {
-					title: this.language[title],
-					content: this.$data[title]
-				}
-				this.$refs.popup.open()
-			},
-			showContactDialogs() {
-				// this.music.play_dede()
-				this.$refs.contactDialogs.open()
-			},
-			logout() {
-				// this.music.play_dede();
-				uni.removeStorageSync('Authorization');
-				uni.redirectTo({
-					url: '../login/login'
+			handleAdClick(ad) {
+				if (ad.link_url) uni.navigateTo({
+					url: ad.link_url
 				})
-			},
-		},
-		mounted() {
-			if (!uni.getStorageSync("Authorization")) {
-				uni.redirectTo({
-					url: '../login/login'
-				})
-				return;
 			}
-			// this.getConfigs();
-
-			this.contact = this.$store.state.configs.contact_us;
-			this.about = this.$store.state.configs.help_content;
-			this.getNotice();
-			this.getImage();
-			this.language = config.language;
-			console.log(this.language.lang)
 		},
 		onShow() {
-			this.getUserInfo();
-			this.navi2D3D = uni.getStorageSync('navi2D3D')
+			if (!uni.getStorageSync('Authorization')) {
+				uni.reLaunch({
+					url: '/pages/login/login'
+				})
+				return
+			}
+			this.getUserInfo()
+			this.getAdvertisements()
+			this.updateUnreadCount()
+		},
+		onLoad() {
+			uni.$on('message:unreadUpdate', this.updateUnreadCount)
+			uni.$on('message:update', this.updateUnreadCount)
+		},
+		onUnload() {
+			uni.$off('message:unreadUpdate', this.updateUnreadCount)
+			uni.$off('message:update', this.updateUnreadCount)
 		}
 	}
 </script>
+
 <style lang="scss">
-	.pic {
-		width: 45px;
-		height: 45px;
-		margin-bottom: 15px;
+	.home-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		background: #2a6268;
 	}
 
-	.padmar {
-		padding: 8px 4px 10px 4px;
-		margin-top: 3vw;
+	.home-top {
+		flex-shrink: 0;
+		padding: 18px 20px 16px;
 	}
 
-	.text-purple {
-		color: #6030d1;
+	.home-logo {
+		display: block;
+		width: 320px;
+		max-width: 90%;
+		margin: 3vh auto 5px;
 	}
 
-	.text-yellow {
-		color: #ea9d31;
+	.home-subtitle {
+		display: block;
+		margin: 3px auto 3vh;
+		color: #fff;
+		font-size: 12px;
+		text-align: center;
 	}
 
-	.text-green {
-		color: #44bc6f;
+	.user-info-card {
+		background-color: white;
+		border-radius: 20px;
+		padding: 5px 12px 10px;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		min-height: 90px;
 	}
 
-	.text-blue {
-		color: #52adff;
+	.user-avatar {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		flex-shrink: 0;
+		margin-right: 10px;
 	}
 
-	.text-orange {
-		color: #ffa56c;
+	.avatar-img {
+		width: 100%;
+		height: 100%;
+		background-color: #ffffff;
 	}
 
-	.padding-col {
-		padding: 2vw;
-		color: white;
+	.user-details {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.user-id {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.user-id-info {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+		align-items: center;
+		flex-direction: row;
+		font-size: 15px;
+	}
+
+	.id-label,
+	.id-value,
+	.cashout-label,
+	.cashout-value {
+		color: #2F5D62;
+	}
+
+	.id-label {
 		font-weight: 600;
 	}
 
-	.dialogs {
-		width: 90vw;
-		height: 50vh;
+	.id-value {
+		font-weight: bold;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
-	.icon {
-		height: 35px;
-		width: 43px;
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
 	}
 
-	.logout {
-		position: fixed;
-		bottom: 8px;
-		right: 8px;
-		background-color: white;
-		border-radius: 3px;
-		display: table;
-		height: 42px;
-		width: 70px
+	.bell-btn,
+	.settings-btn {
+		position: relative;
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 	}
 
-	.dialogsTitle {
-		height: 5vh;
-		line-height: 5vh;
-		border-bottom: 1px solid lightgrey;
-		font-size: 16px;
+	.bell-icon,
+	.settings-icon {
+		width: 22px;
+		height: 22px;
 	}
 
-	.logout-image {
-		display: table-cell;
-		vertical-align: middle;
-		text-align: center;
-		padding: 5px 0 0 5px;
+	.bell-icon.bell-ring {
+		animation: bellRing 1s ease-in-out infinite;
+		transform-origin: top center;
 	}
 
-	.logout-image image {
-		height: 15px;
-		width: 15px;
-	}
-
-	.logout-label {
-		display: table-cell;
-		vertical-align: middle;
-		text-align: center;
-	}
-
-	.background {
-		// background: url(../../static/image/index.png) no-repeat center center;
-		background-size: cover;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-	}
-
-	.user-row {
-		width: 100%;
-		padding: 0 9px;
-		margin-bottom: 5px;
-	}
-
-	.user-bar {
-		display: table;
-		background-color: rgba(255, 255, 255, 0.9);
-		padding: 3px 0;
-		width: 100%;
-		border-radius: 8px;
-	}
-
-	.user-bar-cell {
-		display: table-cell;
-		text-align: left;
-		vertical-align: middle;
-		height: 100px;
-	}
-
-	.user-info-loading {
-		height: 15px;
-		width: 15px;
+	.bell-badge {
 		position: absolute;
-		right: 5px
+		top: -2px;
+		right: -2px;
+		min-width: 16px;
+		height: 16px;
+		padding: 0 4px;
+		border-radius: 8px;
+		background-color: #FF4444;
+		color: #ffffff;
+		font-size: 10px;
+		font-weight: bold;
+		line-height: 16px;
+		text-align: center;
+		border: 1px solid #ffffff;
 	}
 
-	.menu-row {
+	.user-balance-row {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 3px;
+	}
+
+	.balance-item {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		gap: 5px;
+		white-space: nowrap;
+	}
+
+	.secondary-balance-row {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.coin-icon {
+		width: 18px;
+		height: 18px;
+		margin-right: 7px;
+	}
+
+	.balance-value {
+		color: #2F5D62;
+		font-size: 18px;
+	}
+
+	.cashout-label,
+	.cashout-value {
+		font-size: 12px;
+	}
+
+	.cashout-label {
+		white-space: nowrap;
+		font-weight: bold;
+	}
+
+	@keyframes bellRing {
+		0% {
+			transform: rotate(0);
+		}
+
+		15% {
+			transform: rotate(16deg);
+		}
+
+		30% {
+			transform: rotate(-14deg);
+		}
+
+		45% {
+			transform: rotate(11deg);
+		}
+
+		60% {
+			transform: rotate(-8deg);
+		}
+
+		75% {
+			transform: rotate(4deg);
+		}
+
+		100% {
+			transform: rotate(0);
+		}
+	}
+
+
+	.home-nav {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 12px 20px;
+		margin-top: 14px;
+	}
+
+	.nav-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 92px;
+		border-radius: 16px;
+		background: #fff;
+		color: #2a6268;
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	.nav-item image {
+		width: 38px;
+		height: 38px;
+		margin-bottom: 7px;
+		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
+	}
+
+	.nav-item text {
+		max-width: 100%;
+		text-align: center;
+		line-height: 1.2;
+	}
+
+	.nav-item .referral-icon {
+		filter: none;
+	}
+
+	.home-scroll {
+		flex: 1;
+		min-height: 0;
+		height: 0;
+	}
+
+	.news-section {
+		padding: 18px 20px 32px;
+		background-color: #2a6268;
+	}
+
+	.section-title {
+		display: block;
+		margin-bottom: 14px;
+		color: white;
+		font-size: 21px;
+		font-weight: 700;
+	}
+
+	.promotion-swiper,
+	.empty-promotion {
 		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 15px;
+		// background: #e9eeee;
+	}
+
+	.promotion-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.empty-promotion {
 		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
 		align-items: center;
-		border-bottom: 1px solid lightgrey;
-	}
-
-	.menu-row .menu-cell:first-child {
-		border-right: 1px solid lightgrey;
-	}
-
-	.menu-cell {
-		width: 50%;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		padding-left: 15px;
-		height: 120px;
-	}
-
-	.menu-cell view {
-		width: 80px;
-	}
-
-	.menu-cell image {
-		width: 80px;
-		height: 80px;
-		margin-right: 10px;
+		justify-content: center;
+		color: #2a6268;
 	}
 </style>

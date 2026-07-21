@@ -670,7 +670,7 @@
 
 	/* header 占位 */
 	.header-placeholder {
-		height: 210px;
+		height: 190px;
 		width: 100%;
 		background-color: #2F5D62;
 	}

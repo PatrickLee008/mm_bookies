@@ -5,7 +5,7 @@
 		<scroll-view class="user-scroll invite-scroll" scroll-y>
 			<view class="padding">
 				<view class="title-text margin-tb-sm" style="margin-left: 0;">
-					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
+					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
 					{{ $t('User Dashboard') }}
 				</view>
 
@@ -302,19 +302,23 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #ffffff;
+		background: #2F5D62;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 210px;
+		height: 190px;
 		flex-shrink: 0;
 	}
 
 	.invite-scroll {
 		flex: 1;
 		height: 0;
+		border-radius: 20px 20px 0 0;
+		background: #ffffff;
+		position: relative;
+		z-index: 1;
 	}
 
 	.financial-stats {

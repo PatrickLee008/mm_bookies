@@ -416,6 +416,7 @@
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
 	import siteinfo from '../../siteinfo.js'
+	import dateFormatUtils from '../../utils/utils.js'
 	import CountDown from '../match/components/count_down.vue'
 
 	export default {
@@ -508,8 +509,7 @@
 			},
 			formatDateTime(timeStr, sep = '/') {
 				if (!timeStr) return ''
-				// 兼容 'YYYY-MM-DD HH:mm:ss'
-				let str = String(timeStr).replace('T', ' ')
+				let str = this.toMyanmarTime(timeStr)
 				let parts = str.split(' ')
 				let d = parts[0] ? parts[0].split('-') : []
 				let t = parts[1] ? parts[1].split(':') : []
@@ -520,13 +520,37 @@
 			},
 			dateOnly(timeStr, sep = '.') {
 				if (!timeStr) return ''
-				let d = String(timeStr).split(' ')[0].split('-')
+				let d = this.toMyanmarTime(timeStr).split(' ')[0].split('-')
 				if (d.length < 3) return String(timeStr)
 				return `${d[0]}${sep}${d[1]}${sep}${d[2]}`
 			},
+			toMyanmarTime(timeStr) {
+				if (!timeStr) return ''
+				const normalized = String(timeStr).replace('T', ' ').replace(/\.\d+Z?$/, '')
+				try {
+					return dateFormatUtils.convertTimezone(normalized, 'Asia/Yangon')
+				} catch (e) {
+					return normalized
+				}
+			},
+			parseServerTime(timeStr) {
+				if (!timeStr) return null
+				const match = String(timeStr).replace('T', ' ').match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?/
+				)
+				if (!match) return new Date(timeStr)
+				return new Date(Date.UTC(
+					Number(match[1]),
+					Number(match[2]) - 1,
+					Number(match[3]),
+					Number(match[4]),
+					Number(match[5]),
+					Number(match[6] || 0)
+				) - 8 * 60 * 60 * 1000)
+			},
 			isWithin48Hours(dateStr) {
 				if (!dateStr) return false
-				let target = new Date(String(dateStr).replace(/-/g, '/'))
+				let target = this.parseServerTime(dateStr)
 				if (isNaN(target.getTime())) return false
 				const diff = target - new Date()
 				return diff > 0 && diff <= 48 * 60 * 60 * 1000
@@ -833,7 +857,7 @@
 					image: promo.image_url || '/static/image/deals/deals.png',
 					period_start: this.dateOnly(promo.start_date, '.'),
 					period_end: this.dateOnly(promo.end_date, '.'),
-					end_time_full: promo.end_date,
+					end_time_full: this.parseServerTime(promo.end_date),
 					period_start_time: this.formatDateTime(promo.start_date),
 					period_end_time: this.formatDateTime(promo.end_date),
 					terms: promo.description || '',
@@ -1126,7 +1150,7 @@
 <style lang="scss">
 	/* header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 190px;
 		width: 100%;
 		flex-shrink: 0;
 	}
