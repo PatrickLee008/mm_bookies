@@ -509,7 +509,7 @@
 						break;
 					case 3:
 						if (!this.loginInfo.bank_type) {
-							uni.showModal({
+							this.$notice.show({
 								title: 'res.data.message',
 								content: this.$t('please_select_your_bank'),
 								// content: this.language[res.data.message],
@@ -535,7 +535,7 @@
 				let _this = this
 				// let validate = this.mcaptcha.validate(this.loginInfo.captcha)
 				// if (!validate) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: this.language.warning,
 				// 		content: this.language.captcha_not_match,
 				// 		showCancel: false,
@@ -555,7 +555,7 @@
 							this.max_progress += 1
 							return
 						} else {
-							uni.showModal({
+							this.$notice.show({
 								title: 'Tips!',
 								content: _this.$t('account_repeat'),
 								// content: this.language[res.data.message],
@@ -565,7 +565,7 @@
 							});
 						}
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: 'error!',
 							content: res.data.message,
 							// content: this.language[res.data.message],
@@ -609,7 +609,7 @@
 					_this.loadding = ''
 					if (res.statusCode == 200) {
 						_this.login()
-						// uni.showModal({
+						// this.$notice.show({
 						// 	title: 'Success!',
 						// 	content: 'Welcome',
 						// 	showCancel: false,
@@ -621,7 +621,7 @@
 
 					} else {
 						// _this.loginDisabled = false
-						uni.showModal({
+						this.$notice.show({
 							title: '_error!',
 							content: res.data.message,
 							// content: this.language[res.data.message],
@@ -669,7 +669,7 @@
 						uni.setStorageSync('login_success', true)
 						uni.setStorageSync('rigister_success', true)
 					} else if (res.statusCode == 400) {
-						uni.showModal({
+						this.$notice.show({
 							title: 'Tips',
 							content: this.$t('wrong_password'),
 							showCancel: false,
@@ -678,7 +678,7 @@
 						});
 						// _this.loginDisabled = false;
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: 'Tips',
 							content: this.language[res.data.message],
 							showCancel: false,
@@ -732,7 +732,7 @@
 			// 	}
 
 			// 	if (content) {
-			// 		uni.showModal({
+			// 		this.$notice.show({
 			// 			title: 'Warning',
 			// 			content: content,
 			// 			showCancel: false,

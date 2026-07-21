@@ -1,5 +1,6 @@
 <template>
 	<view class="webview-container">
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- #ifdef APP-PLUS -->
 		<web-view :src="gameUrl" @message="handleMessage" @error="handleError"></web-view>
 		<!-- #endif -->
@@ -42,7 +43,7 @@ export default {
 			this.checkIframeLoadTimeout()
 			// #endif
 		} else {
-			uni.showModal({
+			this.$notice.show({
 				title: 'Error',
 				content: 'Missing game URL',
 				showCancel: false,
@@ -58,7 +59,7 @@ export default {
 		},
 		handleError(event) {
 			console.error('Webview loading error:', event)
-			uni.showModal({
+			this.$notice.show({
 				title: 'Loading Failed',
 				content: 'Failed to load game, please try again later',
 				showCancel: false,
@@ -88,7 +89,7 @@ export default {
 			// #ifdef H5
 			const newWindow = window.open(this.gameUrl, '_blank')
 			if (!newWindow) {
-				uni.showModal({
+				this.$notice.show({
 					title: 'Tips',
 					content: 'Please allow pop-ups for this site, then try again',
 					showCancel: false

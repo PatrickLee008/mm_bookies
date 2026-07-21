@@ -786,7 +786,7 @@
 
 				// 检查是否登录
 				if (!_this.isLogin) {
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('tips'),
 						content: _this.$t('please_sign_in_to_receive_the_coupon'),
 						showCancel: false,
@@ -855,7 +855,7 @@
 							const newWindow = window.open(gameUrl, '_blank')
 							if (!newWindow) {
 								// 如果被拦截，提示用户或使用备用方案
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: _this.$t('allow_popups'),
 									confirmText: _this.$t('open_now'),
@@ -881,7 +881,7 @@
 						// #endif
 
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('error_title'),
 							content: res.data.message || _this.$t('unable_enter_lobby'),
 							showCancel: false,

@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
 		<view class="new-header-wrapper">
 			<!-- from tangjq--- 顶部标题区域 -->
@@ -156,6 +157,7 @@
 			this.updateUnreadMessageCount();
 			this.setupWebSocketMessageListener();
 			this.$nextTick(() => {
+				this.$notice.setInstance(this.$refs.globalNotice);
 				this.calculateHeaderHeight();
 			});
 		},
@@ -584,8 +586,12 @@
 		color: #ffffff;
 		font-size: 10px;
 		font-weight: bold;
-		line-height: 16px;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
+		box-sizing: border-box;
 		border: 1px solid #ffffff;
 	}
 

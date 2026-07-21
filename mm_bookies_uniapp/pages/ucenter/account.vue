@@ -213,7 +213,7 @@
 			submit() {
 				var _this = this;
 				// if (!this.password) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'tips',
 				// 		content: this.language['The password cannot be null'],
 				// 		showCancel: false,
@@ -223,7 +223,7 @@
 				// 	return;
 				// }
 				if (this.password == this.old_password) {
-					uni.showModal({
+					this.$notice.show({
 						title: 'tips',
 						content: this.$t('The new password is the same as the old one'),
 						showCancel: false,
@@ -249,7 +249,7 @@
 						// 	icon: 'success',
 						// 	duration: 2000
 						// })
-						uni.showModal({
+						this.$notice.show({
 							// title: this.language['Change Password Success'],
 							title: _this.$t('tips'),
 							content: tips,
@@ -260,7 +260,7 @@
 							}
 						});
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: tips,
 							showCancel: false,

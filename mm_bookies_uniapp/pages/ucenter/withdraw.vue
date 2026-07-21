@@ -246,7 +246,7 @@
 				//判断提现金额是否为最小限额  ,如果未满足禁止体现
 				if (_this.amount < parseInt(_this.$store.state.configs['withdraw_min_limit']) || _this.amount < 0) {
 
-					uni.showModal({
+					this.$notice.show({
 						title: 'tips',
 						content: this.language['The minimum withdraw must be equal or greater'] + _this.$store
 							.state.configs['withdraw_min_limit'],
@@ -259,7 +259,7 @@
 				}
 
 				// if (_this.amount > parseInt(_this.$store.state.userInfo.money.replace(',', ''))) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'tips',
 				// 		content: this.language.withdrawTips2,
 				// 		showCancel: false,
@@ -270,7 +270,7 @@
 				// }
 
 				// if (_this.amount < 0) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'tips',
 				// 		content: this.language.withdrawTips1,
 				// 		showCancel: false,
@@ -285,7 +285,7 @@
 				_this.$http.post('/withdraw/apply', para, (res) => {
 					uni.hideLoading()
 					if (res.statusCode == 200) {
-						uni.showModal({
+						this.$notice.show({
 							title: `${_this.$t('Congratulations')}`,
 							content: `${_this.$t('Amount')} (${_this.amount}). ${_this.$t('withdraw_success')}`,
 							showCancel: false,
@@ -319,7 +319,7 @@
 							tips = res.data.message;
 						}
 
-						uni.showModal({
+						this.$notice.show({
 							title: 'tips',
 							content: tips,
 							showCancel: false,

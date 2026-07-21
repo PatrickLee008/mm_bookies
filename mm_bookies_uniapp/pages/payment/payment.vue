@@ -228,7 +228,7 @@
 					} else {
 						// 请求成功但业务失败的情况
 						that.modalName = 'error_modal';
-						uni.showModal({
+						this.$notice.show({
 							title: that.$t('tips'),
 							content: res.data ? res.data.msg : that.$t('network_error'),
 							confirmText: that.$t('ok'),
@@ -240,7 +240,7 @@
 					console.error('Network request failed:', err);
 					that.modalName = 'error_modal';
 					that.isload = true;
-					uni.showModal({
+					this.$notice.show({
 						title: that.$t('network_error'),
 						content: that.$t('check_network'),
 						confirmText: that.$t('ok'),
@@ -258,7 +258,7 @@
 						that.payInfo = res.data.data;
 						if (that.payInfo.orderStatus == 2) {
 							//支付成功
-							uni.showModal({
+							this.$notice.show({
 								title: that.$t('tips'),
 								content: that.$t('pay_completed'),
 								showCancel: false,

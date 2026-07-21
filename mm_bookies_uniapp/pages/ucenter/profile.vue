@@ -1,5 +1,6 @@
 <template>
 	<view class="profile-page full-page">
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- 顶部栏 -->
 		<view class="profile-header">
 			<text class="header-back-icon" @click="goBack">←</text>
@@ -179,7 +180,7 @@
 						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePwdModal()
 						_this.$nextTick(() => {
-							uni.showModal({
+							this.$notice.show({
 								title: _this.$t('success_word'),
 								content: res.data.message || _this.$t('password_changed_success'),
 								showCancel: false,

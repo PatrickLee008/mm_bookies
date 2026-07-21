@@ -115,7 +115,7 @@
 
 			// 删除消息
 			deleteMessage() {
-				uni.showModal({
+				this.$notice.show({
 					title: this.$t('delete_message'),
 					content: this.$t('confirm_delete_message'),
 					success: (res) => {

@@ -714,7 +714,7 @@
 					})
 					return
 				}
-				uni.showModal({
+				this.$notice.show({
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
 					confirmText: _this.$t('Confirm'),
@@ -729,7 +729,7 @@
 			claimCoupon(coupon) {
 				let _this = this
 				if (!coupon) return
-				uni.showModal({
+				this.$notice.show({
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
 					confirmText: _this.$t('Confirm'),
@@ -762,7 +762,7 @@
 						_this.getCouponList()
 						_this.refreshUserInfo()
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: data.message || 'Failed to claim coupon',
 							showCancel: false
@@ -969,7 +969,7 @@
 			showPromotionDetail(promo) {
 				let _this = this
 				if (promo.status === 'Available' && promo.can_participate === false && promo.ineligibility_reason) {
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('title_alert'),
 						content: promo.ineligibility_reason,
 						showCancel: false
@@ -1074,7 +1074,7 @@
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: res.data.message || 'Failed to join promotion',
 							showCancel: false
@@ -1091,7 +1091,7 @@
 			},
 			showEndPromotionDialog() {
 				let _this = this
-				uni.showModal({
+				this.$notice.show({
 					title: _this.$t('title_alert'),
 					content: _this.$t('are you sure end pro'),
 					confirmText: _this.$t('Confirm'),
@@ -1118,7 +1118,7 @@
 						_this.closePromotionDetail()
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
-						uni.showModal({
+						this.$notice.show({
 							title: 'Success',
 							content: 'Promotion ended successfully',
 							showCancel: false
@@ -1128,7 +1128,7 @@
 						if (res.data.data && res.data.data.unmet_conditions) {
 							msg = 'Cannot end promotion:\n' + res.data.data.unmet_conditions.join('\n')
 						}
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: msg,
 							showCancel: false
@@ -1218,12 +1218,28 @@
 		height: 16px;
 		padding: 0 3px;
 		border-radius: 8px;
-		background-color: #FFC436;
-		color: #2F5D62;
+		background-color: #2F5D62;
+		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
 		line-height: 16px;
 		text-align: center;
+		animation: promoRipple 1.6s ease-in-out infinite;
+	}
+
+	@keyframes promoRipple {
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(47, 93, 98, 0.8);
+		}
+
+		40% {
+			box-shadow: 0 0 0 6px rgba(47, 93, 98, 0.2);
+		}
+
+		60% {
+			box-shadow: 0 0 0 0 rgba(47, 93, 98, 0);
+		}
 	}
 
 	/* 兑换码输入行 */

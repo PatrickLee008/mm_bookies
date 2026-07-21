@@ -41,13 +41,6 @@
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
 			@scroll="handle_scroll"
 			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
-			<!-- from tangjq--- 广告图区域 -->
-			<view class="ad-banner-wrapper" v-for="(ad, index) in advertisements" :key="index"
-				@click="handleAdClick(ad)">
-				<image class="ad-banner-image" :src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''"
-					mode="aspectFill"></image>
-			</view>
-
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
 			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"
 				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
@@ -60,7 +53,8 @@
 						<text class="league-name">{{league.name}}</text>
 					</view>
 					<view class="league-right">
-						<view class="cuIcon-unfold"></view>
+						<image class="league-toggle-icon" :class="{ 'league-fold-icon': league.show_match }"
+							src="/static/image/single/leage_unfold.svg" mode="aspectFit"></image>
 					</view>
 				</view>
 
@@ -72,7 +66,7 @@
 							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
 							<!-- 日期时间行 -->
 							<view class="match-datetime">
-								{{match.MD_DDMM}} {{match.MD_HHMM}} {{match.MD_NOON}}
+								{{match.MD_DATE_TIME}}
 							</view>
 
 							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
@@ -193,12 +187,23 @@
 							<!-- from tangjq--- 展开/收起按钮，仅当有超过2个投注选项时显示 -->
 							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2"
 								@click.stop="toggle_match_expand(match)">
-								<text style="color: white; margin-right: 5px;">{{ match.expanded ? '' : 'More' }}</text>
-								<view :class="match.expanded ? 'cuIcon-fold' : 'cuIcon-unfold'"></view>
+								<image class="match-toggle-icon"
+									:src="match.expanded ? '/static/image/single/fold.svg' : '/static/image/single/unfold.svg'"
+									mode="aspectFit"></image>
 							</view>
 						</view>
 					</view>
 				</transition>
+
+				<!-- from tangjq--- 广告图显示在第一个可见联赛和第二个联赛之间 -->
+				<template v-if="index === firstVisibleLeagueIndex && advertisements.length > 0">
+					<view class="ad-banner-wrapper" v-for="(ad, adIndex) in advertisements" :key="`ad-${adIndex}`"
+						@click="handleAdClick(ad)">
+						<image class="ad-banner-image"
+							:src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''" mode="aspectFill">
+						</image>
+					</view>
+				</template>
 			</view>
 		</scroll-view>
 
@@ -230,8 +235,7 @@
 					<!-- 比赛信息卡片 -->
 					<view class="detail-match-card">
 						<view class="detail-datetime">
-							{{match_ref.match_detail.MD_DDMM}} {{match_ref.match_detail.MD_HHMM}}
-							{{match_ref.match_detail.MD_NOON}}
+							{{match_ref.match_detail.MD_DATE_TIME}}
 						</view>
 						<view class="detail-teams">
 							<view class="detail-team">
@@ -1002,6 +1006,12 @@
 
 				return leagues.filter(ele => ele.checked).length
 			},
+			firstVisibleLeagueIndex() {
+				const dayKey = `include_${this.tomorrow ? 'tomorrow' : 'today'}`
+				return this.league_list.findIndex(league =>
+					league.checked && league[dayKey] && this.isLeagueMatchSearch(league)
+				)
+			},
 			calc_slip_height() {
 				let info = uni.getDeviceInfo()
 				if (info.platform == 'ios') {
@@ -1532,14 +1542,15 @@
 						match.checked = true
 						let time = new Date(match.LOCAL_MATCH_TIME)
 						match.MATCH_MD_DATE = time
-						match.MD_NOON = time.getHours() > 12 ? 'PM' : 'AM'
+						match.MD_DATE_TIME = _this.formatMatchDateTime(time)
+						match.MD_NOON = time.getHours() >= 12 ? 'PM' : 'AM'
 						match.MD_DAY = `${time.toDateString().split(" ")[0]}`
 						match.MD_HHMM =
-							`${String(time.getHours()%12).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
+							`${String(time.getHours()%12 || 12).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
 						match.MD_DDMM =
 							`${String(time.getDate()).padStart(2,'0')} ${time.toDateString().split(" ")[1]}`
 						match.SLIP_DATE =
-							`@ ${match.MD_DDMM} ${time.getFullYear()} ${String(time.getHours()%12).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
+							`@ ${match.MD_DDMM} ${time.getFullYear()} ${String(time.getHours()%12 || 12).padStart(2,'0')}:${String(time.getMinutes()).padStart(2,'0')}`
 						let match_attr = _this.$toolbox.fake_deep_clone(match.ATTR)
 						let show_attr = []
 						let attr_type_list = match_attr.map(attr => {
@@ -1652,7 +1663,7 @@
 					content = _this.$t('at_most_count').replace('xxx', _this.mix_max_count)
 				}
 				if (content) {
-					// from tangjq--- 使用投注失败提示弹窗代替原来的 uni.showModal
+					// from tangjq--- 使用投注失败提示弹窗代替原来的 this.$notice.show
 					_this.show_fail_popup(content);
 					return
 				}
@@ -1684,7 +1695,7 @@
 					if (res.statusCode == 200) {
 						changeList = res.data.items;
 						if (changeList.length > 0) {
-							uni.showModal({
+							this.$notice.show({
 								title: 'tips',
 								content: _this.$t('odds_change'),
 								showCancel: false,
@@ -1812,7 +1823,7 @@
 
 				// 验证优惠券代码
 				if (!_this.promotion_code || _this.promotion_code.trim() === '') {
-					uni.showModal({
+					this.$notice.show({
 						title: 'Tips',
 						content: _this.$t('Please enter promotion code'),
 						showCancel: false,
@@ -1823,7 +1834,7 @@
 
 				// 只支持单笔下单
 				if (_this.match_ref.mixed) {
-					uni.showModal({
+					this.$notice.show({
 						title: 'Tips',
 						content: 'Promotion code can only be used for single bets',
 						showCancel: false,
@@ -1834,7 +1845,7 @@
 
 				// 校验至少选择一场比赛
 				if (_this.bet_list.length === 0) {
-					uni.showModal({
+					this.$notice.show({
 						title: 'Tips',
 						content: _this.$t('Please select at least one match'),
 						showCancel: false,
@@ -1874,7 +1885,7 @@
 						}
 						_this.reset();
 						_this.$store.dispatch('saveUserInfo', userInfo);
-						uni.showModal({
+						this.$notice.show({
 							content: _this.$t('bettingSuccess') + '\n' + _this.$t(
 								'Using promotion code: ') + _this.promotion_code,
 							title: 'Success',
@@ -1886,7 +1897,7 @@
 						});
 					} else {
 						var tips = _this.$t(res.data.message);
-						uni.showModal({
+						this.$notice.show({
 							title: 'Tips',
 							content: tips,
 							showCancel: false,
@@ -1895,7 +1906,7 @@
 					}
 				}, (err) => {
 					uni.hideLoading();
-					uni.showModal({
+					this.$notice.show({
 						title: 'Tips',
 						content: _this.$t('Network error, please try again'),
 						showCancel: false,
@@ -1956,6 +1967,15 @@
 			// from tangjq--- 清空搜索关键字
 			clearSearch() {
 				this.searchKeyword = ''
+			},
+			formatMatchDateTime(time) {
+				const month = String(time.getMonth() + 1).padStart(2, '0')
+				const day = String(time.getDate()).padStart(2, '0')
+				const hours24 = time.getHours()
+				const hours12 = String(hours24 % 12 || 12).padStart(2, '0')
+				const minutes = String(time.getMinutes()).padStart(2, '0')
+				const period = hours24 >= 12 ? 'PM' : 'AM'
+				return `${day}.${month}.${time.getFullYear()} ${hours12}:${minutes} ${period}`
 			},
 			// from tangjq--- 判断比赛是否匹配搜索关键字
 			isMatchSearch(match) {
@@ -2284,14 +2304,14 @@
 		align-items: center;
 		background-color: white;
 		border-radius: 25px;
-		padding: 6px 15px;
-		border: 1px solid #2A6268;
+		padding: 0 5px;
+		border: 2px solid #2A6268;
 	}
 
 	.search-icon {
-		width: 20px;
-		height: 20px;
-		margin-right: 10px;
+		width: 22px;
+		height: 2px;
+		margin: 4px 10px 4px 0;
 	}
 
 	.search-input {
@@ -2311,8 +2331,8 @@
 
 	.filter-btn {
 		position: relative;
-		width: 35px;
-		height: 35px;
+		width: 30px;
+		height: 30px;
 		background-color: #2F5D62;
 		border-radius: 50%;
 		display: flex;
@@ -2347,8 +2367,8 @@
 
 	.filter-badge {
 		position: absolute;
-		top: -3px;
-		right: -3px;
+		top: -5px;
+		right: -5px;
 		background-color: #ff4444;
 		color: white;
 		border-radius: 10px;
@@ -2369,8 +2389,8 @@
 		justify-content: space-between;
 		align-items: center;
 		background-color: #2F5D62;
-		border-radius: 10px;
-		padding: 5px 10px;
+		border-radius: 16px;
+		padding: 7px 12px;
 		margin-bottom: 10px;
 		width: 100%;
 	}
@@ -2383,8 +2403,8 @@
 	}
 
 	.league-icon {
-		width: 30px;
-		height: 30px;
+		width: 20px;
+		height: 20px;
 		border-radius: 50%;
 		background-color: white;
 	}
@@ -2396,28 +2416,37 @@
 	}
 
 	.league-right {
-		color: white;
-		font-size: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.league-toggle-icon {
+		width: 8px;
+		height: 7px;
+	}
+
+	.league-fold-icon {
+		transform: rotate(180deg);
 	}
 
 	/* from tangjq--- 新的比赛卡片样式 */
 	.new-match-card {
 		background-color: white;
-		border-radius: 15px;
-		margin-bottom: 15px;
+		border-radius: 16px;
+		margin-bottom: 12px;
 		overflow: hidden;
-		border: 1px solid #2F5D62;
-		/* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+		border: 1px solid #d7e2e3;
+		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
 	}
 
 	.match-datetime {
-		background-color: #E8F4F5;
-		text-align: center;
+		background-color: transparent;
+		text-align: left;
 		font-size: 12px;
-		margin: 10px;
-		border-radius: 15px;
 		color: #2F5D62;
 		font-weight: 500;
+		padding: 10px 14px 2px;
 	}
 
 	.match-teams {
@@ -2425,20 +2454,20 @@
 		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
-		padding-bottom: 5px;
+		padding: 7px 14px 10px;
 	}
 
 	.team-section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 8px;
+		gap: 5px;
 		flex: 1;
 	}
 
 	.team-logo {
-		width: 35px;
-		height: 35px;
+		width: 42px;
+		height: 42px;
 	}
 
 	.team-name {
@@ -2458,7 +2487,7 @@
 
 	/* from tangjq--- 新的投注选项样式 */
 	.new-bet-options {
-		padding: 0 15px 15px;
+		padding: 0 12px 0;
 	}
 
 	.bet-row {
@@ -2467,8 +2496,8 @@
 		align-items: center;
 		background-color: #2F5D62;
 		border-radius: 12px;
-		padding: 10px;
-		margin-bottom: 10px;
+		padding: 9px 9px 9px 0;
+		margin-bottom: 4px;
 	}
 
 	.bet-row:last-child {
@@ -2480,8 +2509,8 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		margin-right: 15px;
-		min-width: 30px;
+		/* margin-right: 15px; */
+		min-width: 25px;
 	}
 
 	.bet-type-label text {
@@ -2528,20 +2557,20 @@
 	.bet-btn-small {
 		flex: 1;
 		flex-direction: column;
-		padding: 5px;
-		gap: 4px;
+		padding: 3px 5px;
 	}
 
 	.bet-text-small {
 		color: #2F5D62;
-		font-size: 12px;
-		font-weight: 600;
+		font-size: 14px;
+		font-weight: bold;
 	}
 
 	.bet-odds-small {
 		color: #2F5D62;
-		font-size: 12px;
+		font-size: 14px;
 		font-weight: bold;
+		font-style: italic;
 	}
 
 	.bet-odds {
@@ -2558,14 +2587,19 @@
 
 	.match-expand-btn {
 		background-color: #2F5D62;
-		padding: 5px;
+		height: 28px;
+		margin: 4px 12px 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: white;
-		font-size: 18px;
-		border-radius: 0 0 15px 15px;
+		border-radius: 15px;
 		cursor: pointer;
+	}
+
+	.match-toggle-icon {
+		width: 13px;
+		height: 14px;
 	}
 
 	/* from tangjq--- 确保展开按钮可点击 */
@@ -3158,7 +3192,7 @@
 		height: 130px;
 		border-radius: 15px;
 		overflow: hidden;
-		margin: 15px 0;
+		/* margin: 15px 0; */
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 

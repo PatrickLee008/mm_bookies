@@ -1,5 +1,6 @@
 <template>
 	<view class="deposit-component">
+		<global-notice ref="globalNotice"></global-notice>
 		<scroll-view scroll-y class="deposit-scroll">
 			<!-- from tangjq--- 银行卡列表界面（默认显示） -->
 			<view class="bank-list-container" v-if="current_progress==0">
@@ -754,7 +755,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 					this.charge_way = this.charge_way.filter(item => item.checked)
 					let _this = this
 					if (_this.chargeForm.charge_way == 1 && _this.agent_no_bankcard) {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t('agent_no_bankcard'),
 							showCancel: false,
@@ -783,7 +784,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			},
 			show_add_modal(modal_type) {
 				if (modal_type == 'add' && this.card_list.length >= 5) {
-					uni.showModal({
+					this.$notice.show({
 						title: this.$t('tips'),
 						content: this.$t('max_five_banks'),
 						showCancel: false,
@@ -929,7 +930,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 									tips = _this.language[res.message]
 								}
 								uni.hideLoading()
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: tips,
 									showCancel: false,
@@ -1008,7 +1009,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 										title: this.$t('deposit_success')
 									});
 								} else {
-									uni.showModal({
+									this.$notice.show({
 										confirmText: this.$t('ok'),
 										showCancel: false,
 										title: this.$t('error_title'),
@@ -1016,7 +1017,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 									});
 								}
 							} catch (e) {
-								uni.showModal({
+								this.$notice.show({
 									confirmText: this.$t('ok'),
 									showCancel: false,
 									title: this.$t('error_title'),
@@ -1026,7 +1027,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						},
 						fail: (err) => {
 							uni.hideLoading();
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -1055,7 +1056,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 								title: this.$t('deposit_success')
 							});
 						} else {
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -1104,7 +1105,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
 						_this.modalName = ''
 						_this.$nextTick(() => {
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -1294,7 +1295,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
 						this.closeDepositModal()
 						this.$nextTick(() => {
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),

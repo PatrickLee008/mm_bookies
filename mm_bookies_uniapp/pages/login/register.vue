@@ -1,5 +1,6 @@
 <template>
 	<view class="login-container">
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
@@ -196,7 +197,7 @@
 							_this.doRegister();
 						} else {
 							_this.loadding = '';
-							uni.showModal({
+							this.$notice.show({
 								title: _this.$t('tips'),
 								content: _this.$t('account_repeat'),
 								showCancel: false,
@@ -205,7 +206,7 @@
 						}
 					} else {
 						_this.loadding = '';
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('error_title'),
 							content: res.data.message,
 							showCancel: false,
@@ -241,7 +242,7 @@
 						uni.removeStorageSync('default_r_code');
 						_this.login();
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('error_title'),
 							content: res.data.message,
 							showCancel: false,
@@ -291,14 +292,14 @@
 						uni.setStorageSync('login_success', true);
 						uni.setStorageSync('rigister_success', true);
 					} else if (res.statusCode == 400) {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t('wrong_password'),
 							showCancel: false,
 							confirmText: _this.$t('ok'),
 						});
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.language[res.data.message],
 							showCancel: false,

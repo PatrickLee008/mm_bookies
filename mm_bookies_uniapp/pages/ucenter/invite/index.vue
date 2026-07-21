@@ -524,7 +524,7 @@
 					uni.showToast({ title: _this.$t('Already participated'), icon: 'none' })
 					return
 				}
-				uni.showModal({
+				this.$notice.show({
 					title: _this.$t('Join Activity'),
 					content: _this.$t('Do you want to participate in this invitation activity.'),
 					confirmText: _this.$t('Confirm'),
@@ -533,7 +533,7 @@
 						if (!r.confirm) return
 						_this.$http.post('/invitation_v2/join-activity', { activity_id: activity.id }, (res) => {
 							if (res.statusCode === 200 && res.data.code === 200) {
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('Success'),
 									content: _this.$t('Successfully joined the invitation activity!'),
 									showCancel: false,
@@ -550,7 +550,7 @@
 			// 统一失败提示（尝试 i18n）
 			alertMsg(content) {
 				let translated = this.$t(content)
-				uni.showModal({
+				this.$notice.show({
 					title: this.$t('tips'),
 					content: translated || content,
 					showCancel: false,
@@ -580,7 +580,7 @@
 				}, (res) => {
 					if (res.statusCode === 200 && res.data && res.data.code === 200) {
 						_this.refreshAfterClaim()
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('Congratulations'),
 							content: `${_this.$t('You have received a')} ${_this.$toolbox.num_format(rule.reward_amount)} ${_this.$t('MMK reward for completing our task!')}`,
 							showCancel: false,
@@ -601,7 +601,7 @@
 					if (res.statusCode === 200 && res.data && res.data.code === 200) {
 						_this.refreshAfterClaim()
 						const data = res.data.data || {}
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('Congratulations'),
 							content: `${_this.$t('You have received a')} ${_this.$toolbox.num_format(data.total_reward_amount)} Ks`,
 							showCancel: false,
@@ -622,7 +622,7 @@
 					if (res.statusCode === 200 && res.data && res.data.code === 200) {
 						_this.refreshAfterClaim()
 						const data = res.data.data || {}
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('Congratulations'),
 							content: `${_this.$t('You have received a')} ${_this.$toolbox.num_format(data.total_reward_amount)} Ks`,
 							showCancel: false,

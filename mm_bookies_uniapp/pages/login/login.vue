@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
 		<view class="splash-screen" v-if="showSplash">
 			<!-- Skip 按钮（由 enable_skip_button 控制） -->
@@ -334,7 +335,7 @@
 				// let validate = this.mcaptcha.validate(this.Captcha)
 				// let testing = uni.getStorageSync('testing')
 				// if (!validate && !testing) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'Warning',
 				// 		content: 'captcha not match',
 				// 		showCancel: false,
@@ -398,7 +399,7 @@
 							duration: 2000,
 						});
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t(res.data.message),
 							showCancel: false,

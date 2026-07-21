@@ -498,7 +498,7 @@
 					this.charge_way = this.charge_way.filter(item => item.checked)
 					let _this = this
 					if (_this.chargeForm.charge_way == 1 && _this.agent_no_bankcard) {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t('agent_no_bankcard'),
 							showCancel: false,
@@ -518,7 +518,7 @@
 			},
 			show_add_modal(modal_type) {
 				if (modal_type == 'add' && this.card_list.length >= 5) {
-					uni.showModal({
+					this.$notice.show({
 						title: this.$t('tips'),
 						content: this.$t('max_five_banks'),
 						showCancel: false,
@@ -583,7 +583,7 @@
 			removeBank(bank) {
 				var _this = this;
 				if (_this.$toolbox.click_too_fast(.5)) return
-				uni.showModal({
+				this.$notice.show({
 					// content: `Are you sure to remove your bank account ${bank.acc_number}?`,
 					content: `${this.$t('remove_bank_confirm')}`,
 					confirmText: this.$t('Confirm'),
@@ -730,7 +730,7 @@
 									tips = _this.language[res.message]
 								}
 								uni.hideLoading()
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: tips,
 									showCancel: false,
@@ -782,7 +782,7 @@
 			},
 			DelImg(e) {
 				/*
-				uni.showModal({
+				this.$notice.show({
 					title: '删除图片',
 					content: '确定要删除这张图片吗？',
 					cancelText: '取消',
@@ -847,7 +847,7 @@
 										title: this.$t('deposit_success')
 									});
 								} else {
-									uni.showModal({
+									this.$notice.show({
 										confirmText: this.$t('ok'),
 										showCancel: false,
 										title: this.$t('error_title'),
@@ -856,7 +856,7 @@
 								}
 							} catch (e) {
 								// console.error('解析响应失败:', e);
-								uni.showModal({
+								this.$notice.show({
 									confirmText: this.$t('ok'),
 									showCancel: false,
 									title: this.$t('error_title'),
@@ -867,7 +867,7 @@
 						fail: (err) => {
 							uni.hideLoading();
 							// console.error('上传失败:', err);
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -896,7 +896,7 @@
 								title: this.$t('deposit_success')
 							});
 						} else {
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -929,7 +929,7 @@
 			// 				title: 'success'
 			// 			})
 			// 		} else {
-			// 			uni.showModal({
+			// 			this.$notice.show({
 			// 				confirmText: 'OK',
 			// 				showCancel: false,
 			// 				title: 'Error',
@@ -947,7 +947,7 @@
 				}
 				if (!_this.amount || !_this.chargeForm.acc_number)
 					return
-				// uni.showModal({
+				// this.$notice.show({
 				// 	title: 'comming soon',
 				// 	showCancel: false,
 				// })
@@ -992,7 +992,7 @@
 						});
 					} else if (data.code == 409) {
 						let order = data.data;
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: res.data.message,
 							confirmText: _this.$t('pay_other'),
@@ -1008,7 +1008,7 @@
 						})
 
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							confirmText: this.$t('ok'),
 							showCancel: false,
 							title: this.$t('error_title'),

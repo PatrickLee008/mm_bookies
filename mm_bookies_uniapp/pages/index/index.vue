@@ -1,5 +1,6 @@
 <template>
 	<view class="home-page">
+		<global-notice ref="globalNotice"></global-notice>
 		<view class="home-top">
 			<image class="home-logo" src="../../figma/login/title.png" mode="widthFix"></image>
 			<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
@@ -318,9 +319,13 @@
 		color: #ffffff;
 		font-size: 10px;
 		font-weight: bold;
-		line-height: 16px;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
 		border: 1px solid #ffffff;
+		box-sizing: border-box;
 	}
 
 	.user-balance-row {

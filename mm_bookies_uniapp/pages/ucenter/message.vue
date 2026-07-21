@@ -135,7 +135,7 @@
 			</view>
 		</view>
 
-		<!-- Mark All Read 自定义确认弹窗（替代框架自带 uni.showModal，避免英文单词换行问题） -->
+		<!-- Mark All Read 自定义确认弹窗（替代框架自带 this.$notice.show，避免英文单词换行问题） -->
 		<view class="modal-overlay" v-if="showMarkAllModal" @click="showMarkAllModal = false">
 			<view class="confirm-modal" @click.stop>
 				<view class="confirm-header">
@@ -419,7 +419,7 @@
 
 			// 删除消息（onex2 中此入口默认隐藏，保留实现以备启用）
 			deleteMessage() {
-				uni.showModal({
+				this.$notice.show({
 					title: this.$t('confirm_clear'),
 					content: this.$t('confirm_clear_content'),
 					confirmText: this.$t('clear'),
@@ -526,7 +526,7 @@
 				}
 			},
 
-			// 标记全部消息为已读：打开自定义确认弹窗（替代框架自带 uni.showModal）
+			// 标记全部消息为已读：打开自定义确认弹窗（替代框架自带 this.$notice.show）
 			markAllAsRead() {
 				if (!this.isLogin || this.unreadCount === 0) {
 					return

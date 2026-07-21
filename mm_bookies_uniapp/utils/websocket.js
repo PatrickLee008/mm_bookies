@@ -3,6 +3,7 @@
  * Maps to Java backend PushWebSocket: /ws/push/{userId}
  */
 import siteinfo from '../siteinfo.js'
+import noticeManager from './notice.js'
 class WebSocketManager {
   constructor() {
     this.socketTask = null
@@ -324,7 +325,7 @@ class WebSocketManager {
 
     if (message.content && message.content.trim()) {
       setTimeout(() => {
-        uni.showModal({
+        noticeManager.show({
           title: message.title || 'New message',
           content: message.content,
           showCancel: true,
@@ -362,7 +363,7 @@ class WebSocketManager {
    */
   handlePageNavigation(targetPage, message) {
     setTimeout(() => {
-      uni.showModal({
+      noticeManager.show({
         title: 'Message',
         content: `New message: ${message.title}. View now?`,
         success: (res) => {
