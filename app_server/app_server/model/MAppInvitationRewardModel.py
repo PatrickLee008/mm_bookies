@@ -12,6 +12,7 @@ class MAppInvitationReward(BaseSaasModel):
                             comment='关联活动ID(UUID)')
     rule_id = Column(String(36), nullable=True,
                      comment='关联ID：Method 1=规则ID, Method 2=档位ID')
+    aid = Column(String(64), nullable=True, comment='代理ID')
     mb_id = Column(String(64), nullable=False, comment='会员ID(推荐人ID)')
     referred_id = Column(String(64), nullable=True, comment='被邀请人ID(某些规则可能不需要)')
     reward_amount = Column(DECIMAL(10, 2), nullable=False, comment='领取的奖励金额')

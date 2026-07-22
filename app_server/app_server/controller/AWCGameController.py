@@ -175,38 +175,105 @@ def validate_promotion_wallet_for_awc(user_id, game_platform=None):
                         continue
 
             elif activity_type == 'PROMOTION':
-                # 促销活动：检查 egamesConfig
-                # 查询 m_app_promotion 表
+                # 促销活动：检查 usage_scenario_config，逻辑与 COUPON 保持一致
                 promotion_result = db.session.execute(
-                    db.text("SELECT egames_config FROM m_app_promotion WHERE id = :id AND del_flag = 0"),
+                    db.text("SELECT usage_scenario_config FROM m_app_promotion WHERE id = :id AND del_flag = 0"),
                     {'id': activity_id}
                 ).fetchone()
 
                 if promotion_result and promotion_result[0]:
-                    # egamesConfig 不为空，表示支持Egame
-                    logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' with egamesConfig, promotion wallet allowed")
-                    return {
-                        'valid': True,
-                        'message': 'Validation passed',
-                        'activity_info': {
-                            'type': activity_type,
-                            'name': record.activity_name,
-                            'scenario': 'Egame'
-                        }
-                    }
+                    try:
+                        scenario_config = json.loads(promotion_result[0])
+                        scenarios = scenario_config.get('scenarios', [])
+
+                        if scenarios:
+                            for scenario in scenarios:
+                                scenario_type = scenario.get('type', '')
+                                enabled = scenario.get('enabled', False)
+                                config = scenario.get('config', {})
+
+                                if scenario_type == 'Egame' and enabled:
+                                    platforms = config.get('platforms', [])
+
+                                    if platforms:
+                                        if game_platform:
+                                            allowed_platforms_upper = [p.upper() for p in platforms]
+                                            if game_platform.upper() in allowed_platforms_upper:
+                                                logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' supporting platform '{game_platform}', promotion wallet allowed")
+                                                return {
+                                                    'valid': True,
+                                                    'message': 'Validation passed',
+                                                    'activity_info': {
+                                                        'type': activity_type,
+                                                        'name': record.activity_name,
+                                                        'scenario': 'Egame',
+                                                        'platforms': platforms,
+                                                        'matched_platform': game_platform
+                                                    }
+                                                }
+                                            else:
+                                                logger.info(f"Player {user_id} PROMOTION '{record.activity_name}' has Egame scenario but platform '{game_platform}' not in allowed list {platforms}")
+                                                continue
+                                        else:
+                                            from app_server.model.AwcGameModel import AwcGame
+                                            awc_platforms = [p.upper() for p in AwcGame.get_platforms()]
+                                            has_awc = any(p.upper() in awc_platforms for p in platforms)
+                                            if has_awc:
+                                                logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' supporting Egame with AWC platforms: {platforms}, promotion wallet allowed")
+                                                return {
+                                                    'valid': True,
+                                                    'message': 'Validation passed',
+                                                    'activity_info': {
+                                                        'type': activity_type,
+                                                        'name': record.activity_name,
+                                                        'scenario': 'Egame',
+                                                        'platforms': platforms
+                                                    }
+                                                }
+                                            else:
+                                                logger.info(f"Player {user_id} PROMOTION '{record.activity_name}' Egame platforms {platforms} don't include AWC")
+                                                continue
+                                    else:
+                                        # 未限制平台，支持所有 Egame 平台
+                                        logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' supporting all Egame platforms, promotion wallet allowed")
+                                        return {
+                                            'valid': True,
+                                            'message': 'Validation passed',
+                                            'activity_info': {
+                                                'type': activity_type,
+                                                'name': record.activity_name,
+                                                'scenario': 'Egame',
+                                                'platforms': 'all'
+                                            }
+                                        }
+                        else:
+                            # 旧格式兼容
+                            scenario_type = scenario_config.get('type', '')
+                            if scenario_type in ['Egame', 'All']:
+                                logger.info(f"Player {user_id} has active PROMOTION activity '{record.activity_name}' supporting {scenario_type} (legacy format), promotion wallet allowed")
+                                return {
+                                    'valid': True,
+                                    'message': 'Validation passed',
+                                    'activity_info': {
+                                        'type': activity_type,
+                                        'name': record.activity_name,
+                                        'scenario': scenario_type
+                                    }
+                                }
+
+                    except json.JSONDecodeError as e:
+                        logger.warning(f"Failed to parse usage_scenario_config for promotion {activity_id}: {str(e)}")
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error processing usage_scenario_config for promotion {activity_id}: {str(e)}", exc_info=True)
+                        continue
 
             elif activity_type == 'INVITATION':
-                # 邀请活动：默认允许（或根据业务需求调整）
-                logger.info(f"Player {user_id} has active INVITATION activity '{record.activity_name}', promotion wallet allowed")
-                return {
-                    'valid': True,
-                    'message': 'Validation passed',
-                    'activity_info': {
-                        'type': activity_type,
-                        'name': record.activity_name,
-                        'scenario': 'All'
-                    }
-                }
+                # 邀请活动不参与场景校验，跳过
+                # INVITATION 无场景配置概念，且可与 COUPON/PROMOTION 同时共存，
+                # 不应作为 egame 准入依据，否则会绕过 COUPON/PROMOTION 的场景限制
+                logger.info(f"Player {user_id} INVITATION activity '{record.activity_name}' skipped for egame scene validation")
+                continue
 
         # 4. 没有找到支持AWC/Egame的活动
         logger.info(f"Player {user_id} has {len(active_records)} active activity(ies), but none support AWC/Egame")
@@ -221,6 +288,7 @@ def validate_promotion_wallet_for_awc(user_id, game_platform=None):
             'valid': False,
             'message': f'Validation error: {str(e)}'
         }
+
 
 
 def get_request_data():
