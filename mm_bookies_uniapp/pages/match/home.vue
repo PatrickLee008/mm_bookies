@@ -366,7 +366,7 @@
 							<text class="info-value">{{new Date().toLocaleString()}}</text>
 						</view>
 						<view class="bet-info-row">
-							<text class="info-label">Potential Winnings</text>
+							<text class="info-label">{{$t('Potential Winnings')}}</text>
 							<text class="info-value">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
 						</view>
 					</view>
