@@ -1646,8 +1646,16 @@
 				let min = _this.match_ref.mixed ? _this.mix_min : _this.single_min
 				let max = _this.match_ref.mixed ? _this.mix_max : _this.single_max
 				let content = ''
-				if (_this.amount > parseFloat(_this.$store.state.userInfo.money.replaceAll(',', ''))) {
-					content = _this.$t('Sorry, your current balance is not enough for this bet')
+				const betAmount = parseInt(_this.amount) || 0
+				const userInfo = _this.$store.state.userInfo || {}
+				const mainBalance = parseFloat(_this.$toolbox.num_format(userInfo.money || 0, 0, true)) || 0
+				const promotionBalance = parseFloat(_this.$toolbox.num_format(
+					userInfo.money_promotion || 0, 0, true)) || 0
+				const requiredBalance = _this.use_promotion_wallet ? promotionBalance : mainBalance
+				if (betAmount > requiredBalance) {
+					content = _this.use_promotion_wallet ?
+						`Promotion wallet balance (${_this.$toolbox.num_format(promotionBalance)}) is less than required amount (${_this.$toolbox.num_format(betAmount)})` :
+						_this.$t('Sorry, your current balance is not enough for this bet')
 				}
 				if (_this.amount > max) {
 					content = (_this.match_ref.mixed ? _this.$t('mix_max') : _this.$t('single_max')) +
