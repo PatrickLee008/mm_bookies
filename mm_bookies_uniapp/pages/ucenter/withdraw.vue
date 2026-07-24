@@ -88,7 +88,7 @@
 					<view class="bar-icon">
 						<image class="bar-icon-image" src="../../static/image/pocket.png"></image>
 					</view>
-					<text class="text-grey myfont-bold">{{userInfo.money}}</text>
+					<text class="text-grey myfont-bold">{{$toolbox.floor_format(userInfo.money)}}</text>
 				</view>
 				<view class="action" @click="allWithdrawBtn()">
 					<text class="mycolor-red myfont-bold">{{language.withdraw_all}}</text>

@@ -58,7 +58,7 @@
 							<view class="ca-stat">
 								<text class="ca-stat-label">Promo Balance</text>
 								<text class="ca-stat-value">
-									{{ currentActivity.status === 'Active' ? $toolbox.num_format(currentActivity.money_promotion || 0) : '-' }}
+									{{ currentActivity.status === 'Active' ? $toolbox.floor_format(currentActivity.money_promotion || 0) : '-' }}
 								</text>
 							</view>
 						</view>

@@ -374,7 +374,7 @@
 					<!-- Wallet -->
 					<view class="wallet-row">
 						<text class="wallet-label">{{$t('balance')}} ({{$t('main_wallet')}})</text>
-						<text class="wallet-value">{{$toolbox.num_format($store.state.userInfo.money)}}</text>
+						<text class="wallet-value">{{$toolbox.floor_format($store.state.userInfo.money)}}</text>
 					</view>
 
 					<!-- Promotion Wallet -->
@@ -382,7 +382,7 @@
 						<view class="flex-row align-center" style="gap: 8px;">
 							<text class="wallet-label">{{$t('promotion_wallet')}}</text>
 							<text
-								class="wallet-value">{{$toolbox.num_format($store.state.userInfo.money_promotion || 0)}}</text>
+								class="wallet-value">{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</text>
 						</view>
 						<view class="flex-row justify-end align-center" style="gap: 5px;"
 							@click="togglePromotionWallet">
@@ -544,7 +544,7 @@
 									<view class="flex-column margin-left-sm align-start gap-5px"
 										style="align-items: start;">
 										<view class="text-light">{{$t('balance')}} ({{$t('main_wallet')}})</view>
-										<view>{{$toolbox.num_format($store.state.userInfo.money)}}</view>
+										<view>{{$toolbox.floor_format($store.state.userInfo.money)}}</view>
 									</view>
 								</view>
 								<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-30vw"
@@ -564,7 +564,7 @@
 									</view>
 									<view class="flex-column1 margin-left-sm align-start gap-5px">
 										<view class="text-light">{{$t('promotion_wallet')}}</view>
-										<view>{{$toolbox.num_format($store.state.userInfo.money_promotion || 0)}}</view>
+										<view>{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</view>
 									</view>
 								</view>
 								<view class="flex-row1 align-center justify-end" @click="togglePromotionWallet">
@@ -860,8 +860,8 @@
 					this.use_promotion_wallet = false;
 
 					// 提示用户
-					const promotionBalance = parseFloat(this.$toolbox.num_format(
-						this.$store.state.userInfo.money_promotion || 0, 0, true));
+					const promotionBalance = this.$toolbox.floor_value(
+						this.$store.state.userInfo.money_promotion || 0);
 
 					let message = 'Promotion wallet balance is insufficient for this bet amount';
 					let min_limit = this.match_ref.mixed ? this.mix_min : this.single_min
@@ -920,9 +920,8 @@
 			},
 			// 判断是否可以使用优惠钱包
 			canUsePromotionWallet() {
-				// 使用num_format的第三个参数true来去除格式化，获取纯数字
-				const promotionBalance = parseFloat(this.$toolbox.num_format(
-					this.$store.state.userInfo.money_promotion || 0, 0, true));
+				const promotionBalance = this.$toolbox.floor_value(
+					this.$store.state.userInfo.money_promotion || 0);
 
 				// 条件1: 优惠钱包余额必须大于0
 				if (promotionBalance <= 0) {
@@ -1162,9 +1161,8 @@
 				// 使用computed属性检查是否可以使用优惠钱包
 				if (!this.canUsePromotionWallet) {
 					let message = this.$t('Promotion wallet balance is insufficient');
-					// 使用num_format的第三个参数true来去除格式化，获取纯数字
-					const promotionBalance = parseFloat(this.$toolbox.num_format(
-						this.$store.state.userInfo.money_promotion || 0, 0, true));
+					const promotionBalance = this.$toolbox.floor_value(
+						this.$store.state.userInfo.money_promotion || 0);
 
 					// 计算所需金额（考虑优惠券）
 					let requiredAmount = this.amount;
@@ -1648,9 +1646,8 @@
 				let content = ''
 				const betAmount = parseInt(_this.amount) || 0
 				const userInfo = _this.$store.state.userInfo || {}
-				const mainBalance = parseFloat(_this.$toolbox.num_format(userInfo.money || 0, 0, true)) || 0
-				const promotionBalance = parseFloat(_this.$toolbox.num_format(
-					userInfo.money_promotion || 0, 0, true)) || 0
+				const mainBalance = _this.$toolbox.floor_value(userInfo.money || 0)
+				const promotionBalance = _this.$toolbox.floor_value(userInfo.money_promotion || 0)
 				const requiredBalance = _this.use_promotion_wallet ? promotionBalance : mainBalance
 				if (betAmount > requiredBalance) {
 					content = _this.use_promotion_wallet ?
@@ -1780,16 +1777,12 @@
 									// 根据是否使用优惠钱包，从不同的余额扣除
 									if (_this.use_promotion_wallet) {
 										// 从优惠钱包扣除
-										let promotionMoney = _this.$toolbox.num_format(
-											userInfo.money_promotion, 0, true);
-										userInfo.money_promotion = _this.$toolbox.num_format(
-											parseInt(promotionMoney) - actualDeduction);
+										userInfo.money_promotion = _this.$toolbox.floor_format(
+											_this.$toolbox.floor_value(userInfo.money_promotion) - actualDeduction);
 									} else {
 										// 从主钱包扣除
-										let money = _this.$toolbox.num_format(
-											userInfo.money, 0, true);
-										userInfo.money = _this.$toolbox.num_format(
-											parseInt(money) - actualDeduction);
+										userInfo.money = _this.$toolbox.floor_format(
+											_this.$toolbox.floor_value(userInfo.money) - actualDeduction);
 									}
 
 									_this.reset();

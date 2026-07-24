@@ -33,14 +33,14 @@
 						<view class="balance-item">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
 							<text
-								class="balance-value myfont-18px text-bold">{{ $toolbox.num_format(userInfo.money || 0) }}</text>
+								class="balance-value myfont-18px text-bold">{{ $toolbox.floor_format(userInfo.money || 0) }}</text>
 						</view>
 						<view class="secondary-balance-row">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
 							<view class="balance-item">
 								<text class="cashout-label">Promo</text>
 								<text
-									class="cashout-value">{{ $toolbox.num_format(userInfo.money_promotion || 0) }}</text>
+									class="cashout-value">{{ $toolbox.floor_format(userInfo.money_promotion || 0) }}</text>
 							</view>
 							<view class="balance-item" style="margin-left: 12px;">
 								<text class="cashout-label">Cash Out</text>

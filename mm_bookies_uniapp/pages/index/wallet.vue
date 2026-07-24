@@ -16,14 +16,14 @@
 				<view class="info-rec" style="">
 					<view>{{ $t('money') }}</view>
 					<view class="flex-row justify-between">
-						<text>{{userInfo.money}}</text>
+						<text>{{$toolbox.floor_format(userInfo.money)}}</text>
 						<text class="myfont-10px">Ks</text>
 					</view>
 				</view>
 				<view class="info-rec" style="">
 					<view>{{ $t('in_promo_wallet') }}</view>
 					<view class="flex-row justify-between">
-						<text>{{userInfo.money_promotion}}</text>
+						<text>{{$toolbox.floor_format(userInfo.money_promotion)}}</text>
 						<text class="myfont-10px">Points</text>
 					</view>
 				</view>

@@ -67,7 +67,7 @@
 				<view class="wallet-info-section">
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
-						<text class="wallet-info-value">{{$toolbox.num_format(userInfo.money)}}Ks</text>
+						<text class="wallet-info-value">{{$toolbox.floor_format(userInfo.money)}}Ks</text>
 					</view>
 					<!-- <view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('amount_unlock') }} :</text>

@@ -26,6 +26,47 @@ export const toolbox = {
 		last_operate = now
 		return result;
 	},
+	/** 向下取整并格式化为带千位分隔符的字符串（用于余额显示）
+	 * @param {String|Number} num
+	 * @returns {String}
+	 */
+	floor_format(num) {
+		let res = 0
+		switch (typeof num) {
+			case 'number':
+				res = num
+				break
+			case 'string':
+				res = parseFloat(num.replace(/,/g, '')) || 0
+				break
+			default:
+				res = parseFloat(String(num)) || 0
+		}
+		if (isNaN(res)) res = 0
+		res = Math.floor(res)
+		let parts = String(res).split('.')
+		parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+		return parts.join('.')
+	},
+	/** 向下取整并返回整数（用于余额数值比较）
+	 * @param {String|Number} num
+	 * @returns {Number}
+	 */
+	floor_value(num) {
+		let res = 0
+		switch (typeof num) {
+			case 'number':
+				res = num
+				break
+			case 'string':
+				res = parseFloat(num.replace(/,/g, '')) || 0
+				break
+			default:
+				res = parseFloat(String(num)) || 0
+		}
+		if (isNaN(res)) res = 0
+		return Math.floor(res)
+	},
 	/** 格式化数字，time_gap:操作间隔,提示信息:message
 	 * @param {String || Number} message 
 	 * @param {boolean} return_number //返回数字
