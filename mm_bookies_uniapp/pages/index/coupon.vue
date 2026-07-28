@@ -235,13 +235,40 @@
 					</view>
 
 					<!-- 使用场景 -->
-					<view class="detail-description-section" v-if="couponScenarios.length > 0">
+					<view class="detail-description-section" v-if="betTypes.length > 0 || displayVendors.length > 0">
 						<text class="detail-section-title">Applicable Scenarios</text>
-						<view class="scenario-item" v-for="(sc, i) in couponScenarios" :key="i">
-							<text class="scenario-icon">{{ sc.icon }}</text>
-							<view class="scenario-text">
-								<text class="scenario-label">{{ sc.label }}</text>
-								<text class="scenario-detail" v-if="sc.detail">{{ sc.detail }}</text>
+						<view class="usage-scenarios-list">
+							<!-- 1x2 Sports Betting -->
+							<view class="usage-scenario-item" v-if="betTypes.length > 0" @click="openCouponSport">
+								<text class="scenario-icon">⚽</text>
+								<view class="scenario-text">
+									<text class="scenario-label">1x2 Sports Betting</text>
+									<text class="scenario-detail">
+										{{ betTypes.includes('All') ? 'All Bet Types' : betTypes.join(', ') }}
+									</text>
+								</view>
+							</view>
+							<!-- E-Gaming -->
+							<view class="usage-scenario-item scenario-egame-block" v-if="displayVendors.length > 0">
+								<view class="scenario-header">
+									<text class="scenario-icon">🎮</text>
+									<view class="scenario-text">
+										<text class="scenario-label">E-Gaming</text>
+										<text class="scenario-detail">
+											({{ displayVendors.map(v => v.platform).join(', ') }})
+										</text>
+									</view>
+								</view>
+								<view class="vendors-grid">
+									<view class="vendor-card" v-for="(vendor, index) in displayVendors" :key="index"
+										@click="openVendorGames(vendor)">
+										<view class="vendor-info">
+											<image :src="siteinfo.awcImgUrl + vendor.platform_image"
+												style="height: 55px;" mode="heightFix"></image>
+											<text class="vendor-name">{{ vendor.platform }}</text>
+										</view>
+									</view>
+								</view>
 							</view>
 						</view>
 					</view>
@@ -358,6 +385,50 @@
 						v-if="selectedPromotion.status === 'Available' && selectedPromotion.ineligibility_reason">
 						<text>{{ selectedPromotion.ineligibility_reason }}</text>
 					</view>
+
+					<!-- 使用场景 -->
+					<view class="detail-description-section"
+						v-if="selectedPromotion.usage_scenario_1x2 || selectedPromotion.usage_scenario_egame">
+						<text class="detail-section-title">Applicable Scenarios</text>
+						<view class="usage-scenarios-list">
+							<!-- 1x2 Sports Betting -->
+							<view class="usage-scenario-item" v-if="selectedPromotion.usage_scenario_1x2"
+								@click="openPromotionSport">
+								<text class="scenario-icon">⚽</text>
+								<view class="scenario-text">
+									<text class="scenario-label">{{ selectedPromotion.usage_scenario_1x2.label }}</text>
+									<text class="scenario-detail" v-if="selectedPromotion.usage_scenario_1x2.detail">
+										{{ selectedPromotion.usage_scenario_1x2.detail }}
+									</text>
+								</view>
+							</view>
+							<!-- E-Gaming -->
+							<view class="usage-scenario-item scenario-egame-block"
+								v-if="selectedPromotion.usage_scenario_egame">
+								<view class="scenario-header">
+									<text class="scenario-icon">🎮</text>
+									<view class="scenario-text">
+										<text
+											class="scenario-label">{{ selectedPromotion.usage_scenario_egame.label }}</text>
+										<text class="scenario-detail"
+											v-if="selectedPromotion.usage_scenario_egame.detail">
+											{{ selectedPromotion.usage_scenario_egame.detail }}
+										</text>
+									</view>
+								</view>
+								<view class="vendors-grid" v-if="promotionDisplayVendors.length > 0">
+									<view class="vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+										:key="index" @click="openPromotionVendorGames(vendor)">
+										<view class="vendor-info">
+											<image :src="siteinfo.awcImgUrl + vendor.platform_image"
+												style="height: 55px;" mode="heightFix"></image>
+											<text class="vendor-name">{{ vendor.platform }}</text>
+										</view>
+									</view>
+								</view>
+							</view>
+						</view>
+					</view>
 				</scroll-view>
 
 				<view class="detail-modal-footer">
@@ -459,6 +530,13 @@
 				selectedCoupon: null,
 				couponScenarios: [],
 
+				// Applicable Scenarios - 游戏厂商
+				allGameVendors: [],
+				displayVendors: [],
+				allowedPlatforms: [],
+				betTypes: [],
+				promotionDisplayVendors: [],
+
 				// Promotion 列表分页
 				promotion_list: [],
 				promotion_page: 1,
@@ -487,6 +565,8 @@
 				// 静默预加载 promotion 用于角标与切换
 				this.loadPromotionList(true)
 			}
+			// 获取所有游戏厂商列表（用于 Applicable Scenarios 展示与跳转）
+			this.fetchAllGameVendors()
 		},
 		mounted() {
 			this.$nextTick(() => {
@@ -779,13 +859,16 @@
 			},
 			openDetailModal(coupon) {
 				this.selectedCoupon = coupon
-				this.couponScenarios = this.parseScenarios(coupon.usage_scenario_config)
+				this.parseUsageScenarioConfig(coupon.usage_scenario_config)
+				this.filterDisplayVendors()
 				this.showDetailModal = true
 			},
 			closeDetailModal() {
 				this.showDetailModal = false
 				this.selectedCoupon = null
-				this.couponScenarios = []
+				this.displayVendors = []
+				this.allowedPlatforms = []
+				this.betTypes = []
 			},
 			copyCode() {
 				if (!this.selectedCoupon || !this.selectedCoupon.p_code) return
@@ -801,45 +884,87 @@
 				if (status === 'Expired') return 'header-expired'
 				return 'header-unused'
 			},
-			// 解析 usage_scenario_config -> 可展示的场景列表
-			parseScenarios(configStr) {
-				let out = []
-				if (!configStr) return out
+			// 解析 usage_scenario_config -> betTypes / allowedPlatforms
+			parseUsageScenarioConfig(configStr) {
+				this.allowedPlatforms = []
+				this.betTypes = []
+				if (!configStr) return
 				try {
-					const cfg = typeof configStr === 'string' ? JSON.parse(configStr) : configStr
-					if (cfg.type === 'All') {
-						out.push({
-							icon: '✅',
-							label: 'All Games',
-							detail: ''
-						})
-						return out
-					}
-					if (cfg.scenarios && Array.isArray(cfg.scenarios)) {
-						cfg.scenarios.forEach(sc => {
-							if (!sc.enabled) return
-							if (sc.type === '1x2' && sc.config) {
-								const bt = sc.config.bet_types || []
-								out.push({
-									icon: '⚽',
-									label: '1x2 Sports Betting',
-									detail: bt.length ? bt.join(', ') : 'All Bet Types'
-								})
-							} else if (sc.type === 'Egame' && sc.config) {
-								const ps = (sc.config.platforms || []).map(p => typeof p === 'string' ? p : (p
-									.platform_name || p.platform || p.name)).filter(Boolean)
-								out.push({
-									icon: '🎮',
-									label: 'E-Gaming',
-									detail: ps.length ? ps.join(', ') : ''
-								})
+					const config = typeof configStr === 'string' ? JSON.parse(configStr) : configStr
+					if (config.type === 'All') return
+					if (config.scenarios && Array.isArray(config.scenarios)) {
+						config.scenarios.forEach(scenario => {
+							if (!scenario.enabled) return
+							if (scenario.type === '1x2' && scenario.config && scenario.config.bet_types) {
+								this.betTypes = scenario.config.bet_types
+							}
+							if (scenario.type === 'Egame' && scenario.config && scenario.config.platforms) {
+								this.allowedPlatforms = scenario.config.platforms
 							}
 						})
 					}
 				} catch (e) {
-					console.error('parse usage_scenario_config failed', e)
+					console.error('Failed to parse usage_scenario_config:', e)
 				}
-				return out
+			},
+			// 获取所有游戏厂商列表
+			fetchAllGameVendors() {
+				let _this = this
+				_this.$http.get('/awc/getAllVendors', {
+					data: {}
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						_this.allGameVendors = res.data.data.vendors || []
+					}
+				}, (err) => {
+					console.error('Failed to fetch game vendors:', err)
+				})
+			},
+			// 根据平台限制过滤厂商列表
+			filterDisplayVendors() {
+				if (this.allowedPlatforms.length > 0) {
+					this.displayVendors = this.allGameVendors.filter(vendor =>
+						this.allowedPlatforms.includes(vendor.platform)
+					)
+				} else {
+					this.displayVendors = []
+				}
+			},
+			// Coupon - 跳转到 1x2 体育投注
+			openCouponSport() {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				const betTypes = _this.betTypes || []
+				if (betTypes.length === 0) return
+				_this.$notice.confirm(`Do you want to view 1x2 Sports Betting?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
+						_this.closeDetailModal()
+						uni.navigateTo({
+							url: url
+						})
+					}
+				})
+			},
+			// Coupon - 跳转到厂商游戏页面
+			openVendorGames(vendor) {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				_this.$notice.confirm(`Do you want to view ${vendor.platform} games?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						_this.closeDetailModal()
+						uni.navigateTo({
+							url: `/pages/index/game?platform=${vendor.platform}`
+						})
+					}
+				})
 			},
 
 			// ==================== Promotion 数据 ====================
@@ -872,6 +997,8 @@
 					max_withdrawal: promo.max_withdrawal_limit || 0,
 					manual_end_enabled: promo.manual_end_enabled || 0,
 					usage_scenario_config: promo.usage_scenario_config || null,
+					usage_scenario_1x2: null,
+					usage_scenario_egame: null,
 				}
 				if (promo.progress) {
 					const p = promo.progress
@@ -982,10 +1109,110 @@
 				if (promo.status === 'Joined') {
 					_this.loadPromotionProgress(promo.id)
 				}
+				// 解析使用场景配置
+				_this.parseUsageScenario(promo)
+				// 根据 Egame 场景过滤显示的厂商列表
+				if (promo.usage_scenario_egame && promo.usage_scenario_egame.platforms &&
+					promo.usage_scenario_egame.platforms.length > 0) {
+					const allowedNames = promo.usage_scenario_egame.platforms.map(p => {
+						if (typeof p === 'string') return p
+						return p.platform_name || p.platform || p.name
+					}).filter(Boolean)
+					_this.promotionDisplayVendors = _this.allGameVendors.filter(v => allowedNames.includes(v.platform))
+					if (_this.promotionDisplayVendors.length > 0) {
+						const vendorNames = _this.promotionDisplayVendors.map(v => v.platform).join(', ')
+						promo.usage_scenario_egame.detail = `(${vendorNames})`
+					} else {
+						promo.usage_scenario_egame.detail = ''
+					}
+				} else {
+					_this.promotionDisplayVendors = []
+				}
 			},
 			closePromotionDetail() {
 				this.showPromotionDetailModal = false
 				this.selectedPromotion = null
+				this.promotionDisplayVendors = []
+			},
+			// 解析优惠使用场景配置
+			parseUsageScenario(promotion) {
+				promotion.usage_scenario_1x2 = null
+				promotion.usage_scenario_egame = null
+				if (!promotion.usage_scenario_config) return
+				try {
+					const config = typeof promotion.usage_scenario_config === 'string' ?
+						JSON.parse(promotion.usage_scenario_config) :
+						promotion.usage_scenario_config
+					if (!config.scenarios || !Array.isArray(config.scenarios)) return
+					config.scenarios.forEach(scenario => {
+						if (!scenario.enabled) return
+						if (scenario.type === '1x2' && scenario.config) {
+							const betTypes = scenario.config.bet_types || []
+							const betTypeLabels = {
+								'Single': 'Single Bet',
+								'Mix': 'Mix Parlay'
+							}
+							const betTypeText = betTypes.map(t => betTypeLabels[t] || t).join(', ')
+							promotion.usage_scenario_1x2 = {
+								type: '1x2',
+								label: '1x2 Sports Betting',
+								detail: betTypeText ? `(${betTypeText})` : '',
+								bet_types: betTypes
+							}
+						} else if (scenario.type === 'Egame' && scenario.config) {
+							const platforms = scenario.config.platforms || []
+							const platformNames = platforms.map(p => {
+								if (typeof p === 'string') return p
+								return p.platform_name || p.platform || p.name
+							}).filter(Boolean)
+							promotion.usage_scenario_egame = {
+								type: 'Egame',
+								label: 'E-Gaming',
+								detail: platformNames.length > 0 ? `(${platformNames.join(', ')})` : '',
+								platforms: platforms
+							}
+						}
+					})
+				} catch (error) {
+					console.error('Failed to parse usage_scenario_config:', error)
+				}
+			},
+			// Promotion - 跳转到 1x2 体育投注
+			openPromotionSport() {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				const scenario = _this.selectedPromotion && _this.selectedPromotion.usage_scenario_1x2
+				if (!scenario) return
+				_this.$notice.confirm(`Do you want to view ${scenario.label || '1x2 Sports Betting'}?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						const betTypes = scenario.bet_types || []
+						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
+						_this.closePromotionDetail()
+						uni.navigateTo({
+							url: url
+						})
+					}
+				})
+			},
+			// Promotion - 跳转到厂商游戏页面
+			openPromotionVendorGames(vendor) {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				_this.$notice.confirm(`Do you want to view ${vendor.platform} games?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						_this.closePromotionDetail()
+						uni.navigateTo({
+							url: `/pages/index/game?platform=${vendor.platform}`
+						})
+					}
+				})
 			},
 			toggleTerms() {
 				this.isTermsExpanded = !this.isTermsExpanded
@@ -1228,6 +1455,7 @@
 	}
 
 	@keyframes promoRipple {
+
 		0%,
 		100% {
 			box-shadow: 0 0 0 0 rgba(47, 93, 98, 0.8);
@@ -1847,6 +2075,10 @@
 	}
 
 	.detail-bonus-box {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
 		background: #e8f4f8;
 		border-radius: 10px;
 		padding: 14px;
@@ -1901,25 +2133,118 @@
 		margin-bottom: 8px;
 	}
 
+	.usage-scenarios-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.usage-scenario-item {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		padding: 12px;
+		background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+		border: 1px solid #E8E9EB;
+		border-radius: 8px;
+		gap: 12px;
+	}
+
+	.usage-scenario-item:active {
+		opacity: 0.8;
+		transform: scale(0.98);
+	}
+
 	.scenario-icon {
-		font-size: 20px;
+		font-size: 24px;
+		line-height: 1;
+		flex-shrink: 0;
 	}
 
 	.scenario-text {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 4px;
+		flex: 1;
 	}
 
 	.scenario-label {
 		font-size: 14px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #2C3E50;
+		line-height: 1.3;
 	}
 
 	.scenario-detail {
 		font-size: 12px;
 		color: #7F8C8D;
+		line-height: 1.3;
+	}
+
+	.scenario-egame-block {
+		flex-direction: column;
+	}
+
+	.scenario-egame-block .scenario-header {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	.scenario-egame-block .vendors-grid {
+		margin-top: 10px;
+	}
+
+	.vendors-grid {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		gap: 2%;
+	}
+
+	.vendor-card {
+		position: relative;
+		border-radius: 12px;
+		overflow: hidden;
+		width: 32%;
+		background: linear-gradient(180deg, #1868CF 0%, #0C3569 100%);
+		box-shadow: 0px 2px 0px 0px #478BE2;
+		display: flex;
+		flex-direction: column;
+		cursor: pointer;
+		transition: opacity 0.2s, transform 0.1s;
+		margin-bottom: 12px;
+	}
+
+	.vendor-card:active {
+		opacity: 0.8;
+		transform: scale(0.98);
+	}
+
+	.vendor-info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 25px;
+		padding: 8px 6px;
+		border-radius: 0 0 12px 12px;
+		font-size: 12px;
+	}
+
+	.vendor-name {
+		color: white;
+		font-size: 12px;
+		font-weight: bold;
+		text-align: center;
+		word-wrap: break-word;
+		word-break: break-all;
+		white-space: normal;
+		width: 100%;
+		line-height: 1.2;
+		margin: 3px 0;
 	}
 
 	.progress-row {

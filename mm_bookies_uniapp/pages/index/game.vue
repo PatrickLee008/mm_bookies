@@ -109,7 +109,8 @@
 				showFilterPopup: false, // 控制筛选弹窗显示
 				filterOption: 'All', // 当前选中的筛选选项
 				filterOptions: ['All'], // 筛选选项列表（将动态填充游戏类型）
-				allGames: [] // 存储所有原始游戏数据
+				allGames: [], // 存储所有原始游戏数据
+				pendingPlatform: null // 从外部页面跳转传入的厂商平台参数
 			}
 		},
 		computed: {
@@ -196,6 +197,11 @@
 						_this.extractGameTypes()
 						// from tangjq--- 使用过滤后的游戏数据进行分组
 						_this.groupGamesByPlatform(_this.filteredGames)
+						// 如果有外部传入的厂商平台参数，过滤只显示该平台
+						if (_this.pendingPlatform) {
+							_this.game_categories = _this.game_categories.filter(cat => cat.name === _this.pendingPlatform)
+							_this.pendingPlatform = null
+						}
 					} else {
 						uni.showToast({
 							title: res.data.message || _this.$t('failed_load_games'),
@@ -426,6 +432,10 @@
 			}
 		},
 		onLoad(options) {
+			// 检查是否从外部页面传入厂商平台参数
+			if (options && options.platform) {
+				this.pendingPlatform = options.platform
+			}
 			// 加载游戏列表
 			this.loadGames()
 		},
