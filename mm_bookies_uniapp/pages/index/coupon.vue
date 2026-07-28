@@ -221,7 +221,8 @@
 					</view>
 
 					<!-- 奖励 -->
-					<view class="detail-bonus-box">
+					<view class="detail-bonus-box"
+						style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
 						<text class="detail-bonus-title">+ {{ $toolbox.num_format(selectedCoupon.bonus_amount) }}
 							Bonus</text>
 						<text class="detail-bonus-desc">Min bet required:
@@ -2075,10 +2076,6 @@
 	}
 
 	.detail-bonus-box {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
 		background: #e8f4f8;
 		border-radius: 10px;
 		padding: 14px;
