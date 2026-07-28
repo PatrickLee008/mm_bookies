@@ -894,6 +894,11 @@ def participate_promotion():
             # 百分比奖励：按参与金额的百分比计算
             reward_percentage = promotion_obj.reward_amount if promotion_obj.reward_amount else Decimal('0')
             reward_amount = user_participation_amount * (reward_percentage / Decimal('100'))
+        
+        # 按 payout_limit 封顶（用户从本次促销获得的奖金不能超过此上限）
+        if promotion_obj.payout_limit and promotion_obj.payout_limit > Decimal('0'):
+            if reward_amount > promotion_obj.payout_limit:
+                reward_amount = promotion_obj.payout_limit
 
         # ==================== 3. 检查奖金池余额 ====================
         if promotion_obj.bonus_pool_remaining < reward_amount:
