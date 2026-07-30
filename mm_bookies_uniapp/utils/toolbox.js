@@ -451,6 +451,175 @@ export const toolbox = {
 		if (!pages || pages.size === 0) return null;
 		return pages.has(path);
 	},
+	/**
+	 * 广告跳转
+	 */
+	openAdvertisementLink(linkUrl, linkTarget = 'Blank') {
+		if (!linkUrl) return;
+		const normalizedUrl = this.normalizeAdvertisementUrl(linkUrl);
+		if (!normalizedUrl) return;
+		if (normalizedUrl.startsWith('/pages/')) {
+			this.navigateToPage(normalizedUrl);
+			return;
+		}
+	
+		const target = this.normalizeLinkTarget(linkTarget);
+		const encodedUrl = encodeURIComponent(normalizedUrl);
+		const webviewUrl = `/pages/webview/index?url=${encodedUrl}`;
+	
+		if (target === 'self') {
+			// #ifdef APP-PLUS || MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ
+			uni.redirectTo({
+				url: webviewUrl
+			});
+			// #endif
+			// #ifdef H5
+			window.location.href = normalizedUrl;
+			// #endif
+			return;
+		}
+	
+		if (target === 'app') {
+			uni.navigateTo({
+				url: webviewUrl
+			});
+			return;
+		}
+	
+		// #ifdef APP-PLUS
+		plus.runtime.openURL(normalizedUrl);
+		// #endif
+		// #ifdef H5
+		window.open(normalizedUrl, '_blank');
+		// #endif
+		// #ifdef MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ
+		uni.navigateTo({
+			url: webviewUrl
+		});
+		// #endif
+	},
+	normalizeAdvertisementUrl(linkUrl) {
+		if (!linkUrl) return '';
+		const normalizedUrl = String(linkUrl).trim();
+		if (!normalizedUrl) return '';
+		if (normalizedUrl.startsWith('/pages/')) return normalizedUrl;
+		if (/^https?:\/\//i.test(normalizedUrl)) return normalizedUrl;
+		if (/^\/\//.test(normalizedUrl)) return `https:${normalizedUrl}`;
+		if (/^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(normalizedUrl)) return `https://${normalizedUrl}`;
+		return '';
+	},
+	normalizeLinkTarget(linkTarget) {
+		if (!linkTarget) return 'blank';
+		return String(linkTarget).trim().toLowerCase();
+	},
+	/**
+	 * 解析路由路径 - 将关键词路由转换为完整路径
+	 * @param {String} route - 路由标识符（可以是关键词或完整路径）
+	 * @returns {String} 完整的页面路径
+	 */
+	resolvePageRoute(route) {
+		if (!route) return '/pages/match/home';
+		
+		// 如果已经是完整路径，直接返回
+		if (route.startsWith('/')) {
+			return route;
+		}
+		
+		// 关键词路由映射 - 参考 launch 页面的 handleActionButton 实现
+		const routeMap = {
+			'home': '/pages/match/home',
+			'promotions': '/pages/index/coupon?activity_type=promotion',
+			'bet-history': '/pages/orders/home',
+			'coupon': '/pages/index/coupon',
+			'user-center': '/pages/ucenter/home',
+			'wallet': '/pages/index/coupon',
+			'invitation': '/pages/ucenter/invite/index',
+			'deposit': '/pages/ucenter/charge',
+			'withdraw': '/pages/ucenter/withdraw',
+			'egame-list': '/pages/index/egame'
+		};
+		
+		// 查找映射，找不到则默认跳转到首页
+		const resolvedRoute = routeMap[route.toLowerCase()] || '/pages/match/home';
+		
+		console.log(`[RouteResolver] '${route}' resolved to '${resolvedRoute}'`);
+		return resolvedRoute;
+	},
+	
+	/**
+	 * 判断是否为 TabBar 页面
+	 * 从 uni-app 运行时 tabBar 配置读取，无配置时返回 false
+	 * @param {String} url - 页面路径
+	 * @returns {Boolean} 是否为 TabBar 页面
+	 */
+	isTabBarPage(url) {
+		if (!url) return false;
+		const path = String(url).replace(/^\//, '').split('?')[0].split('#')[0];
+		if (!path) return false;
+		try {
+			// eslint-disable-next-line no-undef
+			if (typeof __uniConfig === 'undefined' || !__uniConfig || !__uniConfig.tabBar || !__uniConfig.tabBar.list) {
+				return false;
+			}
+			// eslint-disable-next-line no-undef
+			return __uniConfig.tabBar.list.some(item => {
+				const p = item && (item.pagePath || item.path);
+				if (!p) return false;
+				return String(p).replace(/^\//, '').split('?')[0].split('#')[0] === path;
+			});
+		} catch (e) {
+			return false;
+		}
+	},
+	
+	/**
+	 * 智能页面跳转 - 自动处理 TabBar 和普通页面
+	 * @param {String} route - 路由标识符或完整路径
+	 * @param {Object} options - 跳转选项
+	 * @param {Function} options.success - 成功回调
+	 * @param {Function} options.fail - 失败回调
+	 */
+	navigateToPage(route, options = {}) {
+		try {
+			const targetUrl = this.resolvePageRoute(route);
+			const isTabBar = this.isTabBarPage(targetUrl);
+			
+			console.log(`[Navigator] Navigating to '${targetUrl}', isTabBar: ${isTabBar}`);
+			
+			const runNavigateTo = () => {
+				uni.navigateTo({
+					url: targetUrl,
+					success: (res) => {
+						console.log(`[Navigator] Successfully navigated to '${targetUrl}'`);
+						if (options.success) options.success(res);
+					},
+					fail: (error) => {
+						console.error(`[Navigator] Navigation failed to '${targetUrl}':`, error);
+						if (options.fail) options.fail(error);
+					}
+				});
+			};
+			
+			if (isTabBar) {
+				uni.switchTab({
+					url: targetUrl,
+					success: (res) => {
+						console.log(`[Navigator] Successfully switchTab to '${targetUrl}'`);
+						if (options.success) options.success(res);
+					},
+					fail: (error) => {
+						console.warn(`[Navigator] switchTab failed, fallback to navigateTo for '${targetUrl}':`, error);
+						runNavigateTo();
+					}
+				});
+			} else {
+				runNavigateTo();
+			}
+		} catch (error) {
+			console.error('[Navigator] Navigation error:', error);
+			if (options.fail) options.fail(error);
+		}
+	}
 }
 
 export default toolbox;
