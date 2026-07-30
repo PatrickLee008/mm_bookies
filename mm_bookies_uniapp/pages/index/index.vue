@@ -143,7 +143,7 @@
 				const _this = this
 				this.$http.post('/advertisement/get_by_page', {
 					platform: 'mobile',
-					page: 'index',
+					page: 'home',
 					position: 'banner'
 				}, (res) => {
 					if (res.statusCode == 200 && res.data.code == 200) {
