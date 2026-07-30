@@ -505,9 +505,9 @@
 			onSplashAction() {
 				const route = this.actionButtonRoute
 				this.closeSplash()
-				// 仅对完整页面路径做跳转，避免未登录时跳转异常
-				if (route && route.charAt(0) === '/') {
-					uni.navigateTo({ url: route })
+				// 关键词路由（如 'home'）或完整路径都交给 toolbox 统一处理
+				if (route) {
+					this.$toolbox.navigateToPage(route)
 				}
 			},
 			toggleRememberMe() {

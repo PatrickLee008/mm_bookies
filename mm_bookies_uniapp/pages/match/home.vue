@@ -1438,11 +1438,8 @@
 				})
 			},
 			handleAdClick(ad) {
-				if (ad.link_url) {
-					uni.navigateTo({
-						url: ad.link_url
-					})
-				}
+				if (!ad.link_url) return
+				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
 			},
 			get_list() {
 				var _this = this;
