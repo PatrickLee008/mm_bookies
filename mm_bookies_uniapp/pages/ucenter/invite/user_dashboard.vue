@@ -302,13 +302,18 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #2F5D62;
+		background: #02455F;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		flex-shrink: 0;
 	}
 
@@ -355,7 +360,7 @@
 		display: block;
 		font-size: 16px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.6;
 	}
 
@@ -403,9 +408,9 @@
 		display: flex;
 		align-items: center;
 		padding: 0 12px;
-		border: 1px solid #2F5D62;
+		border: 1px solid #1C667C;
 		border-radius: 8px;
-		background: #2F5D62;
+		background: #1C667C;
 		color: white;
 		cursor: pointer;
 		gap: 4px;

@@ -4,7 +4,7 @@
 		<draggable-button :initial-right="20" :initial-bottom="100" storage-key="customer_btn_position" :btn-size="60"
 			@click="toggleModal">
 			<view class="customer-btn">
-				<image :src="showModal ? '/static/icon/ai-close.svg' : '/static/icon/ai-chat.svg'" mode="aspectFit"
+				<image :src="showModal ? '/static/icon/ai-close.svg' : '/static/ai-chat.svg'" mode="aspectFit"
 					class="customer-btn-icon"></image>
 			</view>
 		</draggable-button>
@@ -501,11 +501,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		background: #1C667C;
+		border: 0;
+		border-radius: 50%;
 	}
 
 	.customer-btn-icon {
-		width: 50px;
-		height: 50px;
+		width: 24px;
+		height: 24px;
+		display: block;
 	}
 
 	/* 模态框遮罩层 */
@@ -552,7 +556,7 @@
 
 	/* 标题区域 */
 	.modal-header {
-		background: linear-gradient(135deg, #2F5D62 0%, #3c787d 100%);
+		background: linear-gradient(135deg, #1C667C 0%, #3c787d 100%);
 		padding: 8px 20px;
 		color: #ffffff;
 		display: flex;

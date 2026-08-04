@@ -209,13 +209,17 @@
 
 <style lang="scss" scoped>
 	.profile-page {
-		background: #f5f5f5;
+		background: #02455F;
 		min-height: 100vh;
 	}
 
 	/* 顶部栏 */
 	.profile-header {
-		background: #3d6877;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center top;
 		padding: 40px 20px 20px 20px;
 		display: flex;
 		justify-content: space-between;

@@ -12,8 +12,7 @@
 			<image class="splash-ad-image" :src="splashImageUrl" mode="aspectFill"></image>
 
 			<!-- 动作按钮（由 enable_action_button 控制） -->
-			<view class="splash-action-button" v-if="enableActionButton && actionButtonLabel"
-				@click="onSplashAction">
+			<view class="splash-action-button" v-if="enableActionButton && actionButtonLabel" @click="onSplashAction">
 				<text class="splash-action-text">{{ actionButtonLabel }}</text>
 			</view>
 		</view>
@@ -123,7 +122,7 @@
 
 			<!-- Version Info -->
 			<view class="version-info">{{version}}</view>
-			
+
 			<!-- 客服按钮 -->
 			<customer-service></customer-service>
 		</view>
@@ -198,17 +197,33 @@
 				// 语言切换
 				showLangModal: false,
 				currentLang: uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm',
-				langOptions: [
-					{ value: 'mm', label: 'မြန်မာ' },
-					{ value: 'en', label: 'English' },
-					{ value: 'th', label: 'ภาษาไทย' },
-					{ value: 'cn', label: '中文' }
+				langOptions: [{
+						value: 'mm',
+						label: 'မြန်မာ'
+					},
+					{
+						value: 'en',
+						label: 'English'
+					},
+					{
+						value: 'th',
+						label: 'ภาษาไทย'
+					},
+					{
+						value: 'cn',
+						label: '中文'
+					}
 				]
 			};
 		},
 		computed: {
 			currentLangLabel() {
-				const map = { mm: 'မြန်မာ', en: 'EN', th: 'ไทย', cn: '中文' }
+				const map = {
+					mm: 'မြန်မာ',
+					en: 'EN',
+					th: 'ไทย',
+					cn: '中文'
+				}
 				return map[this.currentLang] || 'EN'
 			},
 			loginDisabled() {
@@ -248,7 +263,7 @@
 					},
 					Password: {
 						value: this.loginInfo.password,
-						isValid: () => this.loginInfo.password && this.loginInfo.password.length >= 8
+						isValid: () => this.loginInfo.password && this.loginInfo.password.length >= 5
 					},
 					// Captcha验证规则 - Commented out as requested
 					// Captcha: {
@@ -465,7 +480,9 @@
 				let _this = this
 				const tenant_id = (siteinfo && siteinfo.tenant_id) || '10000'
 				_this.$http.get('/splash_screen/get_active', {
-					data: { tenant_id }
+					data: {
+						tenant_id
+					}
 				}, (res) => {
 					const ok = res.statusCode === 200 && res.data && res.data.code === 200
 					const list = ok && res.data.data ? res.data.data.splash_screens : null
@@ -737,7 +754,8 @@
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
+		background: radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;

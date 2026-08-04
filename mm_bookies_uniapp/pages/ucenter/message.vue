@@ -1,5 +1,5 @@
 <template name="messageCenter">
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 		<!-- header 占位，防止内容被固定头部遮挡 -->
 		<view class="header-placeholder"></view>
@@ -665,14 +665,19 @@
 <style lang="scss" scoped>
 	.full-page {
 		min-height: 100vh;
-		background-color: #E1E1E1;
+		background: #02455F;
 	}
 
 	/* header 占位 */
 	.header-placeholder {
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		width: 100%;
-		background-color: #2F5D62;
+		background-color: #02455F;
 	}
 
 	.page-header {
@@ -681,7 +686,7 @@
 		justify-content: space-between;
 		padding: 12px 10px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 		background-color: white;
 	}
 
@@ -712,7 +717,7 @@
 		align-items: center;
 		font-weight: 500;
 		font-size: 13px;
-		color: #2F5D62;
+		color: #1C667C;
 		padding: 6px 12px;
 		background: #E8F0FE;
 		border-radius: 6px;
@@ -758,7 +763,7 @@
 		color: #8B8891;
 
 		.tab-item.active & {
-			color: #2F5D62;
+			color: #1C667C;
 			font-weight: 700;
 		}
 	}
@@ -770,7 +775,7 @@
 		transform: translateX(-50%);
 		width: 40px;
 		height: 3px;
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 2px 2px 0 0;
 		animation: slideIn 0.2s ease-out;
 	}
@@ -825,13 +830,13 @@
 			border: 1px solid rgba(47, 93, 98, 0.1);
 
 			.card-header {
-				background: #2F5D62;
+				background: #1C667C;
 				font-weight: 700;
 			}
 
 			.message-title {
 				font-weight: 700;
-				color: #2F5D62;
+				color: #1C667C;
 			}
 
 			.message-description {
@@ -870,7 +875,7 @@
 	}
 
 	.card-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 8px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -903,7 +908,7 @@
 		font-weight: 600;
 		font-size: 13px;
 		line-height: 1.4;
-		color: #2F5D62;
+		color: #1C667C;
 		display: block;
 		margin-bottom: 6px;
 		overflow: hidden;
@@ -936,7 +941,7 @@
 		width: 20px;
 		height: 20px;
 		border: 2px solid #EDEDED;
-		border-top: 2px solid #2F5D62;
+		border-top: 2px solid #1C667C;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 8px;
@@ -1062,7 +1067,7 @@
 	.detail-title-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.5;
 		display: block;
 		margin-top: 8px;
@@ -1070,7 +1075,7 @@
 
 	.detail-content-text {
 		font-size: 15px;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.6;
 		display: block;
 		margin-top: 8px;
@@ -1104,7 +1109,7 @@
 	}
 
 	.primary-btn {
-		background: #2F5D62;
+		background: #1C667C;
 
 		.btn-text {
 			color: #FFFFFF;
@@ -1140,7 +1145,7 @@
 	.confirm-title {
 		font-size: 17px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.5;
 		word-break: break-word;
 		white-space: normal;
@@ -1182,11 +1187,11 @@
 
 	.cancel-btn {
 		background: #FFFFFF;
-		border: 1px solid #2F5D62;
+		border: 1px solid #1C667C;
 	}
 
 	.ok-btn {
-		background: #2F5D62;
+		background: #1C667C;
 
 		&:active {
 			background: #244a4e;

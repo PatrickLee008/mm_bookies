@@ -141,15 +141,8 @@
 			},
 			handle_password_blur() {
 				const pwd = this.loginInfo.password;
-				// 条件：长度 ≥ 8，包含大小写字母和数字
-				const isValid =
-					pwd &&
-					pwd.length >= 3
-				// pwd &&
-				// pwd.length >= 8 &&
-				// /[a-z]/.test(pwd) &&
-				// /[A-Z]/.test(pwd) &&
-				// /\d/.test(pwd);
+				// 密码只要求至少五个字符，不限制字符类型。
+				const isValid = pwd && pwd.length >= 5
 				this.password_error = !isValid;
 
 				// 同时检查确认密码
@@ -338,7 +331,8 @@
 <style lang="scss">
 	.login-container {
 		min-height: 100vh;
-		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
+		background: radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;

@@ -438,7 +438,7 @@ export default {
 .notification-container {
 	width: 100%;
 	max-width: 400px;
-	background: linear-gradient(135deg, #2F5D62 0%, #5FB5BD 100%);
+	background: linear-gradient(135deg, #1C667C 0%, #5FB5BD 100%);
 	border-radius: 24px;
 	overflow: hidden;
 	position: relative;
@@ -637,7 +637,7 @@ export default {
 
 .primary-btn {
 	background: white;
-	color: #2F5D62;
+	color: #1C667C;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
 	.btn-icon {

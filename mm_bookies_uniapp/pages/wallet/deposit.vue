@@ -1479,7 +1479,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-card-item {
 		width: 100%;
 		margin-bottom: 16px;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 16px;
 		background-color: #fff;
 		overflow: hidden;
@@ -1533,7 +1533,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-btn {
 		width: 100%;
 		height: 60px;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 16px;
 		background-color: #fff;
 		display: flex;
@@ -1544,7 +1544,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-text {
 		font-size: 18px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	/* from tangjq--- 添加银行卡弹窗样式 */
@@ -1575,7 +1575,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.dialog-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		margin: -24px -20px 0;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
@@ -1671,7 +1671,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-btn {
 		width: 100%;
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
@@ -1701,7 +1701,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.deposit-modal-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
 		display: flex;
@@ -1735,7 +1735,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.section-title {
 		font-size: 18px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		display: block;
 		text-align: center;
 		margin-bottom: 16px;
@@ -1772,7 +1772,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-type-text {
 		font-size: 12px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.info-value-box {
@@ -1788,7 +1788,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.info-value-text {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 	}
 
@@ -1810,7 +1810,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.amount-input-field {
 		font-size: 20px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 		border: none;
 		background: transparent;
@@ -1833,7 +1833,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.quick-amount-btn {
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1862,7 +1862,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.payment-channel-btn {
 		flex: 1;
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1874,7 +1874,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.payment-channel-btn.selected {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border: 2px solid #4FB3BF;
 		box-sizing: border-box;
 	}
@@ -1905,7 +1905,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.continue-btn {
 		width: calc(100% - 40px);
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -1932,7 +1932,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.transfer-modal-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		display: flex;
 		justify-content: center;
@@ -1974,22 +1974,22 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.tips-row.highlight {
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		margin-bottom: 0;
 	}
 
 	.tips-label {
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.tips-value {
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.tips-continue-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -2021,7 +2021,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-section-title {
 		font-size: 12px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		display: block;
 		text-align: center;
 		margin-bottom: 5px;
@@ -2058,7 +2058,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-bank-text {
 		font-size: 12px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.confirm-value-box {
@@ -2074,7 +2074,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.confirm-value-text {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 	}
 
@@ -2092,7 +2092,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-copy-text {
 		flex: 1;
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 		padding-left: 16px;
 	}
@@ -2125,7 +2125,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.arrow-icon {
 		font-size: 18px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: bold;
 	}
 
@@ -2150,7 +2150,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.transfer-info-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.countdown-display {
@@ -2181,7 +2181,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.transfer-final-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -2203,7 +2203,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.notice-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		text-align: center;
 	}
@@ -2229,7 +2229,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.notice-confirm-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 14px;
@@ -2253,7 +2253,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.qrcode-modal-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		display: flex;
 		justify-content: center;
@@ -2295,7 +2295,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.save-qr-btn {
 		width: 200px;
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		margin: 20px auto 0;
@@ -2329,7 +2329,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.qrcode-tips-text {
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 		line-height: 1.5;
 	}
@@ -2362,7 +2362,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.qrcode-info-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.qrcode-countdown {
@@ -2380,7 +2380,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.qrcode-continue-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		border: none;
 		font-size: 18px;

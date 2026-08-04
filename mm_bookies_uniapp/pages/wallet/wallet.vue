@@ -138,9 +138,16 @@
 			},
 		},
 
-		onLoad() {
+		onLoad(options) {
 			// from tangjq--- 初始化用户信息
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
+			// 支持从外部页面通过 ?tab=N 跳转到指定 tab
+			if (options && options.tab != null) {
+				const idx = parseInt(options.tab)
+				if (!isNaN(idx) && idx >= 0 && idx <= 3) {
+					this.tab_index = idx
+				}
+			}
 		},
 
 		mounted() {
@@ -157,7 +164,12 @@
 <style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		width: 100%;
 	}
 
@@ -165,7 +177,7 @@
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background-color: #2F5D62;
+		background-color: #02455F;
 	}
 
 	/* from tangjq--- 标题栏样式 */
@@ -249,7 +261,7 @@
 		width: 60px;
 		height: 60px;
 		border-radius: 30px;
-		background: linear-gradient(135deg, #4fb3bf 0%, #2F5D62 100%);
+		background: linear-gradient(135deg, #4fb3bf 0%, #1C667C 100%);
 		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
 		display: flex;
 		flex-direction: column;

@@ -24,7 +24,8 @@
 			<!-- 兑换码输入（仅 Coupon 且已登录） -->
 			<view class="redeem-row" v-if="isLogin && activity_type === 'coupon'">
 				<input class="redeem-input" :class="input_focus ? 'focus-border' : ''"
-					:placeholder="$t('Enter coupon code')" placeholder-class="text-gray" v-model="key_word"
+					:placeholder="$t('Enter coupon code')" placeholder-class=""
+					placeholder-style="color:#1C667C;font-style: italic;font-size:12px" v-model="key_word"
 					maxlength="20" @focus="input_focus = true" @input="allow_en_num" @blur="input_focus = false" />
 				<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
 					@click="submit_code">{{ $t('Claim') }}</view>
@@ -191,84 +192,85 @@
 				</view>
 
 				<scroll-view scroll-y class="detail-modal-body">
-					<view class="detail-coupon-title">{{ selectedCoupon.coupon_name }}</view>
-
-					<view class="detail-image-wrapper" v-if="selectedCoupon.p_img_mb && !selectedCoupon._imageError">
-						<image class="detail-image" mode="widthFix" :src="selectedCoupon.p_img_mb" lazy-load
+					<!-- Hero image with coupon name overlay -->
+					<view class="coupon-hero" v-if="selectedCoupon.p_img_mb && !selectedCoupon._imageError">
+						<image class="coupon-hero-image" mode="aspectFill" :src="selectedCoupon.p_img_mb" lazy-load
 							@error="handleImageError(selectedCoupon)"></image>
-					</view>
-
-					<!-- 兑换码 -->
-					<view class="detail-code-row" v-if="selectedCoupon.p_code">
-						<text class="detail-code">{{ selectedCoupon.p_code }}</text>
-						<text class="detail-code-copy" @click="copyCode">Copy code</text>
-					</view>
-
-					<!-- 信息卡片 -->
-					<view class="detail-info-cards">
-						<view class="detail-info-card">
-							<text class="detail-info-label">Expiry Date</text>
-							<text class="detail-info-value">
-								{{ selectedCoupon.expire_time ? formatDateTime(selectedCoupon.expire_time) : '-' }}
-							</text>
-						</view>
-						<view class="detail-info-card">
-							<text class="detail-info-label">Remaining</text>
-							<text class="detail-info-value">
-								{{ selectedCoupon.usage_limit ? (selectedCoupon.usage_limit - (selectedCoupon.used_count || 0)) : 'Unlimited' }}
-							</text>
+						<view class="coupon-hero-overlay">
+							<text class="coupon-hero-title">{{ selectedCoupon.coupon_name }}</text>
 						</view>
 					</view>
-
-					<!-- 奖励 -->
-					<view class="detail-bonus-box"
-						style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;">
-						<text class="detail-bonus-title">+ {{ $toolbox.num_format(selectedCoupon.bonus_amount) }}
-							Bonus</text>
-						<text class="detail-bonus-desc">Min bet required:
-							{{ selectedCoupon.min_bet_required || 0 }}</text>
+					<!-- Fallback: title bar when no image -->
+					<view class="coupon-hero-fallback" v-else>
+						<text class="coupon-hero-title">{{ selectedCoupon.coupon_name }}</text>
 					</view>
 
-					<!-- 详情描述 -->
-					<view class="detail-description-section" v-if="selectedCoupon.p_content">
-						<text class="detail-section-title">Details</text>
-						<text class="detail-description-text">{{ selectedCoupon.p_content }}</text>
+					<!-- Description -->
+					<view class="coupon-desc-section" v-if="selectedCoupon.p_content">
+						<text class="coupon-desc-heading">Coupon details</text>
+						<text class="coupon-desc-text">{{ selectedCoupon.p_content }}</text>
 					</view>
 
-					<!-- 使用场景 -->
-					<view class="detail-description-section" v-if="betTypes.length > 0 || displayVendors.length > 0">
-						<text class="detail-section-title">Applicable Scenarios</text>
-						<view class="usage-scenarios-list">
+					<!-- Promo Code -->
+					<view class="coupon-code-pill" v-if="selectedCoupon.p_code">
+						<text class="coupon-code-text">{{ selectedCoupon.p_code }}</text>
+						<view class="coupon-copy-btn" @click="copyCode">
+							<text class="coupon-copy-text">Copy code</text>
+							<image class="coupon-copy-icon" src="/static/icon/copy.svg" mode="aspectFit"></image>
+						</view>
+					</view>
+
+					<!-- Metadata Grid -->
+					<view class="coupon-meta-grid">
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Expiry Date:</text>
+							<text
+								class="coupon-meta-value">{{ selectedCoupon.expire_time ? formatDateTime(selectedCoupon.expire_time) : '-' }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Remaining:</text>
+							<text
+								class="coupon-meta-value">{{ selectedCoupon.usage_limit ? (selectedCoupon.usage_limit - (selectedCoupon.used_count || 0)) : 'Unlimited' }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Bonus:</text>
+							<text class="coupon-meta-value">+
+								{{ $toolbox.num_format(selectedCoupon.bonus_amount) }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Min Bet:</text>
+							<text class="coupon-meta-value">{{ selectedCoupon.min_bet_required || 0 }}</text>
+						</view>
+					</view>
+
+					<!-- Applicable Scenarios -->
+					<view class="coupon-scenarios" v-if="betTypes.length > 0 || displayVendors.length > 0">
+						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+						<view class="coupon-scenarios-icons">
 							<!-- 1x2 Sports Betting -->
-							<view class="usage-scenario-item" v-if="betTypes.length > 0" @click="openCouponSport">
-								<text class="scenario-icon">⚽</text>
-								<view class="scenario-text">
-									<text class="scenario-label">1x2 Sports Betting</text>
-									<text class="scenario-detail">
-										{{ betTypes.includes('All') ? 'All Bet Types' : betTypes.join(', ') }}
-									</text>
+							<view class="coupon-scenario-icon-item" v-if="betTypes.length > 0" @click="openCouponSport">
+								<view class="coupon-scenario-icon-circle">
+									<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
 								</view>
+								<text class="coupon-scenario-label">Single</text>
 							</view>
-							<!-- E-Gaming -->
-							<view class="usage-scenario-item scenario-egame-block" v-if="displayVendors.length > 0">
-								<view class="scenario-header">
-									<text class="scenario-icon">🎮</text>
-									<view class="scenario-text">
-										<text class="scenario-label">E-Gaming</text>
-										<text class="scenario-detail">
-											({{ displayVendors.map(v => v.platform).join(', ') }})
-										</text>
-									</view>
+							<!-- Mix Parlay -->
+							<view class="coupon-scenario-icon-item" v-if="displayVendors.length > 0"
+								@click="openVendorGames(displayVendors[0])">
+								<view class="coupon-scenario-icon-diamond">
+									<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
 								</view>
-								<view class="vendors-grid">
-									<view class="vendor-card" v-for="(vendor, index) in displayVendors" :key="index"
-										@click="openVendorGames(vendor)">
-										<view class="vendor-info">
-											<image :src="siteinfo.awcImgUrl + vendor.platform_image"
-												style="height: 55px;" mode="heightFix"></image>
-											<text class="vendor-name">{{ vendor.platform }}</text>
-										</view>
-									</view>
+								<text class="coupon-scenario-label">Mix</text>
+							</view>
+						</view>
+						<!-- Vendor list (collapsible below icons) -->
+						<view class="coupon-vendors-grid" v-if="displayVendors.length > 0">
+							<view class="coupon-vendor-card" v-for="(vendor, index) in displayVendors" :key="index"
+								@click="openVendorGames(vendor)">
+								<view class="coupon-vendor-info">
+									<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+										mode="heightFix"></image>
+									<text class="coupon-vendor-name">{{ vendor.platform }}</text>
 								</view>
 							</view>
 						</view>
@@ -277,7 +279,7 @@
 
 				<view class="detail-modal-footer" v-if="selectedCoupon.status === 'Unused'">
 					<view class="detail-claim-btn" @click="claimCoupon(selectedCoupon)">
-						<text class="detail-claim-text">{{ $t('Get promotions') }}</text>
+						<text class="detail-claim-text">Claim</text>
 					</view>
 				</view>
 			</view>
@@ -407,7 +409,7 @@
 							<view class="usage-scenario-item scenario-egame-block"
 								v-if="selectedPromotion.usage_scenario_egame">
 								<view class="scenario-header">
-									<text class="scenario-icon">🎮</text>
+									<text class="scenario-icon"></text>
 									<view class="scenario-text">
 										<text
 											class="scenario-label">{{ selectedPromotion.usage_scenario_egame.label }}</text>
@@ -796,8 +798,10 @@
 					return
 				}
 				this.$notice.show({
+					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
+					image: '/static/icon/question.svg',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -811,8 +815,10 @@
 				let _this = this
 				if (!coupon) return
 				this.$notice.show({
+					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
+					image: '/static/icon/question.svg',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -1378,20 +1384,25 @@
 <style lang="scss">
 	/* header占位元素样式 */
 	.header-placeholder {
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		width: 100%;
 		flex-shrink: 0;
 	}
 
 	page {
-		background: #2F5D62;
+		background: #1C667C;
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #2F5D62;
+		background: #02455F;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -1427,26 +1438,27 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		background: #e8f4f8;
+		background: #F1FAFB;
+		border: 1px solid #2A626833;
 		color: #2A6268;
 		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.type-btn.active {
-		background: #2F5D62;
+		background: #1C667C;
 		color: #fff;
 	}
 
 	.promo-count-badge {
 		position: absolute;
-		top: 2px;
+		// top: 2px;
 		right: 8px;
 		min-width: 16px;
 		height: 16px;
 		padding: 0 3px;
 		border-radius: 8px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
@@ -1487,12 +1499,12 @@
 		height: 34px;
 		padding: 0 12px;
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 	}
 
 	.focus-border {
-		border: solid 2px #2F5D62;
+		border: solid 2px #1C667C;
 	}
 
 	.redeem-btn {
@@ -1506,7 +1518,7 @@
 	}
 
 	.redeem-btn-active {
-		background: #2F5D62;
+		background: #1C667C;
 		color: #fff;
 	}
 
@@ -1622,7 +1634,7 @@
 	.ca-credit-value {
 		font-size: 24px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 28px;
 	}
 
@@ -1649,14 +1661,15 @@
 	.ca-stat-value {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	/* 优惠券卡片 */
 	.coupon-card {
 		background: #fff;
 		border-radius: 12px;
-		margin-bottom: 15px;
+		margin-top: 7.5px;
+		margin-bottom: 7.5px;
 		overflow: hidden;
 		border: 1px solid rgba(0, 0, 0, 0.08);
 		box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
@@ -1672,7 +1685,7 @@
 	}
 
 	.header-unused {
-		background: #2F5D62;
+		background: #1C667C;
 	}
 
 	.header-expired {
@@ -1734,7 +1747,7 @@
 	.info-val {
 		font-size: 14px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.coupon-bonus {
@@ -1752,7 +1765,7 @@
 	.bonus-value {
 		font-size: 22px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.coupon-card-footer {
@@ -1770,7 +1783,7 @@
 	}
 
 	.claim-action-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1786,7 +1799,7 @@
 	.status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1851,7 +1864,7 @@
 
 	.promo-period {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: bold;
 	}
 
@@ -1859,7 +1872,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: bold;
 		font-size: 13px;
 		margin-top: 2px;
@@ -1867,7 +1880,7 @@
 
 	.promo-terms {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.4;
 	}
 
@@ -1887,7 +1900,7 @@
 	}
 
 	.promo-status-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1899,7 +1912,7 @@
 	.promo-status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1952,7 +1965,7 @@
 	}
 
 	.detail-modal-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 12px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -1987,7 +2000,7 @@
 	.detail-coupon-title {
 		font-size: 18px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: center;
 		margin-bottom: 12px;
 	}
@@ -2024,7 +2037,7 @@
 	.detail-code {
 		font-size: 15px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.detail-code-copy {
@@ -2062,7 +2075,7 @@
 	.detail-info-value {
 		font-size: 14px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.promo-countdown-block {
@@ -2072,7 +2085,7 @@
 	.ends-in {
 		font-size: 16px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.detail-bonus-box {
@@ -2100,7 +2113,7 @@
 	.detail-section-title {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		display: block;
 		margin-bottom: 6px;
 	}
@@ -2259,7 +2272,7 @@
 	.progress-value {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.progress-bar-container {
@@ -2288,7 +2301,7 @@
 	}
 
 	.detail-claim-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 10px;
 		padding: 10px;
 		text-align: center;
@@ -2303,6 +2316,235 @@
 		font-size: 15px;
 		font-weight: 700;
 		color: #fff;
+	}
+
+	/* ============ Coupon Detail Modal (coupon-specific) ============ */
+
+	/* Hero image with title overlay */
+	.coupon-hero {
+		width: 100%;
+		aspect-ratio: 16/9;
+		border-radius: 12px;
+		overflow: hidden;
+		margin-bottom: 20px;
+		position: relative;
+	}
+
+	.coupon-hero-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.coupon-hero-overlay {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: #1C667C;
+		padding: 10px 16px;
+	}
+
+	.coupon-hero-title {
+		font-size: 16px;
+		font-weight: bold;
+		color: #fff;
+		text-align: center;
+	}
+
+	.coupon-hero-fallback {
+		background: #1C667C;
+		border-radius: 12px;
+		padding: 14px 16px;
+		margin-bottom: 20px;
+	}
+
+	/* Description section */
+	.coupon-desc-section {
+		margin-bottom: 20px;
+	}
+
+	.coupon-desc-heading {
+		font-size: 16px;
+		font-weight: bold;
+		color: #1C667C;
+		text-align: center;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	.coupon-desc-text {
+		font-size: 14px;
+		color: #666;
+		text-align: center;
+		line-height: 1.6;
+	}
+
+	/* Promo code pill */
+	.coupon-code-pill {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		background: #F5F5F5;
+		border-radius: 999px;
+		padding: 12px 20px;
+		margin-bottom: 20px;
+	}
+
+	.coupon-code-text {
+		font-size: 18px;
+		font-weight: bold;
+		color: #1C667C;
+	}
+
+	.coupon-copy-btn {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.coupon-copy-icon {
+		width: 16px;
+		height: 16px;
+	}
+
+	.coupon-copy-text {
+		font-size: 13px;
+		color: #1C667C;
+		font-weight: 600;
+	}
+
+	/* Metadata grid */
+	.coupon-meta-grid {
+		margin-bottom: 20px;
+	}
+
+	.coupon-meta-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		height: 25px;
+		color: #1C667C;
+	}
+
+	.coupon-meta-label {
+		font-size: 14px;
+		// color: #666;
+	}
+
+	.coupon-meta-value {
+		font-size: 14px;
+		font-weight: bold;
+		// color: #333;
+	}
+
+	/* Applicable Scenarios */
+	.coupon-scenarios {
+		background: #E8F4F4;
+		border-radius: 12px;
+		padding: 14px 16px;
+		margin-bottom: 8px;
+	}
+
+	.coupon-scenarios-title {
+		font-size: 14px;
+		font-weight: bold;
+		color: #1C667C;
+		display: block;
+		margin-bottom: 14px;
+	}
+
+	.coupon-scenarios-icons {
+		display: flex;
+		flex-direction: row;
+		justify-content: start;
+		gap: 48px;
+	}
+
+	.coupon-scenario-icon-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		// gap: 8px;
+	}
+
+	.coupon-scenario-icon-circle {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		// border: 2px solid #1C667C;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.coupon-scenario-icon-diamond {
+		width: 40px;
+		height: 40px;
+		border: 2px solid #1C667C;
+		transform: rotate(45deg);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.coupon-scenario-emoji {
+		font-size: 18px;
+		line-height: 1;
+	}
+
+	.coupon-scenario-img {
+		width: 100%;
+		height: 100%;
+		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
+	}
+
+	.coupon-scenario-icon-diamond .coupon-scenario-img {
+		transform: rotate(-45deg);
+	}
+
+	.coupon-scenario-icon-diamond .coupon-scenario-emoji {
+		transform: rotate(-45deg);
+	}
+
+	.coupon-scenario-label {
+		font-size: 12px;
+		color: #666;
+	}
+
+	/* Vendor grid inside scenarios */
+	.coupon-vendors-grid {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 14px;
+	}
+
+	.coupon-vendor-card {
+		width: calc(33.33% - 6px);
+		background: #fff;
+		border-radius: 8px;
+		padding: 8px 4px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.coupon-vendor-info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.coupon-vendor-name {
+		font-size: 11px;
+		font-weight: 600;
+		color: #333;
+		text-align: center;
 	}
 
 	/* ============ Join Promotion 弹窗 ============ */
@@ -2332,7 +2574,7 @@
 	}
 
 	.join-dialog-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 12px;
 		text-align: center;
 		font-size: 15px;
@@ -2357,7 +2599,7 @@
 
 	.join-hint-label {
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		display: block;
 		text-align: center;
 		margin-bottom: 10px;
@@ -2377,19 +2619,19 @@
 	.join-currency {
 		font-size: 16px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.join-input {
 		flex: 1;
 		font-size: 16px;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.join-fixed-value {
 		font-size: 16px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.join-range-hint {
@@ -2426,7 +2668,7 @@
 	}
 
 	.join-continue-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		color: #fff;
 	}
 </style>

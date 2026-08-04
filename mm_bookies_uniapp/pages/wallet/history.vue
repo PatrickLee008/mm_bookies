@@ -352,7 +352,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -390,7 +390,7 @@
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.option-radio {
@@ -448,26 +448,26 @@
 	.order-id-label {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.record-date {
 		font-size: 13px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.row-label {
 		font-size: 14px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: #1C667C;
 		flex-shrink: 0;
 	}
 
 	.row-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		text-align: right;
 		margin-left: 10px;
 		word-break: break-word;
@@ -529,7 +529,7 @@
 	}
 
 	.continue-btn {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		color: white;
 		padding: 10px 20px;
 		border-radius: 8px;

@@ -208,7 +208,7 @@
 
 	/* from tangjq--- 标题栏 */
 	.filter-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -294,7 +294,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 25px;
 		padding: 8px;
 		text-align: center;

@@ -223,7 +223,7 @@
 					<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
 						{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
 					</view>
-					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #2F5D62;color: white;">
+					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #1C667C;color: white;">
 						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
 						{{$t('Place Bet')}}
 					</button>
@@ -752,20 +752,25 @@
 <style scoped lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 220px;
+		height: 276px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -276px;
 		width: 100%;
 		flex-shrink: 0;
 	}
 
 	page {
-		background: #2F5D62;
+		background: #1C667C;
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #2F5D62;
+		background: #1C667C;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -852,7 +857,7 @@
 
 	/* 卡片头部 */
 	.card-header {
-		background: linear-gradient(135deg, #2E7D7C 0%, #366968 100%);
+		background: #1C667C;
 		padding: 5px;
 		display: flex;
 		flex-direction: column;

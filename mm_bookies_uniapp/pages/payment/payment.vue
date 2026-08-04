@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 		<view class="header-placeholder"></view>
 		<!-- 滚动内容区域 -->
@@ -660,17 +660,23 @@
 </script>
 <style scoped>
 	page {
-		background-color: white;
+		background-color: #02455F;
 	}
 
 	.header-placeholder {
-		height: 220px;
+		height: 255px;
 		width: 100%;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 	}
 
 	.full-page {
 		display: flex;
 		flex-direction: column;
+		background: #02455F;
 	}
 
 	.payment-content {
@@ -728,7 +734,7 @@
 	.deposit-phone-value {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: #1C667C;
 		letter-spacing: 1px;
 	}
 

@@ -446,9 +446,14 @@
 <style>
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		width: 100%;
-		background-color: #2F5D62;
+		background-color: #02455F;
 	}
 
 	/* Search Container */
@@ -502,7 +507,7 @@
 	.filter-button {
 		width: 35px;
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -551,7 +556,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 25px;
 		padding: 8px 20px;
 		cursor: pointer;
@@ -585,7 +590,7 @@
 		overflow: hidden;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		width: 48%;
-		background: #2F5D62;
+		background: #1C667C;
 		margin-bottom: 12px;
 		transition: transform 0.2s;
 	}
@@ -612,7 +617,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 0 12px;
 		min-height: 50px;
 	}
@@ -692,7 +697,7 @@
 	}
 
 	.filter-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -764,7 +769,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 25px;
 		padding: 8px;
 		display: flex;

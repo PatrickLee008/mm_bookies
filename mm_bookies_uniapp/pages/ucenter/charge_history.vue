@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 		<!-- 顶栏 -->
 		<view class="title-bar" style="height: auto;">
@@ -294,6 +294,11 @@ export default {
 </script>
 
 <style scoped>
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
+
 .record-item {
 	margin: 10px 15px;
 	background-color: #ffffff;

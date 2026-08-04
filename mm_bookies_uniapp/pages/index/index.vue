@@ -1,81 +1,77 @@
 <template>
 	<view class="home-page">
 		<global-notice ref="globalNotice"></global-notice>
-		<view class="home-top">
-			<image class="home-logo" src="../../figma/login/title.png" mode="widthFix"></image>
-			<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
+		<scroll-view scroll-y class="home-scroll">
+			<view class="home-top">
+				<image class="home-logo" src="../../figma/login/title.png" mode="widthFix"></image>
+				<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 
-			<view class="user-info-card">
-				<view class="user-avatar">
-					<image src="/static/icon/nav/user_avatar.png" class="avatar-img" mode="aspectFill"></image>
-				</view>
-				<view class="user-details">
-					<view class="user-id">
-						<view class="user-id-info">
-							<text class="id-label">My ID : </text>
-							<text class="id-value">{{ userInfo.phone || userInfo.nick_name || '' }}</text>
+				<view class="user-summary">
+					<view class="user-avatar">
+						<image src="/static/user_avatar.svg" class="avatar-img" mode="aspectFit"></image>
+					</view>
+					<view class="user-details">
+						<text class="greeting">{{ $t(greetingKey) }}</text>
+						<text class="id-value">My ID : {{ userInfo.phone || userInfo.nick_name || '' }}</text>
+					</view>
+					<view class="header-actions">
+						<view class="bell-btn" @click="goMessage">
+							<image src="/static/icon/nav/notification.svg" class="bell-icon"
+								:class="{ 'bell-ring': unreadCount > 0 }" mode="aspectFit"></image>
+							<view class="bell-badge" v-if="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</view>
 						</view>
-						<view class="header-actions">
-							<view class="bell-btn" @click="goMessage">
-								<image src="/static/icon/nav/notification.svg" class="bell-icon"
-									:class="{ 'bell-ring': unreadCount > 0 }" mode="aspectFit"></image>
-								<view class="bell-badge" v-if="unreadCount > 0">
-									{{ unreadCount > 99 ? '99+' : unreadCount }}
-								</view>
-							</view>
-							<view class="settings-btn" @click="goto('/pages/ucenter/home')">
-								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit">
-								</image>
-							</view>
+						<view class="settings-btn" @click="goto('/pages/ucenter/home')">
+							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
 						</view>
 					</view>
-					<view class="user-balance-row">
+				</view>
+
+				<view class="balance-card">
+					<view class="main-balance-row">
 						<view class="balance-item">
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<text
-								class="balance-value myfont-18px text-bold">{{ $toolbox.floor_format(userInfo.money || 0) }}</text>
+							<text class="balance-value">{{ displayBalance(userInfo.money) }}</text>
 						</view>
-						<view class="secondary-balance-row">
-							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<view class="balance-item">
-								<text class="cashout-label">Promo</text>
-								<text
-									class="cashout-value">{{ $toolbox.floor_format(userInfo.money_promotion || 0) }}</text>
-							</view>
-							<view class="balance-item" style="margin-left: 12px;">
-								<text class="cashout-label">Cash Out</text>
-								<text
-									class="cashout-value">{{ $toolbox.num_format(userInfo.total_withdraw || 0) }}</text>
-							</view>
+							<text class="balance-eye" :class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'" @click="balanceVisible = !balanceVisible"></text>
+					</view>
+					<view class="promo-row">
+						<text class="promo-label">Promo</text>
+							<text class="cashout-value">{{ displayBalance(userInfo.money_promotion) }}</text>
+					</view>
+					<view class="balance-actions">
+						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0')">
+							<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
 						</view>
+						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1')">
+							<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
+						</view>
+						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}</view>
+					</view>
+				</view>
+
+				<view class="home-nav">
+					<view class="nav-item" @click="goto('/pages/match/home?mix=0')">
+						<image src="/static/icon/nav/single.png" mode="aspectFit"></image><text>{{$t('single')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
+						<image src="/static/icon/nav/mpl.png" mode="aspectFit"></image><text>{{$t('mixparlay')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
+						<image class="referral-icon" src="/static/icon/ucenter/referral.svg" mode="aspectFit"></image>
+						<text>{{$t('Referral')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/orders/home')">
+						<image src="/static/icon/nav/history.png" mode="aspectFit"></image><text>{{$t('history')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/index/coupon')">
+						<image src="/static/icon/nav/deals.png" mode="aspectFit"></image><text>{{$t('Deals')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/wallet/wallet')">
+						<image src="/static/icon/nav/wallet.png" mode="aspectFit"></image><text>{{$t('wallet')}}</text>
 					</view>
 				</view>
 			</view>
 
-			<view class="home-nav">
-				<view class="nav-item" @click="goto('/pages/match/home?mix=0')">
-					<image src="/static/icon/nav/single.png" mode="aspectFit"></image><text>{{$t('single')}}</text>
-				</view>
-				<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
-					<image src="/static/icon/nav/mpl.png" mode="aspectFit"></image><text>{{$t('mixparlay')}}</text>
-				</view>
-				<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
-					<image class="referral-icon" src="/static/icon/ucenter/referral.svg" mode="aspectFit"></image>
-					<text>{{$t('Referral')}}</text>
-				</view>
-				<view class="nav-item" @click="goto('/pages/orders/home')">
-					<image src="/static/icon/nav/history.png" mode="aspectFit"></image><text>{{$t('history')}}</text>
-				</view>
-				<view class="nav-item" @click="goto('/pages/index/coupon')">
-					<image src="/static/icon/nav/deals.png" mode="aspectFit"></image><text>{{$t('Deals')}}</text>
-				</view>
-				<view class="nav-item" @click="goto('/pages/wallet/wallet')">
-					<image src="/static/icon/nav/wallet.png" mode="aspectFit"></image><text>{{$t('wallet')}}</text>
-				</view>
-			</view>
-		</view>
-
-		<scroll-view scroll-y class="home-scroll">
 			<view class="news-section" v-if="advertisements.length">
 				<text class="section-title">News &amp; Promotions</text>
 				<swiper class="promotion-swiper" :circular="true" :autoplay="true" interval="3500" duration="500"
@@ -106,10 +102,24 @@
 			return {
 				userInfo: {},
 				unreadCount: 0,
-				advertisements: []
+				advertisements: [],
+				balanceVisible: true
+			}
+		},
+		computed: {
+			greetingKey() {
+				const hour = new Date().getHours()
+				if (hour < 12) return 'Good Morning'
+				if (hour < 18) return 'Good Afternoon'
+				return 'Good Evening'
 			}
 		},
 		methods: {
+			displayBalance(value) {
+				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
+				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
+				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+			},
 			goto(url) {
 				uni.navigateTo({
 					url
@@ -184,11 +194,12 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		background: #2a6268;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
 	}
 
 	.home-top {
-		flex-shrink: 0;
 		padding: 18px 20px 16px;
 	}
 
@@ -219,8 +230,8 @@
 	}
 
 	.user-avatar {
-		width: 50px;
-		height: 50px;
+		width: 37px;
+		height: 37px;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -263,7 +274,7 @@
 	.id-value,
 	.cashout-label,
 	.cashout-value {
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.id-label {
@@ -349,13 +360,13 @@
 	}
 
 	.coin-icon {
-		width: 18px;
-		height: 18px;
-		margin-right: 7px;
+		width: 20px;
+		height: 20px;
+		margin-right: 0px;
 	}
 
 	.balance-value {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 18px;
 	}
 
@@ -403,7 +414,7 @@
 	.home-nav {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
-		gap: 12px 20px;
+		gap: 16px 10px;
 		margin-top: 14px;
 	}
 
@@ -412,7 +423,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		height: 92px;
+		height: 86px;
 		border-radius: 16px;
 		background: #fff;
 		color: #2a6268;
@@ -445,7 +456,7 @@
 
 	.news-section {
 		padding: 18px 20px 32px;
-		background-color: #2a6268;
+		background: transparent;
 	}
 
 	.section-title {
@@ -475,5 +486,127 @@
 		align-items: center;
 		justify-content: center;
 		color: #2a6268;
+	}
+
+	.user-summary {
+		display: flex;
+		align-items: center;
+		padding: 8px 4px 14px;
+		color: #fff;
+	}
+
+	.user-summary .user-avatar {
+		width: 37px;
+		height: 37px;
+		margin-right: 12px;
+		border: 0;
+		background: transparent;
+	}
+
+	.user-summary .user-details {
+		gap: 2px;
+	}
+
+	.greeting {
+		font-size: 12px;
+		color: #fff;
+	}
+
+	.user-summary .id-value {
+		color: #fff;
+		font-size: 15px;
+	}
+
+	.user-summary .header-actions {
+		margin-left: auto;
+	}
+
+	.user-summary .bell-icon,
+	.user-summary .settings-icon {
+		filter: brightness(0) invert(1) !important;
+	}
+
+	.user-summary .avatar-img {
+		background: transparent;
+	}
+
+	.balance-card {
+		background: #fff;
+		border-radius: 20px;
+		padding: 14px 20px 16px;
+		color: #206c80;
+	}
+
+	.main-balance-row,
+	.promo-row,
+	.balance-actions {
+		display: flex;
+		align-items: center;
+	}
+
+	.main-balance-row {
+		justify-content: space-between;
+	}
+
+	.balance-value {
+		font-size: 24px;
+		font-weight: 700;
+	}
+
+	.balance-eye {
+		font-size: 20px;
+		color: #1c667c;
+	}
+
+	.promo-row {
+		gap: 8px;
+		margin: 7px 0 12px;
+	}
+
+	.promo-label {
+		padding: 3px 12px;
+		border-radius: 12px;
+		background: #edf8f9;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.balance-actions {
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.wallet-action {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+	}
+
+	.wallet-action image {
+		width: 20px;
+		height: 20px;
+		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
+	}
+
+	.wallet-action-icon {
+		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%) !important;
+	}
+
+	.cashout-action {
+		white-space: nowrap;
+	}
+
+	.customer-service-wrapper :deep(.customer-btn) {
+		background: #1C667C;
+		border: 0;
+		border-radius: 50%;
+	}
+
+	.customer-service-wrapper :deep(.customer-btn-icon) {
+		width: 24px;
+		height: 24px;
 	}
 </style>

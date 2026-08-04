@@ -1,7 +1,7 @@
 <template>
-	<view class="bg-white">
+	<view class="dark-teal-bg">
 		<zw-header></zw-header>
-		<scroll-view scroll-y style="height: calc(100vh - 120px);">
+		<scroll-view scroll-y style="height: calc(100vh - 120px); background: #fff;">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -353,6 +353,11 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
+
 	.amount-input {
 		font: inherit;
 		letter-spacing: inherit;

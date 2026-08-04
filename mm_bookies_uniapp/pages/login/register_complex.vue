@@ -1,10 +1,10 @@
 <template>
-	<view class="bg-white">
+	<view class="dark-teal-bg">
 		<zw-header></zw-header>
 		<!-- <cu-custom isBack backUrl="/pages/login/login">
 			<block slot="content">{{$t('registerTitle')}}</block>
 		</cu-custom> -->
-		<view class="login-page" style="">
+		<view class="login-page" style="background: #fff;">
 			<view class="flex-column width-100">
 				<view class="myfont-11px margin-bottom">{{language[title_list[current_progress - 1]]}}</view>
 				<view class="flex-row justify-center width-100">
@@ -432,13 +432,8 @@
 				// this.password_focused = false;
 				const pwd = this.loginInfo.password;
 
-				// 条件：长度 ≥ 8，包含大小写字母和数字
-				const isValid =
-					pwd &&
-					pwd.length >= 8 &&
-					/[a-z]/.test(pwd) && // 至少一个小写字母
-					/[A-Z]/.test(pwd) && // 至少一个大写字母
-					/\d/.test(pwd); // 至少一个数字
+				// 密码只要求至少五个字符，不限制字符类型。
+				const isValid = pwd && pwd.length >= 5
 
 				this.password_error = !isValid;
 				this.password_error_contet = !isValid ?
@@ -777,6 +772,11 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
+
 	.default-bank {
 		height: 32px;
 		width: 32px;

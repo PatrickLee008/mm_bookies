@@ -7,7 +7,7 @@
 		<message-notification></message-notification>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: isLogin ? '255px' : '190px' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -2052,9 +2052,12 @@
 <style>
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 190px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		width: 100%;
-		background-color: #2F5D62;
 	}
 
 	.detail-box-shadow {
@@ -2111,7 +2114,7 @@
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
 		height: 100vh;
-		background: #2F5D62;
+		background: #02455F;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -2315,7 +2318,7 @@
 	.search-input {
 		flex: 1;
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	/* from tangjq--- 清空按钮样式 */
@@ -2331,7 +2334,7 @@
 		position: relative;
 		width: 30px;
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -2386,7 +2389,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 16px;
 		padding: 7px 12px;
 		margin-bottom: 10px;
@@ -2442,7 +2445,7 @@
 		background-color: transparent;
 		text-align: left;
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 		padding: 10px 14px 2px;
 	}
@@ -2470,7 +2473,7 @@
 
 	.team-name {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 		text-align: center;
 		max-width: 100px;
@@ -2492,7 +2495,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		padding: 9px 9px 9px 0;
 		margin-bottom: 4px;
@@ -2542,7 +2545,7 @@
 	}
 
 	.bet-text {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 600;
 	}
@@ -2559,13 +2562,13 @@
 	}
 
 	.bet-text-small {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: bold;
 	}
 
 	.bet-odds-small {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: bold;
 		font-style: italic;
@@ -2584,7 +2587,7 @@
 	}
 
 	.match-expand-btn {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		height: 28px;
 		margin: 4px 12px 12px;
 		display: flex;
@@ -2635,7 +2638,7 @@
 	}
 
 	.total-text {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 600;
 	}
@@ -2648,7 +2651,7 @@
 
 	.confirm-btn {
 		flex: 1;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 10px;
 		padding: 5px;
 		display: flex;
@@ -2703,7 +2706,7 @@
 	}
 
 	.detail-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 20px;
 		text-align: center;
 		flex-shrink: 0;
@@ -2733,7 +2736,7 @@
 	.detail-datetime {
 		text-align: center;
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 		margin-bottom: 15px;
 	}
@@ -2759,7 +2762,7 @@
 
 	.detail-team-name {
 		font-size: 13px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 		text-align: center;
 	}
@@ -2815,7 +2818,7 @@
 	}
 
 	.bet-slip-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		text-align: center;
 		flex-shrink: 0;
@@ -2863,7 +2866,7 @@
 
 	.mix-match-datetime text {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 	}
 
@@ -2902,7 +2905,7 @@
 	.mix-vs {
 		font-size: 14px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: #1C667C;
 		flex-shrink: 0;
 		/* from tangjq--- 防止vs文字被压缩 */
 		padding: 0 5px;
@@ -2915,7 +2918,7 @@
 		justify-content: space-between;
 		align-items: center;
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.mix-bet-choice {
@@ -2940,7 +2943,7 @@
 
 	.match-time {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 	}
 
@@ -2976,7 +2979,7 @@
 
 	.vs-text {
 		font-size: 16px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: bold;
 		margin: 0 10px;
 	}
@@ -2989,7 +2992,7 @@
 		align-items: center;
 		margin-bottom: 12px;
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.bet-type {
@@ -3014,12 +3017,12 @@
 	}
 
 	.choice-team {
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 	}
 
 	.choice-type {
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 	}
 
@@ -3053,13 +3056,13 @@
 	}
 
 	.bet-info-row .info-label {
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 	}
 
 	.info-value {
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.wallet-row {
@@ -3073,13 +3076,13 @@
 
 	.wallet-label {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 	}
 
 	.wallet-value {
 		font-size: 12px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: bold;
 	}
 
@@ -3093,7 +3096,7 @@
 	.amount-input {
 		width: 100%;
 		font-size: 13px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 		text-align: center;
 		font-style: italic;
@@ -3122,7 +3125,7 @@
 
 	.quick-btn {
 		flex: 1;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 25px;
 		padding: 5px;
 		display: flex;
@@ -3150,7 +3153,7 @@
 	.cancel-btn {
 		flex: 1;
 		background-color: white;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 12px;
 		padding: 5px;
 		display: flex;
@@ -3175,7 +3178,7 @@
 	}
 
 	.confirm-btn-action.confirm-active {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 	}
 
 	.confirm-btn-action .confirm-text {
@@ -3224,7 +3227,7 @@
 	}
 
 	.success-popup-header {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		padding: 8px;
 		text-align: center;
 	}
@@ -3250,7 +3253,7 @@
 	}
 
 	.success-popup-subtitle {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 20px;
 		font-weight: bold;
 		text-align: center;
@@ -3263,7 +3266,7 @@
 	}
 
 	.success-ok-btn {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		min-width: 100px;

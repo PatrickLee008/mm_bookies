@@ -1128,7 +1128,11 @@
 	/* from tangjq--- header占位元素样式 - 高度由动态计算控制 */
 	.header-placeholder {
 		width: 100%;
-		background-color: #2F5D62;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		flex-shrink: 0;
 	}
 
@@ -1148,7 +1152,7 @@
 	}
 	
 	.ucenter-page {
-		background: #2F5D62;
+		background: #02455F;
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
@@ -1157,7 +1161,7 @@
 
 	/* 顶部栏 */
 	.ucenter-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 40px 20px 20px 20px;
 		text-align: center;
 	}
@@ -1190,7 +1194,7 @@
 		width: 60px;
 		height: 60px;
 		border-radius: 50%;
-		background: #2F5D62;
+		background: #1C667C;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1252,12 +1256,12 @@
 	.settings-icon-img {
 		width: 28px;
 		height: 28px;
-		tint-color: #2F5D62;
+		tint-color: #1C667C;
 	}
 
 	/* 快捷图标区域 */
 	.quick-icons-container {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 0 16px 24px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -1303,7 +1307,7 @@
 
 	.setting-item {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		margin-bottom: 20px;
@@ -1313,7 +1317,7 @@
 	.setting-item-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	/* 高亮提醒样式 - 联系我们、关于我们 */
@@ -1364,7 +1368,7 @@
 	}
 
 	.logout-modal-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 10px;
 		text-align: center;
 		border-radius: 16px 16px 0 0;
@@ -1383,7 +1387,7 @@
 
 	.logout-question {
 		font-size: 16px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 500;
 	}
 
@@ -1395,7 +1399,7 @@
 	}
 
 	.logout-btn-confirm {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1408,7 +1412,7 @@
 	}
 
 	.logout-btn-cancel {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1445,7 +1449,7 @@
 	}
 
 	.modal-header {
-		background: #2F5D62;
+		background: #1C667C;
 		padding: 10px;
 		display: flex;
 		justify-content: space-between;
@@ -1485,7 +1489,7 @@
 		width: 100px;
 		height: 100px;
 		border-radius: 50%;
-		// background: #2F5D62;
+		// background: #1C667C;
 		overflow: hidden;
 	}
 
@@ -1524,7 +1528,7 @@
 
 	.profile-change-pwd-btn {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1534,11 +1538,11 @@
 	.profile-change-pwd-text {
 		font-size: 16px;
 		font-weight: 400;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.profile-save-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1552,7 +1556,7 @@
 
 	/* Contact 弹窗样式 */
 	.live-chat-btn {
-		background: linear-gradient(135deg, #2F5D62, #5FB5BD);
+		background: linear-gradient(135deg, #1C667C, #5FB5BD);
 		border-radius: 12px;
 		padding: 16px 20px;
 		display: flex;
@@ -1587,7 +1591,7 @@
 
 	.contact-description {
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		line-height: 1.5;
 		display: block;
 		margin-bottom: 24px;
@@ -1595,7 +1599,7 @@
 
 	.contact-rich-text {
 		font-size: 14px;
-		color: #1e3a5f;
+		color: #1C667C;
 		line-height: 1.8;
 		margin-bottom: 16px;
 		word-break: break-all;
@@ -1682,7 +1686,7 @@
 
 	.rule-number {
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 		margin-right: 8px;
 		flex-shrink: 0;
@@ -1734,7 +1738,7 @@
 	}
 
 	.language-confirm-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1785,7 +1789,7 @@
 
 	.support-link-text {
 		font-size: 14px;
-		color: #2F5D62;
+		color: #1C667C;
 		// text-decoration: underline;
 	}
 
@@ -1848,7 +1852,7 @@
 
 	.pwd-cancel-btn {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1859,11 +1863,11 @@
 	.pwd-cancel-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.pwd-save-btn {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;

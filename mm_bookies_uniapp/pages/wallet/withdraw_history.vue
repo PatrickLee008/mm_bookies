@@ -280,7 +280,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -318,7 +318,7 @@
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.option-radio {

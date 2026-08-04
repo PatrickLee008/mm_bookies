@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 
 		<scroll-view scroll-y style="height: calc(100vh - 110px);">
@@ -306,6 +306,10 @@
 </script>
 
 <style lang="scss">
+	.full-page {
+		background: #02455F;
+	}
+
 	.info-rec {
 		padding: 10px;
 		margin: 10px 10px 0;

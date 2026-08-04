@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 
 		<view class="title-bar" style="height: auto;">
@@ -13,7 +13,7 @@
 		</view>
 		<view class="flex-column justify-center" style="position: fixed;top: 45vh;">
 			<view class="flex-column align-center justify-center" style="">
-				<view class="myfont-20px mycolor-primary">{{language.is_coming_soon}}</view>
+				<view class="myfont-20px" style="color: #FFFFFF;">{{language.is_coming_soon}}</view>
 			</view>
 		</view>
 
@@ -38,4 +38,7 @@
 </script>
 
 <style lang="scss">
+	.full-page {
+		background: #02455F;
+	}
 </style>

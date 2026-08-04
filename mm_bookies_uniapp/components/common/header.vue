@@ -2,63 +2,54 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="new-header-wrapper">
+		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin }">
 			<!-- from tangjq--- 顶部标题区域 -->
 			<view class="header-title-bar">
 				<text class="header-title">MM Bookies</text>
 			</view>
 
-			<!-- from tangjq--- 用户信息卡片 -->
-			<view class="user-info-card" v-if="isLogin">
-				<!-- 头像 -->
+			<view class="user-summary" v-if="isLogin">
 				<view class="user-avatar" @click="goto('/pages/ucenter/home', 1)">
-					<image src="/static/icon/nav/user_avatar.png" class="avatar-img" mode="aspectFill"></image>
+					<image src="/static/user_avatar.svg" class="avatar-img" mode="aspectFit"></image>
 				</view>
-
-				<!-- 用户信息 -->
 				<view class="user-details">
-					<view class="user-id">
-						<view class="user-id-info">
-							<text class="id-label">My ID : </text>
-							<text class="id-value">{{userInfo.phone || ''}}</text>
-						</view>
-						<!-- 右侧操作区：消息铃铛 + 设置 -->
-						<view class="header-actions">
-							<!-- 消息铃铛入口：有未读时变红并摇动 -->
-							<view class="bell-btn" @click="goMessage">
-								<image src="/static/icon/nav/notification.svg" class="bell-icon"
-									:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
-								<view class="bell-badge" v-if="unreadMessageCount > 0">
-									{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
-								</view>
-							</view>
-							<!-- 设置按钮 -->
-							<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
-								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit">
-								</image>
-							</view>
+					<text class="greeting">{{ $t(greetingKey) }}</text>
+					<text class="id-value">My ID : {{userInfo.phone || ''}}</text>
+				</view>
+				<view class="header-actions">
+					<view class="bell-btn" @click="goMessage">
+						<image src="/static/icon/nav/notification.svg" class="bell-icon"
+							:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
+						<view class="bell-badge" v-if="unreadMessageCount > 0">
+							{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
 						</view>
 					</view>
-					<view class="user-balance-row">
-						<view class="balance-item">
-							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<text
-								class="balance-value myfont-18px text-bold">{{$toolbox.floor_format(userInfo.money) || '0'}}</text>
-						</view>
-						<view class="secondary-balance-row">
-							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<view class="balance-item">
-								<text class="cashout-label">Promo</text>
-								<text
-									class="cashout-value">{{$toolbox.floor_format(userInfo.money_promotion) || '0'}}</text>
-							</view>
-							<view class="balance-item" style="margin-left: 12px;">
-								<text class="cashout-label">{{ $t('cash_out') }}</text>
-								<text
-									class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
-							</view>
-						</view>
+					<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+						<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
 					</view>
+				</view>
+			</view>
+
+			<view class="balance-card" v-if="isLogin">
+				<view class="main-balance-row">
+					<view class="balance-item">
+						<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+						<text class="balance-value">{{displayBalance(userInfo.money)}}</text>
+					</view>
+					<text class="balance-eye" :class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'" @click="balanceVisible = !balanceVisible"></text>
+				</view>
+				<view class="promo-row">
+					<text class="promo-label">Promo</text>
+					<text class="cashout-value">{{displayBalance(userInfo.money_promotion)}}</text>
+				</view>
+				<view class="balance-actions">
+					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0', 1)">
+						<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
+					</view>
+					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1', 1)">
+						<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
+					</view>
+					<view class="cashout-action">{{$t('cash_out')}} {{displayBalance(userInfo.total_withdraw)}}</view>
 				</view>
 			</view>
 
@@ -113,9 +104,16 @@
 				unreadMessageCount: 0, // 未读消息数量
 				activeNav: '', // from tangjq--- 当前激活的导航项
 				headerHeight: 0, // 组件实际高度
+				balanceVisible: true,
 			}
 		},
 		computed: {
+			greetingKey() {
+				const hour = new Date().getHours()
+				if (hour < 12) return 'Good Morning'
+				if (hour < 18) return 'Good Afternoon'
+				return 'Good Evening'
+			},
 			currentRoute() {
 				const pages = getCurrentPages();
 				return pages.length ? pages[pages.length - 1].route : '';
@@ -123,7 +121,7 @@
 			pageTitle() {
 				const titles = {
 					'pages/match/home': 'single',
-					'pages/orders/home': 'sistory',
+					'pages/orders/home': 'history',
 					'pages/index/coupon': 'Deals',
 					'pages/wallet/wallet': 'wallet',
 					'pages/index/game': 'E-Games',
@@ -174,6 +172,11 @@
 			}
 		},
 		methods: {
+			displayBalance(value) {
+				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
+				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
+				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+			},
 			// from tangjq--- 更新当前激活的导航项
 			updateActiveNav() {
 				if (this.active) {
@@ -341,10 +344,18 @@
 		left: 0;
 		right: 0;
 		width: 100%;
-		background-color: #2F5D62;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center top;
 		// padding-bottom: 15px;
 		z-index: 1000;
 		// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.new-header-wrapper.header-logged-out {
+		min-height: 190px;
 	}
 
 	/* from tangjq--- 顶部标题栏 */
@@ -401,10 +412,10 @@
 	}
 
 	.user-avatar {
-		width: 50px;
-		height: 50px;
+		width: 37px;
+		height: 37px;
 		border-radius: 50%;
-		// background-color: #2F5D62;
+		// background-color: #1C667C;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -443,12 +454,12 @@
 	}
 
 	.id-label {
-		color: #2F5D62;
+		color: #1C667C;
 		font-weight: 600;
 	}
 
 	.id-value {
-		color: #2F5D62;
+		color: #1C667C;
 		// font-size: 14px;
 		font-weight: bold;
 		overflow: hidden;
@@ -478,14 +489,14 @@
 	}
 
 	.coin-icon {
-		width: 18px;
-		height: 18px;
-		margin-right: 7px;
+		width: 20px;
+		height: 20px;
+		margin-right: 0px;
 	}
 
 	.balance-label,
 	.cashout-label {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 12px;
 		white-space: nowrap;
 		font-weight: bold;
@@ -493,7 +504,7 @@
 
 	.balance-value,
 	.cashout-value {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 12px;
 	}
 
@@ -612,7 +623,7 @@
 	}
 
 	.login-prompt-text {
-		color: #2F5D62;
+		color: #1C667C;
 		font-size: 16px;
 		font-weight: 600;
 	}
@@ -644,7 +655,7 @@
 	}
 
 	.login-btn2 {
-		background-color: #2F5D62;
+		background-color: #1C667C;
 		color: white;
 	}
 
@@ -690,7 +701,7 @@
 
 	.nav-icon-active .nav-icon-wrapper {
 		background-color: white;
-		background-color: #2F5D62;
+		background-color: #1C667C;
 	}
 
 	.nav-icon {
@@ -714,7 +725,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0 4px;
-		border: 2px solid #2F5D62;
+		border: 2px solid #1C667C;
 	}
 
 	.nav-icon-label {
@@ -732,5 +743,142 @@
 	.nav-label-active {
 		color: #5FB5BD;
 		font-weight: bold;
+	}
+
+	.new-header-wrapper {
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center top;
+		padding: 0 20px;
+		box-sizing: border-box;
+	}
+
+	.header-title-bar {
+		padding: 14px 0 8px;
+	}
+
+	.header-page-row {
+		padding: 0 4px;
+	}
+
+	.header-page-title {
+		color: #fff;
+		font-size: 16px;
+	}
+
+	.user-summary {
+		display: flex;
+		align-items: center;
+		padding: 4px 4px 14px;
+		color: #fff;
+	}
+
+	.user-summary .user-avatar {
+		width: 37px;
+		height: 37px;
+		margin-right: 10px;
+		border: 0;
+		background: transparent;
+	}
+
+	.user-summary .user-details {
+		gap: 2px;
+	}
+
+	.greeting {
+		color: #fff;
+		font-size: 12px;
+	}
+
+	.user-summary .id-value {
+		color: #fff;
+		font-size: 15px;
+	}
+
+	.user-summary .header-actions {
+		margin-left: auto;
+	}
+
+	.user-summary .bell-icon,
+	.user-summary .settings-icon {
+		filter: brightness(0) invert(1) !important;
+	}
+
+	.user-summary .avatar-img {
+		background: transparent;
+	}
+
+	.balance-card {
+		background: #fff;
+		border-radius: 20px;
+		padding: 14px 20px 16px;
+		color: #206c80;
+	}
+
+	.main-balance-row,
+	.promo-row,
+	.balance-actions {
+		display: flex;
+		align-items: center;
+	}
+
+	.main-balance-row {
+		justify-content: space-between;
+	}
+
+	.balance-value {
+		color: #206c80;
+		font-size: 23px;
+		font-weight: 700;
+	}
+
+	.balance-eye {
+		font-size: 19px;
+		color: #1c667c;
+	}
+
+	.promo-row {
+		gap: 8px;
+		margin: 6px 0 12px;
+	}
+
+	.promo-label {
+		padding: 3px 12px;
+		border-radius: 12px;
+		background: #edf8f9;
+		color: #206c80;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.balance-actions {
+		justify-content: space-between;
+		gap: 8px;
+		color: #206c80;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.wallet-action {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+	}
+
+	.wallet-action image {
+		width: 20px;
+		height: 20px;
+		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
+	}
+
+	.wallet-action-icon {
+		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%) !important;
+	}
+
+	.cashout-action {
+		white-space: nowrap;
 	}
 </style>

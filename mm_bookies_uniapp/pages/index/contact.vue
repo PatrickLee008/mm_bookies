@@ -1,5 +1,5 @@
 <template name="ucenter">
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 
 		<view class="title-bar">
@@ -11,7 +11,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="flex-column justify-center align-center width-100 padding">
+		<view class="flex-column justify-center align-center width-100 padding bg-white">
 			<view class="flex-row justify-center align-center height-56px">
 				<text class="margin-top-sm margin-bottom-lg text-black"
 					style="font-weight: 600;">{{language.customer_support}}
@@ -114,4 +114,8 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
 </style>

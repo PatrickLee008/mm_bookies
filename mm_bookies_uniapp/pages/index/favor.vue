@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-55px text-bold" @scroll="handle_scroll"
@@ -164,4 +164,8 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
 </style>

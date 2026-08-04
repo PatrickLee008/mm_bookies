@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 		<scroll-view class="padding" scroll-y style="height: calc(100vh - 120px);">
 			<!-- 返回头部 -->
@@ -321,6 +321,11 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
+
 	.message-detail-card {
 		background-color: #FFFFFF;
 		border-radius: 12px;

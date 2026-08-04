@@ -1,10 +1,10 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 
 
 		<!-- 标题栏 -->
-		<view class="title-bar" style="height: 183px;">
+		<view class="title-bar" style="height: 183px; background: #fff;">
 			<view class="flex-row justify-between" style="">
 				<view class="flex-row align-center" style="">
 					<image class="yellow2dblue" style="height: 25px;" mode="heightFix" src="/static/icon/wallet.png">
@@ -56,7 +56,7 @@
 
 		<!-- 筛选框 -->
 		<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
-		<view class="padding-sm">
+		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
 				<image mode="widthFix" class="width-38upx " src="/static/image/order/calender.svg"
 					@click="$refs.date_picker.show()" />
@@ -105,7 +105,7 @@
 		<scroll-view scroll-y class="" style="height:calc(100vh - 110px - 187px - 73px)" @scrolltolower="clickLoadMore">
 			<!-- 列表 -->
 			<view class="flex-column1 justify-around" v-for="(element,index) in list" :key='index'
-				style="min-height: 140px;font-weight: 400;line-height: 1.5;font-size: 10px;border-radius: 10px;padding: 5px 30px;margin: 5px 11px;box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;">
+				style="min-height: 140px;font-weight: 400;line-height: 1.5;font-size: 10px;border-radius: 10px;background-color: #fff;padding: 5px 30px;margin: 5px 11px;box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;">
 				<view class="flex-row justify-between">
 					<view class="flex-column1 align-center">
 						<image :src="`/static/icon/register/${element.bank_code}.png`"
@@ -342,6 +342,11 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		background: #02455F;
+		min-height: 100vh;
+	}
+
 	.info-rec {
 		margin-top: 5px;
 		width: 49%;

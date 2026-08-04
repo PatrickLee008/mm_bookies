@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 		<!-- 顶栏 -->
 		<view class="title-bar" style="height: auto;">
@@ -26,7 +26,7 @@
 			</view>
 			<view class="padding-sm"></view>
 		</view>
-		<scroll-view scroll-y style="height: calc(100vh - 120px - 118px);">
+		<scroll-view scroll-y style="height: calc(100vh - 120px - 118px); background: #fff;">
 			<view v-if="current_progress==0">
 				<!-- 银行选择 -->
 				<view class="flex-column justify-center padding-top-sm mycolor-primary">
@@ -1044,6 +1044,10 @@
 </script>
 
 <style>
+	.full-page {
+		background: #02455F;
+	}
+
 	.myrect {
 		width: 90%;
 		margin-left: 5%;

@@ -643,13 +643,18 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #2F5D62;
+		background: #02455F;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 190px;
+		height: 255px;
+		background:
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-size: 100% 552px;
+		background-position: center -255px;
 		flex-shrink: 0;
 	}
 
@@ -761,7 +766,7 @@
 		align-items: center;
 		padding: 8px 20px;
 		margin: 12px 0 0;
-		background: #2F5D62;
+		background: #1C667C;
 		border-radius: 8px;
 		color: white;
 		font-size: 13px;
@@ -775,7 +780,7 @@
 		width: 100%;
 		border-radius: 10px;
 		margin: 10px 0;
-		color: #2F5D62;
+		color: #1C667C;
 	}
 
 	.activity-status-badge {
@@ -806,7 +811,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		background: #2F5D62;
+		background: #1C667C;
 		color: white;
 		padding: 8px 20px;
 		margin-bottom: 5px;

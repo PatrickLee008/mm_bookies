@@ -307,7 +307,7 @@
 	}
 
 	.notice-header-notice {
-		background: linear-gradient(135deg, #2F5D62 0%, #2F5D62 100%);
+		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
 	}
 
 	.notice-header-alert {
@@ -337,15 +337,15 @@
 	}
 
 	.notice-image {
-		width: 120upx;
-		height: 120upx;
+		width: 80upx;
+		height: 80upx;
 		margin: 20upx 0;
 	}
 
 	.notice-content {
 		font-size: 28upx;
 		line-height: 1.6;
-		color: #2F5D62;
+		color: #1C667C;
 		word-wrap: break-word;
 		white-space: pre-wrap;
 	}
@@ -364,7 +364,7 @@
 
 	.notice-btn-simple {
 		flex: 1;
-		height: 80upx;
+		height: 60upx;
 		border-radius: 16upx;
 		display: flex;
 		align-items: center;
@@ -381,17 +381,18 @@
 	}
 
 	.notice-btn-cancel-simple {
-		background-color: #E5E7EB;
+		background-color: transparent;
+		border: 2px solid #1C667C;
 		max-width: 300upx;
 	}
 
 	.notice-btn-confirm-simple {
-		background: linear-gradient(135deg, #2F5D62 0%, #2F5D62 100%);
+		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
 	}
 
 	.notice-btn-simple-text {
 		font-size: 28upx;
-		color: #4B5563;
+		color: #FF5341;
 	}
 
 	.notice-btn-simple-text-white {
@@ -399,42 +400,44 @@
 		color: #FFFFFF;
 	}
 
-	/* ============ 按钮区域 - 有头部样式（占满底部，带分割线） ============ */
+	/* ============ 按钮区域 - 有头部样式（带边距的并排按钮） ============ */
 	.notice-footer-normal {
 		display: flex;
-		border-top: 1px solid #E5E7EB;
-		/* 灰色分割线 */
+		gap: 20upx;
+		padding: 0 40upx 24upx 40upx;
 	}
 
 	.notice-btn-normal {
 		flex: 1;
-		height: 90upx;
+		height: 60upx;
+		border-radius: 16upx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
 		transition: all 0.2s;
-		background-color: #FFFFFF;
+		background-color: transparent;
+		border: 2px solid #1C667C;
 	}
 
 	.notice-btn-normal:active {
-		background-color: #F3F4F6;
+		opacity: 0.8;
+		transform: scale(0.98);
 	}
 
-	/* 两个按钮之间的分割线 */
 	.notice-btn-confirm-border {
-		border-left: 1px solid #E5E7EB;
+		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
+		border: none;
 	}
 
 	.notice-btn-normal-text {
-		font-size: 32upx;
-		color: #6B7280;
-		font-weight: 400;
+		font-size: 28upx;
+		color: #FF5341;
+		font-weight: 500;
 	}
 
 	.notice-btn-confirm-color {
-		color: #3B82F6;
-		/* 蓝色 */
+		color: #FFFFFF;
 		font-weight: 500;
 	}
 
