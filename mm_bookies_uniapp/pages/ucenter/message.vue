@@ -1,8 +1,8 @@
 <template name="messageCenter">
 	<view class="full-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<!-- header 占位，防止内容被固定头部遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- 页面头部 -->
 		<view class="page-header">
@@ -42,7 +42,7 @@
 
 		<!-- 下拉刷新容器 -->
 		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
-			@refresherrefresh="onRefresh" :style="{ height: scrollHeight }">
+			@refresherrefresh="onRefresh" :style="{ height: scrollHeight }" @scroll="handleHeaderScroll">
 
 			<!-- 消息列表 -->
 			<view class="message-list">
@@ -167,9 +167,11 @@
 		markAllAsRead as apiMarkAllAsRead,
 		deleteMessage as apiDeleteMessage
 	} from '../../utils/api/message.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		name: "messageCenter",
+		mixins: [headerCollapse],
 		data() {
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
@@ -678,6 +680,7 @@
 		background-position: center -255px;
 		width: 100%;
 		background-color: #02455F;
+		transition: height 0.3s ease;
 	}
 
 	.page-header {

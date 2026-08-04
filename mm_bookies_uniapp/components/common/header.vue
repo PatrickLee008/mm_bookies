@@ -2,10 +2,29 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin }">
+		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }">
 			<!-- from tangjq--- 顶部标题区域 -->
-			<view class="header-title-bar">
+			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
 				<text class="header-title">MM Bookies</text>
+				<!-- 收起状态：紧凑余额 + 铃铛 + 设置 -->
+				<view class="collapsed-right" v-if="isLogin">
+					<view class="collapsed-balance">
+						<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+						<text class="collapsed-balance-value">{{displayBalance(userInfo.money)}}</text>
+					</view>
+					<view class="header-actions">
+						<view class="bell-btn" @click="goMessage">
+							<image src="/static/icon/nav/notification.svg" class="bell-icon"
+								:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
+							<view class="bell-badge" v-if="unreadMessageCount > 0">
+								{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
+							</view>
+						</view>
+						<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+						</view>
+					</view>
+				</view>
 			</view>
 
 			<view class="user-summary" v-if="isLogin">
@@ -54,7 +73,7 @@
 			</view>
 
 			<!-- from tangjq--- 未登录状态 -->
-			<view class="user-info-card login-prompt-card" v-else>
+			<view class="user-info-card login-prompt-card" v-if="!isLogin">
 				<view class="login-prompt-content">
 					<text class="login-prompt-text">{{ $t('please_login') }}</text>
 					<view class="login-buttons">
@@ -105,6 +124,8 @@
 				activeNav: '', // from tangjq--- 当前激活的导航项
 				headerHeight: 0, // 组件实际高度
 				balanceVisible: true,
+				collapsed: false, // header收起状态
+				expandedHeight: 0, // 展开时的精确高度（用于立即恢复）
 			}
 		},
 		computed: {
@@ -158,6 +179,8 @@
 				this.$notice.setInstance(this.$refs.globalNotice);
 				this.calculateHeaderHeight();
 			});
+			// 监听页面滚动事件，控制header收起/展开
+			uni.$on('header:setCollapsed', this.handleSetCollapsed);
 		},
 		activated() {
 			this.updateActiveNav();
@@ -226,9 +249,35 @@
 				query.select('.new-header-wrapper').boundingClientRect((rect) => {
 					if (rect && rect.height) {
 						this.headerHeight = rect.height;
+						// 记录展开状态的高度，用于收起后立即恢复
+						if (!this.collapsed) {
+							this.expandedHeight = rect.height;
+						}
 						this.$emit('headerHeightChange', rect.height);
 					}
 				}).exec();
+			},
+
+			// 接收页面滚动事件，控制header收起/展开
+			handleSetCollapsed(collapsed) {
+				if (this.collapsed === collapsed) return
+				this.collapsed = collapsed
+				
+				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
+				if (collapsed) {
+					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
+					if (this.isLogin) {
+						this.$emit('headerHeightChange', 85)
+					}
+				} else if (this.expandedHeight) {
+					// 展开：立即恢复到之前测量的精确高度
+					this.$emit('headerHeightChange', this.expandedHeight)
+				}
+				
+				// CSS过渡完成后(0.3s)，测量实际高度进行精确校正
+				setTimeout(() => {
+					this.calculateHeaderHeight()
+				}, 320)
 			},
 
 			goto(url, limit_click) {
@@ -332,6 +381,7 @@
 			uni.$off('message:read')
 			uni.$off('message:update')
 			uni.$off('message:unreadUpdate')
+			uni.$off('header:setCollapsed', this.handleSetCollapsed)
 		}
 	}
 </script>
@@ -590,7 +640,7 @@
 		top: -2px;
 		right: -2px;
 		min-width: 16px;
-		height: 16px;
+		min-height: 16px;
 		padding: 0 4px;
 		border-radius: 8px;
 		background-color: #FF4444;
@@ -603,7 +653,7 @@
 		justify-content: center;
 		text-align: center;
 		box-sizing: border-box;
-		border: 1px solid #ffffff;
+		// border: 1px solid #ffffff;
 	}
 
 	/* from tangjq--- 未登录状态卡片 */
@@ -756,7 +806,57 @@
 	}
 
 	.header-title-bar {
+		position: relative;
 		padding: 14px 0 8px;
+	}
+
+	/* 收起状态：标题栏左对齐 */
+	.header-title-bar.title-bar-collapsed {
+		text-align: left;
+	}
+
+	/* collapsed-right 绝对定位，不占据布局空间，避免header高度偏大 */
+	.collapsed-right {
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		pointer-events: none;
+	}
+
+	.header-collapsed .collapsed-right {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.collapsed-balance {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.collapsed-balance-value {
+		color: #fff;
+		font-size: 14px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.collapsed-balance .coin-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* 收起状态的图标滤镜：确保白色 */
+	.collapsed-right .bell-icon,
+	.collapsed-right .settings-icon,
+	.collapsed-right .coin-icon {
+		filter: brightness(0) invert(1) !important;
 	}
 
 	.header-page-row {
@@ -773,6 +873,15 @@
 		align-items: center;
 		padding: 4px 4px 14px;
 		color: #fff;
+		overflow: hidden;
+		max-height: 100px;
+		transition: opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
+	}
+
+	.header-collapsed .user-summary {
+		opacity: 0;
+		max-height: 0;
+		padding: 0;
 	}
 
 	.user-summary .user-avatar {
@@ -815,6 +924,16 @@
 		border-radius: 20px;
 		padding: 14px 20px 16px;
 		color: #206c80;
+		overflow: hidden;
+		max-height: 300px;
+		transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+	}
+
+	.header-collapsed .balance-card {
+		opacity: 0;
+		max-height: 0;
+		margin: 0;
+		padding: 0;
 	}
 
 	.main-balance-row,

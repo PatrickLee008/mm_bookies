@@ -1,9 +1,9 @@
 <template name="orders">
 	<view class="full-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary padding-tb justify-around myfont-17px line-height-17px">
 			<view class="flex-column gap-5px">
@@ -63,7 +63,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view">
+		<scroll-view scroll-y class="main-scroll-view" @scroll="handleHeaderScroll">
 			<view class="history-container">
 				<view v-for="(item,index) in history_list" :key='index' class="history-item">
 					<!-- 单笔投注 -->
@@ -277,6 +277,7 @@
 	import dateFormatUtils from "../../utils/utils.js";
 	import Selector from '../../components/common/selector.vue'
 	import match_mixins from '../match/components/mixins.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 
 	export default {
@@ -284,7 +285,7 @@
 		components: {
 			Selector,
 		},
-		mixins: [match_mixins],
+		mixins: [match_mixins, headerCollapse],
 		data() {
 			return {
 				listQuery: {
@@ -863,6 +864,7 @@
 		background-position: center -255px;
 		width: 100%;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	page {

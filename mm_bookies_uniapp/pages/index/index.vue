@@ -18,7 +18,8 @@
 						<view class="bell-btn" @click="goMessage">
 							<image src="/static/icon/nav/notification.svg" class="bell-icon"
 								:class="{ 'bell-ring': unreadCount > 0 }" mode="aspectFit"></image>
-							<view class="bell-badge" v-if="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}</view>
+							<view class="bell-badge" v-if="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}
+							</view>
 						</view>
 						<view class="settings-btn" @click="goto('/pages/ucenter/home')">
 							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
@@ -32,20 +33,25 @@
 							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
 							<text class="balance-value">{{ displayBalance(userInfo.money) }}</text>
 						</view>
-							<text class="balance-eye" :class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'" @click="balanceVisible = !balanceVisible"></text>
+						<text class="balance-eye"
+							:class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"
+							@click="balanceVisible = !balanceVisible"></text>
 					</view>
 					<view class="promo-row">
 						<text class="promo-label">Promo</text>
-							<text class="cashout-value">{{ displayBalance(userInfo.money_promotion) }}</text>
+						<text class="cashout-value">{{ displayBalance(userInfo.money_promotion) }}</text>
 					</view>
 					<view class="balance-actions">
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0')">
-							<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
+							<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image>
+							<text>{{$t('Deposit')}}</text>
 						</view>
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1')">
-							<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
+							<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image>
+							<text>{{$t('Withdraw')}}</text>
 						</view>
-						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}</view>
+						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}
+						</view>
 					</view>
 				</view>
 
@@ -61,7 +67,8 @@
 						<text>{{$t('Referral')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/orders/home')">
-						<image src="/static/icon/nav/history.png" mode="aspectFit"></image><text>{{$t('history')}}</text>
+						<image src="/static/icon/nav/history.png" mode="aspectFit"></image>
+						<text>{{$t('history')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/index/coupon')">
 						<image src="/static/icon/nav/deals.png" mode="aspectFit"></image><text>{{$t('Deals')}}</text>
@@ -195,7 +202,11 @@
 		flex-direction: column;
 		overflow: hidden;
 		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
+			/* 第三层（最上层）：左下角光晕 */
+			radial-gradient(circle at 0% 100%, #36BCCB 0%, #1F879B 20%, rgba(31, 135, 155, 0) 70%),
+			/* 第二层：右上角光晕 */
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 24%, rgba(31, 135, 155, 0) 78%),
+			/* 第一层（最底层）：线性渐变底色 */
 			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
 	}
 

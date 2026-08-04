@@ -1,9 +1,9 @@
 <template name="coupon">
 	<view class="full-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- 标题栏 -->
 		<view class="title-bar">
@@ -32,7 +32,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60">
+		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60" @scroll="handleHeaderScroll">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
@@ -483,11 +483,13 @@
 	import siteinfo from '../../siteinfo.js'
 	import dateFormatUtils from '../../utils/utils.js'
 	import CountDown from '../match/components/count_down.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {
 			CountDown,
 		},
+		mixins: [headerCollapse],
 		name: "coupon",
 		data() {
 			return {
@@ -1400,6 +1402,7 @@
 		background-position: center -255px;
 		width: 100%;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	page {

@@ -1,13 +1,13 @@
 <template>
 	<view class="match-page-container">
 		<!-- from tangjq--- 使用新的统一header组件 -->
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- 实时消息弹窗提醒（全局挂载点） -->
 		<message-notification></message-notification>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder" :style="{ height: isLogin ? '255px' : '190px' }"></view>
+		<view class="header-placeholder" :style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -39,8 +39,8 @@
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
-			@scroll="handle_scroll"
-			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px)` : `calc(${calc_page_height} - 80px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
+			@scroll="onScrollHandler"
+			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px - ${headerHeight}px)` : `calc(${calc_page_height} - 80px - ${headerHeight}px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
 			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"
 				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
@@ -785,6 +785,7 @@
 	import Vue from "vue";
 	import './components/match.css'
 	import match_mixins from './components/mixins.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 	import LeagueFilter from './components/league_filter.vue'
 	import FuzzySearch from './components/fuzzy_search.vue'
 	import CountDown from './components/count_down.vue'
@@ -800,7 +801,7 @@
 			// MatchDetail,
 			// BetsSlip,
 		},
-		mixins: [match_mixins],
+		mixins: [match_mixins, headerCollapse],
 		data() {
 			return {
 				amount_list: [1000, 5000, 10000],
@@ -1052,6 +1053,10 @@
 			},
 		},
 		methods: {
+			onScrollHandler(e) {
+				this.handle_scroll(e)
+				this.handleHeaderScroll(e)
+			},
 			// 格式化赔率，保留两位小数
 			formatOdds(odds) {
 				if (odds == null || odds == undefined) return '0.00';
@@ -2058,6 +2063,7 @@
 		background-size: 100% 552px;
 		background-position: center -255px;
 		width: 100%;
+		flex-shrink: 0;
 	}
 
 	.detail-box-shadow {

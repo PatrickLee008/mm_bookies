@@ -1,8 +1,8 @@
 <template>
 	<view class="invite-page">
-		<zw-header></zw-header>
-		<view class="invite-header-placeholder"></view>
-		<scroll-view scroll-y class="padding-bottom invite-scroll">
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
+		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+		<scroll-view scroll-y class="padding-bottom invite-scroll" @scroll="handleHeaderScroll">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
 					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
@@ -77,8 +77,10 @@
 	import config from '@/utils/config.js'
 	import uQRCode from '@/uni_modules/Sansnn-uQRCode/js_sdk/u-qrcode';
 	import siteinfo from '@/siteinfo.js';
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
+		mixins: [headerCollapse],
 		data() {
 			return {
 				language: config.language,
@@ -220,6 +222,7 @@
 		background-size: 100% 552px;
 		background-position: center -255px;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.invite-scroll {

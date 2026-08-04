@@ -1,10 +1,10 @@
 <template>
 	<view class="match-page-container" >
 		<!-- from tangjq--- 使用新的统一header组件 -->
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- Search Bar and Filter Button -->
 		<view class="search-container padding-lr-sm">
@@ -25,7 +25,7 @@
 		</view>
 
 		<!-- Game Categories and Game Cards -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" @scroll="handleHeaderScroll" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
 
 			<!-- Loop through game categories -->
 			<view class="flex-column padding-tb-sm" v-for="(category, catIndex) in game_categories" :key="catIndex">
@@ -91,9 +91,11 @@
 
 <script>
 	import siteinfo from '../../siteinfo.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {},
+		mixins: [headerCollapse],
 		data() {
 			return {
 				siteinfo: siteinfo,
@@ -454,6 +456,8 @@
 		background-position: center -255px;
 		width: 100%;
 		background-color: #02455F;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	/* Search Container */

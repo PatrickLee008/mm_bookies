@@ -1,9 +1,9 @@
 <template>
 	<view class="bg-white full-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- from tangjq--- 标题栏：包含钱包信息和 Tab 页签 -->
 		<view class="title-bar">
@@ -65,6 +65,7 @@
 	import WalletWithdraw from './withdraw.vue'
 	import WalletHistory from './history.vue'
 	import WalletWithdrawHistory from './withdraw_history.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {
@@ -74,6 +75,7 @@
 			WalletHistory,
 			WalletWithdrawHistory,
 		},
+		mixins: [headerCollapse],
 		data() {
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
@@ -157,6 +159,11 @@
 			})
 		},
 
+		// from tangjq--- 页面级滚动监听（本页面未使用 scroll-view，使用页面滚动）
+		onPageScroll(e) {
+			this.handleHeaderScroll({ detail: { scrollTop: e.scrollTop } })
+		},
+
 		created() {}
 	}
 </script>
@@ -171,6 +178,8 @@
 		background-size: 100% 552px;
 		background-position: center -255px;
 		width: 100%;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.full-page {

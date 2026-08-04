@@ -1,9 +1,9 @@
 <template>
 	<view class="full-page">
-		<zw-header></zw-header>
-		<view class="header-placeholder"></view>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 		<!-- 滚动内容区域 -->
-		<scroll-view scroll-y class="payment-content">
+		<scroll-view scroll-y class="payment-content" @scroll="handleHeaderScroll">
 			<block>
 				<!-- <block v-if="isload && payInfo"> -->
 				<!-- 隐藏的二维码生成组件 -->
@@ -162,11 +162,13 @@
 </template>
 <script>
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 	let intervalSearch;
 	export default {
 		components: {
 			tkiQrcode
 		},
+		mixins: [headerCollapse],
 		data() {
 			return {
 				dataId: '',
@@ -671,6 +673,8 @@
 			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
 		background-size: 100% 552px;
 		background-position: center -255px;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.full-page {

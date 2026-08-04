@@ -1,11 +1,11 @@
 <template>
 	<view class="invite-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		
-		<!-- header 占位元素，防止内容被固定顶栏遮挡（参考 coupon 页布局） -->
-		<view class="invite-header-placeholder"></view>
+		<!-- header 占位元素，防止内容被固定顶栏遮挡 -->
+		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
-		<scroll-view class="padding invite-scroll" scroll-y>
+		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll">
 			<!-- 标题 -->
 			<view class="flex-row justify-start align-center" style="">
 				<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
@@ -411,8 +411,10 @@
 
 <script>
 	import config from '@/utils/config.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
+		mixins: [headerCollapse],
 		data() {
 			return {
 				language: config.language,
@@ -656,6 +658,7 @@
 		background-size: 100% 552px;
 		background-position: center -255px;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.invite-scroll {

@@ -5,7 +5,7 @@
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<scroll-view class="ucenter-content-scroll" scroll-y>
+		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll">
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -341,12 +341,14 @@
 	import dateFormatUtils from "../../utils/utils.js"
 	import CustomerService from '@/components/common/customer-service.vue'
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {
 			CustomerService,
 			ConfirmDialog,
 		},
+		mixins: [headerCollapse],
 		name: "ucenter",
 		data() {
 			return {
@@ -1168,6 +1170,7 @@
 		background-size: 100% 552px;
 		background-position: center -255px;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.main-scroll-view {
