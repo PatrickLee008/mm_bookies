@@ -6,16 +6,8 @@
 		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll">
-			<!-- 标题 -->
-			<view class="flex-row justify-start align-center" style="">
-				<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
-				<image src="/static/icon/ucenter/referral.svg" class="lblue2blue" style="height: 28px;" mode="heightFix">
-				</image>
-				<text class="title-text" style="">{{ language.invite_friend }}</text>
-			</view>
-
 			<!-- 两个仪表盘入口 -->
-			<view class="flex-row justify-between text-black margin-top-sm" style="">
+			<view class="flex-row justify-between text-black invite-dashboards">
 				<view class="dashboard-rec dashboard-bonus" @click="goto('./bonus_dashboard')">
 					<text class="text-bold myfont-12px">{{ $t('Bonus Dashboard') }}</text>
 					<view class="flex-row justify-between align-center height-22px">
@@ -33,73 +25,88 @@
 			</view>
 
 			<!-- 推荐码卡片 -->
-			<view class="white-rec flex-column text-bold text-center" style="position: relative;">
-				<text>{{ $t('Invite a friend and get rewarded') }}</text>
-				<text class="myfont-10px line-height-13px mycolor-info">{{ $t('Share your unique referral code') }}</text>
-				<view class="flex-row justify-around margin-tb">
-					<view class="rec-btn" style="border: dashed 3upx;" @click="copy">
-						<view class="text-cut" style="max-width: 70%;"><text>{{ userInfo ? userInfo.r_code : '' }}</text></view>
-						<view class="cuIcon-copy myfont-20px mycolor-primary"></view>
+			<view class="referral-card">
+				<text class="referral-title">{{ $t('Invite a friend and get rewarded') }}</text>
+				<text class="referral-description">{{ $t('Share your unique referral code') }}</text>
+				<view class="referral-code" @click="copy">
+					<view>
+						<text class="code-label">YOUR CODE</text>
+						<text class="code-value">{{ userInfo ? userInfo.r_code : '' }}</text>
 					</view>
-					<view class="rec-btn myfont-12px mybg-primary text-white"
-						@click="goto(`./share?r_code=${userInfo ? userInfo.r_code : ''}`)">
-						<text class="flex-column">{{ $t('Invite Friends') }}</text>
-					</view>
+					<text class="cuIcon-copy copy-icon"></text>
 				</view>
+				<view class="invite-friends-button"
+					@click="goto(`./share?r_code=${userInfo ? userInfo.r_code : ''}`)">
+					<text class="cuIcon-share margin-right-xs"></text>
+					<text>{{ $t('Invite Friends') }}</text>
+					</view>
 			</view>
 
 			<!-- 活动列表 -->
-			<view v-for="(activity, activityIndex) in task_list" :key="activityIndex">
+			<view v-for="(activity, activityIndex) in task_list" :key="activityIndex" class="activity-item">
 				<!-- 活动标题卡片 -->
 				<view class="activity-title-card" style="position: relative;">
-					<text class="cuIcon-infofill myfont-20px mycolor-primary"
-						style="position: absolute;right: 12px;top:12px" @click="openRulesModal(activity.id)"></text>
-					<view class="flex-row1 align-center" style="padding-right: 30px;">
-						<text class="cuIcon-rankfill myfont-20px mycolor-primary margin-right-sm"></text>
-						<text class="myfont-16px text-bold" style="line-height: 1.6;">{{ activity.title }}</text>
-					</view>
-					<view class="flex-row justify-between align-center margin-top-xs">
-						<text class="myfont-10px mycolor-info">
-							{{ formatDate(activity.start_date) }} - {{ formatDate(activity.end_date) }}
-						</text>
-						<view class="activity-status-badge" :class="activity.is_valid ? 'status-active' : 'status-inactive'">
-							<text class="myfont-10px">{{ activity.is_valid ? $t('Active') : $t('Ended') }}</text>
+					<view class="activity-card-header">
+						<view class="activity-card-title">
+							<text class="cuIcon-rankfill"></text>
+							<text>{{ activity.title }}</text>
+						</view>
+						<view class="activity-detail-button" @click="openRulesModal(activity.id)">
+							<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
 						</view>
 					</view>
-
-					<view class="flex-row justify-around margin-top-sm" v-if="activity.summary">
-						<view class="flex-column1 align-center">
-							<text class="myfont-10px mycolor-info">{{ $t('Total Claimable') }}</text>
-							<text class="myfont-14px text-bold mycolor-warning">
-								{{ $toolbox.num_format(activity.summary.total_claimable || 0) }} Ks
+					<view class="activity-card-body">
+						<view class="flex-row justify-between align-center margin-top-xs">
+							<text class="myfont-10px mycolor-info">
+								{{ $t('Expires') }}: {{ formatDate(activity.end_date) }}
 							</text>
+							<view class="activity-status-badge" :class="activity.is_valid ? 'status-active' : 'status-inactive'">
+								<text class="myfont-10px">{{ activity.is_valid ? $t('Active') : $t('Ended') }}</text>
+							</view>
 						</view>
-						<view class="flex-column1 align-center">
-							<text class="myfont-10px mycolor-info">{{ $t('Total Claimed') }}</text>
-							<text class="myfont-14px text-bold mycolor-success">
-								{{ $toolbox.num_format(activity.summary.total_rewards_claimed || 0) }} Ks
-							</text>
-						</view>
-					</view>
 
-					<view class="flex-row justify-center margin-top-sm">
-						<view v-if="activity.has_joined" class="participate-badge participated">
-							<text class="cuIcon-check myfont-14px margin-right-xs"></text>
-							<text class="myfont-12px">{{ $t('Participated') }}</text>
+						<view class="activity-summary-row" v-if="activity.summary">
+							<view class="flex-column1 align-start">
+								<text class="myfont-10px mycolor-info">{{ $t('Total Claimable') }}</text>
+								<text class="activity-summary-value">
+									{{ $toolbox.num_format(activity.summary.total_claimable || 0) }} Ks
+								</text>
+							</view>
+							<view class="flex-column1 align-end">
+								<text class="myfont-10px mycolor-info">{{ $t('Total Claimed') }}</text>
+								<text class="activity-summary-value">
+									{{ $toolbox.num_format(activity.summary.total_rewards_claimed || 0) }} Ks
+								</text>
+							</view>
 						</view>
-						<view v-else-if="activity.is_valid" class="participate-btn" @click="joinActivity(activity)">
-							<text class="cuIcon-add myfont-14px margin-right-xs"></text>
-							<text class="myfont-12px text-bold">{{ $t('Join Activity') }}</text>
+
+						<view class="flex-row justify-center margin-top-sm">
+							<view v-if="activity.has_joined" class="participate-badge participated">
+								<text class="cuIcon-check myfont-14px margin-right-xs"></text>
+								<text class="myfont-12px">{{ $t('Participated') }}</text>
+							</view>
+							<view v-else-if="activity.is_valid" class="participate-btn" @click="joinActivity(activity)">
+								<text class="myfont-12px text-bold">{{ $t('Join Activity') }}</text>
+							</view>
 						</view>
 					</view>
 				</view>
 
+				<text
+					v-if="activity.method1 && activity.method1.achievement_rules && activity.method1.achievement_rules.length > 0"
+					class="invite-section-title">
+					{{ $t('Invitation Achievement') }}
+				</text>
+
 				<!-- Method 1.1: 成就规则奖励 -->
-				<view v-if="activity.method1 && activity.method1.achievement_rules && activity.method1.achievement_rules.length > 0">
-					<view class="white-rec flex-column1" style="padding: 8px;align-items: start;">
+				<view v-if="activity.method1 && activity.method1.achievement_rules && activity.method1.achievement_rules.length > 0" class="activity-achievement">
+					<view class="white-rec method-card flex-column1" style="padding: 8px;align-items: start;">
 						<view class="method-title">
 							<text class="cuIcon-friend margin-right-xs"></text>
 							<text>{{ $t('Invitation Achievement') }}</text>
+							<view class="method-detail-button" @click="openRulesModal(activity.id)">
+								<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
+							</view>
 						</view>
 						<view class="inner-rec flex-row justify-between text-bold text-center"
 							v-for="(rule, ruleIndex) in activity.method1.achievement_rules" :key="rule.rule_id">
@@ -119,7 +126,7 @@
 									</text>
 								</view>
 								<view class="flex-row1 justify-around margin-left-sm">
-									<view class="rec-btn-sm" :class="rule.can_claim ? 'mybg-primary text-white' : 'mybg-info'"
+									<view class="rec-btn-sm" :class="rule.can_claim ? 'claim-enabled text-white' : 'claim-disabled'"
 										@click="rule.can_claim ? claimAchievementReward(activity, rule) : ''">
 										<text>{{ $t('Claim') }}</text>
 									</view>
@@ -130,11 +137,14 @@
 				</view>
 
 				<!-- Method 1.2: 一次性邀请奖励 -->
-				<view v-if="activity.method1 && activity.method1.invitation_share">
-					<view class="white-rec flex-column1" style="padding: 8px;align-items: start;">
+				<view v-if="activity.method1 && activity.method1.invitation_share" class="activity-invitation-share">
+					<view class="white-rec method-card flex-column1" style="padding: 8px;align-items: start;">
 						<view class="method-title">
 							<text class="cuIcon-share myfont-16px margin-right-xs"></text>
 							<text>{{ $t('Invitation Share') }}</text>
+							<view class="method-detail-button" @click="openRulesModal(activity.id)">
+								<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
+							</view>
 						</view>
 						<view class="inner-rec flex-row justify-between text-bold text-center">
 							<view class="flex-column1 text-left" style="max-width: 60%;">
@@ -150,22 +160,15 @@
 									</text>
 								</view>
 							</view>
-							<view class="flex-row1 justify-end align-center" style="min-width: 40%;">
-								<view class="flex-column1 align-center">
-									<text class="myfont-17px line-height-17px mycolor-primary">
-										{{ $toolbox.num_format(activity.method1.invitation_share.potential_rewards || 0) }}
-									</text>
-									<text class="myfont-9px mycolor-info" style="margin-top: 2px;">Ks</text>
-								</view>
-								<view class="flex-row1 justify-around margin-left-sm">
-									<view class="rec-btn-sm"
-										:class="activity.method1.invitation_share.can_claim ? 'mybg-primary text-white' : 'mybg-info'"
-										@click="activity.method1.invitation_share.can_claim ? claimOneTimeReward(activity) : ''">
-										<text>{{ $t('Claim') }}</text>
+								<view class="flex-row1 justify-end align-center" style="min-width: 40%;">
+									<view class="flex-column1 align-center">
+										<text class="myfont-17px line-height-17px mycolor-primary">
+											{{ $toolbox.num_format(activity.method1.invitation_share.potential_rewards || 0) }}
+										</text>
+										<text class="myfont-9px mycolor-info" style="margin-top: 2px;">Ks</text>
 									</view>
 								</view>
 							</view>
-						</view>
 						<view class="requirement-hint">
 							<text class="myfont-9px">
 								{{ $t('Requirements') }}: {{ $t('Deposit') }}
@@ -174,15 +177,23 @@
 								≥{{ $toolbox.num_format(activity.method1.invitation_share.min_turnover) }} Ks
 							</text>
 						</view>
+						<view class="method-claim-button"
+							:class="activity.method1.invitation_share.can_claim ? 'claim-enabled' : 'claim-disabled'"
+							@click="activity.method1.invitation_share.can_claim ? claimOneTimeReward(activity) : ''">
+							<text>{{ $t('Claim') }}</text>
+						</view>
 					</view>
 				</view>
 
 				<!-- Method 2: 存款分享 -->
-				<view v-if="activity.method2 && activity.method2.deposit_share_tiers && activity.method2.deposit_share_tiers.length > 0">
-					<view class="white-rec flex-column1" style="padding: 8px;align-items: start;">
+				<view v-if="activity.method2 && activity.method2.deposit_share_tiers && activity.method2.deposit_share_tiers.length > 0" class="activity-deposit-share">
+					<view class="white-rec method-card flex-column1" style="padding: 8px;align-items: start;">
 						<view class="method-title">
 							<text class="cuIcon-moneybag myfont-16px margin-right-xs"></text>
 							<text>{{ $t('Deposit Share') }}</text>
+							<view class="method-detail-button" @click="openRulesModal(activity.id)">
+								<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
+							</view>
 						</view>
 						<view class="inner-rec flex-row justify-between text-bold text-center"
 							v-for="(tier, tierIndex) in activity.method2.deposit_share_tiers" :key="tierIndex">
@@ -206,28 +217,22 @@
 								</view>
 							</view>
 						</view>
-						<view class="summary-rec flex-row justify-between align-center">
-							<view class="flex-column1 align-start">
-								<text>{{ $t('Total Deposit Share Rewards') }}: </text>
-								<text class="text-bold">{{ $toolbox.num_format(activity.method2.total_rewards) }} Ks</text>
-								<text class="myfont-9px margin-top-xs" style="color:#FFD98A;" v-if="activity.method2.can_claim">
-									{{ $t('Claimable') }}: {{ $toolbox.num_format(activity.method2.total_claimable_amount) }} Ks
-								</text>
-							</view>
-							<view class="rec-btn-sm"
-								:class="activity.method2.can_claim ? 'bg-white mycolor-primary text-bold' : 'mybg-info'"
-								@click="activity.method2.can_claim ? claimDepositShareReward(activity) : ''">
-								<text>{{ $t('Claim') }}</text>
-							</view>
+						<view class="method-claim-button"
+							:class="activity.method2.can_claim ? 'claim-enabled' : 'claim-disabled'"
+							@click="activity.method2.can_claim ? claimDepositShareReward(activity) : ''">
+							<text>{{ $t('Claim') }}</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Method 3: 邀请人佣金 -->
-				<view v-if="activity.method3 && activity.method3.commission_stats">
+				<view v-if="activity.method3 && activity.method3.commission_stats" class="method-block activity-inviter-commission">
 					<view class="method-title">
 						<text class="cuIcon-fork myfont-16px margin-right-xs"></text>
 						<text>{{ $t('Inviter Commission') }}</text>
+						<view class="method-detail-button" @click="openRulesModal(activity.id)">
+							<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
+						</view>
 					</view>
 					<view class="white-rec flex-column text-bold" style="align-items: flex-start;">
 						<view class="flex-row justify-between align-center" style="width: 100%;">
@@ -254,10 +259,13 @@
 				</view>
 
 				<!-- Method 4: 被邀请人投注佣金 -->
-				<view v-if="activity.method4 && activity.method4.commission_stats">
+				<view v-if="activity.method4 && activity.method4.commission_stats" class="method-block activity-invitee-commission">
 					<view class="method-title">
 						<text class="cuIcon-redpacket myfont-16px margin-right-xs"></text>
 						<text>{{ $t('Invitee Bet Commission') }}</text>
+						<view class="method-detail-button" @click="openRulesModal(activity.id)">
+							<text>{{ $t('Detail') }}</text><text class="cuIcon-right"></text>
+						</view>
 					</view>
 					<view class="white-rec flex-column text-bold" style="align-items: flex-start;">
 						<view class="flex-row justify-between align-center" style="width: 100%;">
@@ -288,7 +296,7 @@
 		</scroll-view>
 
 		<!-- 规则弹窗 -->
-		<view class="cu-modal" style="z-index: 10;" :class="{ 'show': !modal_hidden }" @click="modal_hidden = true">
+		<view class="cu-modal rules-modal" :class="{ 'show': !modal_hidden }" @click="modal_hidden = true">
 			<view class="cu-dialog padding-lr-sm width-100" style="vertical-align: top;background: none;margin-top: 10vh;"
 				@click.stop="">
 				<scroll-view scroll-y
@@ -668,6 +676,135 @@
 		background: #ffffff;
 		position: relative;
 		z-index: 1;
+		padding: 14px;
+	}
+
+	.invite-dashboards {
+		gap: 8px;
+		margin-top: 0;
+	}
+
+	.invite-dashboards .dashboard-rec {
+		width: 50%;
+		min-height: 59px;
+		padding: 10px 9px;
+		border-radius: 10px;
+		box-shadow: none;
+		color: #fff;
+		box-sizing: border-box;
+	}
+
+	.invite-dashboards .dashboard-bonus {
+		background: #123f46;
+	}
+
+	.invite-dashboards .dashboard-user {
+		background: #236f83;
+	}
+
+	.invite-section-title {
+		display: block;
+		margin: 16px 0 10px;
+		color: #17657a;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.activity-item {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.activity-item > .activity-title-card {
+		order: 1;
+	}
+
+	.activity-item > .invite-section-title {
+		order: 2;
+	}
+
+	.activity-item > .activity-achievement {
+		order: 3;
+	}
+
+	.activity-item > .activity-invitation-share {
+		order: 4;
+	}
+
+	.activity-item > .activity-deposit-share {
+		order: 5;
+	}
+
+	.activity-item > .activity-inviter-commission {
+		order: 6;
+	}
+
+	.activity-item > .activity-invitee-commission {
+		order: 7;
+	}
+
+	.referral-card {
+		margin-top: 14px;
+		padding: 16px 14px 14px;
+		border-radius: 12px;
+		background: #effafa;
+		color: #17657a;
+	}
+
+	.referral-title {
+		display: block;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.referral-description {
+		display: block;
+		margin-top: 8px;
+		font-size: 10px;
+		line-height: 15px;
+	}
+
+	.referral-code {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: 9px;
+		padding: 8px 12px;
+		border-radius: 10px;
+		background: #123f46;
+		color: #fff;
+	}
+
+	.code-label {
+		display: block;
+		font-size: 9px;
+	}
+
+	.code-value {
+		display: block;
+		margin-top: 2px;
+		color: #2bb8ca;
+		font-size: 22px;
+		font-weight: 700;
+		letter-spacing: 1px;
+	}
+
+	.copy-icon {
+		color: #2bb8ca;
+		font-size: 18px;
+	}
+
+	.invite-friends-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 31px;
+		margin-top: 8px;
+		border-radius: 10px;
+		background: #236f83;
+		color: #fff;
+		font-size: 10px;
+		font-weight: 700;
 	}
 
 	.white-rec {
@@ -777,30 +914,332 @@
 	}
 
 	.activity-title-card {
-		box-shadow: 0px 3px 4px 0px #00000040;
-		border: 1px solid #00000040;
-		padding: 10px 20px;
+		border: 1px solid #d7e5e7;
+		padding: 0;
 		width: 100%;
-		border-radius: 10px;
+		border-radius: 12px;
+		margin: 10px 0 14px;
+		overflow: hidden;
+		color: #123f46;
+		box-shadow: 0 1px 3px rgba(18, 63, 70, 0.14);
+	}
+
+	.activity-card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 35px;
+		padding: 8px 12px;
+		background: #236f83;
+		color: #fff;
+	}
+
+	.activity-card-title {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex: 1;
+		min-width: 0;
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 15px;
+		white-space: normal;
+	}
+
+	.activity-card-title text:last-child {
+		flex: 1;
+		min-width: 0;
+		white-space: normal;
+	}
+
+	.activity-detail-button,
+	.method-detail-button {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		flex-shrink: 0;
+		color: #fff;
+		font-size: 9px;
+		margin-left: 10px;
+		white-space: nowrap;
+	}
+
+	.activity-card-body {
+		padding: 8px 12px 10px;
+		background: #fff;
+	}
+
+	.activity-summary-row {
+		display: flex;
+		justify-content: space-between;
+		margin-top: 8px;
+	}
+
+	.activity-summary-value {
+		margin-top: 2px;
+		color: #22b6c8;
+		font-size: 13px;
+		font-weight: 700;
+	}
+
+	.method-block {
 		margin: 10px 0;
-		color: #1C667C;
+	}
+
+	.method-card {
+		display: block;
+		padding: 0 !important;
+		margin: 0;
+		border: 1px solid #d7e5e7;
+		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: 0 1px 3px rgba(18, 63, 70, 0.14);
+	}
+
+	.method-card > .method-title {
+		margin: 0;
+		padding: 9px 12px;
+		background: #236f83;
+		color: #fff;
+	}
+
+	.method-card > .inner-rec,
+	.method-card > .requirement-hint {
+		margin-left: 12px;
+		margin-right: 12px;
+		width: auto;
+	}
+
+	.method-card > .inner-rec {
+		border: 0;
+		padding: 10px 0 0;
+	}
+
+	.activity-achievement .method-card > .inner-rec {
+		min-height: 52px;
+		width: 100%;
+		margin: 7px 0;
+		padding: 7px 0;
+		box-sizing: border-box;
+		border: 1px solid #d7e5e7;
+		border-radius: 10px;
+		overflow: hidden;
+	}
+
+	.activity-achievement .method-card > .inner-rec + .inner-rec {
+		border-top: 1px solid #d7e5e7;
+	}
+
+	.activity-achievement .method-title {
+		display: none;
+	}
+
+	.activity-achievement .method-card {
+		border: 0;
+		box-shadow: none;
+		overflow: visible;
+	}
+
+	.activity-achievement .method-card > .inner-rec > text:first-child {
+		flex: 1;
+		max-width: 47% !important;
+		color: #123f46;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 14px;
+	}
+
+	.activity-achievement .method-card > .inner-rec > view:last-child {
+		flex: 1;
+		min-width: 53% !important;
+	}
+
+	.activity-achievement .method-card > .inner-rec > view:last-child > view:first-child {
+		min-width: 58px;
+	}
+
+	.activity-achievement .method-card .rec-btn-sm {
+		width: 48px;
+		height: 100%;
+		min-height: 40px;
+		border-radius: 0 9px 9px 0;
+		color: #fff !important;
+		font-size: 10px;
+		font-weight: 700;
+	}
+
+	.activity-achievement .method-card .rec-btn-sm.claim-enabled {
+		background: #1C667C !important;
+	}
+
+	.activity-achievement .method-card .rec-btn-sm.claim-disabled {
+		background: #8DB2BD !important;
+	}
+
+	.activity-achievement .method-card > .inner-rec > view:last-child > view:last-child {
+		align-self: stretch;
+		margin: -7px 0 -7px 8px;
+	}
+
+	.activity-invitation-share .inner-rec > view:first-child,
+	.activity-deposit-share .inner-rec > view:first-child,
+	.method-block .white-rec > view:first-child > text:first-child {
+		flex: 1;
+		max-width: 68% !important;
+		line-height: 15px;
+	}
+
+	.method-card > .requirement-hint {
+		margin-bottom: 12px;
+	}
+
+	.method-block > .method-title {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: 0;
+		padding: 9px 12px;
+		border-radius: 12px 12px 0 0;
+		background: #236f83;
+		color: #fff;
+	}
+
+	.method-block > .white-rec {
+		margin-top: 0;
+		border-top: 0;
+		border-radius: 0 0 12px 12px;
+	}
+
+	.activity-inviter-commission > .method-title,
+	.activity-invitee-commission > .method-title {
+		justify-content: flex-start;
+		margin: 16px 0 8px;
+		padding: 0;
+		border-radius: 0;
+		background: transparent;
+		color: #17657a;
+		font-size: 14px;
+	}
+
+	.activity-inviter-commission > .method-title .method-detail-button,
+	.activity-invitee-commission > .method-title .method-detail-button {
+		display: none;
+	}
+
+	.activity-inviter-commission > .white-rec,
+	.activity-invitee-commission > .white-rec {
+		border-top: 1px solid #d7e5e7;
+		border-radius: 10px;
+	}
+
+	.method-title {
+		display: flex;
+		align-items: center;
+		gap: 3px;
+		font-size: 12px;
+	}
+
+	.method-title .method-detail-button {
+		margin-left: auto;
+	}
+
+	.method-detail-button {
+		background: transparent;
+		padding: 0;
+	}
+
+	.method-card .requirement-hint {
+		background: transparent;
+		padding: 7px 0 0;
+		color: #2d94a4;
+	}
+
+	.method-card .summary-rec {
+		margin: 8px 12px 12px;
+		padding: 0;
+		background: transparent;
+		color: #123f46;
+		width: auto;
+	}
+
+	.method-claim-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: calc(100% - 24px);
+		height: 29px;
+		margin: 0 12px 12px;
+		border-radius: 10px;
+		color: #fff;
+		font-size: 10px;
+		font-weight: 700;
+	}
+
+	.claim-enabled {
+		background: #1C667C;
+	}
+
+	.claim-disabled {
+		background: #8DB2BD;
+	}
+
+	.activity-card-body .participate-btn,
+	.activity-card-body .participate-badge {
+		width: 100%;
+		height: 30px;
+		box-sizing: border-box;
+		margin-bottom: 0;
+		padding: 0;
+		border-radius: 10px;
+		box-shadow: none;
+	}
+
+	.activity-card-body .participate-btn {
+		background: #1C667C;
+	}
+
+	.rules-modal {
+		z-index: 2001 !important;
+	}
+
+	.rules-modal .cu-dialog {
+		position: relative;
+		z-index: 2002;
+		margin-top: 8vh !important;
 	}
 
 	.activity-status-badge {
-		padding: 2px 12px;
-		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding: 0;
+		border-radius: 0;
 		font-size: 11px;
 		font-weight: bold;
+		background: transparent;
+		color: #22b6c8;
+	}
+
+	.activity-status-badge::before {
+		content: '';
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #22b6c8;
 	}
 
 	.status-active {
-		background-color: #d4edda;
-		color: #155724;
+		background: transparent;
+		color: #22b6c8;
 	}
 
 	.status-inactive {
-		background-color: #f8d7da;
-		color: #721c24;
+		background: transparent;
+		color: #8c8c8c;
+	}
+
+	.status-inactive::before {
+		background: #8c8c8c;
 	}
 
 	.info-section {

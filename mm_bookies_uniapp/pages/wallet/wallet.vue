@@ -51,8 +51,9 @@
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在充值/提现记录页签显示，点击刷新列表数据 -->
 		<view class="refresh-btn-float" v-if="tab_index === 2 || tab_index === 3" @click="refreshList">
-			<image class="refresh-icon" mode="widthFix" src="/static/icon/wallet/reflesh.svg" />
-			<text class="refresh-text">{{ $t('refresh') }}</text>
+			<!-- <image class="refresh-icon" mode="widthFix" src="/static/icon/wallet/reflesh.svg" /> -->
+			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
+			<!-- <text class="refresh-text">{{ $t('refresh') }}</text> -->
 		</view>
 	</view>
 </template>
@@ -267,8 +268,8 @@
 		position: fixed;
 		right: 20px;
 		bottom: 80px;
-		width: 60px;
-		height: 60px;
+		width: 50px;
+		height: 50px;
 		border-radius: 30px;
 		background: linear-gradient(135deg, #4fb3bf 0%, #1C667C 100%);
 		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
