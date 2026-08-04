@@ -121,7 +121,7 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/coupon.png"></image>
+						<image class="empty-icon" mode="heightFix" src="/static/icon/nav/deals.png"></image>
 						<text class="empty-text">No coupons available</text>
 					</view>
 				</view>
@@ -165,7 +165,7 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/coupon.png"></image>
+						<image class="empty-icon" mode="heightFix" src="/static/icon/nav/deals.png"></image>
 						<text class="empty-text">No promotions available</text>
 					</view>
 				</view>
@@ -1403,14 +1403,14 @@
 	}
 
 	page {
-		background: #1C667C;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -1938,7 +1938,8 @@
 	.empty-icon {
 		height: 60px;
 		margin-bottom: 16px;
-		opacity: 0.4;
+		opacity: 0.6;
+		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
 	}
 
 	.empty-text {

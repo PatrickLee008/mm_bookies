@@ -17,8 +17,12 @@
 
 			<!-- 主列表区域 -->
 			<view class="settings-list-container">
-				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)" v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)" :class="{'setting-item-highlight': bar.highlight}">
-					<text class="setting-item-text" :class="{'setting-item-text-highlight': bar.highlight}">{{$t(bar.title)}}</text>
+				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index"
+					@click="list_method(bar.method,bar.args)"
+					v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)"
+					:class="{'setting-item-highlight': bar.highlight}">
+					<text class="setting-item-text"
+						:class="{'setting-item-text-highlight': bar.highlight}">{{$t(bar.title)}}</text>
 				</view>
 
 				<!-- #ifdef APP-PLUS -->
@@ -42,18 +46,21 @@
 					<!-- 用户头像 -->
 					<view class="profile-avatar-section">
 						<view class="profile-avatar-circle">
-							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill"></image>
+							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill">
+							</image>
 						</view>
 					</view>
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">{{ $t('my_phone') }} : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
+						<text class="profile-info-label">{{ $t('my_phone') }} :
+							{{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
 					<!-- Phone No -->
 					<view class="profile-phone-row">
-						<text class="profile-phone-label">{{ $t('phone_no') }}: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
+						<text class="profile-phone-label">{{ $t('phone_no') }}:
+							{{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
 						<!-- <image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image> -->
 					</view>
 
@@ -95,38 +102,41 @@
 
 					<!-- 原来的联系方式列表，用 v-if="false" 隐藏 -->
 					<view v-if="false">
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('viber') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">09789456123</text>
-							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('viber') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">09789456123</text>
+								<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('telegram') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">09789456123</text>
-							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('telegram') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">09789456123</text>
+								<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('email') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">mmbookies@test.com</text>
-							<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('email') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">mmbookies@test.com</text>
+								<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 					</view>
 				</view>
 			</view>
@@ -248,24 +258,34 @@
 				</view>
 				<view class="modal-body">
 					<!-- Old Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
-						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" :placeholder="$t('enter_old_password')" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
+						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password"
+							:placeholder="$t('enter_old_password')" @focus="old_password_focused = true"
+							@blur="handleOldPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_old_password = !show_old_password">
 							<text :class="show_old_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
 					</view>
 
 					<!-- New Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
-						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" :placeholder="$t('enter_new_password')" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
+						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password"
+							:placeholder="$t('enter_new_password')" @focus="new_password_focused = true"
+							@blur="handleNewPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_new_password = !show_new_password">
 							<text :class="show_new_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
 					</view>
 
 					<!-- Confirm Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
-						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" :placeholder="$t('enter_confirm_new_password')" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
+						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'"
+							v-model="confirm_password" :placeholder="$t('enter_confirm_new_password')"
+							@focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur"
+							@input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_confirm_password = !show_confirm_password">
 							<text :class="show_confirm_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -310,14 +330,8 @@
 		<customer-service></customer-service>
 
 		<!-- 密码修改结果提示弹窗 -->
-		<ConfirmDialog
-			:visible="showPwdResultDialog"
-			:title="pwdResultDialogTitle"
-			:message="pwdResultDialogMessage"
-			:confirmText="$t('ok')"
-			:showCancel="false"
-			@confirm="showPwdResultDialog = false"
-		/>
+		<ConfirmDialog :visible="showPwdResultDialog" :title="pwdResultDialogTitle" :message="pwdResultDialogMessage"
+			:confirmText="$t('ok')" :showCancel="false" @confirm="showPwdResultDialog = false" />
 	</view>
 </template>
 
@@ -590,7 +604,10 @@
 					const isSelfClosing = match[4] === '/'
 
 					if (tagName === 'br' || (isSelfClosing && tagName === 'br')) {
-						const brNode = { name: 'br', attrs: {} }
+						const brNode = {
+							name: 'br',
+							attrs: {}
+						}
 						if (currentParent && currentParent.children) {
 							currentParent.children.push(brNode)
 						} else {
@@ -619,7 +636,11 @@
 								nodes.push(aNode)
 							}
 						} else if (tagName === 'p') {
-							const pNode = { name: 'p', attrs: {}, children: [] }
+							const pNode = {
+								name: 'p',
+								attrs: {},
+								children: []
+							}
 							nodes.push(pNode)
 							currentParent = pNode
 						}
@@ -665,7 +686,10 @@
 					if (m.index > lastIdx) {
 						const before = text.substring(lastIdx, m.index)
 						if (before) {
-							parts.push({ type: 'text', text: before })
+							parts.push({
+								type: 'text',
+								text: before
+							})
 						}
 					}
 					parts.push({
@@ -674,7 +698,10 @@
 							href: m[0],
 							style: 'color: #4fb3bf; text-decoration: underline;'
 						},
-						children: [{ type: 'text', text: m[0] }]
+						children: [{
+							type: 'text',
+							text: m[0]
+						}]
 					})
 					lastIdx = m.index + m[0].length
 				}
@@ -682,12 +709,18 @@
 				if (lastIdx < text.length) {
 					const after = text.substring(lastIdx)
 					if (after) {
-						parts.push({ type: 'text', text: after })
+						parts.push({
+							type: 'text',
+							text: after
+						})
 					}
 				}
 
 				if (parts.length === 0 && text) {
-					parts.push({ type: 'text', text })
+					parts.push({
+						type: 'text',
+						text
+					})
 				}
 				return parts
 			},
@@ -864,7 +897,8 @@
 										if (modalRes.confirm) {
 											// 用户确认后，跳转到webview页面
 											uni.navigateTo({
-												url: '/pages/webview/index?url=' + encodeURIComponent(gameUrl)
+												url: '/pages/webview/index?url=' +
+													encodeURIComponent(gameUrl)
 											})
 										}
 									}
@@ -998,7 +1032,8 @@
 
 				if (!isValid) {
 					this.new_password_error = true
-					this.password_error_message = this.$t('password_must_contain') || 'Password must be at least 8 characters with uppercase, lowercase and number'
+					this.password_error_message = this.$t('password_must_contain') ||
+						'Password must be at least 8 characters with uppercase, lowercase and number'
 				} else {
 					this.new_password_error = false
 					this.password_error_message = ''
@@ -1061,7 +1096,8 @@
 					this.hidePasswordChangeModal()
 					this.$nextTick(() => {
 						_this.pwdResultDialogTitle = _this.$t('tips')
-						_this.pwdResultDialogMessage = _this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password'
+						_this.pwdResultDialogMessage = _this.$t('The new password is the same as the old one') ||
+							'The new password cannot be the same as the old password'
 						_this.showPwdResultDialog = true
 					})
 					return
@@ -1112,10 +1148,8 @@
 				})
 			},
 		},
-		onLoad() {
-		},
-		onShow() {
-		},
+		onLoad() {},
+		onShow() {},
 		mounted() {
 			this.configs = Object.assign({}, this.$store.state.configs)
 			console.log(this.configs);
@@ -1150,9 +1184,9 @@
 		position: relative;
 		z-index: 1;
 	}
-	
+
 	.ucenter-page {
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;

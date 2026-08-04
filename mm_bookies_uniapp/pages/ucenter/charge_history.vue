@@ -295,7 +295,7 @@ export default {
 
 <style scoped>
 	.dark-teal-bg {
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		min-height: 100vh;
 	}
 

@@ -275,7 +275,7 @@
 				<!-- 金额输入 -->
 				<view class="amount-section">
 					<view class="amount-input-box">
-						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_deposit_amount')" />
+						<input class="amount-input-field" placeholder-class="myfont-13px" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_deposit_amount')" />
 					</view>
 					<text class="amount-hint">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} Ks, Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</text>
 

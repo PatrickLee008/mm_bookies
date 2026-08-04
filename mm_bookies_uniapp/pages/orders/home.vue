@@ -866,14 +866,14 @@
 	}
 
 	page {
-		background: #1C667C;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;

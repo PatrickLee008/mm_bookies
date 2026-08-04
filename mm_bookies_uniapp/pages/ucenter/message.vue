@@ -665,7 +665,7 @@
 <style lang="scss" scoped>
 	.full-page {
 		min-height: 100vh;
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 	}
 
 	/* header 占位 */

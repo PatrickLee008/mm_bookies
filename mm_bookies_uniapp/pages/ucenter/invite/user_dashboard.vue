@@ -302,7 +302,7 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #02455F;
+		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 		overflow: hidden;
 	}
 
