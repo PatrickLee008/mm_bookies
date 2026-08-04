@@ -9,15 +9,15 @@
 		<view class="title-bar">
 			<!-- Coupon / Promotion 顶部切换 -->
 			<view class="type-toggle" v-if="isLogin">
-				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
-					<text>{{ $t('coupon') }}</text>
-				</view>
 				<view class="type-btn" :class="{ 'active': activity_type === 'promotion' }"
 					@click="change_type('promotion')">
 					<text>{{ $t('Promotion_title') }}</text>
 					<view class="promo-count-badge" v-if="activity_type !== 'promotion' && promotionCount > 0">
 						{{ promotionCount > 99 ? '99+' : promotionCount }}
 					</view>
+				</view>
+				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
+					<text>{{ $t('coupon') }}</text>
 				</view>
 			</view>
 
@@ -389,49 +389,40 @@
 						<text>{{ selectedPromotion.ineligibility_reason }}</text>
 					</view>
 
-					<!-- 使用场景 -->
-					<view class="detail-description-section"
-						v-if="selectedPromotion.usage_scenario_1x2 || selectedPromotion.usage_scenario_egame">
-						<text class="detail-section-title">Applicable Scenarios</text>
-						<view class="usage-scenarios-list">
-							<!-- 1x2 Sports Betting -->
-							<view class="usage-scenario-item" v-if="selectedPromotion.usage_scenario_1x2"
-								@click="openPromotionSport">
-								<text class="scenario-icon">⚽</text>
-								<view class="scenario-text">
-									<text class="scenario-label">{{ selectedPromotion.usage_scenario_1x2.label }}</text>
-									<text class="scenario-detail" v-if="selectedPromotion.usage_scenario_1x2.detail">
-										{{ selectedPromotion.usage_scenario_1x2.detail }}
-									</text>
-								</view>
+					<!-- Applicable Scenarios -->
+				<view class="coupon-scenarios"
+					v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
+					<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+					<view class="coupon-scenarios-icons">
+						<!-- 1x2 Sports Betting -->
+						<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
+							@click="openPromotionSport">
+							<view class="coupon-scenario-icon-circle">
+								<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
 							</view>
-							<!-- E-Gaming -->
-							<view class="usage-scenario-item scenario-egame-block"
-								v-if="selectedPromotion.usage_scenario_egame">
-								<view class="scenario-header">
-									<text class="scenario-icon"></text>
-									<view class="scenario-text">
-										<text
-											class="scenario-label">{{ selectedPromotion.usage_scenario_egame.label }}</text>
-										<text class="scenario-detail"
-											v-if="selectedPromotion.usage_scenario_egame.detail">
-											{{ selectedPromotion.usage_scenario_egame.detail }}
-										</text>
-									</view>
-								</view>
-								<view class="vendors-grid" v-if="promotionDisplayVendors.length > 0">
-									<view class="vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
-										:key="index" @click="openPromotionVendorGames(vendor)">
-										<view class="vendor-info">
-											<image :src="siteinfo.awcImgUrl + vendor.platform_image"
-												style="height: 55px;" mode="heightFix"></image>
-											<text class="vendor-name">{{ vendor.platform }}</text>
-										</view>
-									</view>
-								</view>
+							<text class="coupon-scenario-label">Single</text>
+						</view>
+						<!-- Mix Parlay -->
+						<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
+							@click="openPromotionVendorGames(promotionDisplayVendors[0])">
+							<view class="coupon-scenario-icon-diamond">
+								<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
+							</view>
+							<text class="coupon-scenario-label">Mix</text>
+						</view>
+					</view>
+					<!-- Vendor list (collapsible below icons) -->
+					<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
+						<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+							:key="index" @click="openPromotionVendorGames(vendor)">
+							<view class="coupon-vendor-info">
+								<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+									mode="heightFix"></image>
+								<text class="coupon-vendor-name">{{ vendor.platform }}</text>
 							</view>
 						</view>
 					</view>
+				</view>
 				</scroll-view>
 
 				<view class="detail-modal-footer">
@@ -507,7 +498,7 @@
 				loading: false,
 
 				// 顶部切换：coupon / promotion
-				activity_type: 'coupon',
+			activity_type: 'promotion',
 
 				// Coupon Tab
 				tabs: ['Unused', 'Used', 'Expired'],
@@ -563,10 +554,19 @@
 			}
 			if (this.isLogin) {
 				this.userInfo = Object.assign({}, this.$store.state.userInfo)
-				this.getCurrentActivity()
-				this.getCouponList()
-				// 静默预加载 promotion 用于角标与切换
-				this.loadPromotionList(true)
+				if (this.activity_type === 'promotion') {
+					// 默认打开 Promotion，加载 promotion 列表
+					this.loadPromotionList()
+					// 静默预加载 coupon 用于角标与切换
+					this.getCurrentActivity()
+					this.getCouponList(false, true)
+				} else {
+					// 直接打开 Coupon
+					this.getCurrentActivity()
+					this.getCouponList()
+					// 静默预加载 promotion 用于角标与切换
+					this.loadPromotionList(true)
+				}
 			}
 			// 获取所有游戏厂商列表（用于 Applicable Scenarios 展示与跳转）
 			this.fetchAllGameVendors()
@@ -672,6 +672,8 @@
 				this.activity_type = type
 				if (type === 'promotion' && this.promotion_list.length === 0) {
 					this.loadPromotionList()
+				} else if (type === 'coupon' && this.list.length === 0) {
+					this.getCouponList()
 				}
 			},
 			handleTabClick(index) {
@@ -717,7 +719,7 @@
 					}
 				}, () => {})
 			},
-			getCouponList(isLoadMore = false) {
+			getCouponList(isLoadMore = false, silent = false) {
 				let _this = this
 				if (!isLoadMore) {
 					_this.page = 1
@@ -730,16 +732,20 @@
 					page_size: _this.limit,
 					status: statusParam
 				}
-				_this.loading = true
-				uni.showLoading({
-					title: 'Loading...',
-					mask: true
-				})
+				if (!silent) {
+					_this.loading = true
+					uni.showLoading({
+						title: 'Loading...',
+						mask: true
+					})
+				}
 				_this.$http.get('/coupon/history', {
 					data: params
 				}, (res) => {
-					uni.hideLoading()
-					_this.loading = false
+					if (!silent) {
+						uni.hideLoading()
+						_this.loading = false
+					}
 					if (res.statusCode === 200 && res.data.code === 200) {
 						let coupons = res.data.data.history || []
 						// 若存在进行中的活动，将对应 Used 记录标记为 Active（参考onex2_test逻辑）
@@ -760,21 +766,23 @@
 						}
 					} else {
 						if (!isLoadMore) _this.list = []
-						uni.showToast({
+						if (!silent) uni.showToast({
 							icon: 'none',
 							title: res.data.message || 'Failed to load coupons',
 							duration: 2000
 						})
 					}
 				}, () => {
-					uni.hideLoading()
-					_this.loading = false
+					if (!silent) {
+						uni.hideLoading()
+						_this.loading = false
+						uni.showToast({
+							icon: 'none',
+							title: 'Network error',
+							duration: 2000
+						})
+					}
 					if (!isLoadMore) _this.list = []
-					uni.showToast({
-						icon: 'none',
-						title: 'Network error',
-						duration: 2000
-					})
 				})
 			},
 
@@ -2141,120 +2149,6 @@
 		border-radius: 8px;
 		padding: 10px;
 		margin-bottom: 8px;
-	}
-
-	.usage-scenarios-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-
-	.usage-scenario-item {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		padding: 12px;
-		background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
-		border: 1px solid #E8E9EB;
-		border-radius: 8px;
-		gap: 12px;
-	}
-
-	.usage-scenario-item:active {
-		opacity: 0.8;
-		transform: scale(0.98);
-	}
-
-	.scenario-icon {
-		font-size: 24px;
-		line-height: 1;
-		flex-shrink: 0;
-	}
-
-	.scenario-text {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		flex: 1;
-	}
-
-	.scenario-label {
-		font-size: 14px;
-		font-weight: bold;
-		color: #2C3E50;
-		line-height: 1.3;
-	}
-
-	.scenario-detail {
-		font-size: 12px;
-		color: #7F8C8D;
-		line-height: 1.3;
-	}
-
-	.scenario-egame-block {
-		flex-direction: column;
-	}
-
-	.scenario-egame-block .scenario-header {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		gap: 12px;
-	}
-
-	.scenario-egame-block .vendors-grid {
-		margin-top: 10px;
-	}
-
-	.vendors-grid {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: flex-start;
-		gap: 2%;
-	}
-
-	.vendor-card {
-		position: relative;
-		border-radius: 12px;
-		overflow: hidden;
-		width: 32%;
-		background: linear-gradient(180deg, #1868CF 0%, #0C3569 100%);
-		box-shadow: 0px 2px 0px 0px #478BE2;
-		display: flex;
-		flex-direction: column;
-		cursor: pointer;
-		transition: opacity 0.2s, transform 0.1s;
-		margin-bottom: 12px;
-	}
-
-	.vendor-card:active {
-		opacity: 0.8;
-		transform: scale(0.98);
-	}
-
-	.vendor-info {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		min-height: 25px;
-		padding: 8px 6px;
-		border-radius: 0 0 12px 12px;
-		font-size: 12px;
-	}
-
-	.vendor-name {
-		color: white;
-		font-size: 12px;
-		font-weight: bold;
-		text-align: center;
-		word-wrap: break-word;
-		word-break: break-all;
-		white-space: normal;
-		width: 100%;
-		line-height: 1.2;
-		margin: 3px 0;
 	}
 
 	.progress-row {
