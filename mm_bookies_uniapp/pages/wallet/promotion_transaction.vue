@@ -13,63 +13,69 @@
 				<text class="filter-icon" :class="filterExpanded ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
 			</view>
 
-		<!-- 下拉选项 -->
-		<view v-if="filterExpanded" class="filter-dropdown">
-			<view v-for="(option, index) in filterOptions" :key="index" class="filter-option" @click="toggleFilterOption(option)">
-				<text class="option-text">{{ $t(option.label) }}</text>
-				<view class="option-radio" :class="{'active': option.checked}">
-					<view class="option-radio-inner" v-if="option.checked"></view>
-				</view>
-			</view>
-		</view>
-
-		<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" @refresherrestore="onRefresherRestore" @refresherabort="onRefresherAbort" :refresher-triggered="refresherTriggered">
-
-			<!-- 空状态 -->
-			<view v-if="!loading && recordList.length === 0" class="empty-state">
-				<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
-				<text class="empty-text">{{ $t('no_records') || 'No transaction records available at the moment.' }}</text>
-			</view>
-
-			<!-- 记录项（参考 Wallet_Page.png 卡片样式） -->
-			<view v-for="(item, index) in recordList" :key="index" class="record-card">
-				<!-- 顶部：Order ID + 时间 -->
-				<view class="card-top">
-					<text class="order-id">{{$t('order_id')}}：{{item.id}}</text>
-					<text class="order-time">{{formatTime(item.create_time)}}</text>
-				</view>
-
-				<!-- 类型行：● + 类型 | 支付方式logo+名称 -->
-				<view class="card-type-row">
-					<view class="type-left">
-						<view class="type-dot" :class="item.type === 'Deposit' ? 'dot-deposit' : 'dot-withdraw'"></view>
-						<text class="type-name">{{item.display_type || item.type}}</text>
-					</view>
-					<view class="pay-right">
-						<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit" class="pay-logo"></image>
-						<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
+			<!-- 下拉选项 -->
+			<view v-if="filterExpanded" class="filter-dropdown">
+				<view v-for="(option, index) in filterOptions" :key="index" class="filter-option"
+					@click="toggleFilterOption(option)">
+					<text class="option-text">{{ $t(option.label) }}</text>
+					<view class="option-radio" :class="{'active': option.checked}">
+						<view class="option-radio-inner" v-if="option.checked"></view>
 					</view>
 				</view>
-
-				<!-- 金额行 -->
-				<view class="card-amount-row">
-					<text class="amount-label">{{$t('transaction_amount')}}：</text>
-					<text class="amount-value">{{numberFormat(item.money || item.amount)}} {{item.currency || 'MMK'}}</text>
-				</view>
-
-				<!-- 状态 -->
-				<view class="card-status">
-					<text class="status-text" :class="getStatusClass(item.status)">{{getStatusText(item.status)}}</text>
-				</view>
 			</view>
 
-			<!-- 加载更多 -->
-			<view v-if="loading" class="loading-more">
-				<text class="cuIcon-loading2 load-icon rotating"></text>
-				<text class="loading-text">{{ $t('loading_dots') || 'Loading...' }}</text>
-			</view>
-			<view class="blank"></view>
-		</scroll-view>
+			<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltolower="loadMore"
+				:refresher-enabled="true" @refresherrefresh="onRefresh" @refresherrestore="onRefresherRestore"
+				@refresherabort="onRefresherAbort" :refresher-triggered="refresherTriggered">
+
+				<!-- 空状态 -->
+				<view v-if="!loading && recordList.length === 0" class="empty-state">
+					<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
+					<text
+						class="empty-text">{{ $t('no_records') || 'No transaction records available at the moment.' }}</text>
+				</view>
+
+				<!-- 记录项（参考 Wallet_Page.png 卡片样式） -->
+				<view v-for="(item, index) in recordList" :key="index" class="record-card">
+					<!-- 顶部：Order ID + 时间 -->
+					<view class="card-top">
+						<text class="order-id">{{$t('order_id')}}：{{item.id}}</text>
+						<text class="order-time">{{formatTime(item.create_time)}}</text>
+					</view>
+
+					<!-- 类型行：● + 类型 | 支付方式logo+名称 -->
+					<view class="card-type-row">
+						<view class="type-left">
+							<text class="type-name">{{item.display_type || item.type}}</text>
+						</view>
+						<view class="pay-right">
+							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
+								class="pay-logo"></image>
+							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
+						</view>
+					</view>
+
+					<!-- 金额行 -->
+					<view class="card-amount-row">
+						<text class="amount-label">{{$t('transaction_amount')}}：</text>
+						<text class="amount-value">{{numberFormat(item.money || item.amount)}}
+							{{item.currency || 'MMK'}}</text>
+					</view>
+
+					<!-- 状态 -->
+					<view class="card-status">
+						<text class="status-text"
+							:class="getStatusClass(item.status)">{{getStatusText(item.status)}}</text>
+					</view>
+				</view>
+
+				<!-- 加载更多 -->
+				<view v-if="loading" class="loading-more">
+					<text class="cuIcon-loading2 load-icon rotating"></text>
+					<text class="loading-text">{{ $t('loading_dots') || 'Loading...' }}</text>
+				</view>
+				<view class="blank"></view>
+			</scroll-view>
 		</view>
 	</view>
 </template>
@@ -95,10 +101,21 @@
 
 				filterExpanded: false,
 				// from tangjq--- 钱包筛选：默认 promotion
-				filterOptions: [
-					{ label: 'filter_all', value: '', checked: false },
-					{ label: 'main_wallet', value: 'Money', checked: false },
-					{ label: 'pro_wallet', value: 'Promotion', checked: true },
+				filterOptions: [{
+						label: 'filter_all',
+						value: '',
+						checked: false
+					},
+					{
+						label: 'main_wallet',
+						value: 'Money',
+						checked: false
+					},
+					{
+						label: 'pro_wallet',
+						value: 'Promotion',
+						checked: true
+					},
 				],
 			}
 		},
@@ -112,33 +129,31 @@
 				this.loadRecords();
 			},
 
-		onRefresh() {
-			if (this.refresherTriggered || this.loading) return
-			// 必须同步置 true，否则 refresher 手势上下文丢失会卡在刷新态（无法上滑、任意位置误触刷新）
-			this.refresherTriggered = true
-			this.page = 1
-			this.hasMore = true
-			this.recordList = []
-			this.loadRecords().finally(() => {
+			onRefresh() {
+				if (this.refresherTriggered || this.loading) return
+				this.refresherTriggered = true
+				this.page = 1
+				this.hasMore = true
+				this.recordList = []
+				this.loadRecords().finally(() => {
+					this.refresherTriggered = false
+				})
+			},
+
+			onRefresherRestore() {
 				this.refresherTriggered = false
-			})
-		},
+			},
 
-		onRefresherRestore() {
-			this.refresherTriggered = false
-		},
+			onRefresherAbort() {
+				this.refresherTriggered = false
+			},
 
-		onRefresherAbort() {
-			this.refresherTriggered = false
-		},
+			onScroll(e) {
+				if (this.refresherTriggered) return
+				this.handleHeaderScroll(e)
+			},
 
-		onScroll(e) {
-			// 刷新/下拉过程中冻结 header 折叠，避免布局变化干扰 refresher
-			if (this.refresherTriggered) return
-			this.handleHeaderScroll(e)
-		},
-
-		loadMore() {
+			loadMore() {
 				if (!this.hasMore || this.loading) return;
 				this.page++;
 				this.loadRecords();
@@ -161,7 +176,9 @@
 					}
 
 					await new Promise((resolve, reject) => {
-						this.$http.get('/balance_log', { data: para }, (res) => {
+						this.$http.get('/balance_log', {
+							data: para
+						}, (res) => {
 							if (res.statusCode === 200) {
 								const items = (res.data.items || []).map(ele => this.parseLog(ele));
 
@@ -221,13 +238,16 @@
 					ele.display_subtype = ele.money > 0 ? 'From Promo Wallet' : 'To Main Wallet'
 				} else if (type === 'Order') {
 					ele.display_type = 'Betting'
-					ele.display_subtype = type_sub === 'Football' ? 'Football Bet' : type_sub === 'Egame' ? 'eGame Session' : ''
+					ele.display_subtype = type_sub === 'Football' ? 'Football Bet' : type_sub === 'Egame' ?
+						'eGame Session' : ''
 				} else if (type === 'Settlement') {
 					ele.display_type = 'Settlement'
-					ele.display_subtype = type_sub === 'Football' ? 'Football Win' : type_sub === 'Egame' ? 'eGame Win' : ''
+					ele.display_subtype = type_sub === 'Football' ? 'Football Win' : type_sub === 'Egame' ? 'eGame Win' :
+						''
 				} else if (type === 'Refund') {
 					ele.display_type = 'Refund'
-					ele.display_subtype = type_sub === 'Football' ? 'Football Refund' : type_sub === 'Egame' ? 'eGame Refund' : ''
+					ele.display_subtype = type_sub === 'Football' ? 'Football Refund' : type_sub === 'Egame' ?
+						'eGame Refund' : ''
 				} else if (type === 'Promotion') {
 					if (type_sub === 'Claim') ele.display_type = 'Promo Credited'
 					else if (type_sub === 'Release') ele.display_type = 'Promo Released'
@@ -249,8 +269,16 @@
 			formatTime(time) {
 				if (!time) return '';
 				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const timeMatch = String(convertedTime).match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/
+				);
+				if (timeMatch) {
+					return `${timeMatch[3]}/${timeMatch[2]}/${timeMatch[1]} ${timeMatch[4]}:${timeMatch[5]}`;
+				}
 				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : convertedTime;
-				return dateFormatUtils.formatTime(date);
+				if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+				const pad = value => String(value).padStart(2, '0');
+				return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 			},
 
 			numberFormat(number) {
@@ -317,10 +345,12 @@
 <style lang="scss" scoped>
 	/* from tangjq--- 页面级样式 */
 	.promotion-page {
-		min-height: 100vh;
+		height: 100vh;
+		min-height: 0;
 		display: flex;
 		flex-direction: column;
 		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		overflow: hidden;
 	}
 
 	.header-placeholder {
@@ -332,11 +362,13 @@
 		background-position: center -255px;
 		width: 100%;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.promotion-content {
 		flex: 1;
 		height: 0;
+		min-height: 0;
 		background: #fff;
 		border-radius: 20px 20px 0 0;
 		display: flex;
@@ -416,6 +448,7 @@
 	.history-scroll {
 		flex: 1;
 		height: 0;
+		min-height: 0;
 		background-color: #ffffff;
 	}
 
@@ -431,14 +464,15 @@
 	.card-top {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: start;
 		padding: 14px 16px 8px;
 	}
 
 	.order-id {
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 700;
 		color: #1C667C;
+		max-width: 60%;
 	}
 
 	.order-time {
@@ -458,36 +492,6 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
-	}
-
-	.type-dot {
-		width: 18px;
-		height: 18px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-	}
-
-	.type-dot::after {
-		content: '+';
-		color: #fff;
-		font-size: 14px;
-		font-weight: bold;
-		line-height: 1;
-	}
-
-	.type-dot.dot-deposit {
-		background-color: #1C667C;
-	}
-
-	.type-dot.dot-withdraw {
-		background-color: #1C667C;
-	}
-
-	.type-dot.dot-withdraw::after {
-		content: '-';
 	}
 
 	.type-name {
@@ -531,6 +535,7 @@
 		font-size: 17px;
 		font-weight: 700;
 		color: #17A2B8;
+		font-style: italic;
 	}
 
 	/* 状态 */
@@ -605,8 +610,13 @@
 	}
 
 	@keyframes rotate {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.loading-text {
@@ -616,5 +626,12 @@
 
 	.blank {
 		height: 20px;
+	}
+</style>
+
+<style lang="scss">
+	page {
+		height: 100vh;
+		overflow: hidden;
 	}
 </style>

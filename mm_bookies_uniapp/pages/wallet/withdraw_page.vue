@@ -148,6 +148,7 @@
 		background: #fff;
 		border-radius: 20px 20px 0 0;
 		flex-shrink: 0;
+		padding: 10px 20px;
 	}
 
 	.tab-selector {

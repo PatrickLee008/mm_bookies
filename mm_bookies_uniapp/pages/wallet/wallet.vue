@@ -72,9 +72,9 @@
 							<text class="type-name">{{item.type || 'Deposit'}}</text>
 						</view>
 						<view class="pay-right">
+							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
 							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
 								class="pay-logo"></image>
-							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
 						</view>
 					</view>
 
@@ -171,8 +171,16 @@
 			formatTime(time) {
 				if (!time) return '';
 				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const timeMatch = String(convertedTime).match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/
+				);
+				if (timeMatch) {
+					return `${timeMatch[3]}/${timeMatch[2]}/${timeMatch[1]} ${timeMatch[4]}:${timeMatch[5]}`;
+				}
 				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : convertedTime;
-				return dateFormatUtils.formatTime(date);
+				if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+				const pad = value => String(value).padStart(2, '0');
+				return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 			},
 
 			getStatusText(status) {
@@ -491,14 +499,15 @@
 	}
 
 	.order-id {
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 700;
 		color: #1C667C;
+		max-width: 60%;
 	}
 
 	.order-time {
 		font-size: 12px;
-		color: #888;
+		color: #1C667C;
 	}
 
 	/* 类型行：●类型 | 支付方式 */
@@ -563,6 +572,7 @@
 	.amount-value {
 		font-size: 17px;
 		font-weight: 700;
+		font-style: italic;
 	}
 
 	.amount-deposit-color {
