@@ -23,6 +23,27 @@
 
 		<!-- from tangjq--- 标题栏 -->
 		<view class="title-bar">
+			<view class="order-filter">
+				<view class="order-filter-pill order-filter-calendar-pill" @click="$refs.date_picker.show()">
+					<image mode="widthFix" class="order-filter-calendar" src="/static/image/order/calender.svg" />
+					<text class="cuIcon-unfold pill-arrow"></text>
+				</view>
+				<view class="order-filter-pill">
+					<selector :option_list.sync="type_list" :default_label="$t('type')" @click_option="click_option">
+					</selector>
+				</view>
+				<view class="order-filter-pill">
+					<selector :option_list.sync="status_list" :default_label="$t('status')"
+						@click_option="click_option"></selector>
+				</view>
+				<view class="order-filter-pill">
+					<selector :option_list.sync="wallet_list" :default_label="$t('wallet')"
+						@click_option="click_option"></selector>
+				</view>
+			</view>
+		</view>
+
+		<view class="bg-white">
 			<view class="tab-selector">
 				<view class="tab-container">
 					<view class="tab-item" :class="{'active':current_page==='pending'}" @click="page_change('pending')">
@@ -39,30 +60,6 @@
 			</view>
 		</view>
 
-		<view class="padding-lr-sm bg-white">
-			<view class="flex-row flex-wrap justify-start filter padding-sm" style="">
-				<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg"
-					@click="$refs.date_picker.show()" />
-				<view class="filter-row">
-					<view class="text mycolor-primary">{{$t('type')}}</view>
-					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
-				</view>
-				<view class="filter-row">
-					<view class="text mycolor-primary">{{$t('status')}}</view>
-					<selector :option_list.sync="status_list" @click_option="click_option"></selector>
-				</view>
-				<view class="filter-row">
-					<view class="text mycolor-primary">{{$t('wallet')}}</view>
-					<selector :option_list.sync="wallet_list" @click_option="click_option"></selector>
-				</view>
-				<view class="filter-row">
-					<view class="text mycolor-primary line-height-28px">Period:
-						{{date_range[0].show}}{{' - '}}{{date_range[1].show}}
-					</view>
-				</view>
-			</view>
-		</view>
-
 		<scroll-view scroll-y class="main-scroll-view" @scroll="handleHeaderScroll">
 			<view class="history-container">
 				<view v-for="(item,index) in history_list" :key='index' class="history-item">
@@ -70,10 +67,9 @@
 					<view class="bet-card" v-if="item.IS_MIX == '0' || item.IS_MIX === false">
 						<!-- 卡片头部 -->
 						<view class="card-header">
-							<!-- from tangjq--- 已结算时右上角显示该场比赛输赢状态 -->
-							<view class="status-badge" :class="'badge-'+status_badge(item.bet_status).type"
-								v-if="current_page==='Finished' && item.bet_status">
-								<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
+							<view class="user-label-badge" :class="getWalletBadgeClass(item.pay_wallet)"
+								v-if="item.pay_wallet">
+								<text class="user-label-text">{{getWalletBadgeLabel(item.pay_wallet)}}</text>
 							</view>
 							<view class="match-time">{{item.order_time}}</view>
 							<view class="header-match">
@@ -105,7 +101,8 @@
 								<text class="value value-amount">{{item.real_odds}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">{{$t('total bet amount')}}</text>
+								<text class="label">{{$t('total bet amount')}}<text v-if="item.pay_wallet">
+										({{getWalletBadgeLabel(item.pay_wallet)}})</text></text>
 								<text class="value  value-amount"
 									style="font-style: italic;">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
@@ -119,7 +116,7 @@
 						<view class="result-bar" v-if="current_page==='Finished'"
 							:class="{'result-win':item.benefit.indexOf('-') === -1 && item.benefit !== '\\', 'result-lose':item.benefit.indexOf('-') > -1 || item.benefit === '\\'}">
 							<text class="result-text"
-								v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN {{item.benefit}}
+								v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN +{{item.benefit}}
 								MMK</text>
 							<text class="result-text" v-else-if="item.benefit === '\\'">CANCEL</text>
 							<text class="result-text" v-else>LOSE {{item.benefit}} MMK</text>
@@ -131,16 +128,16 @@
 						<!-- 单个比赛项 - 折叠时只显示一个 -->
 						<view v-if="!item.show_detail">
 							<view class="card-header">
-								<!-- from tangjq--- 已结算时右上角显示订单输赢状态 -->
-								<view class="status-badge" :class="'badge-'+status_badge(item.bet_status).type"
-									v-if="current_page==='Finished' && item.bet_status">
-									<text class="status-badge-text">{{status_badge(item.bet_status).label}}</text>
+								<view class="user-label-badge" :class="getWalletBadgeClass(item.pay_wallet)"
+									v-if="item.pay_wallet">
+									<text class="user-label-text">{{getWalletBadgeLabel(item.pay_wallet)}}</text>
 								</view>
 								<view class="match-time">{{item.order_time}}</view>
 								<view class="header-match">
 									<text class="team-name"
 										:class="{ 'team-give': give_team_side(item) === 'H' }">{{item.HOME}}</text>
-									<text class="vs-text" v-if="current_page==='pending' && give_team_side(item)">VS</text>
+									<text class="vs-text"
+										v-if="current_page==='pending' && give_team_side(item)">VS</text>
 									<text class="score-text" v-else>{{item.SCORE}}</text>
 									<text class="team-name"
 										:class="{ 'team-give': give_team_side(item) === 'A' }">{{item.AWAY}}</text>
@@ -170,10 +167,11 @@
 						<view v-else>
 							<view v-for="(detail,_index) in item.detail" :key="_index">
 								<view class="card-header">
-									<!-- from tangjq--- 已结算时右上角显示该场比赛输赢状态 -->
-									<view class="status-badge" :class="'badge-'+status_badge(detail.bet_status).type"
-										v-if="current_page==='Finished' && detail.bet_status">
-										<text class="status-badge-text">{{status_badge(detail.bet_status).label}}</text>
+									<view class="user-label-badge"
+										:class="getWalletBadgeClass(detail.pay_wallet || item.pay_wallet)"
+										v-if="detail.pay_wallet || item.pay_wallet">
+										<text
+											class="user-label-text">{{getWalletBadgeLabel(detail.pay_wallet || item.pay_wallet)}}</text>
 									</view>
 									<!-- 混合投注展开后，仅第一场显示下注日期 -->
 									<view class="match-time" v-if="_index === 0">{{detail.order_time}}</view>
@@ -212,7 +210,8 @@
 						<!-- Parlay 底部汇总信息 -->
 						<view class="parlay-summary">
 							<view class="info-row">
-								<text class="label">{{$t('total bet amount')}}</text>
+								<text class="label">{{$t('total bet amount')}}<text v-if="item.pay_wallet">
+										({{getWalletBadgeLabel(item.pay_wallet)}})</text></text>
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row">
@@ -229,7 +228,7 @@
 						<view class="result-bar" v-if="current_page==='Finished'"
 							:class="{'result-win':item.benefit.indexOf('-') === -1 && item.benefit !== '\\', 'result-lose':item.benefit.indexOf('-') > -1 || item.benefit === '\\'}">
 							<text class="result-text"
-								v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN {{item.benefit}}
+								v-if="item.benefit.indexOf('-') === -1 && item.benefit !== '\\'">WIN +{{item.benefit}}
 								MMK</text>
 							<text class="result-text" v-else-if="item.benefit === '\\'">CANCEL</text>
 							<text class="result-text" v-else>LOSE {{item.benefit}} MMK</text>
@@ -304,6 +303,7 @@
 				status_list: [],
 				wallet_list: [],
 				date_range: [{}, {}],
+				date_preset: '', // from tangjq--- 当前选中的日期预设 label（如 Today / Yesterday / Weekly 等），为空时回退到 date_range 拼接
 				date_filtered: false,
 				send_date: true,
 				report: {
@@ -344,12 +344,13 @@
 				this.reset_list()
 				this.get_list()
 			},
-			date_click(arr) {
-				// let start = arr[0]
-				// let end = arr[1]
+			date_click(arr, presetLabel) {
+				// from tangjq--- 优先使用预设 label；presetLabel 为空时回退到日期范围拼接
+				this.date_preset = presetLabel || ''
 				this.date_range = arr
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
 					this.send_date = false
+					this.date_preset = ''
 				} else {
 					this.send_date = true
 				}
@@ -777,50 +778,20 @@
 			status_color(status) {
 				return status.indexOf('n') > -1 ? 'color:#60C07A' : 'color:#E52626'
 			},
-			// from tangjq--- 根据bet_status计算右上角徽章的显示文本与配色类型
-			status_badge(status) {
-				const map = {
-					Pending: {
-						label: 'PENDING',
-						type: 'warn'
-					},
-					Win: {
-						label: 'WIN',
-						type: 'win'
-					},
-					Lose: {
-						label: 'LOSE',
-						type: 'lose'
-					},
-					Draw: {
-						label: 'DRAW',
-						type: 'neutral'
-					},
-					Cancel: {
-						label: 'CANCEL',
-						type: 'neutral'
-					},
-					Refund: {
-						label: 'REFUND',
-						type: 'warn'
-					},
-					Rejected: {
-						label: 'REJECTED',
-						type: 'lose'
-					},
-					HalfWin: {
-						label: 'HALF WIN',
-						type: 'win'
-					},
-					HalfLose: {
-						label: 'HALF LOSE',
-						type: 'lose'
-					},
-				}
-				return map[status] || {
-					label: String(status || '').toUpperCase(),
-					type: 'neutral'
-				}
+			// from tangjq--- 卡片右上角钱包徽章：Money→Main Wallet，Promotion→Promo Wallet
+			getWalletBadgeLabel(payWallet) {
+				if (!payWallet) return ''
+				const w = String(payWallet).toLowerCase()
+				if (w === 'money' || w === 'main' || w === 'main wallet') return 'Main Wallet'
+				if (w === 'promotion' || w === 'promo' || w === 'promo wallet') return 'Promo Wallet'
+				return payWallet
+			},
+			// from tangjq--- 卡片右上角钱包徽章：返回颜色类名 badge-main / badge-promo
+			getWalletBadgeClass(payWallet) {
+				if (!payWallet) return 'badge-main'
+				const w = String(payWallet).toLowerCase()
+				if (w === 'promotion' || w === 'promo' || w === 'promo wallet') return 'badge-promo'
+				return 'badge-main'
 			},
 			parse_time(order) {
 				// 先进行时区转换：从系统时区 (UTC+8) 转到用户时区
@@ -885,6 +856,95 @@
 		background: #fff;
 		border-radius: 20px 20px 0 0;
 		flex-shrink: 0;
+		padding: 0 15px;
+	}
+
+	.order-filter {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		justify-content: space-between;
+		background-color: #ffffff;
+		// border-radius: 0 0 16px 16px;
+		gap: 8px;
+		// border-bottom: 1upx solid #eef2f4;
+	}
+
+	/* from tangjq--- 参考 History_Finished.png：4 个青绿色填充的胶囊按钮排在同一行 */
+	.order-filter-pill {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6upx;
+		padding: 0 0;
+		height: 56upx;
+		border: none;
+		border-radius: 999upx;
+		background: #1C667C;
+		color: #FFFFFF;
+		cursor: pointer;
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	.order-filter-calendar-pill {
+		flex: 0 0 auto;
+		padding: 0 18upx;
+	}
+
+	.order-filter-calendar {
+		width: 30upx;
+		height: 30upx;
+		flex-shrink: 0;
+	}
+
+	/* from tangjq--- 日历胶囊内的日期/预设文本，宽度不够时省略号 */
+	.calendar-text {
+		flex: 1;
+		min-width: 0;
+		font-size: 22upx;
+		font-weight: 600;
+		color: #FFFFFF;
+		line-height: 32upx;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		text-align: left;
+	}
+
+	.pill-arrow {
+		color: #FFFFFF;
+		font-size: 22upx;
+		margin-left: 2upx;
+		flex-shrink: 0;
+	}
+
+	/* 让 selector 在 pill 内部显示为白字 + 白箭头（用 ::v-deep 穿透 scoped） */
+	.order-filter-pill ::v-deep .selector-tag {
+		height: auto;
+		line-height: 32upx;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background-color: transparent !important;
+		color: #FFFFFF !important;
+		font-size: 22upx;
+		font-weight: 600;
+		gap: 4upx;
+		justify-content: center;
+	}
+
+	.order-filter-pill ::v-deep .selector-tag text {
+		color: #FFFFFF;
+		font-size: 22upx;
+		font-weight: 600;
+	}
+
+	.order-filter-pill ::v-deep .selector-tag .cuIcon-unfold,
+	.order-filter-pill ::v-deep .selector-tag .cuIcon-fold {
+		color: #FFFFFF;
+		font-size: 20upx;
+		margin-left: 2upx;
 	}
 
 	/* Tab 样式 */
@@ -892,6 +952,7 @@
 		width: 100%;
 		background: #fff;
 		border-radius: 20px 20px 0 0;
+		padding: 0 15px;
 	}
 
 	.tab-container {
@@ -899,7 +960,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		border-bottom: 1px solid #d9d9d9;
+		border-bottom: 2px solid #2A626833;
 	}
 
 	.tab-item {
@@ -907,7 +968,7 @@
 		align-items: center;
 		cursor: pointer;
 		height: 30px;
-		padding: 0 10px;
+		// padding: 0 10px;
 	}
 
 	.tab-text {
@@ -918,15 +979,15 @@
 	}
 
 	.tab-item.active .tab-text {
-		color: #4fb3bf;
+		color: #1C667C;
 	}
 
 	.slide-indicator {
 		position: absolute;
 		bottom: 0;
-		left: 10px;
-		height: 1px;
-		background: #4fb3bf;
+		left: 0;
+		height: 2px;
+		background: #1C667C;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 		width: 60px;
@@ -934,7 +995,7 @@
 
 	.slide-indicator.indicator-finished {
 		left: auto;
-		right: 10px;
+		right: 0;
 	}
 
 	.main-scroll-view {
@@ -957,7 +1018,8 @@
 		background: #FFFFFF;
 		border-radius: 15px;
 		overflow: hidden;
-		box-shadow: 0 4upx 12upx rgba(0, 0, 0, 0.08);
+		box-shadow: 0px 2px 2px 0px #2A626833;
+		border: 1px solid #2A626833
 	}
 
 	/* 卡片头部 */
@@ -1057,55 +1119,48 @@
 		font-weight: 700;
 	}
 
-	/* from tangjq--- 卡片右上角的输赢状态徽章（圆形 + 倾斜字体） */
-	.status-badge {
+	/* 卡片右上角的钱包徽章（pay_wallet），参考 History_Finished.png：
+	   Main Wallet = 白底深字 / Promo Wallet = 青绿底白字 */
+	.user-label-badge {
 		position: absolute;
-		top: -10upx;
-		right: -6upx;
-		width: 72upx;
-		height: 72upx;
-		border-radius: 50%;
-		z-index: 2;
+		top: 0;
+		right: 0;
+		// max-width: 220upx;
+		padding: 4upx 30upx;
+		border-top-right-radius: 12px;
+		border-bottom-left-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		box-shadow: 0 4upx 12upx rgba(0, 0, 0, 0.25);
-		transform: rotate(8deg);
+		z-index: 2;
+		color: white;
 	}
 
-	.status-badge-text {
-		font-size: 18upx;
-		color: #FFFFFF;
-		font-weight: 800;
-		font-style: italic;
-		letter-spacing: 0upx;
-		line-height: 1;
-		text-align: center;
-		text-shadow: 0 1upx 2upx rgba(0, 0, 0, 0.2);
+	.user-label-badge.badge-main {
+		background-color: #02455F;
+	}
+
+	.user-label-badge.badge-promo {
+		background-color: #37BDCC;
+	}
+
+	.user-label-text {
+		max-width: 196upx;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		white-space: nowrap;
-	}
-
-	.badge-win {
-		background: radial-gradient(circle at 35% 35%, #6FE8D4 0%, #2CB5A0 60%, #1A8A7A 100%);
-	}
-
-	.badge-lose {
-		background: radial-gradient(circle at 35% 35%, #F07070 0%, #D32F2F 60%, #A51D1D 100%);
-	}
-
-	.badge-neutral {
-		background: radial-gradient(circle at 35% 35%, #B0BEC5 0%, #607D8B 60%, #3D5A66 100%);
-	}
-
-	.badge-warn {
-		background: radial-gradient(circle at 35% 35%, #FFB74D 0%, #F57C00 60%, #C56000 100%);
+		font-size: 20upx;
+		font-weight: 600;
+		line-height: 30upx;
+		text-align: center;
 	}
 
 	/* 结算状态条 */
 	.result-bar {
-		padding: 5upx;
+		// padding: 5upx;
 		margin: 10upx;
 		text-align: center;
+		font-style: italic;
 	}
 
 	/* from tangjq--- 单笔投注的result-bar四个角都圆角 */
@@ -1114,18 +1169,15 @@
 	}
 
 	.result-win {
-		background: linear-gradient(90deg, #4DBFBF 0%, #5DD5D5 100%);
-		border-radius: 15px;
+		color: #37BDCC;
 	}
 
 	.result-lose {
-		background: linear-gradient(90deg, #E74C3C 0%, #EC7063 100%);
-		border-radius: 15px;
+		color: #FF5341;
 	}
 
 	.result-text {
-		font-size: 28upx;
-		color: #FFFFFF;
+		font-size: 24upx;
 		font-weight: 700;
 		letter-spacing: 1upx;
 	}
@@ -1146,8 +1198,7 @@
 		justify-content: center;
 		align-items: center;
 		padding: 5upx;
-		background: #edfffe;
-		border-top: 2upx solid #E0E0E0;
+		background: #F1FAFB;
 		cursor: pointer;
 		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
 		border-radius: 0 0 15px 15px;
@@ -1156,7 +1207,7 @@
 	.parlay-label {
 		font-size: 28upx;
 		color: #2A6268;
-		font-weight: 600;
+		font-weight: bold;
 		/* from tangjq--- 文字左右两侧留出箭头间距 */
 		margin: 0 16upx;
 	}

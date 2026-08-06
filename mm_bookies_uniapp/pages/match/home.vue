@@ -7,7 +7,8 @@
 		<message-notification></message-notification>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder" :style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
+		<view class="header-placeholder"
+			:style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -28,6 +29,7 @@
 					@tap="clearSearch"></image>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
+				<view>{{$t('league')}}</view>
 				<view class="filter-icon">
 					<view class="filter-line"></view>
 					<view class="filter-line"></view>
@@ -564,7 +566,8 @@
 									</view>
 									<view class="flex-column1 margin-left-sm align-start gap-5px">
 										<view class="text-light">{{$t('promotion_wallet')}}</view>
-										<view>{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</view>
+										<view>{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}
+										</view>
 									</view>
 								</view>
 								<view class="flex-row1 align-center justify-end" @click="togglePromotionWallet">
@@ -1780,11 +1783,13 @@
 									if (_this.use_promotion_wallet) {
 										// 从优惠钱包扣除
 										userInfo.money_promotion = _this.$toolbox.floor_format(
-											_this.$toolbox.floor_value(userInfo.money_promotion) - actualDeduction);
+											_this.$toolbox.floor_value(userInfo.money_promotion) -
+											actualDeduction);
 									} else {
 										// 从主钱包扣除
 										userInfo.money = _this.$toolbox.floor_format(
-											_this.$toolbox.floor_value(userInfo.money) - actualDeduction);
+											_this.$toolbox.floor_value(userInfo.money) -
+											actualDeduction);
 									}
 
 									_this.reset();
@@ -2338,10 +2343,13 @@
 
 	.filter-btn {
 		position: relative;
-		width: 30px;
 		height: 30px;
 		background-color: #1C667C;
-		border-radius: 50%;
+		color: white;
+		font-weight: bold;
+		gap: 5px;
+		padding: 0 12px;
+		border-radius: 16px;
 		display: flex;
 		align-items: center;
 		justify-content: center;

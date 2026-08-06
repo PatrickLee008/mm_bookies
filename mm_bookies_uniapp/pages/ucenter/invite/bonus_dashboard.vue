@@ -9,7 +9,6 @@
 				<view class="dashboard-filters">
 					<view class="type-filter-container">
 						<view class="dashboard-filter type-filter" @click="typeMenuVisible = !typeMenuVisible">
-							<image mode="widthFix" class="dashboard-filter-icon" src="/static/image/order/calender.svg" />
 							<text class="type-filter-label">{{ typeDisplay }}</text>
 							<text class="cuIcon-unfold dashboard-filter-arrow"></text>
 						</view>
@@ -21,7 +20,8 @@
 						</view>
 					</view>
 					<view class="dashboard-filter period-filter" @click="openPeriodPicker">
-						<text>{{ $t('period') }}: {{ periodDisplay }}</text>
+						<image mode="widthFix" class="dashboard-filter-icon" src="/static/image/order/calender.svg" />
+						<text class="period-filter-text">{{ periodDisplay }}</text>
 						<text class="cuIcon-unfold dashboard-filter-arrow"></text>
 					</view>
 				</view>
@@ -377,7 +377,7 @@ export default {
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 7px;
+		gap: 3px;
 		margin-bottom: 14px;
 	}
 
@@ -465,6 +465,14 @@ export default {
 
 	.period-filter {
 		gap: 4px;
+		white-space: nowrap;
+	}
+
+	.period-filter-text {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 

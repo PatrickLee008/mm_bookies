@@ -203,11 +203,11 @@
 		overflow: hidden;
 		background:
 			/* 第三层（最上层）：左下角光晕 */
-			radial-gradient(circle at 0% 100%, #36BCCB 0%, #1F879B 20%, rgba(31, 135, 155, 0) 70%),
+			radial-gradient(circle at 0% 100%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
 			/* 第二层：右上角光晕 */
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 24%, rgba(31, 135, 155, 0) 78%),
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
 			/* 第一层（最底层）：线性渐变底色 */
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+			linear-gradient(135deg, #103D43 0%, #103D43 56%, #103D43 100%);
 	}
 
 	.home-top {

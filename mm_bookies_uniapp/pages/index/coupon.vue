@@ -32,8 +32,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60"
-			@scroll="handleHeaderScroll">
+		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60" @scroll="handleHeaderScroll">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
@@ -251,8 +250,7 @@
 							<!-- 1x2 Sports Betting -->
 							<view class="coupon-scenario-icon-item" v-if="betTypes.length > 0" @click="openCouponSport">
 								<view class="coupon-scenario-icon-circle">
-									<image src="/static/icon/nav/single.png" class="coupon-scenario-img"
-										mode="aspectFit"></image>
+									<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
 								</view>
 								<text class="coupon-scenario-label">Single</text>
 							</view>
@@ -260,8 +258,7 @@
 							<view class="coupon-scenario-icon-item" v-if="displayVendors.length > 0"
 								@click="openVendorGames(displayVendors[0])">
 								<view class="coupon-scenario-icon-diamond">
-									<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit">
-									</image>
+									<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
 								</view>
 								<text class="coupon-scenario-label">Mix</text>
 							</view>
@@ -393,41 +390,39 @@
 					</view>
 
 					<!-- Applicable Scenarios -->
-					<view class="coupon-scenarios"
-						v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
-						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
-						<view class="coupon-scenarios-icons">
-							<!-- 1x2 Sports Betting -->
-							<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
-								@click="openPromotionSport">
-								<view class="coupon-scenario-icon-circle">
-									<image src="/static/icon/nav/single.png" class="coupon-scenario-img"
-										mode="aspectFit"></image>
-								</view>
-								<text class="coupon-scenario-label">Single</text>
+				<view class="coupon-scenarios"
+					v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
+					<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+					<view class="coupon-scenarios-icons">
+						<!-- 1x2 Sports Betting -->
+						<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
+							@click="openPromotionSport">
+							<view class="coupon-scenario-icon-circle">
+								<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
 							</view>
-							<!-- Mix Parlay -->
-							<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
-								@click="openPromotionVendorGames(promotionDisplayVendors[0])">
-								<view class="coupon-scenario-icon-diamond">
-									<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit">
-									</image>
-								</view>
-								<text class="coupon-scenario-label">Mix</text>
-							</view>
+							<text class="coupon-scenario-label">Single</text>
 						</view>
-						<!-- Vendor list (collapsible below icons) -->
-						<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
-							<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
-								:key="index" @click="openPromotionVendorGames(vendor)">
-								<view class="coupon-vendor-info">
-									<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
-										mode="heightFix"></image>
-									<text class="coupon-vendor-name">{{ vendor.platform }}</text>
-								</view>
+						<!-- Mix Parlay -->
+						<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
+							@click="openPromotionVendorGames(promotionDisplayVendors[0])">
+							<view class="coupon-scenario-icon-diamond">
+								<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
+							</view>
+							<text class="coupon-scenario-label">Mix</text>
+						</view>
+					</view>
+					<!-- Vendor list (collapsible below icons) -->
+					<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
+						<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+							:key="index" @click="openPromotionVendorGames(vendor)">
+							<view class="coupon-vendor-info">
+								<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+									mode="heightFix"></image>
+								<text class="coupon-vendor-name">{{ vendor.platform }}</text>
 							</view>
 						</view>
 					</view>
+				</view>
 				</scroll-view>
 
 				<view class="detail-modal-footer">
@@ -505,7 +500,7 @@
 				loading: false,
 
 				// 顶部切换：coupon / promotion
-				activity_type: 'promotion',
+			activity_type: 'promotion',
 
 				// Coupon Tab
 				tabs: ['Unused', 'Used', 'Expired'],
@@ -1428,7 +1423,8 @@
 		background: #fff;
 		border-radius: 20px 20px 0 0;
 		flex-shrink: 0;
-		padding: 6px 15px;
+		padding-top: 6px;
+		padding-bottom: 6px;
 	}
 
 	.main-scroll-view {
@@ -1441,7 +1437,7 @@
 	.type-toggle {
 		display: flex;
 		flex-direction: row;
-		padding: 8px 0 4px;
+		padding: 8px 12px 4px;
 		gap: 10px;
 	}
 
@@ -1503,7 +1499,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		padding: 6px 0;
+		padding: 6px 12px;
 		gap: 8px;
 	}
 

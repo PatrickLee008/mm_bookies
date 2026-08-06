@@ -1,6 +1,24 @@
 <template>
 	<view class="login-container">
 		<global-notice ref="globalNotice"></global-notice>
+		<!-- 语言切换按钮 -->
+		<view class="lang-switch" @click="openLangModal">
+			<image class="lang-switch-icon" src="/static/icon/ucenter/language.png" mode="aspectFit"></image>
+			<text class="lang-switch-text">{{ currentLangLabel }}</text>
+		</view>
+
+		<!-- 语言切换弹窗 -->
+		<view class="lang-modal-mask" v-if="showLangModal" @click="showLangModal = false">
+			<view class="lang-modal" @click.stop="">
+				<view class="lang-modal-title">{{ $t('change_language') }}</view>
+				<view class="lang-option" v-for="opt in langOptions" :key="opt.value" @click="selectLang(opt.value)">
+					<text class="lang-option-label">{{ opt.label }}</text>
+					<view class="lang-radio" :class="{ 'lang-radio-on': currentLang === opt.value }">
+						<view class="lang-radio-dot" v-if="currentLang === opt.value"></view>
+					</view>
+				</view>
+			</view>
+		</view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
@@ -90,7 +108,7 @@
 
 		<!-- Version Info -->
 		<view class="version-info">{{version}}</view>
-		
+
 		<!-- 客服按钮 -->
 		<customer-service></customer-service>
 	</view>
@@ -98,6 +116,7 @@
 
 <script>
 	import config from '../../utils/config.js'
+	import language from '../../utils/language.js'
 	import CryptoJS from 'crypto-js';
 	import CustomerService from '@/components/common/customer-service.vue'
 
@@ -118,6 +137,27 @@
 				version: uni.getStorageSync("version"),
 				rememberMe: true,
 
+				// 语言切换
+				showLangModal: false,
+				currentLang: uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm',
+				langOptions: [{
+						value: 'mm',
+						label: 'မြန်မာ'
+					},
+					{
+						value: 'en',
+						label: 'English'
+					},
+					{
+						value: 'th',
+						label: 'ภาษาไทย'
+					},
+					{
+						value: 'cn',
+						label: '中文'
+					},
+				],
+
 				// 验证相关
 				phone_error: false,
 				password_error: false,
@@ -132,6 +172,15 @@
 			registerDisabled() {
 				return !this.loginInfo.phone || !this.loginInfo.password || !this.loginInfo.confirm_password ||
 					this.phone_error || this.password_error || this.confirm_password_error
+			},
+			currentLangLabel() {
+				const map = {
+					mm: 'မြန်မာ',
+					en: 'EN',
+					th: 'ไทย',
+					cn: '中文'
+				}
+				return map[this.currentLang] || 'EN'
 			}
 		},
 		methods: {
@@ -166,6 +215,21 @@
 				uni.navigateTo({
 					url: "./login"
 				})
+			},
+			// 语言切换
+			openLangModal() {
+				this.currentLang = uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm'
+				this.showLangModal = true
+			},
+			selectLang(value) {
+				if (!value) value = 'mm'
+				this.currentLang = value
+				// 与 pages/ucenter/language.vue 保持一致：更新全局语言、缓存与 i18n
+				config.language = language[value]
+				uni.setStorageSync('language', value)
+				uni.setLocale(value)
+				this.$i18n.locale = value
+				this.showLangModal = false
 			},
 			register() {
 				if (this.$toolbox.click_too_fast(1)) return
@@ -330,14 +394,115 @@
 
 <style lang="scss">
 	.login-container {
+		position: relative;
 		min-height: 100vh;
-		background: radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background:
+			/* 第三层（最上层）：左下角光晕 */
+			radial-gradient(circle at 0% 100%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
+			/* 第二层：右上角光晕 */
+			radial-gradient(circle at 100% 0%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
+			/* 第一层（最底层）：线性渐变底色 */
+			linear-gradient(135deg, #103D43 0%, #103D43 56%, #103D43 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		padding: 0 30rpx;
 		box-sizing: border-box;
+	}
+
+	/* 语言切换按钮 */
+	.lang-switch {
+		position: absolute;
+		top: 24rpx;
+		right: 24rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 8rpx 18rpx;
+		background: rgba(255, 255, 255, 1);
+		border: 1rpx solid rgba(255, 255, 255, 0.35);
+		border-radius: 30rpx;
+		z-index: 50;
+	}
+
+	.lang-switch-icon {
+		width: 32rpx;
+		height: 32rpx;
+		margin-right: 8rpx;
+	}
+
+	.lang-switch-text {
+		color: #000000;
+		font-size: 24rpx;
+		font-weight: 600;
+	}
+
+	/* 语言切换弹窗 */
+	.lang-modal-mask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 9998;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.lang-modal {
+		width: 78%;
+		max-width: 600rpx;
+		background: #ffffff;
+		border-radius: 20rpx;
+		padding: 30rpx 24rpx;
+	}
+
+	.lang-modal-title {
+		font-size: 32rpx;
+		font-weight: 700;
+		color: #1e3a5f;
+		text-align: center;
+		margin-bottom: 20rpx;
+	}
+
+	.lang-option {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		background: #f5f7f8;
+		border-radius: 14rpx;
+		padding: 24rpx 28rpx;
+		margin-bottom: 16rpx;
+	}
+
+	.lang-option-label {
+		font-size: 30rpx;
+		font-weight: 600;
+		color: #1e3a5f;
+	}
+
+	.lang-radio {
+		width: 40rpx;
+		height: 40rpx;
+		border-radius: 50%;
+		border: 3rpx solid #ccc;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.lang-radio.lang-radio-on {
+		border-color: #2A6268;
+	}
+
+	.lang-radio-dot {
+		width: 22rpx;
+		height: 22rpx;
+		border-radius: 50%;
+		background: #2A6268;
 	}
 
 	/* 标题区域 */

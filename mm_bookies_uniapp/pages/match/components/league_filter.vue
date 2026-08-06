@@ -24,17 +24,15 @@
 						</view>
 
 						<!-- from tangjq--- 联赛列表 -->
-						<view class="filter-item"
-							v-for="(league,index) in league_list"
-							:key="index"
-							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]'
-							@click="toggleLeague(index)">
+						<view class="filter-item" v-for="(league,index) in league_list" :key="index"
+							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]' @click="toggleLeague(index)">
 							<text class="filter-item-text">{{league.name}}</text>
 							<view class="filter-radio" :class="{'filter-radio-checked': league.checked}">
 								<view class="filter-radio-inner" v-if="league.checked"></view>
 							</view>
 							<!-- from tangjq--- 隐藏的checkbox用于保持原有逻辑 -->
-							<checkbox style="display: none;" :checked="league.checked" :value="String(index)"></checkbox>
+							<checkbox style="display: none;" :checked="league.checked" :value="String(index)">
+							</checkbox>
 						</view>
 
 						<!-- from tangjq--- 隐藏的All checkbox用于保持原有逻辑 -->
@@ -117,8 +115,8 @@
 				list.forEach((league, index) => {
 					league.checked = this.all_status
 				})
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -130,8 +128,8 @@
 				list[index].checked = !list[index].checked
 				// 检查是否所有联赛都被选中
 				this.all_status = list.every(league => league.checked)
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -151,8 +149,8 @@
 						league.checked = check_list.includes(String(index))
 					})
 				}
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -228,7 +226,7 @@
 		overflow-y: auto;
 		min-height: 0;
 		background-color: #f8f9fa;
-		padding: 20px 0;
+		padding: 20px 12px;
 	}
 
 	.filter-list {
@@ -246,6 +244,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
+		border-bottom: 1px solid #2A626833;
 	}
 
 	.filter-item:active {
@@ -253,7 +252,7 @@
 	}
 
 	.filter-item-text {
-		color: #2A6268;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 500;
 		flex: 1;
