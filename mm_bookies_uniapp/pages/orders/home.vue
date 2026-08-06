@@ -26,6 +26,7 @@
 			<view class="order-filter">
 				<view class="order-filter-pill order-filter-calendar-pill" @click="$refs.date_picker.show()">
 					<image mode="widthFix" class="order-filter-calendar" src="/static/image/order/calender.svg" />
+					<text class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
 					<text class="cuIcon-unfold pill-arrow"></text>
 				</view>
 				<view class="order-filter-pill">
@@ -817,6 +818,8 @@
 		},
 		mounted() {
 			this.date_range = [this.getCurrentDate(0), this.getCurrentDate(0)]
+			// from tangjq--- 初始化时默认选中 today 预设
+			this.date_preset = this.$t('today')
 			this.parse_option_list()
 			this.get_list()
 		},
@@ -866,7 +869,7 @@
 		justify-content: space-between;
 		background-color: #ffffff;
 		// border-radius: 0 0 16px 16px;
-		gap: 8px;
+		gap: 5px;
 		// border-bottom: 1upx solid #eef2f4;
 	}
 
@@ -884,7 +887,6 @@
 		color: #FFFFFF;
 		cursor: pointer;
 		flex: 1 1 0;
-		min-width: 0;
 	}
 
 	.order-filter-calendar-pill {
@@ -920,6 +922,14 @@
 	}
 
 	/* 让 selector 在 pill 内部显示为白字 + 白箭头（用 ::v-deep 穿透 scoped） */
+	/* from tangjq--- 让 selector-wrapper 占满整个 pill 宽度，使下拉面板（.selector-bg 用 left:0）和 pill 左对齐 */
+	.order-filter-pill ::v-deep .selector-wrapper {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
 	.order-filter-pill ::v-deep .selector-tag {
 		height: auto;
 		line-height: 32upx;

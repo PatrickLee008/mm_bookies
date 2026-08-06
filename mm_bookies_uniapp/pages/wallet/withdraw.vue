@@ -1,7 +1,7 @@
 <template>
 	<view class="withdraw-component">
 		<!-- from tangjq--- Withdraw 组件内容从 withdraw.vue 提取 -->
-		<scroll-view scroll-y class="withdraw-scroll">
+		<scroll-view scroll-y class="withdraw-scroll" @scroll="onScrollEmit">
 			<!-- from tangjq--- 银行卡列表界面（仿照deposit.vue） -->
 			<view class="bank-list-container">
 				<!-- 银行卡列表 -->
@@ -250,6 +250,10 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			},
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')
 				amount = amount ? parseInt(amount) : '0'
@@ -477,7 +481,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	/* from tangjq--- 银行卡列表样式（完全仿照deposit.vue） */
 	.bank-list-container {
-		padding: 20px 16px;
+		padding: 20px 5px;
 	}
 
 	.bank-card-item {

@@ -63,10 +63,10 @@
 				</view>
 				<view class="balance-actions">
 					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0', 1)">
-						<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
+						<image class="" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
 					</view>
 					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1', 1)">
-						<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
+						<image class="" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
 					</view>
 					<view class="cashout-action">{{$t('cash_out')}} {{displayBalance(userInfo.total_withdraw)}}</view>
 				</view>
@@ -157,9 +157,12 @@
 					'pages/ucenter/message': 'Messages',
 					'pages/ucenter/invite/bonus_dashboard': 'Bonus Dashboard',
 					'pages/ucenter/invite/user_dashboard': 'User Dashboard',
-					'pages/ucenter/withdraw': 'Withdraw',
-					'pages/ucenter/charge': 'Deposit',
-					'pages/payment/payment': 'Payment'
+				'pages/ucenter/withdraw': 'Withdraw',
+				'pages/ucenter/charge': 'Deposit',
+				'pages/wallet/deposit_page': 'Deposit',
+				'pages/wallet/withdraw_page': 'Withdraw',
+				'pages/wallet/promotion_transaction': 'promotion_transaction',
+				'pages/payment/payment': 'Payment'
 				}
 				const pages = getCurrentPages()
 				const current = pages.length ? pages[pages.length - 1] : null
@@ -990,11 +993,6 @@
 	.wallet-action image {
 		width: 20px;
 		height: 20px;
-		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
-	}
-
-	.wallet-action-icon {
-		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%) !important;
 	}
 
 	.cashout-action {

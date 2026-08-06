@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -102,6 +102,10 @@
 			}
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			refreshData() {
 				if (this.refreshing) return;
 				this.refreshing = true;
@@ -129,19 +133,19 @@
 				this.loadRecords();
 			},
 
-			async loadRecords() {
-				if (this.loading) return;
+async loadRecords() {
+			if (this.loading) return;
 
-				this.loading = true;
+			this.loading = true;
 
-				try {
-					const filterParams = this.getFilterParams();
-					const para = {
-						page: this.page,
-						limit: this.pageSize,
-						type: 'Withdraw',
-						...filterParams
-					};
+			try {
+				const filterParams = this.getFilterParams();
+				const para = {
+					page: this.page,
+					limit: this.pageSize,
+					// from tangjq--- 去掉 type=Withdraw 限制，显示所有交易类型（Deposit/Withdraw 都会显示）
+					...filterParams
+				};
 
 					await new Promise((resolve, reject) => {
 						this.$http.get('/withdraw/get', { data: para }, (res) => {

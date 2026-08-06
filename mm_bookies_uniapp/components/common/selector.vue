@@ -119,7 +119,7 @@
 	.selector-tag {
 		background-color: #bdbdbd;
 		color: white;
-		gap: 8upx;
+		gap: 6upx;
 		position: relative;
 		overflow: visible;
 	}

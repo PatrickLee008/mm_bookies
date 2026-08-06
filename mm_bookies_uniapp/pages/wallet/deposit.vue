@@ -1,7 +1,7 @@
 <template>
 	<view class="deposit-component">
 		<global-notice ref="globalNotice"></global-notice>
-		<scroll-view scroll-y class="deposit-scroll">
+		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit">
 			<!-- from tangjq--- 银行卡列表界面（默认显示） -->
 			<view class="bank-list-container" v-if="current_progress==0">
 				<!-- 银行卡列表 -->
@@ -684,6 +684,10 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			},
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			select_option(selected, list, allow_false) {
 				if (selected.checked && !allow_false) return
 				selected.checked = !selected.checked
@@ -1473,7 +1477,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	/* from tangjq--- 银行卡列表样式 */
 	.bank-list-container {
-		padding: 20px 16px;
+		padding: 20px 5px;
 	}
 
 	.bank-card-item {

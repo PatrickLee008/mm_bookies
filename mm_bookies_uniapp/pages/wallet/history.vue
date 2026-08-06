@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -106,6 +106,10 @@
 			}
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			refreshData() {
 				if (this.refreshing) return;
 				this.refreshing = true;

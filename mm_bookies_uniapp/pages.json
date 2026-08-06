@@ -14,6 +14,18 @@
 			"style": {}
 		},
 		{
+			"path": "pages/wallet/deposit_page",
+			"style": {}
+		},
+		{
+			"path": "pages/wallet/withdraw_page",
+			"style": {}
+		},
+		{
+			"path": "pages/wallet/promotion_transaction",
+			"style": {}
+		},
+		{
 			"path": "pages/index/coupon",
 			"style": {}
 		},

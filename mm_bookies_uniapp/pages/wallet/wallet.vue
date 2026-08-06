@@ -1,81 +1,121 @@
-<template>
+<template name="wallet">
 	<view class="bg-white full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<!-- from tangjq--- 标题栏：包含钱包信息和 Tab 页签 -->
-		<view class="title-bar">
-			<!-- from tangjq--- Tab 页签 -->
-			<view class="tab-selector">
-				<view class="tab-container">
-					<view class="tab-item" :class="{'active': tab_index === 0}" @click="handleTabClick(0)">
-						<text class="tab-text">{{ $t('deposit') }}</text>
-					</view>
-					<view class="tab-item" :class="{'active': tab_index === 1}" @click="handleTabClick(1)">
-						<text class="tab-text">{{ $t('withdraw') }}</text>
-					</view>
-					<view class="tab-item" :class="{'active': tab_index === 2}" @click="handleTabClick(2)">
-						<text class="tab-text">{{ $t('deposit_history') }}</text>
-					</view>
-
-					<view class="tab-item" :class="{'active': tab_index === 3}" @click="handleTabClick(3)">
-						<text class="tab-text">{{ $t('withdraw_history') }}</text>
-					</view>
-
-					<!-- from tangjq--- 底部滑动指示器 -->
-					<view class="slide-indicator" :style="{
-						width: indicator_width + 'px',
-						transform: `translateX(${indicator_offset}px)`
-					}"></view>
+		<!-- from tangjq--- 入口按钮栏：Deposit / Withdraw / Promotion Transaction（图标使用首页index的同款图标） -->
+		<view class="entry-bar">
+			<view class="entry-item" @click="goto('/pages/wallet/deposit_page')">
+				<image class="entry-icon entry-icon-svg" mode="aspectFit" src="/static/deposit.svg" />
+				<view class="flex-column align-center" style="min-height: 34px;">
+					<text class="entry-text">{{ $t('deposit') }}</text>
+				</view>
+			</view>
+			<view class="entry-item" @click="goto('/pages/wallet/withdraw_page')">
+				<image class="entry-icon entry-icon-svg" mode="aspectFit" src="/static/withdraw.svg" />
+				<view class="flex-column align-center" style="min-height: 34px;">
+					<text class="entry-text">{{ $t('withdraw') }}</text>
+				</view>
+			</view>
+			<view class="entry-item" @click="goto('/pages/wallet/promotion_transaction')">
+				<image class="entry-icon entry-icon-coin" mode="aspectFit" src="/static/icon/nav/coin.png" />
+				<view class="flex-column align-center" style="min-height: 34px;">
+					<text class="entry-text">{{ $t('promotion_transaction') || 'Promotion Transaction' }}</text>
 				</view>
 			</view>
 		</view>
 
-		<!-- from tangjq--- Tab 内容区域 -->
-		<view class="tab-content">
-			<!-- Deposit 子组件 -->
-			<wallet-deposit v-if="tab_index === 0"></wallet-deposit>
+		<!-- from tangjq--- 默认列表：调用 /withdraw/get 不带 type，显示所有充值+提现信息 -->
+		<view class="transaction-list-wrap">
+			<!-- 筛选器 -->
+			<view class="filter-bar" @click="toggleFilterDropdown">
+				<text class="filter-text">{{getFilterText()}}</text>
+				<text class="filter-icon" :class="filterExpanded ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+			</view>
 
-			<!-- Withdraw 子组件 -->
-			<wallet-withdraw v-if="tab_index === 1"></wallet-withdraw>
+			<!-- 下拉选项 -->
+			<view v-if="filterExpanded" class="filter-dropdown">
+				<view v-for="(option, index) in filterOptions" :key="index" class="filter-option"
+					@click="toggleFilterOption(option)">
+					<text class="option-text">{{ $t(option.label) }}</text>
+					<view class="option-radio" :class="{'active': option.checked}">
+						<view class="option-radio-inner" v-if="option.checked"></view>
+					</view>
+				</view>
+			</view>
 
-			<!-- from tangjq--- History 子组件 -->
-			<wallet-history v-if="tab_index === 2" ref="depositHistory"></wallet-history>
+			<scroll-view scroll-y class="history-scroll" @scroll="handleHeaderScroll" @scrolltolower="loadMore"
+				:refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
+				<!-- 空状态 -->
+				<view v-if="!loading && recordList.length === 0" class="empty-state">
+					<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
+					<text
+						class="empty-text">{{ $t('no_withdraw_records') || 'No transaction records available at the moment.' }}</text>
+				</view>
 
-			<!-- Withdraw History 子组件 -->
-			<wallet-withdraw-history v-if="tab_index === 3" ref="withdrawHistory"></wallet-withdraw-history>
+				<!-- 记录项（参考 Wallet_Page.png 卡片样式） -->
+				<view v-for="(item, index) in recordList" :key="index" class="record-card">
+					<!-- 顶部：Order ID + 时间 -->
+					<view class="card-top">
+						<text class="order-id">Order ID：{{item.id}}</text>
+						<text class="order-time">{{formatTime(item.create_time)}}</text>
+					</view>
+
+					<!-- 类型行：● + 类型 | 支付方式logo+名称 -->
+					<view class="card-type-row">
+						<view class="type-left">
+							<image class="type-svg" mode="aspectFit"
+								:src="item.type === 'Deposit' ? '/static/deposit.svg' : '/static/withdraw.svg'" />
+							<text class="type-name">{{item.type || 'Deposit'}}</text>
+						</view>
+						<view class="pay-right">
+							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
+								class="pay-logo"></image>
+							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
+						</view>
+					</view>
+
+					<!-- 金额行 -->
+					<view class="card-amount-row">
+						<text class="amount-label">Transaction Amount：</text>
+						<text class="amount-value"
+							:class="item.type === 'Deposit' ? 'amount-deposit-color' : 'amount-withdraw-color'">{{item.type === 'Deposit' ? '+' : '-'}}{{numberFormat(item.amount)}}
+							MMK</text>
+					</view>
+
+					<!-- 状态 -->
+					<view class="card-status">
+						<text class="status-text"
+							:class="getStatusClass(item.status)">{{getStatusText(item.status)}}</text>
+					</view>
+				</view>
+
+				<!-- 加载更多 -->
+				<view v-if="loading" class="loading-more">
+					<text class="cuIcon-loading2 load-icon rotating"></text>
+					<text class="loading-text">{{ $t('loading_dots') }}</text>
+				</view>
+				<view class="blank"></view>
+			</scroll-view>
 		</view>
 
-		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在充值/提现记录页签显示，点击刷新列表数据 -->
-		<view class="refresh-btn-float" v-if="tab_index === 2 || tab_index === 3" @click="refreshList">
-			<!-- <image class="refresh-icon" mode="widthFix" src="/static/icon/wallet/reflesh.svg" /> -->
+		<!-- from tangjq--- 悬浮的 Refresh 按钮，点击刷新列表数据 -->
+		<view class="refresh-btn-float" @click="refreshList">
 			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
-			<!-- <text class="refresh-text">{{ $t('refresh') }}</text> -->
 		</view>
 	</view>
 </template>
 
 <script>
-	// from tangjq--- 引入必要的工具和组件
+	// from tangjq--- wallet 默认页面：入口按钮 + 统一交易列表
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
-	import WalletDeposit from './deposit.vue'
-	import WalletWithdraw from './withdraw.vue'
-	import WalletHistory from './history.vue'
-	import WalletWithdrawHistory from './withdraw_history.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
-		components: {
-			// from tangjq--- 注册子组件
-			WalletDeposit,
-			WalletWithdraw,
-			WalletHistory,
-			WalletWithdrawHistory,
-		},
 		mixins: [headerCollapse],
 		data() {
 			return {
@@ -83,86 +123,198 @@
 				language: config.language,
 				userInfo: null,
 
-				// from tangjq--- Tab 相关变量
-				tab_index: 0,
-				indicator_width: 0,
-				indicator_offset: 0,
+				// from tangjq--- 默认列表数据（调用 /withdraw/get 不带 type）
+				recordList: [],
+				loading: false,
+				refreshing: false,
+				refresherTriggered: false,
+				hasMore: true,
+				page: 1,
+				pageSize: 10,
+
+				filterExpanded: false,
+				filterOptions: [{
+						label: 'filter_all',
+						value: 'all',
+						checked: true
+					},
+					{
+						label: 'filter_pending',
+						value: 'Pending',
+						type: 'status',
+						checked: false
+					},
+					{
+						label: 'filter_success',
+						value: 'Success',
+						type: 'status',
+						checked: false
+					},
+					{
+						label: 'filter_rejected',
+						value: 'Rejected',
+						type: 'status',
+						checked: false
+					},
+				],
 			}
 		},
-
 		methods: {
-			// from tangjq--- 刷新当前记录列表数据（仅在充值/提现记录页签有效），不再重新加载页面
-			refreshList() {
-				const historyRef = this.tab_index === 2 ? this.$refs.depositHistory : this.$refs.withdrawHistory
-				if (historyRef && typeof historyRef.refreshData === 'function') {
-					historyRef.refreshData()
-				}
-			},
 			goto(url) {
 				uni.navigateTo({
-					url: url,
+					url: url
 				})
 			},
-			numberFormat(num) {
-				return dateFormatUtils.numFormat(num)
+			numberFormat(number) {
+				return dateFormatUtils.numFormat(number)
+			},
+			formatTime(time) {
+				if (!time) return '';
+				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : convertedTime;
+				return dateFormatUtils.formatTime(date);
 			},
 
-			// from tangjq--- 处理 Tab 点击事件
-			handleTabClick(index) {
-				if (this.tab_index === index) return
-
-				// from tangjq--- 切换 tab，不再跳转
-				this.tab_index = index
-				this.updateIndicator()
+			getStatusText(status) {
+				const s = String(status);
+				const statusMap = {
+					'Pending': this.$t('processing') || 'Pending',
+					'Success': this.$t('success') || 'Success',
+					'Rejected': this.$t('Rejected') || 'Rejected',
+					'Time Out': 'Time Out',
+				};
+				return statusMap[s] || status;
 			},
 
-			// from tangjq--- 初始化指示器
-			initIndicator() {
-				const query = uni.createSelectorQuery().in(this)
-				query.selectAll('.tab-item').boundingClientRect().exec((res) => {
-					if (res[0] && res[0].length > 0) {
-						this.indicator_width = res[0][0].width
-						this.updateIndicator()
-					}
-				})
+			getStatusClass(status) {
+				const s = String(status);
+				const classMap = {
+					'Pending': 'status-pending',
+					'Success': 'status-success',
+					'Rejected': 'status-failed',
+					'Time Out': 'status-timeout',
+				};
+				return classMap[s] || 'status-default';
 			},
 
-			// from tangjq--- 更新指示器位置
-			updateIndicator() {
-				const query = uni.createSelectorQuery().in(this)
-				query.selectAll('.tab-item').boundingClientRect().exec((res) => {
-					if (res[0] && res[0].length > this.tab_index) {
-						const currentTab = res[0][this.tab_index]
-						const container = res[0][0]
-						this.indicator_offset = currentTab.left - container.left
-						this.indicator_width = currentTab.width
-					}
-				})
+			refreshList() {
+				if (this.refreshing) return;
+				this.refreshing = true;
+				this.page = 1;
+				this.hasMore = true;
+				this.recordList = [];
+				this.loadRecords();
+			},
+
+			onRefresh() {
+				setTimeout(() => {
+					this.refresherTriggered = true;
+					this.page = 1;
+					this.hasMore = true;
+					this.recordList = [];
+					this.loadRecords().finally(() => {
+						this.refresherTriggered = false;
+					});
+				}, 500)
+			},
+
+			loadMore() {
+				if (!this.hasMore || this.loading) return;
+				this.page++;
+				this.loadRecords();
+			},
+
+			async loadRecords() {
+				if (this.loading) return;
+				this.loading = true;
+				try {
+					const filterParams = this.getFilterParams();
+					const para = {
+						page: this.page,
+						limit: this.pageSize,
+						// from tangjq--- 不传 type，显示所有充值+提现
+						...filterParams
+					};
+
+					await new Promise((resolve, reject) => {
+						this.$http.get('/withdraw/get', {
+							data: para
+						}, (res) => {
+							if (res.statusCode === 200) {
+								const items = res.data.items || [];
+								if (this.page === 1) {
+									this.recordList = items;
+								} else {
+									this.recordList.push(...items);
+								}
+								this.hasMore = items.length === this.pageSize;
+								resolve();
+							} else {
+								reject(new Error(res.data.message || 'Load failed'));
+							}
+						});
+					});
+				} catch (error) {
+					console.error('Load records failed:', error);
+					uni.showToast({
+						title: error.message || 'Load failed',
+						icon: 'none'
+					});
+				} finally {
+					this.loading = false;
+					this.refreshing = false;
+				}
+			},
+
+			toggleFilterDropdown() {
+				this.filterExpanded = !this.filterExpanded;
+			},
+
+			toggleFilterOption(option) {
+				this.filterOptions.forEach(opt => {
+					opt.checked = opt.value === option.value;
+				});
+				this.filterExpanded = false;
+				this.page = 1;
+				this.hasMore = true;
+				this.recordList = [];
+				this.loadRecords();
+			},
+
+			getFilterText() {
+				const allOption = this.filterOptions.find(opt => opt.value === 'all');
+				if (allOption && allOption.checked) {
+					return 'All Transaction';
+				}
+				const checkedOptions = this.filterOptions.filter(opt => opt.value !== 'all' && opt.checked);
+				if (checkedOptions.length === 0) {
+					return 'All Transaction';
+				}
+				return this.$t(checkedOptions[0].label);
+			},
+
+			getFilterParams() {
+				const allOption = this.filterOptions.find(opt => opt.value === 'all');
+				if (allOption && allOption.checked) {
+					return {};
+				}
+				const params = {};
+				const checkedOptions = this.filterOptions.filter(opt => opt.value !== 'all' && opt.checked);
+				if (checkedOptions.length === 0) {
+					return {};
+				}
+				const statusOption = checkedOptions.find(opt => opt.type === 'status');
+				if (statusOption) {
+					params.status = statusOption.value;
+				}
+				return params;
 			},
 		},
 
 		onLoad(options) {
-			// from tangjq--- 初始化用户信息
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
-			// 支持从外部页面通过 ?tab=N 跳转到指定 tab
-			if (options && options.tab != null) {
-				const idx = parseInt(options.tab)
-				if (!isNaN(idx) && idx >= 0 && idx <= 3) {
-					this.tab_index = idx
-				}
-			}
-		},
-
-		mounted() {
-			// from tangjq--- 组件挂载后初始化指示器
-			this.$nextTick(() => {
-				this.initIndicator()
-			})
-		},
-
-		// from tangjq--- 页面级滚动监听（本页面未使用 scroll-view，使用页面滚动）
-		onPageScroll(e) {
-			this.handleHeaderScroll({ detail: { scrollTop: e.scrollTop } })
+			// from tangjq--- 默认页面加载列表数据
+			this.loadRecords()
 		},
 
 		created() {}
@@ -190,77 +342,324 @@
 		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
 	}
 
-	/* from tangjq--- 标题栏样式 */
-	.title-bar {
+	/* from tangjq--- 入口按钮栏（参考 Wallet_Page.png：3个圆角矩形按钮，圆形icon背景+文字） */
+	.entry-bar {
 		background: #fff;
 		border-radius: 20px 20px 0 0;
+		padding: 15px 12px 10px;
+		display: flex;
+		align-items: stretch;
+		justify-content: space-between;
+		gap: 10px;
 		flex-shrink: 0;
 	}
 
-	/* from tangjq--- Tab 样式 (参照 coupon.vue) */
-	.tab-selector {
-		width: 100%;
-		background: #fff;
-	}
-
-	.tab-container {
-		position: relative;
+	.entry-item {
+		flex: 1;
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		border-bottom: 1px solid #d9d9d9;
-	}
-
-	.tab-item {
-		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		gap: 8px;
 		cursor: pointer;
-		height: 30px;
-		// min-width: 80px;
+		padding: 16px 6px 10px;
+		border: 1.5px solid #1C667C;
+		border-radius: 14px;
+		background: #FFFFFF;
+		transition: background 0.2s ease;
+		min-width: 0;
 	}
 
-	/* from tangjq--- 第一个 tab 居左对齐 */
-	.tab-item:first-child {
-		justify-content: flex-start;
-		padding-left: 0;
+	.entry-icon {
+		width: 26px;
+		height: 26px;
+		flex-shrink: 0;
+		/* 与首页 index 同款图标重着色（充值/提现 SVG -> 青色） */
+		// filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
 	}
 
-	/* from tangjq--- 最后一个 tab 居右对齐 */
-	.tab-item:last-child {
-		justify-content: flex-end;
-		padding-right: 0;
+	/* 余额金币为 PNG，保持原色，不应用重着色滤镜 */
+	.entry-icon-coin {
+		filter: none;
 	}
 
-	.tab-text {
+	.entry-text {
 		font-size: 13px;
-		color: #5a7a8f;
-		transition: color 0.25s ease;
-		font-weight: 400;
+		color: #1C667C;
+		font-weight: 600;
+		line-height: 17px;
+		text-align: center;
 	}
 
-	.tab-item.active .tab-text {
-		color: #4fb3bf;
-	}
-
-	.slide-indicator {
-		position: absolute;
-		bottom: 0;
-		height: 2px;
-		background: #4fb3bf;
-		border-radius: 2px;
-		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-	}
-
-	/* from tangjq--- Tab 内容区域 */
-	.tab-content {
+	/* from tangjq--- 交易列表容器 */
+	.transaction-list-wrap {
 		flex: 1;
 		height: 0;
-		overflow: hidden;
 		background: #fff;
 		display: flex;
 		flex-direction: column;
 		padding: 0 10px;
+	}
+
+	/* 筛选器 */
+	.filter-bar {
+		background: #1C667C;
+		border-radius: 20px;
+		padding: 10px 14px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-shrink: 0;
+	}
+
+	.filter-text {
+		font-size: 13px;
+		font-weight: 600;
+		color: #ffffff;
+	}
+
+	.filter-icon {
+		font-size: 13px;
+		color: #ffffff;
+		transition: transform 0.3s ease;
+	}
+
+	.filter-dropdown {
+		background: #E8F4F5;
+		border-radius: 12px;
+		flex-shrink: 0;
+		margin-bottom: 8px;
+		overflow: hidden;
+	}
+
+	.filter-option {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 12px 16px;
+		cursor: pointer;
+	}
+
+	.option-text {
+		font-size: 13px;
+		font-weight: 500;
+		color: #1C667C;
+	}
+
+	.option-radio {
+		width: 18px;
+		height: 18px;
+		border: 2px solid #5FB5BD;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+	}
+
+	.option-radio.active {
+		border-color: #5FB5BD;
+	}
+
+	.option-radio-inner {
+		width: 10px;
+		height: 10px;
+		background-color: #5FB5BD;
+		border-radius: 50%;
+	}
+
+	.history-scroll {
+		flex: 1;
+		height: 0;
+		background-color: #ffffff;
+	}
+
+	/* ====== 卡片样式（参考 Wallet_Page.png）====== */
+	.record-card {
+		margin: 10px 0;
+		background-color: #EBF5F6;
+		border-radius: 14px;
+		overflow: hidden;
+	}
+
+	/* 顶部：Order ID + 时间 */
+	.card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 14px 16px 8px;
+	}
+
+	.order-id {
+		font-size: 14px;
+		font-weight: 700;
+		color: #1C667C;
+	}
+
+	.order-time {
+		font-size: 12px;
+		color: #888;
+	}
+
+	/* 类型行：●类型 | 支付方式 */
+	.card-type-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 6px 16px 10px;
+	}
+
+	.type-left {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.type-svg {
+		width: 20px;
+		height: 20px;
+		flex-shrink: 0;
+		/* 与首页 index / 入口栏同款青色重着色 */
+		// filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
+	}
+
+	.type-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1C667C;
+	}
+
+	.pay-right {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.pay-logo {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+	}
+
+	.pay-name {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1C667C;
+	}
+
+	/* 金额行 */
+	.card-amount-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 4px 16px 12px;
+	}
+
+	.amount-label {
+		font-size: 14px;
+		color: #1C667C;
+	}
+
+	.amount-value {
+		font-size: 17px;
+		font-weight: 700;
+	}
+
+	.amount-deposit-color {
+		color: #17A2B8;
+	}
+
+	.amount-withdraw-color {
+		color: #E74C3C;
+	}
+
+	/* 状态 */
+	.card-status {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0 16px 14px;
+	}
+
+	.status-text {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.status-success {
+		color: #17A2B8;
+	}
+
+	.status-pending {
+		color: #888;
+	}
+
+	.status-timeout {
+		color: #E74C3C;
+	}
+
+	.status-failed {
+		color: #E74C3C;
+	}
+
+	.status-default {
+		color: #888;
+	}
+
+	/* 空状态 */
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 60px 20px;
+	}
+
+	.empty-icon {
+		width: 120px;
+		height: 120px;
+		opacity: 0.6;
+	}
+
+	.empty-text {
+		font-size: 14px;
+		color: #999999;
+		margin-top: 20px;
+	}
+
+	/* 加载更多 */
+	.loading-more {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+	}
+
+	.load-icon {
+		margin-right: 10px;
+	}
+
+	.rotating {
+		animation: rotate 1s linear infinite;
+	}
+
+	@keyframes rotate {
+		from {
+			transform: rotate(0deg);
+		}
+
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.loading-text {
+		font-size: 14px;
+		color: #999999;
+	}
+
+	.blank {
+		height: 20px;
 	}
 
 	/* from tangjq--- 悬浮 Refresh 按钮样式 */
@@ -271,24 +670,12 @@
 		width: 50px;
 		height: 50px;
 		border-radius: 30px;
-		background: linear-gradient(135deg, #4fb3bf 0%, #1C667C 100%);
+		background: #1C667C;
 		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		z-index: 999;
-	}
-
-	.refresh-icon {
-		width: 24px;
-		height: 24px;
-		margin-bottom: 2px;
-	}
-
-	.refresh-text {
-		font-size: 10px;
-		color: #fff;
-		font-weight: 500;
 	}
 </style>

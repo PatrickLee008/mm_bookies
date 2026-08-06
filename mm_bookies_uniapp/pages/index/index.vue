@@ -43,11 +43,11 @@
 					</view>
 					<view class="balance-actions">
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0')">
-							<image class="wallet-action-icon" src="/static/deposit.svg" mode="aspectFit"></image>
+							<image class="" src="/static/deposit.svg" mode="aspectFit"></image>
 							<text>{{$t('Deposit')}}</text>
 						</view>
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1')">
-							<image class="wallet-action-icon" src="/static/withdraw.svg" mode="aspectFit"></image>
+							<image class="" src="/static/withdraw.svg" mode="aspectFit"></image>
 							<text>{{$t('Withdraw')}}</text>
 						</view>
 						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}
@@ -599,11 +599,6 @@
 	.wallet-action image {
 		width: 20px;
 		height: 20px;
-		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%);
-	}
-
-	.wallet-action-icon {
-		filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(1120%) hue-rotate(145deg) brightness(85%) contrast(90%) !important;
 	}
 
 	.cashout-action {

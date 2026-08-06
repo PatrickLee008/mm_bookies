@@ -23,8 +23,8 @@
 		<view class="new-header-wrapper">
 			<view class="new-search-bar">
 				<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
-				<input class="search-input" type="text" :placeholder="$t('search_by_team')" v-model="searchKeyword"
-					@input="handleSearchInput" />
+				<input class="search-input" placeholder-style="font-style:italic;color:#1C667C" type="text"
+					:placeholder="$t('search_by_team')" v-model="searchKeyword" @input="handleSearchInput" />
 				<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword"
 					@tap="clearSearch"></image>
 			</view>
@@ -277,43 +277,41 @@
 					<text class="bet-slip-title">Details</text>
 				</view>
 
-				<!-- from tangjq--- 混合投注：可滚动的比赛列表区域 -->
-				<scroll-view scroll-y class="bet-slip-scroll" v-if="match_ref.mixed">
-					<view class="mix-matches-list">
-						<view class="mix-match-item" v-for="(match,index) in bet_list" :key='index'>
-							<!-- from tangjq--- 比赛时间 -->
-							<view class="mix-match-datetime">
-								<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}}
-									{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
+<!-- from tangjq--- 混合投注：可滚动的比赛列表区域 -->
+			<scroll-view scroll-y class="bet-slip-scroll" v-if="match_ref.mixed">
+				<view class="mix-matches-list">
+					<view class="mix-match-item" v-for="(match,index) in bet_list" :key='index'>
+						<!-- from tangjq--- 比赛时间 -->
+						<view class="mix-match-datetime">
+							<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}}
+								{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
+						</view>
+
+						<view class="mix-match-info">
+							<!-- from tangjq--- 队伍对阵 -->
+							<view class="mix-match-row mix-teams-row">
+								<text class="mix-team-name"
+									:class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
+								<text class="mix-vs">vs</text>
+								<text class="mix-team-name"
+									:class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
 							</view>
 
-							<view class="mix-match-info">
-								<!-- from tangjq--- 队伍对阵 -->
-								<view class="mix-match-row mix-teams-row">
-									<text class="mix-team-name"
-										:class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
-									<text class="mix-vs">vs</text>
-									<text class="mix-team-name"
-										:class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
-								</view>
+							<!-- from tangjq--- 投注类型 + 赔率（2列） -->
+							<view class="mix-match-row">
+								<text class="mix-row-label">{{bet_type.MIX_BODY == match.sa.MATCH_ATTR_TYPE ?'HDP':'O/U'}}</text>
+								<text class="mix-row-value">{{calc_real_odds(match.sa)}}</text>
+							</view>
 
-								<!-- from tangjq--- 投注类型和赔率 -->
-								<view class="mix-match-row">
-									<text>{{bet_type.MIX_BODY == match.sa.MATCH_ATTR_TYPE ?'HDP':'O/U'}}</text>
-									<text>{{calc_real_odds(match.sa)}}</text>
-									<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
-								</view>
-
-								<!-- from tangjq--- 联赛和投注选择 -->
-								<view class="mix-match-row">
-									<text>{{match.REMARK || match.LEAGUE}}</text>
-									<text class="mix-bet-choice">{{bet_content(match)}}</text>
-									<text>Home</text>
-								</view>
+							<!-- from tangjq--- Bet: + 选中的队伍名（2列） -->
+							<view class="mix-match-row">
+								<text class="mix-row-label">Bet :</text>
+								<text class="mix-row-value mix-bet-choice">{{bet_content(match)}}</text>
 							</view>
 						</view>
 					</view>
-				</scroll-view>
+				</view>
+			</scroll-view>
 
 				<!-- from tangjq--- 单注：比赛信息（完整版，参考设计稿） -->
 				<view class="single-match-info" v-if="!match_ref.mixed && match_ref.bet_match">
@@ -359,77 +357,58 @@
 					</view>
 				</view>
 
-				<!-- from tangjq--- 投注信息和输入区域（固定在底部，不滚动） -->
-				<view class="bet-input-section">
-					<!-- Bet Time 和 Potential Winnings -->
-					<view class="bet-info-rows">
-						<view class="bet-info-row">
-							<text class="info-label">{{$t('Bet Time')}}</text>
-							<text class="info-value">{{new Date().toLocaleString()}}</text>
-						</view>
-						<view class="bet-info-row">
-							<text class="info-label">{{$t('Potential Winnings')}}</text>
-							<text class="info-value">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
-						</view>
+<!-- from tangjq--- 投注信息和输入区域（固定在底部，不滚动） -->
+			<view class="bet-input-section">
+				<!-- Bet Time 和 Potential Winnings -->
+				<view class="bet-info-rows">
+					<view class="bet-info-row">
+						<text class="info-label">{{$t('Bet Time')}}</text>
+						<text class="info-value">{{new Date().toLocaleString()}}</text>
 					</view>
-
-					<!-- Wallet -->
-					<view class="wallet-row">
-						<text class="wallet-label">{{$t('balance')}} ({{$t('main_wallet')}})</text>
-						<text class="wallet-value">{{$toolbox.floor_format($store.state.userInfo.money)}}</text>
-					</view>
-
-					<!-- Promotion Wallet -->
-					<view class="wallet-row">
-						<view class="flex-row align-center" style="gap: 8px;">
-							<text class="wallet-label">{{$t('promotion_wallet')}}</text>
-							<text
-								class="wallet-value">{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</text>
-						</view>
-						<view class="flex-row justify-end align-center" style="gap: 5px;"
-							@click="togglePromotionWallet">
-							<text class="wallet-label"
-								style="font-size: 10px; line-height: 1.2;">{{$t('use_promotion_wallet')}}</text>
-							<view class="custom-checkbox" :class="{
-									'custom-checkbox-checked': use_promotion_wallet,
-									'custom-checkbox-disabled': !canUsePromotionWallet
-								}">
-								<view v-if="use_promotion_wallet" class="custom-checkbox-icon cuIcon-check"></view>
-							</view>
-						</view>
-					</view>
-
-					<!-- 输入框 -->
-					<view class="bet-amount-input">
-						<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum"
-							class="amount-input" />
-					</view>
-
-					<!-- Minimum Bet Amount -->
-					<view class="min-bet-text">
-						<text>Minimum Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_min:single_min)}}Ks</text>
-					</view>
-
-					<!-- 快捷金额按钮 -->
-					<view class="quick-amount-btns">
-						<view class="quick-btn" :class="{'quick-btn-selected': amount == amt}"
-							v-for="(amt,index) in amount_list" :key='index' @click="set_amount(amt)">
-							<text>{{$toolbox.num_format(amt)}}</text>
-						</view>
-					</view>
-
-					<!-- Cancel 和 Confirm 按钮 -->
-					<view class="action-buttons">
-						<view class="cancel-btn" @click="hide_bets_slip = true">
-							<text class="cancel-text">{{$t('Cancel')}}</text>
-						</view>
-						<view class="confirm-btn-action"
-							:class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}"
-							@click="submit()">
-							<text class="confirm-text">{{$t('Confirm')}}</text>
-						</view>
+					<view class="bet-info-row">
+						<text class="info-label">{{$t('Potential Winnings')}}</text>
+						<text class="info-value">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
 					</view>
 				</view>
+
+				<!-- from tangjq--- Main Wallet / Promo Wallet 并排按钮，参考 MPL_Detial_Overlay.png -->
+				<view class="wallet-buttons">
+					<view class="wallet-btn wallet-btn-main" :class="{'wallet-btn-active': !use_promotion_wallet}"
+						@click="use_promotion_wallet && togglePromotionWallet()">
+						<text class="wallet-btn-label">{{$t('main_wallet')}}</text>
+						<text class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money)}}</text>
+					</view>
+					<view class="wallet-btn wallet-btn-promo" :class="{'wallet-btn-active': use_promotion_wallet, 'wallet-btn-disabled': !canUsePromotionWallet}"
+						@click="canUsePromotionWallet && !use_promotion_wallet && togglePromotionWallet()">
+						<text class="wallet-btn-label">{{$t('promotion_wallet')}}</text>
+						<text class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</text>
+					</view>
+				</view>
+
+				<!-- 输入框 -->
+				<view class="bet-amount-input">
+					<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum"
+						class="amount-input" />
+				</view>
+
+				<!-- from tangjq--- Min/Max Bet Amount：一行左右两侧，参考 MPL_Detial_Overlay.png -->
+				<view class="min-max-bet-row">
+					<text class="min-bet-label">Min Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_min:single_min)}}</text>
+					<text class="min-bet-label">Max Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_max:single_max)}}</text>
+				</view>
+
+				<!-- Cancel 和 Confirm 按钮 -->
+				<view class="action-buttons">
+					<view class="cancel-btn" @click="hide_bets_slip = true">
+						<text class="cancel-text">{{$t('Cancel')}}</text>
+					</view>
+					<view class="confirm-btn-action"
+						:class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}"
+						@click="submit()">
+						<text class="confirm-text">{{$t('Confirm')}}</text>
+					</view>
+				</view>
+			</view>
 			</view>
 		</view>
 
@@ -2302,7 +2281,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		padding: 10px;
+		padding: 10px 10px 0;
 		gap: 10px;
 		background-color: #ffffff;
 		border-radius: 20px 20px 0 0;
@@ -2348,17 +2327,18 @@
 		color: white;
 		font-weight: bold;
 		gap: 5px;
-		padding: 0 12px;
+		padding: 0 10px;
 		border-radius: 16px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		font-size: 12px;
 	}
 
 	.filter-icon {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 3px;
 		align-items: center;
 	}
 
@@ -2935,6 +2915,18 @@
 		color: #1C667C;
 	}
 
+	/* from tangjq--- mix-match-item 卡片内的字段行：左 label / 右 value */
+	.mix-row-label {
+		color: #1C667C;
+		font-weight: 500;
+	}
+
+	.mix-row-value {
+		color: #1C667C;
+		font-weight: 600;
+		text-align: right;
+	}
+
 	.mix-bet-choice {
 		color: #4A90A4;
 		font-weight: 600;
@@ -3079,13 +3071,59 @@
 		color: #1C667C;
 	}
 
-	.wallet-row {
+	/* from tangjq--- Main/Promo Wallet 并排按钮，参考 MPL_Detial_Overlay.png */
+	.wallet-buttons {
 		display: flex;
 		flex-direction: row;
-		justify-content: space-between;
+		gap: 10px;
+		margin-bottom: 10px;
+	}
+
+	.wallet-btn {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
 		align-items: center;
-		padding: 0;
-		margin-bottom: 5px;
+		justify-content: center;
+		gap: 2px;
+		padding: 4px;
+		border-radius: 12px;
+		border: 1.5px solid #1C667C;
+		background: #FFFFFF;
+		cursor: pointer;
+		transition: background 0.2s ease;
+	}
+
+	.wallet-btn-label {
+		font-size: 12px;
+		color: #1C667C;
+		font-weight: 500;
+		line-height: 16px;
+	}
+
+	.wallet-btn-value {
+		font-size: 14px;
+		color: #1C667C;
+		font-weight: 700;
+		line-height: 18px;
+	}
+
+	/* Main Wallet 默认（未选中态）：白底 + 青绿边框 + 青绿文字 */
+	.wallet-btn-main.wallet-btn-active,
+	.wallet-btn-promo.wallet-btn-active {
+		background: #1C667C;
+	}
+
+	.wallet-btn-main.wallet-btn-active .wallet-btn-label,
+	.wallet-btn-main.wallet-btn-active .wallet-btn-value,
+	.wallet-btn-promo.wallet-btn-active .wallet-btn-label,
+	.wallet-btn-promo.wallet-btn-active .wallet-btn-value {
+		color: #FFFFFF;
+	}
+
+	.wallet-btn-disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	.wallet-label {
@@ -3123,39 +3161,21 @@
 		color: #7FA5A8;
 	}
 
-	.min-bet-text {
-		text-align: center;
-		color: #890006;
-		font-size: 12px;
-		margin-bottom: 15px;
-	}
-
-	.quick-amount-btns {
+	/* from tangjq--- Min/Max Bet Amount：一行左右两侧，参考 MPL_Detial_Overlay.png */
+	.min-max-bet-row {
 		display: flex;
 		flex-direction: row;
-		gap: 10px;
-		margin-bottom: 20px;
-	}
-
-	.quick-btn {
-		flex: 1;
-		background-color: #1C667C;
-		border-radius: 25px;
-		padding: 5px;
-		display: flex;
+		justify-content: space-between;
 		align-items: center;
-		justify-content: center;
+		margin-bottom: 15px;
+		gap: 10px;
 	}
 
-	/* from tangjq--- 快捷金额按钮选中状态 */
-	.quick-btn-selected {
-		background-color: #5FB5BD;
-	}
-
-	.quick-btn text {
-		color: white;
-		font-size: 12px;
-		font-weight: 600;
+	.min-bet-label {
+		color: #890006;
+		font-size: 11px;
+		font-weight: 500;
+		white-space: nowrap;
 	}
 
 	.action-buttons {
@@ -3164,10 +3184,11 @@
 		gap: 15px;
 	}
 
+	/* from tangjq--- Cancel 按钮：白底 + 红边 + 红字，参考 MPL_Detial_Overlay.png */
 	.cancel-btn {
 		flex: 1;
 		background-color: white;
-		border: 2px solid #1C667C;
+		border: 2px solid #C8434C;
 		border-radius: 12px;
 		padding: 5px;
 		display: flex;
