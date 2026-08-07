@@ -338,7 +338,7 @@ async loadRecords() {
 	.option-radio {
 		width: 15px;
 		height: 15px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid #37BDCC;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -347,13 +347,13 @@ async loadRecords() {
 	}
 
 	.option-radio.active {
-		border-color: #5FB5BD;
+		border-color: #37BDCC;
 	}
 
 	.option-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: #37BDCC;
 		border-radius: 50%;
 	}
 
@@ -366,7 +366,7 @@ async loadRecords() {
 	/* 记录项（参考 wallet/wallet 卡片样式） */
 	.record-card {
 		margin: 10px 0;
-		background-color: #EBF5F6;
+		background-color: #F1FAFB;
 		border-radius: 14px;
 		overflow: hidden;
 	}

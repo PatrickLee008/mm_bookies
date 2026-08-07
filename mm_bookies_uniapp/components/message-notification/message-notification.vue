@@ -438,7 +438,7 @@ export default {
 .notification-container {
 	width: 100%;
 	max-width: 400px;
-	background: linear-gradient(135deg, #1C667C 0%, #5FB5BD 100%);
+	background: linear-gradient(135deg, #1C667C 0%, #37BDCC 100%);
 	border-radius: 24px;
 	overflow: hidden;
 	position: relative;

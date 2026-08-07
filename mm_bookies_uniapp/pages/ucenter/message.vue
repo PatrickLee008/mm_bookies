@@ -860,7 +860,7 @@
 		top: 0;
 		bottom: 0;
 		width: 6px;
-		background: #5FB5BD;
+		background: #37BDCC;
 		border-radius: 12px 0 0 12px;
 		animation: pulse 2s ease-in-out infinite;
 		box-shadow: 2px 0 8px rgba(95, 181, 189, 0.5);

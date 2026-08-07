@@ -899,7 +899,7 @@
 
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
-		color: #5FB5BD;
+		color: #37BDCC;
 		min-width: 0;
 	}
 

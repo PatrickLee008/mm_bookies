@@ -426,7 +426,7 @@
 	.option-radio {
 		width: 18px;
 		height: 18px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid #37BDCC;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -435,13 +435,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #5FB5BD;
+		border-color: #37BDCC;
 	}
 
 	.option-radio-inner {
 		width: 10px;
 		height: 10px;
-		background-color: #5FB5BD;
+		background-color: #37BDCC;
 		border-radius: 50%;
 	}
 
@@ -455,7 +455,7 @@
 	/* ====== 卡片样式（参考 Wallet_Page.png）====== */
 	.record-card {
 		margin: 10px 0;
-		background-color: #EBF5F6;
+		background-color: #F1FAFB;
 		border-radius: 14px;
 		overflow: hidden;
 	}

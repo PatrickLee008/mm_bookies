@@ -455,7 +455,7 @@
 	.user-info-card {
 		background-color: white;
 		border-radius: 20px;
-		margin: 5px 15px 10px;
+		margin: 5px 0 10px;
 		padding: 5px 12px 10px;
 		box-sizing: border-box;
 		display: flex;
@@ -713,7 +713,7 @@
 	}
 
 	.register-btn2 {
-		background-color: #5FB5BD;
+		background-color: #37BDCC;
 		color: white;
 	}
 
@@ -794,7 +794,7 @@
 	}
 
 	.nav-label-active {
-		color: #5FB5BD;
+		color: #37BDCC;
 		font-weight: bold;
 	}
 
@@ -926,7 +926,7 @@
 		background: #fff;
 		border-radius: 20px;
 		padding: 14px 20px 16px;
-		color: #206c80;
+		color: #1C667C;
 		overflow: hidden;
 		max-height: 300px;
 		transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
@@ -951,7 +951,7 @@
 	}
 
 	.balance-value {
-		color: #206c80;
+		color: #1C667C;
 		font-size: 23px;
 		font-weight: 700;
 	}
@@ -969,8 +969,8 @@
 	.promo-label {
 		padding: 3px 12px;
 		border-radius: 12px;
-		background: #edf8f9;
-		color: #206c80;
+		background: #F1FAFB;
+		color: #1C667C;
 		font-size: 11px;
 		font-weight: 700;
 	}
@@ -978,7 +978,7 @@
 	.balance-actions {
 		justify-content: space-between;
 		gap: 8px;
-		color: #206c80;
+		color: #1C667C;
 		font-size: 11px;
 		font-weight: 700;
 	}

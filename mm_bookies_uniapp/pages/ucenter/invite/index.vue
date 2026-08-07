@@ -695,7 +695,7 @@
 	}
 
 	.invite-dashboards .dashboard-bonus {
-		background: #123f46;
+		background: #1C667C;
 	}
 
 	.invite-dashboards .dashboard-user {
@@ -705,7 +705,7 @@
 	.invite-section-title {
 		display: block;
 		margin: 16px 0 10px;
-		color: #17657a;
+		color: #1C667C;
 		font-size: 16px;
 		font-weight: 700;
 	}
@@ -748,7 +748,7 @@
 		padding: 16px 14px 14px;
 		border-radius: 12px;
 		background: #effafa;
-		color: #17657a;
+		color: #1C667C;
 	}
 
 	.referral-title {
@@ -771,7 +771,7 @@
 		margin-top: 9px;
 		padding: 8px 12px;
 		border-radius: 10px;
-		background: #123f46;
+		background: #1C667C;
 		color: #fff;
 	}
 
@@ -920,7 +920,7 @@
 		border-radius: 12px;
 		margin: 10px 0 14px;
 		overflow: hidden;
-		color: #123f46;
+		color: #1C667C;
 		box-shadow: 0 1px 3px rgba(18, 63, 70, 0.14);
 	}
 
@@ -1043,7 +1043,7 @@
 	.activity-achievement .method-card > .inner-rec > text:first-child {
 		flex: 1;
 		max-width: 47% !important;
-		color: #123f46;
+		color: #1C667C;
 		font-size: 11px;
 		font-weight: 700;
 		line-height: 14px;
@@ -1117,7 +1117,7 @@
 		padding: 0;
 		border-radius: 0;
 		background: transparent;
-		color: #17657a;
+		color: #1C667C;
 		font-size: 14px;
 	}
 
@@ -1158,7 +1158,7 @@
 		margin: 8px 12px 12px;
 		padding: 0;
 		background: transparent;
-		color: #123f46;
+		color: #1C667C;
 		width: auto;
 	}
 

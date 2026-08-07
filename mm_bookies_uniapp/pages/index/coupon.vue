@@ -1450,8 +1450,8 @@
 		justify-content: center;
 		position: relative;
 		background: #F1FAFB;
-		border: 1px solid #2A626833;
-		color: #2A6268;
+		border: 1px solid #1C667C33;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 600;
 	}
@@ -1639,7 +1639,7 @@
 
 	.ca-credit-label {
 		font-size: 11px;
-		color: #2A6268;
+		color: #1C667C;
 	}
 
 	.ca-credit-value {
@@ -1770,7 +1770,7 @@
 
 	.bonus-label {
 		font-size: 13px;
-		color: #2A6268;
+		color: #1C667C;
 	}
 
 	.bonus-value {

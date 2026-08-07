@@ -35,7 +35,7 @@ export default {
 		},
 		safeAreaBottom: {
 			type: Number,
-			default: 80
+			default: 10
 		},
 		safeAreaRight: {
 			type: Number,

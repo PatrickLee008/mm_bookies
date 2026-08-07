@@ -437,7 +437,7 @@
 		height: 86px;
 		border-radius: 16px;
 		background: #fff;
-		color: #2a6268;
+		color: #1C667C;
 		font-size: 12px;
 		font-weight: 700;
 	}
@@ -496,7 +496,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #2a6268;
+		color: #1C667C;
 	}
 
 	.user-summary {
@@ -545,7 +545,7 @@
 		background: #fff;
 		border-radius: 20px;
 		padding: 14px 20px 16px;
-		color: #206c80;
+		color: #1C667C;
 	}
 
 	.main-balance-row,
@@ -577,7 +577,7 @@
 	.promo-label {
 		padding: 3px 12px;
 		border-radius: 12px;
-		background: #edf8f9;
+		background: #F1FAFB;
 		font-size: 11px;
 		font-weight: 700;
 	}

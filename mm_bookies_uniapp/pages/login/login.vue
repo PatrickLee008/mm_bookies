@@ -578,7 +578,7 @@
 		right: 40rpx;
 		width: 180rpx;
 		height: 60rpx;
-		background-color: #2A6268;
+		background-color: #1C667C;
 		border-radius: 30rpx;
 		display: flex;
 		justify-content: center;
@@ -641,7 +641,7 @@
 		min-width: 300rpx;
 		height: 80rpx;
 		padding: 0 40rpx;
-		background-color: #2A6268;
+		background-color: #1C667C;
 		border-radius: 40rpx;
 		display: flex;
 		align-items: center;
@@ -740,14 +740,14 @@
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: #2A6268;
+		border-color: #1C667C;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: #2A6268;
+		background: #1C667C;
 	}
 
 	/* 原有登录页面样式 */

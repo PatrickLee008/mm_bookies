@@ -1,6 +1,6 @@
 <template>
 	<view class="selector-wrapper">
-		<view class="cu-tag round sm selector-tag" :style="{'style':tag_style}" @click="set_dialog_status(!hidden)">
+		<view class="cu-tag round sm selector-tag" :style="tag_style" @click="set_dialog_status(!hidden)">
 			<text>{{language[current_tag.label]?language[current_tag.label]:current_tag.label}}</text>
 			<text class="" :class="hidden?'cuIcon-unfold':'cuIcon-fold'"></text>
 		</view>
@@ -115,9 +115,9 @@
 		padding: 0;
 	}
 
-	/* 触发器（tag）：默认灰底兜底，无 !important 以便父级容器用更高优先级覆盖（参考 orders/home 胶囊） */
+	/* 触发器（tag）：统一使用订单筛选栏的青绿色样式，页面可按容器覆盖 */
 	.selector-tag {
-		background-color: #bdbdbd;
+		background-color: #1C667C;
 		color: white;
 		gap: 6upx;
 		position: relative;

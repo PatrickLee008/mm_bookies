@@ -1359,13 +1359,13 @@
 
 	/* 高亮提醒样式 - 联系我们、关于我们 */
 	.setting-item-highlight {
-		border-color: #5FB5BD;
+		border-color: #37BDCC;
 		background: linear-gradient(135deg, #fff 0%, #E8F4F5 100%);
 		box-shadow: 0 2px 8px rgba(47, 93, 98, 0.15);
 	}
 
 	.setting-item-text-highlight {
-		color: #5FB5BD;
+		color: #37BDCC;
 		font-weight: 700;
 		font-size: 17px;
 	}
@@ -1593,7 +1593,7 @@
 
 	/* Contact 弹窗样式 */
 	.live-chat-btn {
-		background: linear-gradient(135deg, #1C667C, #5FB5BD);
+		background: linear-gradient(135deg, #1C667C, #37BDCC);
 		border-radius: 12px;
 		padding: 16px 20px;
 		display: flex;
@@ -1664,7 +1664,7 @@
 		flex-direction: row;
 		align-items: center;
 		background: #fff;
-		border: 2px solid #5FB5BD;
+		border: 2px solid #37BDCC;
 		border-radius: 20px;
 		overflow: hidden;
 		height: 38px;
@@ -1681,7 +1681,7 @@
 	}
 
 	.contact-copy-button {
-		background: #5FB5BD;
+		background: #37BDCC;
 		padding: 8px 14px;
 		display: flex;
 		flex-direction: row;

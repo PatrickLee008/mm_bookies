@@ -481,7 +481,7 @@
 		background-color: #ffffff;
 		border-radius: 25px;
 		padding: 6px 15px;
-		border: 1px solid #2A6268;
+		border: 1px solid #1C667C;
 	}
 
 	.search-icon {
@@ -738,7 +738,7 @@
 	}
 
 	.filter-option-text {
-		color: #2A6268;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 500;
 	}
@@ -746,7 +746,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid #37BDCC;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -755,13 +755,13 @@
 	}
 
 	.filter-radio.active {
-		border-color: #5FB5BD;
+		border-color: #37BDCC;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: #37BDCC;
 		border-radius: 50%;
 	}
 

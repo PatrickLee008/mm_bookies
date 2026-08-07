@@ -970,7 +970,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		border-bottom: 2px solid #2A626833;
+		border-bottom: 2px solid #1C667C33;
 	}
 
 	.tab-item {
@@ -1028,8 +1028,8 @@
 		background: #FFFFFF;
 		border-radius: 15px;
 		overflow: hidden;
-		box-shadow: 0px 2px 2px 0px #2A626833;
-		border: 1px solid #2A626833
+		box-shadow: 0px 2px 2px 0px #1C667C33;
+		border: 1px solid #1C667C33
 	}
 
 	/* 卡片头部 */
@@ -1068,7 +1068,7 @@
 
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
-		color: #5FB5BD;
+		color: #37BDCC;
 		min-width: 0;
 	}
 
@@ -1125,7 +1125,7 @@
 	}
 
 	.value-amount {
-		color: #2A6268;
+		color: #1C667C;
 		font-weight: 700;
 	}
 
@@ -1216,7 +1216,7 @@
 
 	.parlay-label {
 		font-size: 28upx;
-		color: #2A6268;
+		color: #1C667C;
 		font-weight: bold;
 		/* from tangjq--- 文字左右两侧留出箭头间距 */
 		margin: 0 16upx;
@@ -1233,7 +1233,7 @@
 	.toggle-icon .arrow {
 		font-size: 22upx;
 		line-height: 0.55;
-		color: #2A6268;
+		color: #1C667C;
 		font-weight: bold;
 	}
 

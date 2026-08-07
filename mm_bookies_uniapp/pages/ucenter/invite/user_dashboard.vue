@@ -3,110 +3,101 @@
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 		<scroll-view class="user-scroll invite-scroll" scroll-y @scroll="handleHeaderScroll">
-			<view class="padding">
-				<view class="title-text margin-tb-sm" style="margin-left: 0;">
-					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
-					{{ $t('User Dashboard') }}
+			<view class="dashboard-content">
+				<view class="dashboard-card revenue-card">
+					<text class="card-label">{{ $t('Total Revenue from Invitees') }}</text>
+					<text class="money-value">{{ formatAmount(bonusSummary.total_amount) }}<text
+							class="money-unit"> Ks</text></text>
 				</view>
 
-				<!-- Total Revenue Card -->
-				<view class="flex-row justify-between shadow-rec padding-lr text-bold text-black" style="height: 44px;">
-					<text class="myfont-12px">{{ $t('Total Revenue from Invitees') }}</text>
-					<text class="myfont-20px">{{ formatAmount(bonusSummary.total_amount) }}<text
-							class="myfont-10px margin-left-xs">Ks</text></text>
-				</view>
-
-				<!-- Invitation Stats -->
-				<view class="flex-row justify-between shadow-rec text-black flex-wrap margin-top-sm" style="border: 0px;">
-					<view class="flex-column mybg-primary line-height-28px radius-top-10px text-white">
-						<text>{{ $t('invitation') }}</text>
-					</view>
-					<view class="shadow-rec flex-row justify-around radius-top-1px myfont-14px padding-tb-xs"
-						style="line-height: 1;">
-						<view class="flex-column1 text-center width-33">
-							<view class="padding-tb-xs">{{ $t('total') }}</view>
-							<view class="padding-tb-xs text-bold">{{ inviteStats.total_invited }}</view>
+				<view class="dashboard-card invitation-card">
+					<text class="invitation-title">{{ $t('invitation') }}</text>
+					<view class="invitation-stat-grid">
+						<view class="invitation-stat">
+							<text class="invitation-stat-label">{{ $t('total') }}</text>
+							<text class="invitation-stat-value">{{ inviteStats.total_invited }}</text>
 						</view>
-						<view class="flex-column1 text-center width-33">
-							<view class="padding-tb-xs">{{ $t('Pending') }}</view>
-							<view class="padding-tb-xs text-bold">{{ inviteStats.pending_invitees }}</view>
+						<view class="invitation-stat">
+							<text class="invitation-stat-label">{{ $t('Pending') }}</text>
+							<text class="invitation-stat-value">{{ inviteStats.pending_invitees }}</text>
 						</view>
-						<view class="flex-column1 text-center width-33">
-							<view class="padding-tb-xs">{{ $t('Active Invitees') }}</view>
-							<view class="padding-tb-xs text-bold">{{ inviteStats.active_invitees }}</view>
+						<view class="invitation-stat">
+							<text class="invitation-stat-label">{{ $t('Active Invitees') }}</text>
+							<text class="invitation-stat-value">{{ inviteStats.active_invitees }}</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- Financial Stats -->
-				<view class="financial-stats">
-					<view class="financial-item">
-						<text class="financial-label">{{ $t('Total Deposit') }}</text>
-						<text class="financial-amount">{{ formatAmount(inviteesRewardsData.total_deposit || 0) }}</text>
-						<text class="financial-currency">MMK</text>
+				<view class="financial-list">
+					<view class="dashboard-card financial-card">
+						<text class="card-label">{{ $t('Total Deposit') }}</text>
+						<text class="money-value">{{ formatAmount(inviteesRewardsData.total_deposit || 0) }}<text
+								class="money-unit"> Ks</text></text>
 					</view>
-					<view class="financial-item">
-						<text class="financial-label">{{ $t('Total Turnover') }}</text>
-						<text class="financial-amount">{{ formatAmount(inviteesRewardsData.total_turnover || 0) }}</text>
-						<text class="financial-currency">MMK</text>
+					<view class="dashboard-card financial-card">
+						<text class="card-label">{{ $t('Total Turnover') }}</text>
+						<text class="money-value">{{ formatAmount(inviteesRewardsData.total_turnover || 0) }}<text
+								class="money-unit"> Ks</text></text>
 					</view>
-					<view class="financial-item">
-						<text class="financial-label">{{ $t('Total Net Win') }}</text>
-						<text class="financial-amount">{{ formatAmount(inviteesRewardsData.total_net_win || 0) }}</text>
-						<text class="financial-currency">MMK</text>
+					<view class="dashboard-card financial-card">
+						<text class="card-label">{{ $t('Total Net Win') }}</text>
+						<text class="money-value">{{ formatAmount(inviteesRewardsData.total_net_win || 0) }}<text
+								class="money-unit"> Ks</text></text>
 					</view>
 				</view>
 
-				<!-- Filter Controls -->
 				<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
-				<view class="flex-row flex-wrap justify-start filter padding-lr-sm padding-tb-xs margin-tb-sm" style="">
-					<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg"
-						@click="$refs.date_picker.show()" />
-					<view class="filter-row">
-						<view class="date-selector" style="font-size: 12px;">
-							<selector :option_list.sync="status_list" @click_option="onStatusSelect" top="36px"
-								left="-14px"></selector>
-						</view>
+				<view class="dashboard-filters">
+					<view class="user-filter-pill date-filter" @click="$refs.date_picker.show()">
+						<image mode="widthFix" class="user-filter-calendar"
+							src="/static/image/order/calender.svg" />
+						<text class="calendar-text">{{ dateDisplay }}</text>
+						<text class="cuIcon-unfold filter-arrow"></text>
 					</view>
-					<view class="search-container">
-						<input type="text" v-model="searchKeyword" class="search-input-field" :placeholder="$t('Search')"
+					<view class="user-filter-pill status-filter">
+						<selector :option_list.sync="status_list" :default_label="$t('status')"
+							@click_option="onStatusSelect"></selector>
+					</view>
+					<view class="search-box">
+						<text class="cuIcon-search search-icon"></text>
+						<input type="text" v-model="searchKeyword" :placeholder="$t('Search')"
 							@input="onSearch" @confirm="onSearch" />
 					</view>
 				</view>
 
-				<!-- User List -->
 				<view class="user-list-container">
 					<view class="user-card" v-for="(user, index) in filteredUserList" :key="index">
-						<view class="user-top-row">
-							<text class="user-id">{{ user.name || user.user_name }}</text>
+						<view class="user-card-header">
+							<text class="user-name">{{ user.name || user.user_name }}</text>
 							<view class="user-status-badges">
-								<text v-if="user.user_label" class="user-label-badge"
-									:class="getUserLabelClass(user.user_label)">{{ user.user_label }}</text>
+								<text v-if="user.user_label" class="user-label">{{ user.user_label }}</text>
 								<text v-if="getUserStatus(user)" class="status-badge"
-									:class="getStatusBadgeClass(getUserStatus(user))">{{ user.user_status }}</text>
+									:class="getStatusBadgeClass(getUserStatus(user))">{{ getUserStatus(user) }}</text>
 							</view>
 						</view>
-						<view class="user-stats-row">
-							<view class="stat-item">
-								<text class="stat-label">{{ $t('Deposit') }}</text>
-								<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_recharge : 0) }}</text>
-								<text class="stat-label">MMK</text>
+						<view class="user-card-body">
+							<view class="user-stats-row">
+								<view class="stat-item">
+									<text class="stat-label">{{ $t('Deposit') }}</text>
+									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_recharge : 0) }}<text
+											class="stat-unit"> Ks</text></text>
+								</view>
+								<view class="stat-item">
+									<text class="stat-label">{{ $t('Turnover') }}</text>
+									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_bet : 0) }}<text
+											class="stat-unit"> Ks</text></text>
+								</view>
+								<view class="stat-item">
+									<text class="stat-label">{{ $t('Net Win') }}</text>
+									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.net_win : 0) }}<text
+											class="stat-unit"> Ks</text></text>
+								</view>
 							</view>
-							<view class="stat-item">
-								<text class="stat-label">{{ $t('Turnover') }}</text>
-								<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_bet : 0) }}</text>
-								<text class="stat-label">MMK</text>
+							<view class="user-footer-row">
+								<text class="joined-text" v-if="user.last_login_time">{{ $t('Last Login') }}
+									{{ formatDate(user.last_login_time) }}</text>
+								<text class="joined-text">{{ $t('Joined') }} {{ formatDate(user.register_time) }}</text>
 							</view>
-							<view class="stat-item">
-								<text class="stat-label">{{ $t('Net Win') }}</text>
-								<text class="stat-value">{{ formatAmount(user.stats ? user.stats.net_win : 0) }}</text>
-								<text class="stat-label">MMK</text>
-							</view>
-						</view>
-						<view class="user-footer-row">
-							<text class="joined-text" v-if="user.last_login_time">{{ $t('Last Login') }}
-								{{ formatDate(user.last_login_time) }}</text>
-							<text class="joined-text">{{ $t('Joined') }} {{ formatDate(user.register_time) }}</text>
 						</view>
 					</view>
 
@@ -151,6 +142,7 @@
 				status_list: [],
 				userList: [],
 				filteredUserList: [],
+				date_preset: '',
 				date_range: [{
 					show: "00/00/0000",
 					value: "0000-00-00",
@@ -160,6 +152,18 @@
 				}],
 				searchTimeout: null,
 			}
+		},
+		computed: {
+			dateDisplay() {
+				if (this.date_preset) return this.date_preset;
+
+				const start = this.date_range[0];
+				const end = this.date_range[1];
+				if (!start || !end || start.value === '0000-00-00' || end.value === '0000-00-00') {
+					return this.$t('All');
+				}
+				return `${start.show} - ${end.show}`;
+			},
 		},
 		onLoad() {
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
@@ -259,20 +263,24 @@
 			filterUserList() {
 				this.filteredUserList = this.userList;
 			},
-			date_click(range) {
-				if (this.date_range[0].value == range[0].value && this.date_range[1].value == range[1].value) {
-					this.date_range = [{ show: "00/00/0000", value: "0000-00-00" }, { show: "00/00/0000", value: "0000-00-00" }]
-					if (this.$refs.date_picker && this.$refs.date_picker.date_arr) {
-						this.$refs.date_picker.date_arr.forEach(e => e.checked = false)
-					}
-				} else {
-					this.date_range = range;
+			date_click(range, presetLabel) {
+				this.date_preset = presetLabel || '';
+				this.date_range = range;
+				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
+					this.date_preset = '';
+					this.date_range = [{
+						show: "00/00/0000",
+						value: "0000-00-00"
+					}, {
+						show: "00/00/0000",
+						value: "0000-00-00"
+					}];
 				}
 				this.loadBonusSummary();
 				this.loadInviteesRewards();
 			},
 			getUserStatus(user) {
-				return user.user_status ? user.user_status : 'pending';
+				return user.user_status ? user.user_status : 'Pending';
 			},
 			getStatusBadgeClass(status) {
 				switch (status) {
@@ -282,9 +290,6 @@
 					case 'Signed Up': return 'status-signed';
 					default: return 'status-default';
 				}
-			},
-			getUserLabelClass(userLabel) {
-				return userLabel === 'Top User' ? 'label-top-user' : 'label-default';
 			},
 			formatDate(dateString) {
 				if (!dateString) return '';
@@ -329,225 +334,406 @@
 		z-index: 1;
 	}
 
-	.financial-stats {
-		display: flex;
-		flex-direction: row;
-		gap: 12px;
-		margin: 16px 0;
+	.dashboard-content {
+		padding: 15px 20px;
+		box-sizing: border-box;
+		color: #1C667C;
 	}
 
-	.financial-item {
-		flex: 1;
-		background: white;
-		border-radius: 10px;
-		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-		padding: 16px 12px;
-		text-align: center;
+	.dashboard-card {
+		border: 1px solid #d3e1e3;
+		border-radius: 12px;
+		background: #ffffff;
+		box-shadow: 0 2px 2px rgba(18, 63, 70, 0.18);
+		box-sizing: border-box;
+	}
+
+	.revenue-card,
+	.financial-card {
 		display: flex;
-		flex-direction: column;
+		align-items: center;
 		justify-content: space-between;
+		min-height: 65px;
+		padding: 0 19px;
 	}
 
-	.financial-label {
+	.card-label {
+		max-width: 70%;
+		overflow: hidden;
+		color: #1C667C;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.money-value {
+		color: #1C667C;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+		white-space: nowrap;
+	}
+
+	.money-unit,
+	.stat-unit {
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.invitation-card {
+		margin-top: 19px;
+		padding: 20px;
+	}
+
+	.invitation-title {
+		display: block;
+		color: #1C667C;
+		font-size: 20px;
+		font-weight: 700;
+		line-height: 25px;
+		text-align: center;
+		text-transform: capitalize;
+	}
+
+	.invitation-stat-grid {
+		display: flex;
+		align-items: stretch;
+		margin-top: 9px;
+		padding: 13px 6px;
+		border-radius: 11px;
+		background: #effafa;
+		box-sizing: border-box;
+	}
+
+	.invitation-stat {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
+		min-width: 0;
+	}
+
+	.invitation-stat-label {
+		overflow: hidden;
+		color: #1C667C;
+		font-size: 12px;
+		line-height: 16px;
+		text-align: center;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.invitation-stat-value {
+		margin-top: 7px;
+		color: #1C667C;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+	}
+
+	.financial-list {
+		margin-top: 19px;
+	}
+
+	.financial-card + .financial-card {
+		margin-top: 19px;
+	}
+
+	.dashboard-filters {
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: 5px;
+		margin-top: 18px;
+	}
+
+	.user-filter-pill,
+	.search-box {
+		height: 56upx;
+		border-radius: 999upx;
+		box-sizing: border-box;
+	}
+
+	.user-filter-pill {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 12px;
-		color: #666;
-		margin-bottom: 8px;
-		line-height: 1.6;
-		min-height: 40px;
+		flex: 1 1 0;
+		background: #1c667c;
+		color: #ffffff;
 	}
 
-	.financial-amount {
-		display: block;
-		font-size: 16px;
-		font-weight: bold;
-		color: #1C667C;
-		line-height: 1.6;
+	.date-filter {
+		flex: 0 0 79px;
+		gap: 6px;
+		padding: 0 8px;
+		overflow: hidden;
 	}
 
-	.financial-currency {
-		display: block;
-		font-size: 12px;
-		color: #333;
-		margin-top: 4px;
+	.user-filter-calendar {
+		width: 17px;
+		height: 17px;
+		flex-shrink: 0;
 	}
 
-	.filter {
-		background-color: #f8f9fa;
-		border-radius: 8px;
-		margin-bottom: 16px;
-	}
-
-	.filter-row {
-		display: flex;
-		align-items: center;
-		margin: 8px 0;
-		gap: 8px;
-	}
-
-	.width-38upx {
-		width: 38upx;
-		cursor: pointer;
-		opacity: 0.8;
-	}
-
-	.search-container {
+	.calendar-text {
 		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		color: #ffffff;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		text-align: left;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
-	.search-input-field {
-		width: 100%;
-		height: 36px;
-		border: 1px solid #00000040;
-		border-radius: 8px;
-		padding: 8px 16px;
-		font-size: 14px;
-		background: white;
+	.filter-arrow {
+		flex-shrink: 0;
+		color: #ffffff;
+		font-size: 10px;
+		line-height: 16px;
 	}
 
-	.date-selector {
+	.status-filter {
+		flex: 0 0 74px;
+		overflow: visible;
+	}
+
+	.status-filter ::v-deep .selector-wrapper {
 		display: flex;
 		align-items: center;
-		padding: 0 12px;
-		border: 1px solid #1C667C;
-		border-radius: 8px;
-		background: #1C667C;
-		color: white;
-		cursor: pointer;
-		gap: 4px;
-		height: 25px;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.status-filter ::v-deep .selector-tag {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: auto;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background-color: transparent !important;
+		color: #ffffff !important;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+	}
+
+	.status-filter ::v-deep .selector-tag text {
+		color: #ffffff;
+		font-size: 11px;
+		font-weight: 600;
+	}
+
+	.status-filter ::v-deep .selector-tag .cuIcon-unfold,
+	.status-filter ::v-deep .selector-tag .cuIcon-fold {
+		margin-left: 3px;
+		color: #ffffff;
+		font-size: 10px;
+	}
+
+	.search-box {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		min-width: 0;
+		padding: 0 10px;
+		border: 2px solid #1c667c;
+		border-radius: 999upx;
+		color: #1C667C;
+	}
+
+	.search-icon {
+		flex: 0 0 auto;
+		margin-right: 8px;
+		font-size: 19px;
+		line-height: 20px;
+	}
+
+	.search-box input {
+		flex: 1;
+		min-width: 0;
+		height: 27px;
+		padding: 0;
+		border: 0;
+		outline: 0;
+		background: transparent;
+		color: #1C667C;
+		font-size: 12px;
+		line-height: 27px;
+	}
+
+	.search-box input::placeholder {
+		color: #1C667C;
+		font-style: italic;
 	}
 
 	.user-list-container {
-		margin-top: 16px;
+		margin-top: 20px;
 	}
 
 	.user-scroll {
-		padding-right: 4px;
+		padding-right: 0;
 	}
 
 	.user-card {
-		background: white;
-		border-radius: 12px;
-		margin-bottom: 12px;
-		padding: 16px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-		border: 1px solid #f3f4f6;
+		overflow: hidden;
+		margin-bottom: 19px;
+		border: 1px solid #d3e1e3;
+		border-radius: 15px;
+		background: #ffffff;
+		box-shadow: 0 2px 2px rgba(18, 63, 70, 0.18);
+	}
+
+	.user-card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 40px;
+		padding: 0 19px;
+		background: #1c6b80;
+		box-sizing: border-box;
+	}
+
+	.user-name {
+		overflow: hidden;
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.user-status-badges {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-left: 10px;
+		white-space: nowrap;
+	}
+
+	.user-label {
+		overflow: hidden;
+		max-width: 90px;
+		color: #ffffff;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.status-badge {
+		padding: 3px 7px;
+		border-radius: 8px;
+		font-size: 11px;
+		font-weight: 700;
+		line-height: 18px;
+	}
+
+	.status-active {
+		background: #38c2cf;
+		color: #ffffff;
+	}
+
+	.status-inactive {
+		background: #ff4e4e;
+		color: #ffffff;
+	}
+
+	.status-pending {
+		background: #e7f0f2;
+		color: #1C667C;
+	}
+
+	.status-signed {
+		background: #38c2cf;
+		color: #ffffff;
+	}
+
+	.status-default {
+		background: #e7f0f2;
+		color: #1C667C;
+	}
+
+	.user-card-body {
+		padding: 14px 19px 12px;
+		box-sizing: border-box;
 	}
 
 	.user-stats-row {
 		display: flex;
+		align-items: flex-start;
 		justify-content: space-between;
-		margin-bottom: 8px;
+		margin-bottom: 10px;
 	}
 
 	.stat-item {
 		flex: 1;
+		min-width: 0;
+	}
+
+	.stat-item:first-child {
+		text-align: left;
+	}
+
+	.stat-item:nth-child(2) {
 		text-align: center;
+	}
+
+	.stat-item:last-child {
+		text-align: right;
 	}
 
 	.stat-label {
 		display: block;
+		overflow: hidden;
+		color: #1C667C;
 		font-size: 11px;
-		color: #9ca3af;
-		margin-bottom: 4px;
+		line-height: 15px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.stat-value {
 		display: block;
-		font-size: 13px;
-		font-weight: 600;
-		color: #374151;
+		margin-top: 3px;
+		overflow: hidden;
+		color: #1C667C;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 20px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-footer-row {
 		display: flex;
 		justify-content: space-between;
+		color: #1C667C;
 	}
 
-	.user-top-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 12px;
-	}
-
-	.user-id {
-		font-size: 16px;
-		font-weight: 600;
-		color: #1f2937;
-	}
-
-	.user-status-badges {
-		display: flex;
-		gap: 6px;
-		align-items: center;
-	}
-
-	.user-label-badge {
-		padding: 4px 8px;
-		border-radius: 12px;
-		font-size: 10px;
-		font-weight: 600;
-	}
-
-	.label-top-user {
-		background: #079417;
-		color: white;
-	}
-
-	.label-default {
-		background: #949191;
-		color: white;
-	}
-
-	.status-badge {
-		padding: 4px 10px;
-		border-radius: 12px;
-		font-size: 11px;
-		font-weight: 500;
-	}
-
-	.status-active {
-		background: #d1fae5;
-		color: #065f46;
-	}
-
-	.status-inactive {
-		background: #fee2e2;
-		color: #991b1b;
-	}
-
-	.status-pending {
-		background: #fef3c7;
-		color: #92400e;
-	}
-
-	.status-signed {
-		background: #dbeafe;
-		color: #1e40af;
-	}
-
-	.status-default {
-		background: #f3f4f6;
-		color: #6b7280;
+	.user-footer-row .joined-text:last-child {
+		margin-left: auto;
+		text-align: right;
 	}
 
 	.joined-text {
-		font-size: 10px;
-		color: #9ca3af;
+		font-size: 11px;
+		line-height: 15px;
+		white-space: nowrap;
 	}
 
 	.text-gray {
 		color: #999;
 		font-size: 14px;
-	}
-
-	.shadow-rec {
-		box-shadow: 0px 2px 2px 0px #00000040;
-		border: 1px solid #00000040;
-		border-radius: 10px;
 	}
 </style>

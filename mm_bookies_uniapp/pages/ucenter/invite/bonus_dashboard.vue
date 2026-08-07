@@ -12,7 +12,7 @@
 						<image mode="widthFix" class="dashboard-filter-icon" src="/static/image/order/calender.svg"
 							/>
 						<text class="period-filter-text">{{ periodDisplay }}</text>
-						<text class="cuIcon-unfold dashboard-filter-arrow" v-show="!periodDisplay"></text>
+						<text class="cuIcon-unfold dashboard-filter-arrow"></text>
 					</view>
 					<view class="type-filter-container">
 						<view class="dashboard-filter type-filter" @click="typeMenuVisible = !typeMenuVisible">
@@ -169,6 +169,7 @@
 					}
 				},
 				type_list: [],
+				date_preset: '',
 				date_range: [{
 					show: "00/00/0000",
 					value: "0000-00-00",
@@ -211,7 +212,8 @@
 					this.chartsDataPie1.series[0].data.length > 0;
 			},
 			periodDisplay() {
-				if (this.date_range[0].value === '0000-00-00') {
+				if (this.date_preset) return this.date_preset;
+				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
 					return this.$t('All');
 				}
 				return `${this.date_range[0].show} - ${this.date_range[1].show}`;
@@ -335,9 +337,11 @@
 					maximumFractionDigits: 0
 				}).format(amount);
 			},
-			date_click(range) {
+			date_click(range, presetLabel) {
+				this.date_preset = presetLabel || '';
 				this.date_range = range;
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
+					this.date_preset = '';
 					this.date_range = [{
 						show: "00/00/0000",
 						value: "0000-00-00"
@@ -428,7 +432,7 @@
 	}
 
 	.bonus-dashboard-content {
-		color: #123f46;
+		color: #1C667C;
 	}
 
 	.dashboard-filters {
@@ -487,7 +491,7 @@
 		background: #fff;
 		box-shadow: 0 2px 8px rgba(18, 63, 70, 0.2);
 		box-sizing: border-box;
-		color: #123f46;
+		color: #1C667C;
 	}
 
 	.type-option {
@@ -541,7 +545,7 @@
 		padding: 0 15px;
 		border-radius: 11px;
 		background: #effafa;
-		color: #17657a;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 700;
 		line-height: 18px;
@@ -563,7 +567,7 @@
 	.bonus-card-title {
 		display: block;
 		margin-bottom: 10px;
-		color: #17657a;
+		color: #1C667C;
 		font-size: 14px;
 		font-weight: 700;
 		line-height: 18px;
@@ -593,7 +597,7 @@
 	.bonus-overview-value {
 		min-width: 42px;
 		margin-left: 8px;
-		color: #17657a;
+		color: #1C667C;
 		font-weight: 700;
 		text-align: right;
 		white-space: nowrap;
@@ -658,7 +662,7 @@
 		flex-wrap: wrap;
 		gap: 9px;
 		margin: 0 0 24px;
-		color: #123f46;
+		color: #1C667C;
 		font-size: 8px;
 		line-height: 11px;
 	}
@@ -686,7 +690,7 @@
 
 	.chart-table-header {
 		padding: 0 0 5px;
-		color: #17657a;
+		color: #1C667C;
 		font-size: 8px;
 		line-height: 11px;
 	}

@@ -244,7 +244,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		border-bottom: 1px solid #2A626833;
+		border-bottom: 1px solid #1C667C33;
 	}
 
 	.filter-item:active {
@@ -262,7 +262,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid #37BDCC;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -273,13 +273,13 @@
 
 	.filter-radio-checked {
 		background-color: white;
-		border-color: #5FB5BD;
+		border-color: #37BDCC;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: #37BDCC;
 		border-radius: 50%;
 	}
 

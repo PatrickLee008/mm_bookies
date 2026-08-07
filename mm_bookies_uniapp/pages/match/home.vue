@@ -2296,7 +2296,7 @@
 		background-color: white;
 		border-radius: 25px;
 		padding: 0 5px;
-		border: 2px solid #2A6268;
+		border: 2px solid #1C667C;
 	}
 
 	.search-icon {
