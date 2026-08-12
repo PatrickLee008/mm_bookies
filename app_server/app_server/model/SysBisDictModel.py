@@ -135,6 +135,16 @@ class SysBisDict(BaseSaasModel):
         platform_order_cfg_vo = PlatformOrderCfgVo().map_from(platform_order_config)
         return platform_order_cfg_vo
 
+    # 返回结算佣金值（让球盘HDP/大小盘OU的单式佣金比例 singleRatio）
+    @staticmethod
+    def get_single_ratio(tenant_id=None) -> float:
+        """
+        获取结算佣金值 singleRatio，对应业务字典 platformOrder.single_ratio
+        （与 Java 端 BisConfigFactory.getPlatformOrderConfig().getSingleRatio() 一致）
+        """
+        platform_order_config = SysBisDict.get_platform_order_config(tenant_id)
+        return platform_order_config.singleRatio
+
     # 返回App前端配置
     @staticmethod
     def get_app_front_setting(tenant_id=None) -> AppFrontSettingVo:

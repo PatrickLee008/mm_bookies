@@ -13,6 +13,7 @@ from app_server.model.MatchModel import Match, MatchAttr, VipMatchAttr
 from app_server.model import GameType
 from app_server.model.OrderModel import Order, OrderType, BetType
 from app_server.model.OrderHistoryModel import OrderHistory
+from app_server.model.SysBisDictModel import SysBisDict
 from app_server.model.AppBetOrderModel import AppBetOrder, BetStatus, PayWallet
 from app_server.model.AppPlayerActivityRecordModel import AppPlayerActivityRecord
 from app_server.model.MAppCouponModel import MAppCoupon
@@ -671,6 +672,8 @@ def single_bet():
         betting_config = AppSettingBet1x2Model.get_agent_config(user.aid)
         # 获取默认的下注配置（混合下注单场最大和订单数最大限制）
         betting_default_config = AppSettingBet1x2Model.get_agent_config()
+        # 让球盘HDP和大小盘OU（1\2）的结算佣金值，从业务字典获取 singleRatio
+        singleRatio = SysBisDict.get_single_ratio(user.tenant_id)
         for bet in bets:
             order_type = bet['attrType']
             # 订单类型:1单笔胜负(让球)2单笔大小球3波胆4混合胜负5混合大小6单笔单双7混合单双8数字盘 9数字盘3d 10胜负平单笔 11胜负平混合
@@ -735,8 +738,9 @@ def single_bet():
                 response = jsonify({'message': "Bet failed: this match has reached the order limit."})
                 response.status_code = 400
                 return response
-            # 让球盘HDP和大小盘OU（1\2）
-            BET_ODDS = 1 if order_type in (1, 2) else match_attr.ODDS
+            # 让球盘HDP和大小盘OU（1\2），singleRatio 来自业务字典（见循环外获取）
+            # round 到两位小数，避免 1-0.05 产生 0.9500000000000001 之类的浮点误差
+            BET_ODDS = round(1 - singleRatio, 2) if order_type in (1, 2) else match_attr.ODDS
             order_id = "%s-%s" % (user.username, round(time.time() * 1000))
             new_order = Order(ID=str(uuid.uuid4()).replace("-", ""), ORDER_ID=order_id, USER_ID=user.id,
                               USER_NAME=user.username,
