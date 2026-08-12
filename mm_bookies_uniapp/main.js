@@ -18,6 +18,9 @@ Vue.prototype.$httpPay =httpPay.httpPay;
 import config from './utils/config.js'
 Vue.prototype.$config =config;
 
+import noticeManager from './utils/notice.js'
+Vue.prototype.$notice = noticeManager;
+
 import store from './store/index.js';
 Vue.prototype.$store =store;
 // WebSocket服务
@@ -43,6 +46,9 @@ Vue.component('cu-custom',cuCustom)
 // 顶栏底栏
 Vue.component('zw-header', () => import('@/components/common/header.vue'));
 Vue.component('zw-footer', () => import('@/components/common/footer.vue'));
+Vue.component('global-notice', () => import('@/components/common/global-notice.vue'));
+Vue.component('theme-icon', () => import('@/components/common/theme-icon.vue'));
+Vue.component('theme-logo', () => import('@/components/common/theme-logo.vue'));
 
 Vue.config.productionTip = false
 
@@ -59,6 +65,3 @@ app.$mount()
 
 
  
-
-
-

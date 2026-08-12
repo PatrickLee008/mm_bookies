@@ -1,13 +1,14 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header></zw-header>
 		<!-- 顶栏 -->
 		<view class="title-bar" style="height: auto;">
 			<view class="flex-row justify-between" style="height: 50px;">
 				<view class="flex-row align-center" style="">
-					<image src="/static/icon/basic/back.svg" mode="widthFix" class="width-30px"
-						@click="goto('../index/wallet')"></image>
-					<image src="/static/icon/ucenter/wallet2.svg" mode="widthFix" class="width-20px"></image>
+					<theme-icon name="back" class="width-30px"
+						color="var(--theme-icon-on-primary, #fff)" @click="goto('../index/wallet')"></theme-icon>
+					<theme-icon name="wallet2" class="width-20px"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<text class="title-text" style="">{{language.deposit}}</text>
 				</view>
 				<view class="align-center" style="">
@@ -26,7 +27,7 @@
 			</view>
 			<view class="padding-sm"></view>
 		</view>
-		<scroll-view scroll-y style="height: calc(100vh - 120px - 118px);">
+		<scroll-view scroll-y style="height: calc(100vh - 120px - 118px); background: #fff;">
 			<view v-if="current_progress==0">
 				<!-- 银行选择 -->
 				<view class="flex-column justify-center padding-top-sm mycolor-primary">
@@ -117,9 +118,8 @@
 							</view>
 						</view>
 						<view class="width-70px">
-							<view class="height-70px flex-column text-white myfont-14px radius-right-6px"
-								:class="card.is_default?'mybg-linfo':''"
-								:style="card.is_default?'color:#666666':'background-color: #E02B2B;'" v-if="editing"
+							<view class="height-70px flex-column text-white myfont-14px radius-right-6px account-remove-btn"
+								:class="{ 'disabled-action': card.is_default }" v-if="editing"
 								@click="card.is_default?'':removeBank(card)">
 								{{ $t('remove') }}
 							</view>
@@ -142,8 +142,8 @@
 					<text class="myfont-17px margin-left-lg text-black">{{ $t('add_bank_manually') }}</text>
 				</view>
 
-				<view class="height-45px radius-10px margin-top flex-column"
-					:class="acc_checked?'mybg-lprimary':'mybg-linfo'" @click="auto_submit()">
+				<view class="height-45px radius-10px margin-top flex-column mybg-lprimary"
+					:class="{ 'disabled-action': !acc_checked }" @click="auto_submit()">
 					{{$t('proceed_selected_account')}}
 				</view>
 				<view class="flex-row1 width-100vw margin-top-sm align-start height-20px"
@@ -224,7 +224,8 @@
 
 
 			<!-- 提交 -->
-			<button class="login-btn" style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="confirmDisabled"
+			<button class="login-btn" :class="{ 'disabled-action': confirmDisabled }"
+				style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="confirmDisabled"
 				v-if="(!chargeForm.charge_way&&current_progress!=1 ) || chargeForm.charge_way"
 				@click="next_or_submit()">
 				{{language.submit}}</button>
@@ -290,7 +291,7 @@
 							{{$t('add_bank_tips')}}
 						</view>
 					</view>
-					<button class="radius-12px width-50" :class="add_disable?'mybg-linfo':'mybg-primary'"
+					<button class="radius-12px width-50 mybg-primary" :class="{ 'disabled-action': add_disable }"
 						style="position: absolute;bottom: 20px;left: 25%;"
 						@click="modal_type=='add'?add_card():auto_submit()"
 						:disabled="add_disable">{{modal_type=='add'?language.save:language.confirm }}</button>
@@ -498,7 +499,7 @@
 					this.charge_way = this.charge_way.filter(item => item.checked)
 					let _this = this
 					if (_this.chargeForm.charge_way == 1 && _this.agent_no_bankcard) {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t('agent_no_bankcard'),
 							showCancel: false,
@@ -518,7 +519,7 @@
 			},
 			show_add_modal(modal_type) {
 				if (modal_type == 'add' && this.card_list.length >= 5) {
-					uni.showModal({
+					this.$notice.show({
 						title: this.$t('tips'),
 						content: this.$t('max_five_banks'),
 						showCancel: false,
@@ -583,7 +584,7 @@
 			removeBank(bank) {
 				var _this = this;
 				if (_this.$toolbox.click_too_fast(.5)) return
-				uni.showModal({
+				this.$notice.show({
 					// content: `Are you sure to remove your bank account ${bank.acc_number}?`,
 					content: `${this.$t('remove_bank_confirm')}`,
 					confirmText: this.$t('Confirm'),
@@ -730,7 +731,7 @@
 									tips = _this.language[res.message]
 								}
 								uni.hideLoading()
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: tips,
 									showCancel: false,
@@ -782,7 +783,7 @@
 			},
 			DelImg(e) {
 				/*
-				uni.showModal({
+				this.$notice.show({
 					title: '删除图片',
 					content: '确定要删除这张图片吗？',
 					cancelText: '取消',
@@ -847,7 +848,7 @@
 										title: this.$t('deposit_success')
 									});
 								} else {
-									uni.showModal({
+									this.$notice.show({
 										confirmText: this.$t('ok'),
 										showCancel: false,
 										title: this.$t('error_title'),
@@ -856,7 +857,7 @@
 								}
 							} catch (e) {
 								// console.error('解析响应失败:', e);
-								uni.showModal({
+								this.$notice.show({
 									confirmText: this.$t('ok'),
 									showCancel: false,
 									title: this.$t('error_title'),
@@ -867,7 +868,7 @@
 						fail: (err) => {
 							uni.hideLoading();
 							// console.error('上传失败:', err);
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -896,7 +897,7 @@
 								title: this.$t('deposit_success')
 							});
 						} else {
-							uni.showModal({
+							this.$notice.show({
 								confirmText: this.$t('ok'),
 								showCancel: false,
 								title: this.$t('error_title'),
@@ -929,7 +930,7 @@
 			// 				title: 'success'
 			// 			})
 			// 		} else {
-			// 			uni.showModal({
+			// 			this.$notice.show({
 			// 				confirmText: 'OK',
 			// 				showCancel: false,
 			// 				title: 'Error',
@@ -947,7 +948,7 @@
 				}
 				if (!_this.amount || !_this.chargeForm.acc_number)
 					return
-				// uni.showModal({
+				// this.$notice.show({
 				// 	title: 'comming soon',
 				// 	showCancel: false,
 				// })
@@ -992,7 +993,7 @@
 						});
 					} else if (data.code == 409) {
 						let order = data.data;
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: res.data.message,
 							confirmText: _this.$t('pay_other'),
@@ -1008,7 +1009,7 @@
 						})
 
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							confirmText: this.$t('ok'),
 							showCancel: false,
 							title: this.$t('error_title'),
@@ -1043,7 +1044,17 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+	.account-remove-btn {
+		background-color: #E02B2B;
+	}
+
+	.disabled-action {
+		opacity: 0.5;
+	}
+
+
+
 	.myrect {
 		width: 90%;
 		margin-left: 5%;

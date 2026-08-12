@@ -1,14 +1,14 @@
 <template>
 	<view class="invite-page">
-		<zw-header></zw-header>
-		<view class="invite-header-placeholder"></view>
-		<scroll-view scroll-y class="padding-bottom invite-scroll">
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
+		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+		<scroll-view scroll-y class="padding-bottom invite-scroll" @scroll="handleHeaderScroll">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
-					<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
+					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
 					<view class="flex-row align-center" style="">
-						<image src="/static/icon/ucenter/invite.png" class="lblue2blue" style="height: 28px;"
-							mode="heightFix"></image>
+						<theme-icon name="referral" class="lblue2blue" style="width: 28px; height: 28px;"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="title-text" style="">{{ language.invite_friend }}</text>
 					</view>
 				</view>
@@ -36,7 +36,8 @@
 					<view class="flex-row justify-around margin-top-sm">
 						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareSystem()">
 							<view class="mybg-primary flex-column radius-50" style="width: 38px;height: 38px;">
-								<image mode="widthFix" class="width-38upx" src="/static/icon/share/share.svg" />
+								<theme-icon name="share" class="width-38upx"
+									color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 							</view>
 							<text class="myfont-12px">{{ language.share }}</text>
 						</view>
@@ -77,8 +78,10 @@
 	import config from '@/utils/config.js'
 	import uQRCode from '@/uni_modules/Sansnn-uQRCode/js_sdk/u-qrcode';
 	import siteinfo from '@/siteinfo.js';
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
+		mixins: [headerCollapse],
 		data() {
 			return {
 				language: config.language,
@@ -207,19 +210,23 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: #ffffff;
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
-		height: 210px;
+		height: 255px;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.invite-scroll {
 		flex: 1;
 		height: 0;
+		border-radius: 20px 20px 0 0;
+		background: #ffffff;
+		position: relative;
+		z-index: 1;
 	}
 
 	.qr-rec {

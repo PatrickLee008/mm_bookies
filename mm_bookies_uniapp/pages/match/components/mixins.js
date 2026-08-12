@@ -77,7 +77,7 @@ export default {
 					league.favor = !league.favor
 					// _this.get_list()
 				} else {
-					uni.showModal({
+					this.$notice.show({
 						content: fail_content,
 						title: _this.$t('tips'),
 						showCancel: false,

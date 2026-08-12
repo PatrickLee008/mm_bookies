@@ -89,13 +89,16 @@
 
 <style lang="scss" scoped>
 	.language-page {
-		background: #f5f5f5;
 		min-height: 100vh;
 	}
 
 	/* 顶部栏 */
 	.language-header {
-		background: #3d6877;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		padding: 40px 20px 20px 20px;
 		display: flex;
 		justify-content: space-between;

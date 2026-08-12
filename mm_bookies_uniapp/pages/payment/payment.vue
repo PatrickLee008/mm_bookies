@@ -1,9 +1,9 @@
 <template>
-	<view class="bg-white full-page">
-		<zw-header></zw-header>
-		<view class="header-placeholder"></view>
+	<view class="full-page">
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 		<!-- 滚动内容区域 -->
-		<scroll-view scroll-y class="payment-content">
+		<scroll-view scroll-y class="payment-content" @scroll="handleHeaderScroll">
 			<block>
 				<!-- <block v-if="isload && payInfo"> -->
 				<!-- 隐藏的二维码生成组件 -->
@@ -162,11 +162,13 @@
 </template>
 <script>
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 	let intervalSearch;
 	export default {
 		components: {
 			tkiQrcode
 		},
+		mixins: [headerCollapse],
 		data() {
 			return {
 				dataId: '',
@@ -228,7 +230,7 @@
 					} else {
 						// 请求成功但业务失败的情况
 						that.modalName = 'error_modal';
-						uni.showModal({
+						this.$notice.show({
 							title: that.$t('tips'),
 							content: res.data ? res.data.msg : that.$t('network_error'),
 							confirmText: that.$t('ok'),
@@ -240,7 +242,7 @@
 					console.error('Network request failed:', err);
 					that.modalName = 'error_modal';
 					that.isload = true;
-					uni.showModal({
+					this.$notice.show({
 						title: that.$t('network_error'),
 						content: that.$t('check_network'),
 						confirmText: that.$t('ok'),
@@ -258,7 +260,7 @@
 						that.payInfo = res.data.data;
 						if (that.payInfo.orderStatus == 2) {
 							//支付成功
-							uni.showModal({
+							this.$notice.show({
 								title: that.$t('tips'),
 								content: that.$t('pay_completed'),
 								showCancel: false,
@@ -658,14 +660,12 @@
 		}
 	};
 </script>
-<style scoped>
-	page {
-		background-color: white;
-	}
-
+<style lang="scss" scoped>
 	.header-placeholder {
-		height: 220px;
+		height: 255px;
 		width: 100%;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.full-page {
@@ -728,7 +728,7 @@
 	.deposit-phone-value {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		letter-spacing: 1px;
 	}
 

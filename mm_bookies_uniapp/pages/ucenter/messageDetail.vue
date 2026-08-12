@@ -1,5 +1,5 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 		<scroll-view class="padding" scroll-y style="height: calc(100vh - 120px);">
 			<!-- 返回头部 -->
@@ -115,7 +115,7 @@
 
 			// 删除消息
 			deleteMessage() {
-				uni.showModal({
+				this.$notice.show({
 					title: this.$t('delete_message'),
 					content: this.$t('confirm_delete_message'),
 					success: (res) => {
@@ -321,6 +321,10 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		min-height: 100vh;
+	}
+
 	.message-detail-card {
 		background-color: #FFFFFF;
 		border-radius: 12px;

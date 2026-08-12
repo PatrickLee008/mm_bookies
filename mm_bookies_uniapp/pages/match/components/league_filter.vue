@@ -24,17 +24,15 @@
 						</view>
 
 						<!-- from tangjq--- 联赛列表 -->
-						<view class="filter-item"
-							v-for="(league,index) in league_list"
-							:key="index"
-							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]'
-							@click="toggleLeague(index)">
+						<view class="filter-item" v-for="(league,index) in league_list" :key="index"
+							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]' @click="toggleLeague(index)">
 							<text class="filter-item-text">{{league.name}}</text>
 							<view class="filter-radio" :class="{'filter-radio-checked': league.checked}">
 								<view class="filter-radio-inner" v-if="league.checked"></view>
 							</view>
 							<!-- from tangjq--- 隐藏的checkbox用于保持原有逻辑 -->
-							<checkbox style="display: none;" :checked="league.checked" :value="String(index)"></checkbox>
+							<checkbox style="display: none;" :checked="league.checked" :value="String(index)">
+							</checkbox>
 						</view>
 
 						<!-- from tangjq--- 隐藏的All checkbox用于保持原有逻辑 -->
@@ -117,8 +115,8 @@
 				list.forEach((league, index) => {
 					league.checked = this.all_status
 				})
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -130,8 +128,8 @@
 				list[index].checked = !list[index].checked
 				// 检查是否所有联赛都被选中
 				this.all_status = list.every(league => league.checked)
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -151,8 +149,8 @@
 						league.checked = check_list.includes(String(index))
 					})
 				}
-				list.forEach(ele=>{
-					ele.match_list.forEach(match=>{
+				list.forEach(ele => {
+					ele.match_list.forEach(match => {
 						match.checked = true
 					})
 				})
@@ -208,7 +206,7 @@
 
 	/* from tangjq--- 标题栏 */
 	.filter-header {
-		background-color: #2F5D62;
+		background-color: $color-secondary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -228,16 +226,19 @@
 		overflow-y: auto;
 		min-height: 0;
 		background-color: #f8f9fa;
-		padding: 20px 0;
+		padding: 20px 12px;
 	}
 
 	.filter-list {
 		padding: 0;
+		background-color: $bg-color-info;
+		border-radius: $radius-medium;
+		overflow: hidden;
 	}
 
 	/* from tangjq--- 过滤项样式 */
 	.filter-item {
-		background-color: #F1FAFB;
+		background-color: $bg-color-info;
 		margin-bottom: 1px;
 		padding: 8px 25px;
 		display: flex;
@@ -246,6 +247,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
+		border-bottom: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
 	}
 
 	.filter-item:active {
@@ -253,7 +255,7 @@
 	}
 
 	.filter-item-text {
-		color: #2A6268;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 500;
 		flex: 1;
@@ -263,7 +265,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -274,13 +276,13 @@
 
 	.filter-radio-checked {
 		background-color: white;
-		border-color: #5FB5BD;
+		border-color: $color-secondary;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -294,8 +296,8 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #2F5D62;
-		border-radius: 25px;
+		background-color: $color-secondary;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 		cursor: pointer;

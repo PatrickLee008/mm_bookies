@@ -1,8 +1,8 @@
 <template name="messageCenter">
-	<view class="bg-white full-page">
-		<zw-header></zw-header>
+	<view class="full-page">
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<!-- header 占位，防止内容被固定头部遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- 页面头部 -->
 		<view class="page-header">
@@ -42,7 +42,7 @@
 
 		<!-- 下拉刷新容器 -->
 		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
-			@refresherrefresh="onRefresh" :style="{ height: scrollHeight }">
+			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll">
 
 			<!-- 消息列表 -->
 			<view class="message-list">
@@ -135,7 +135,7 @@
 			</view>
 		</view>
 
-		<!-- Mark All Read 自定义确认弹窗（替代框架自带 uni.showModal，避免英文单词换行问题） -->
+		<!-- Mark All Read 自定义确认弹窗（替代框架自带 this.$notice.show，避免英文单词换行问题） -->
 		<view class="modal-overlay" v-if="showMarkAllModal" @click="showMarkAllModal = false">
 			<view class="confirm-modal" @click.stop>
 				<view class="confirm-header">
@@ -167,9 +167,11 @@
 		markAllAsRead as apiMarkAllAsRead,
 		deleteMessage as apiDeleteMessage
 	} from '../../utils/api/message.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		name: "messageCenter",
+		mixins: [headerCollapse],
 		data() {
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
@@ -191,10 +193,6 @@
 		computed: {
 			hasUnreadMessages() {
 				return this.messages.some(msg => !msg.read)
-			},
-			// 列表滚动区域高度：视口高度 - header占位(210) - 页头(约50) - 标签(约45)
-			scrollHeight() {
-				return 'calc(100vh - 305px)'
 			}
 		},
 
@@ -419,7 +417,7 @@
 
 			// 删除消息（onex2 中此入口默认隐藏，保留实现以备启用）
 			deleteMessage() {
-				uni.showModal({
+				this.$notice.show({
 					title: this.$t('confirm_clear'),
 					content: this.$t('confirm_clear_content'),
 					confirmText: this.$t('clear'),
@@ -526,7 +524,7 @@
 				}
 			},
 
-			// 标记全部消息为已读：打开自定义确认弹窗（替代框架自带 uni.showModal）
+			// 标记全部消息为已读：打开自定义确认弹窗（替代框架自带 this.$notice.show）
 			markAllAsRead() {
 				if (!this.isLogin || this.unreadCount === 0) {
 					return
@@ -664,15 +662,18 @@
 
 <style lang="scss" scoped>
 	.full-page {
-		min-height: 100vh;
-		background-color: #E1E1E1;
+		height: 100vh;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 	}
 
 	/* header 占位 */
 	.header-placeholder {
-		height: 210px;
+		height: 255px;
 		width: 100%;
-		background-color: #2F5D62;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.page-header {
@@ -681,8 +682,9 @@
 		justify-content: space-between;
 		padding: 12px 10px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 		background-color: white;
+		flex-shrink: 0;
 	}
 
 	.header-left {
@@ -712,7 +714,7 @@
 		align-items: center;
 		font-weight: 500;
 		font-size: 13px;
-		color: #2F5D62;
+		color: $color-primary;
 		padding: 6px 12px;
 		background: #E8F0FE;
 		border-radius: 6px;
@@ -736,6 +738,7 @@
 		border-top: 1px solid #E5E7EB;
 		border-bottom: 1px solid #E5E7EB;
 		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+		flex-shrink: 0;
 	}
 
 	.tab-item {
@@ -758,7 +761,7 @@
 		color: #8B8891;
 
 		.tab-item.active & {
-			color: #2F5D62;
+			color: $color-primary;
 			font-weight: 700;
 		}
 	}
@@ -770,7 +773,7 @@
 		transform: translateX(-50%);
 		width: 40px;
 		height: 3px;
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 2px 2px 0 0;
 		animation: slideIn 0.2s ease-out;
 	}
@@ -801,6 +804,9 @@
 	}
 
 	.message-scroll {
+		flex: 1;
+		height: 0;
+		min-height: 0;
 		background-color: #E1E1E1;
 	}
 
@@ -825,13 +831,13 @@
 			border: 1px solid rgba(47, 93, 98, 0.1);
 
 			.card-header {
-				background: #2F5D62;
+				background: $color-primary;
 				font-weight: 700;
 			}
 
 			.message-title {
 				font-weight: 700;
-				color: #2F5D62;
+				color: $color-primary;
 			}
 
 			.message-description {
@@ -852,7 +858,7 @@
 		top: 0;
 		bottom: 0;
 		width: 6px;
-		background: #5FB5BD;
+		background: $color-secondary;
 		border-radius: 12px 0 0 12px;
 		animation: pulse 2s ease-in-out infinite;
 		box-shadow: 2px 0 8px rgba(95, 181, 189, 0.5);
@@ -870,7 +876,7 @@
 	}
 
 	.card-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 8px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -903,7 +909,7 @@
 		font-weight: 600;
 		font-size: 13px;
 		line-height: 1.4;
-		color: #2F5D62;
+		color: $color-primary;
 		display: block;
 		margin-bottom: 6px;
 		overflow: hidden;
@@ -936,7 +942,7 @@
 		width: 20px;
 		height: 20px;
 		border: 2px solid #EDEDED;
-		border-top: 2px solid #2F5D62;
+		border-top: 2px solid $color-primary;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 8px;
@@ -1062,7 +1068,7 @@
 	.detail-title-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 1.5;
 		display: block;
 		margin-top: 8px;
@@ -1070,7 +1076,7 @@
 
 	.detail-content-text {
 		font-size: 15px;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 1.6;
 		display: block;
 		margin-top: 8px;
@@ -1104,7 +1110,7 @@
 	}
 
 	.primary-btn {
-		background: #2F5D62;
+		background: $color-primary;
 
 		.btn-text {
 			color: #FFFFFF;
@@ -1140,7 +1146,7 @@
 	.confirm-title {
 		font-size: 17px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 1.5;
 		word-break: break-word;
 		white-space: normal;
@@ -1182,11 +1188,11 @@
 
 	.cancel-btn {
 		background: #FFFFFF;
-		border: 1px solid #2F5D62;
+		border: 1px solid $color-primary;
 	}
 
 	.ok-btn {
-		background: #2F5D62;
+		background: $color-primary;
 
 		&:active {
 			background: #244a4e;

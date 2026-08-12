@@ -1,14 +1,21 @@
 <template>
-	<view class="" style="position: relative;margin: 0;padding: 0;">
-		<view class="cu-tag round sm selector-tag" :style="{'style':tag_style}" @click="set_dialog_status(!hidden)">
+	<view class="selector-wrapper">
+		<view class="cu-tag round sm selector-tag" :style="tag_style" @click="set_dialog_status(!hidden)">
 			<text>{{language[current_tag.label]?language[current_tag.label]:current_tag.label}}</text>
 			<text class="" :class="hidden?'cuIcon-unfold':'cuIcon-fold'"></text>
 		</view>
-		<view class="selector-bg" style="" v-if="!hidden" :style="{'top':top,'left':left}">
-			<view class="flex-column" style="align-items: flex-start;">
-				<view class="option-bg" v-for="(i,_index) in option_list" :key="_index" style=""
-					:class="{'option-active width-100':i.checked}" @click="clickOption(_index)">
-					{{language[i.label]?language[i.label]:i.label}}
+		<view class="selector-bg" v-if="!hidden" :style="{'top':top,'left':left}">
+			<!-- 顶部青绿标题栏：当前选中项 + 收起箭头 -->
+			<view class="selector-header" @click="set_dialog_status(true)">
+				<text class="selector-header-text">{{language[current_tag.label]?language[current_tag.label]:current_tag.label}}</text>
+				<text class="cuIcon-fold selector-header-arrow"></text>
+			</view>
+			<!-- 选项列表 -->
+			<view class="selector-options">
+				<view class="option-bg" v-for="(i,_index) in option_list" :key="_index"
+					:class="{'option-active':i.checked}" @click="clickOption(_index)">
+					<text class="option-text">{{language[i.label]?language[i.label]:i.label}}</text>
+					<view class="option-radio" :class="{'radio-checked':i.checked}"></view>
 				</view>
 			</view>
 		</view>
@@ -49,6 +56,11 @@
 				type: String,
 				default: '0'
 			},
+			// from tangjq--- 当选中项 value 为 'All'（不区分大小写）时，触发器显示该 prop 代替 'All'
+			default_label: {
+				type: String,
+				default: ''
+			},
 		},
 		data() {
 			return {
@@ -64,6 +76,10 @@
 				})
 				if (checked.length > 0) {
 					res = checked[0]
+				}
+				// from tangjq--- 当选中项是 'All'（默认初始值）时，用 default_label 替代显示
+				if (res && typeof res.value === 'string' && res.value.toLowerCase() === 'all' && this.default_label) {
+					res = Object.assign({}, res, { label: this.default_label })
 				}
 				return res
 			}
@@ -93,56 +109,117 @@
 </script>
 
 <style lang="scss">
-	.selector-bg {
-		clear: both;
-		top: calc(100% - 10upx);
-		left: 0;
-		position: absolute;
-		z-index: 15;
-		box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-		font-style: normal;
-		font-family: '__Inter_7be8ac', '__Inter_Fallback_7be8ac';
-		color: rgb(12, 53, 106);
-		position: absolute;
-		font-weight: 400;
-		line-height: 1.5;
-		min-width: 16px;
-		min-height: 16px;
-		outline: 0px;
-		border-radius: 10px;
-		padding: 5px;
-		transform-origin: 0px 0px;
-		margin-top: 0;
-		background-color: rgb(255, 255, 255);
-
+	.selector-wrapper {
+		position: relative;
+		margin: 0;
+		padding: 0;
 	}
 
-	.option-bg {
-		font-weight: 400;
-		line-height: 1.5;
+	/* 触发器（tag）：统一使用订单筛选栏的青绿色样式，页面可按容器覆盖 */
+	.selector-tag {
+		background-color: $color-primary;
+		color: white;
+		gap: 6upx;
+		position: relative;
+		overflow: visible;
+	}
+
+	/* 下拉面板：顶部青绿标题栏 + 浅蓝白选项列表 */
+	.selector-bg {
+		position: absolute;
+		top: calc(100% + 8upx);
+		left: 0;
+		z-index: 15;
+		min-width: 220upx;
+		background-color: #F0F9FB;
+		border-radius: 16upx;
+		box-shadow: 0 6upx 20upx var(--theme-primary-alpha-18, rgba(28, 102, 124, 0.18));
+		overflow: hidden;
+	}
+
+	/* 顶部青绿标题栏（与触发器同宽，含当前选中项 + 收起箭头） */
+	.selector-header {
 		display: flex;
-		justify-content: flex-start;
 		align-items: center;
-		padding: 5px;
-		border-radius: 5px;
-		font-size: 10px;
-		height: 25px;
-		min-height: 25px;
-		min-width: 15vw;
+		justify-content: space-between;
+		gap: 16upx;
+		padding: 18upx 24upx;
+		background: $color-primary;
+		cursor: pointer;
+	}
+
+	.selector-header-text {
+		color: #FFFFFF;
+		font-size: 24upx;
+		font-weight: 600;
+		line-height: 32upx;
 		white-space: nowrap;
 	}
 
-	.option-active {
-		background-color: rgba(12, 53, 106, 0.08);
+	.selector-header-arrow {
+		color: #FFFFFF;
+		font-size: 22upx;
+		flex-shrink: 0;
 	}
 
-	.selector-tag {
-		// padding: 0px 6px;
-		background-color: #bdbdbd !important;
-		color: white;
-		gap: 15rpx;
+	/* 选项列表 */
+	.selector-options {
+		display: flex;
+		flex-direction: column;
+		padding: 8upx 0;
+	}
+
+	.option-bg {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16upx;
+		padding: 18upx 24upx;
+		background: transparent;
+		white-space: nowrap;
+		cursor: pointer;
+		transition: background 0.15s ease;
+	}
+
+	.option-bg:active {
+		background: var(--theme-primary-alpha-06, rgba(28, 102, 124, 0.06));
+	}
+
+	.option-text {
+		color: $color-primary;
+		font-size: 24upx;
+		font-weight: 500;
+		line-height: 32upx;
+		flex: 1;
+	}
+
+	/* radio 圆圈：青绿描边，选中带实心内点 */
+	.option-radio {
+		width: 28upx;
+		height: 28upx;
+		border: 2upx solid #4fb3bf;
+		border-radius: 50%;
+		background: transparent;
+		flex-shrink: 0;
 		position: relative;
-		overflow: visible;
+		box-sizing: border-box;
+	}
+
+	.option-radio.radio-checked::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 14upx;
+		height: 14upx;
+		border-radius: 50%;
+		background: #4fb3bf;
+	}
+
+	/* 旧 option-active 不再使用浅色背景，由 radio-checked 表达选中态 */
+	.option-active {
+		background: transparent;
 	}
 
 	.mask {

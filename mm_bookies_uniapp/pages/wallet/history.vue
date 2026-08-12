@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -106,6 +106,10 @@
 			}
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			refreshData() {
 				if (this.refreshing) return;
 				this.refreshing = true;
@@ -352,7 +356,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -374,7 +378,7 @@
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 	}
@@ -390,13 +394,13 @@
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 15px;
 		height: 15px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -405,13 +409,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #5FB5BD;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -424,7 +428,7 @@
 	/* 记录项 - 参照设计稿：浅薄荷色卡片 + 底部状态条 */
 	.record-item {
 		margin: 12px 0;
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		padding: 14px 16px;
 		overflow: hidden;
@@ -448,26 +452,26 @@
 	.order-id-label {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.record-date {
 		font-size: 13px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.row-label {
 		font-size: 14px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: $color-primary;
 		flex-shrink: 0;
 	}
 
 	.row-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: right;
 		margin-left: 10px;
 		word-break: break-word;
@@ -500,11 +504,11 @@
 	}
 
 	.status-bar.status-success {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.status-bar.status-new {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.status-bar.status-pending {
@@ -529,7 +533,7 @@
 	}
 
 	.continue-btn {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		color: white;
 		padding: 10px 20px;
 		border-radius: 8px;

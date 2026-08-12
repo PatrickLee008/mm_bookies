@@ -1,15 +1,15 @@
 <template>
-	<view class="bg-white">
+	<view class="dark-teal-bg">
 		<zw-header></zw-header>
 		<!-- <cu-custom isBack backUrl="/pages/login/login">
 			<block slot="content">{{$t('registerTitle')}}</block>
 		</cu-custom> -->
-		<view class="login-page" style="">
+		<view class="login-page" style="background: #fff;">
 			<view class="flex-column width-100">
 				<view class="myfont-11px margin-bottom">{{language[title_list[current_progress - 1]]}}</view>
 				<view class="flex-row justify-center width-100">
 					<view class="progress-btn"
-						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, rgb(12, 53, 106) 60%, rgb(50, 106, 178) 100%);'"
+						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, var(--theme-primary) 60%, var(--theme-secondary) 100%);'"
 						@click="progressChange(-1)">
 						<view class="text-white cuIcon-triangleupfill myfont-12px" style="transform: rotate(-90deg);">
 						</view>
@@ -19,7 +19,7 @@
 						<view class="mybg-primary" :style="[{ width:loading?(current_progress*25)+'%':''}]"></view>
 					</view>
 					<view class="progress-btn" @click="progressChange(1)"
-						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, rgb(12, 53, 106) 60%, rgb(50, 106, 178) 100%);'">
+						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, var(--theme-primary) 60%, var(--theme-secondary) 100%);'">
 						<view class="text-white cuIcon-triangleupfill myfont-12px" style="transform: rotate(90deg);">
 						</view>
 					</view>
@@ -432,13 +432,8 @@
 				// this.password_focused = false;
 				const pwd = this.loginInfo.password;
 
-				// 条件：长度 ≥ 8，包含大小写字母和数字
-				const isValid =
-					pwd &&
-					pwd.length >= 8 &&
-					/[a-z]/.test(pwd) && // 至少一个小写字母
-					/[A-Z]/.test(pwd) && // 至少一个大写字母
-					/\d/.test(pwd); // 至少一个数字
+				// 密码只要求至少五个字符，不限制字符类型。
+				const isValid = pwd && pwd.length >= 5
 
 				this.password_error = !isValid;
 				this.password_error_contet = !isValid ?
@@ -509,7 +504,7 @@
 						break;
 					case 3:
 						if (!this.loginInfo.bank_type) {
-							uni.showModal({
+							this.$notice.show({
 								title: 'res.data.message',
 								content: this.$t('please_select_your_bank'),
 								// content: this.language[res.data.message],
@@ -535,7 +530,7 @@
 				let _this = this
 				// let validate = this.mcaptcha.validate(this.loginInfo.captcha)
 				// if (!validate) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: this.language.warning,
 				// 		content: this.language.captcha_not_match,
 				// 		showCancel: false,
@@ -555,7 +550,7 @@
 							this.max_progress += 1
 							return
 						} else {
-							uni.showModal({
+							this.$notice.show({
 								title: 'Tips!',
 								content: _this.$t('account_repeat'),
 								// content: this.language[res.data.message],
@@ -565,7 +560,7 @@
 							});
 						}
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: 'error!',
 							content: res.data.message,
 							// content: this.language[res.data.message],
@@ -609,7 +604,7 @@
 					_this.loadding = ''
 					if (res.statusCode == 200) {
 						_this.login()
-						// uni.showModal({
+						// this.$notice.show({
 						// 	title: 'Success!',
 						// 	content: 'Welcome',
 						// 	showCancel: false,
@@ -621,7 +616,7 @@
 
 					} else {
 						// _this.loginDisabled = false
-						uni.showModal({
+						this.$notice.show({
 							title: '_error!',
 							content: res.data.message,
 							// content: this.language[res.data.message],
@@ -669,7 +664,7 @@
 						uni.setStorageSync('login_success', true)
 						uni.setStorageSync('rigister_success', true)
 					} else if (res.statusCode == 400) {
-						uni.showModal({
+						this.$notice.show({
 							title: 'Tips',
 							content: this.$t('wrong_password'),
 							showCancel: false,
@@ -678,7 +673,7 @@
 						});
 						// _this.loginDisabled = false;
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: 'Tips',
 							content: this.language[res.data.message],
 							showCancel: false,
@@ -732,7 +727,7 @@
 			// 	}
 
 			// 	if (content) {
-			// 		uni.showModal({
+			// 		this.$notice.show({
 			// 			title: 'Warning',
 			// 			content: content,
 			// 			showCancel: false,
@@ -777,6 +772,10 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		min-height: 100vh;
+	}
+
 	.default-bank {
 		height: 32px;
 		width: 32px;
@@ -806,7 +805,7 @@
 		width: 25px;
 		height: 25px;
 		border-radius: 50%;
-		filter: drop-shadow(rgb(12, 53, 106) 0px 0px 2px);
+		filter: drop-shadow(var(--theme-header-background-color, #{$theme-header-start}) 0px 0px 2px);
 	}
 
 	// 登录样式

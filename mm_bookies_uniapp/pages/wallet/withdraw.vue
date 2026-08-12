@@ -1,7 +1,7 @@
 <template>
 	<view class="withdraw-component">
 		<!-- from tangjq--- Withdraw 组件内容从 withdraw.vue 提取 -->
-		<scroll-view scroll-y class="withdraw-scroll">
+		<scroll-view scroll-y class="withdraw-scroll" @scroll="onScrollEmit">
 			<!-- from tangjq--- 银行卡列表界面（仿照deposit.vue） -->
 			<view class="bank-list-container">
 				<!-- 银行卡列表 -->
@@ -67,7 +67,7 @@
 				<view class="wallet-info-section">
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
-						<text class="wallet-info-value">{{$toolbox.num_format(userInfo.money)}}Ks</text>
+						<text class="wallet-info-value">{{$toolbox.floor_format(userInfo.money)}}Ks</text>
 					</view>
 					<!-- <view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('amount_unlock') }} :</text>
@@ -250,6 +250,10 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			},
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')
 				amount = amount ? parseInt(amount) : '0'
@@ -477,13 +481,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	/* from tangjq--- 银行卡列表样式（完全仿照deposit.vue） */
 	.bank-list-container {
-		padding: 20px 16px;
+		padding: 20px 5px;
 	}
 
 	.bank-card-item {
 		width: 100%;
 		margin-bottom: 16px;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 16px;
 		background-color: #fff;
 		overflow: hidden;
@@ -537,7 +541,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-btn {
 		width: 100%;
 		height: 60px;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 16px;
 		background-color: #fff;
 		display: flex;
@@ -548,7 +552,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-text {
 		font-size: 18px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.tips {
@@ -657,7 +661,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.dialog-header {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		margin: -24px -20px 0;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
@@ -713,7 +717,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.bank-icon-item.selected {
-		border-color: #4FB3BF;
+		border-color: $color-secondary;
 	}
 
 	.bank-icon-img {
@@ -743,7 +747,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.form-input {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: $color-secondary-light;
 		border-radius: 12px;
 		font-size: 12px;
 		color: #000;
@@ -753,7 +757,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-btn {
 		width: 100%;
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
@@ -766,8 +770,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.confirm-btn.disabled {
-		background-color: #ccc;
-		color: #666;
+		opacity: 0.5;
 	}
 
 	/* from tangjq--- 提现弹窗样式（仿照deposit-modal-dialog） */
@@ -783,7 +786,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.withdraw-modal-header {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
 		display: flex;
@@ -810,14 +813,14 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.user-account-section {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		padding: 20px;
 	}
 
 	.section-title {
 		font-size: 18px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		display: block;
 		text-align: center;
 		margin-bottom: 16px;
@@ -854,13 +857,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-type-text {
 		font-size: 12px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.info-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: $color-secondary-light;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -870,13 +873,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.info-value-text {
 		font-size: 12px;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
 	/* from tangjq--- 钱包信息部分样式 */
 	.wallet-info-section {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		padding: 0 20px 20px;
 	}
 
@@ -891,13 +894,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.wallet-info-label {
 		font-size: 14px;
 		font-weight: 400;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.wallet-info-value {
 		font-size: 16px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.amount-section {
@@ -907,7 +910,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.amount-input-box {
 		width: 100%;
 		height: 40px;
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -918,7 +921,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.amount-input-field {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: center;
 		border: none;
 		background: transparent;
@@ -948,7 +951,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.quick-amount-btn {
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -960,17 +963,17 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.quick-amount-btn.selected {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.quick-amount-btn:active {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.continue-btn {
 		width: calc(100% - 40px);
 		height: 30px;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -984,7 +987,6 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.continue-btn[disabled] {
-		background-color: #ccc;
-		color: #666;
+		opacity: 0.5;
 	}
 </style>

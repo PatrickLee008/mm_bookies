@@ -1,394 +1,619 @@
 <template>
-	<view class="mybg-grey full-page" style="background-image: url(../../static/image/index_bg.jpg);background-repeat: no-repeat;background-size: 100% 100%;">
-		<cu-custom>
-			<block slot="content">INNWA BET</block>
-		</cu-custom>
-		<view>
-			<swiper class="box-shadow myrect screen-swiper" :class="dotStyle?'square-dot':'round-dot'" :indicator-dots="false" :circular="true" :autoplay="true" interval="3000" duration="500" style="border-radius: 13px;">
-				<swiper-item v-for="(item,index) in swiperList" :key="index">
-					<image style="border-radius: 13px;" :src="item.url" mode="scaleToFill" v-if="item.type=='image'">
-					</image>
-					<video :src="item.url" autoplay loop muted :show-play-btn="false" :controls="false" objectFit="cover" v-if="item.type=='video'"></video>
-				</swiper-item>
-			</swiper>
-		</view>
+	<view class="home-page theme-bg-no-header">
+		<global-notice ref="globalNotice"></global-notice>
+		<scroll-view scroll-y class="home-scroll">
+			<view class="home-top">
+				<theme-logo variant="page" height="88px" class="home-logo"></theme-logo>
+				<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 
-		<view class="myrect box-shadow flex-row bg-white padmar" style="width: 90vw;">
-			<!-- <image class="icon" src="../../static/image/notice.png"></image> -->
-			<uni-notice-bar backgroundColor="white" color="black" :speed="speed" scrollable="true" :text="notice" style="margin-bottom: 0;font-weight: bold;"></uni-notice-bar>
-		</view>
-		<scroll-view>
-			<view class="myrect box-shadow bg-white padmar">
-				<view class="flex-row" style="justify-content: space-between;">
-					<view class="flex-row">
-						<!-- <image class="my-icon-plus" src="../../static/image/tocenter.png"></image> -->
-						<text class="myfont-bold" style="line-height: 40px;">{{userInfo.nick_name}}</text>
+				<view class="user-summary">
+					<view class="user-avatar">
+						<image src="/static/user_avatar.svg" class="avatar-img" mode="aspectFit"></image>
 					</view>
-					<!-- <image style="width: 14px;height: 10px;float: right;margin: 13px 10px;" src="../../static/image/fanhui(5).png"></image> -->
+					<view class="user-details">
+						<text class="greeting">{{ $t(greetingKey) }}</text>
+						<text class="id-value">My ID : {{ userInfo.phone || userInfo.nick_name || '' }}</text>
+					</view>
+					<view class="header-actions">
+						<view class="bell-btn" @click="goMessage">
+							<image src="/static/icon/nav/notification.svg" class="bell-icon"
+								:class="{ 'bell-ring': unreadCount > 0 }" mode="aspectFit"></image>
+							<view class="bell-badge" v-if="unreadCount > 0">{{ unreadCount > 99 ? '99+' : unreadCount }}
+							</view>
+						</view>
+						<view class="settings-btn" @click="goto('/pages/ucenter/home')">
+							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+						</view>
+					</view>
 				</view>
-				<view class="mybg-red flex-row" style="padding: 5vw 2vw 5vw 2vw;border-radius: 5px;align-items: center;width: 96%;margin-left: 2%;">
-					<view class="flex-column">
-						<view class="myfont-bold padding-col" style="font-size: 18px;">{{userInfo.total_withdraw}}</view>
-						<view class="myfont padding-col">{{language.totalCashOut}}</view>
+
+				<view class="balance-card">
+					<view class="main-balance-row">
+						<view class="balance-item">
+							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+							<text class="balance-value">{{ displayBalance(userInfo.money) }}</text>
+						</view>
+						<text class="balance-eye"
+							:class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"
+							@click="balanceVisible = !balanceVisible"></text>
 					</view>
-					<view style="height: 5vh;width: 1px;background-color: rgb(190,150,150);"></view>
-					<view class="flex-column">
-						<view class="myfont-bold padding-col" style="font-size: 18px;">{{userInfo.money}}</view>
-						<view class="myfont padding-col">{{language.balance}}</view>
+					<view class="promo-row">
+						<text class="promo-label">Promo</text>
+						<text class="cashout-value">{{ displayBalance(userInfo.money_promotion) }}</text>
+					</view>
+					<view class="balance-actions">
+						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0')">
+							<theme-icon name="deposit" class="wallet-action-icon"></theme-icon>
+							<text>{{$t('Deposit')}}</text>
+						</view>
+						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1')">
+							<theme-icon name="withdraw" class="wallet-action-icon"></theme-icon>
+							<text>{{$t('Withdraw')}}</text>
+						</view>
+						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}
+						</view>
+					</view>
+				</view>
+
+				<view class="home-nav">
+					<view class="nav-item" @click="goto('/pages/match/home?mix=0')">
+						<theme-icon name="single" class="nav-theme-icon"></theme-icon><text>{{$t('single')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
+						<theme-icon name="mixparlay" class="nav-theme-icon"></theme-icon><text>{{$t('mixparlay')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
+						<theme-icon name="referral" class="referral-icon"></theme-icon>
+						<text>{{$t('Referral')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/orders/home')">
+						<theme-icon name="history" class="nav-theme-icon"></theme-icon>
+						<text>{{$t('history')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/index/coupon')">
+						<theme-icon name="deals" class="nav-theme-icon"></theme-icon><text>{{$t('Deals')}}</text>
+					</view>
+					<view class="nav-item" @click="goto('/pages/wallet/wallet')">
+						<theme-icon name="wallet" class="nav-theme-icon"></theme-icon><text>{{$t('wallet')}}</text>
 					</view>
 				</view>
 			</view>
-			<view class="myrect flex-row" style="line-height: 20px;width: 90vw;margin: 3vw 5vw;justify-content: space-between;">
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/mixed')">
-					<!-- <image class="pic" src="../../static/image/mixbet.png"></image> -->
-					<text class="myfont-bold mycolor-red">{{language.mixed}}</text>
-				</view>
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/home')">
-					<!-- <image class="pic" src="../../static/image/zuqiu.png"></image> -->
-					<text class="text-bold text-yellow">{{language.single}}</text>
-				</view>
-				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;"
-					@click="goto(navi2D3D=='3D'? 'number/3d-number-bet' : 'number/number-bet')"> -->
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('number/3d-number-bet')">
-					<!-- <image class="pic" src="../../static/image/2D3D.png"></image> -->
-					<text class="text-purple text-bold">2D/3D</text>
-				</view>
-			</view>
-			<view class="myrect flex-row" style="width: 90vw;margin: 3vw 5vw;justify-content: space-between;align-items: flex-start;">
 
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="to_score_link" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/score.png"></image> -->
-					<text class="text-blue text-bold">{{language.score}}</text>
-				</view>
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('orders/home')" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/zhangdan_.png"></image> -->
-					<text class="text-green text-bold" style="padding: 0 8px 0 8px;">{{language.myBet}}</text>
-				</view>
-				<!-- <view class="flex-column bg-white myrect2 box-shadow padding-ud20px" style="width: 32%;" @click="goto('match/score')" :style="{'min-height':dyHeight()}"> -->
-
-
-				<view class="flex-column bg-white myrect2 box-shadow padding-ud20px " style="width: 32%;" @click="goto('ucenter/home')" :style="{'min-height':dyHeight()}">
-					<!-- <image class="pic" src="../../static/image/jingjiren_icon.png"></image> -->
-					<text class="text-orange text-bold" style="padding: 0 8px 0 8px;">{{language.ucenter}}</text>
-				</view>
+			<view class="news-section" v-if="advertisements.length">
+				<text class="section-title">News &amp; Promotions</text>
+				<swiper class="promotion-swiper" :circular="true" :autoplay="true" interval="3500" duration="500"
+					indicator-dots>
+					<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+						<image class="promotion-image"
+							:src="ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url" mode="aspectFill">
+						</image>
+					</swiper-item>
+				</swiper>
 			</view>
 		</scroll-view>
-
-		<uni-popup ref="popup" type="center">
-			<view class="bg-white text-bold text-center dialogsTitle">{{temp.title}}</view>
-			<scroll-view scroll-y class="bg-white">
-				<view class="bg-white dialogs text-center span_box">
-					<view class="words_span">{{temp.content}}</view>
-				</view>
-			</scroll-view>
-		</uni-popup>
-
+		<customer-service></customer-service>
 	</view>
 </template>
 
 <script>
-	import match from '../match/home.vue'
-	import orders from '../orders/home.vue'
-	import ucenter from '../ucenter/home.vue'
-	import config from '../../utils/config.js'
-	import dateFormatUtils from "../../utils/utils.js"
-	import uniPopup from "@/components/uni-popup/uni-popup.vue";
-
+	import CustomerService from '@/components/common/customer-service.vue'
+	import {
+		getUnreadCount
+	} from '@/utils/api/message.js'
 
 	export default {
 		components: {
-			match,
-			orders,
-			ucenter
+			CustomerService
 		},
 		data() {
 			return {
-				cardCur: 0,
-				// swiperList:[],
-				swiperList: [],
-				dotStyle: false,
-				towerStart: 0,
-				direction: '',
-				temp: {},
 				userInfo: {},
-				language: config.language,
-				speed: 8,
-				contact: '',
-				about: '',
-				notice: '',
-				navi2D3D: null,
-				loading: false,
+				unreadCount: 0,
+				advertisements: [],
+				balanceVisible: true
+			}
+		},
+		computed: {
+			greetingKey() {
+				const hour = new Date().getHours()
+				if (hour < 12) return 'Good Morning'
+				if (hour < 18) return 'Good Afternoon'
+				return 'Good Evening'
 			}
 		},
 		methods: {
-			developingTips() {
-				uni.showModal({
-					title: this.$t('tips'),
-					content: this.$t('coming_soon'),
-					confirmText: this.$t('ok'),
-					cancelText: this.$t('cancel'),
+			displayBalance(value) {
+				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
+				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
+				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+			},
+			goto(url) {
+				uni.navigateTo({
+					url
 				})
 			},
-			numberFormat(num) {
-				return dateFormatUtils.numFormat(num)
-			},
-			dyHeight() {
-				return this.language.lang == 'mm' ? '160px' : ''
-			},
-			goto(name) {
-				// this.music.play_dede()
+			goMessage() {
 				uni.navigateTo({
-					url: '/pages/' + name,
-					animationType: 'slide-in-right',
-					animationDuration: 100
+					url: '/pages/ucenter/message'
+				})
+			},
+			updateUnreadCount() {
+				if (!uni.getStorageSync('Authorization')) {
+					this.unreadCount = 0
+					return
+				}
+				getUnreadCount().then((count) => {
+					this.unreadCount = count || 0
+				}).catch(() => {
+					this.unreadCount = 0
 				})
 			},
 			getUserInfo() {
-				var _this = this;
-				_this.loading = true;
-				if (uni.getStorageSync("Authorization")) {
-					_this.$http.get('/app_user/user_info', {}, (res) => {
-						_this.loading = false;
-						if (res.statusCode == 200) {
-							_this.$store.dispatch('saveUserInfo', res.data.data);
-							_this.userInfo = res.data.data
-						}
-					})
-				}
-			},
-			to_score_link() {
-				const url = "https://innwasport.com";
-				// 在 App 端调用原生浏览器
-				// #ifdef APP-PLUS
-				plus.runtime.openURL(url);
-				// #endif
-
-				// 在 H5 端用新标签页打开
-				// #ifdef H5
-				window.open(url, "_blank");
-				// #endif
-			},
-			getNotice() {
-				var _this = this;
-				_this.$http.get('/notice/get', {}, (res) => {
-					if (res.statusCode == 200) {
-						_this.notice = '';
-						res.data.items.forEach(element => {
-							_this.notice += '[' + element.TITLE + ']' + element.CONTENT + '           ';
-						})
+				this.$http.get('/app_user/user_info', {}, (res) => {
+					if (res.statusCode === 200) {
+						this.userInfo = res.data.data || {}
+						this.$store.dispatch('saveUserInfo', this.userInfo)
 					}
 				})
 			},
-			getImage() {
-				var _this = this;
-				_this.$http.get('/up_image/get', {}, (res) => {
-					if (res.statusCode == 200) {
-						_this.swiperList = []
-						res.data.items.forEach(element => {
-							_this.swiperList.push({
-								id: element.ID,
-								type: 'image',
-								url: 'http://img.innwabet.net/' + element.ADDRESS
-							})
-						})
+			getAdvertisements() {
+				const _this = this
+				this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'home',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						_this.advertisements = res.data.data.items || []
 					}
 				})
 			},
-			showDialogs(title) {
-				// this.music.play_dede()
-				this.temp = {
-					title: this.language[title],
-					content: this.$data[title]
-				}
-				this.$refs.popup.open()
-			},
-			showContactDialogs() {
-				// this.music.play_dede()
-				this.$refs.contactDialogs.open()
-			},
-			logout() {
-				// this.music.play_dede();
-				uni.removeStorageSync('Authorization');
-				uni.redirectTo({
-					url: '../login/login'
-				})
-			},
-		},
-		mounted() {
-			if (!uni.getStorageSync("Authorization")) {
-				uni.redirectTo({
-					url: '../login/login'
-				})
-				return;
+			handleAdClick(ad) {
+				if (!ad.link_url) return
+				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
 			}
-			// this.getConfigs();
-
-			this.contact = this.$store.state.configs.contact_us;
-			this.about = this.$store.state.configs.help_content;
-			this.getNotice();
-			this.getImage();
-			this.language = config.language;
-			console.log(this.language.lang)
 		},
 		onShow() {
-			this.getUserInfo();
-			this.navi2D3D = uni.getStorageSync('navi2D3D')
+			if (!uni.getStorageSync('Authorization')) {
+				uni.reLaunch({
+					url: '/pages/login/login'
+				})
+				return
+			}
+			this.getUserInfo()
+			this.getAdvertisements()
+			this.updateUnreadCount()
+		},
+		onLoad() {
+			uni.$on('message:unreadUpdate', this.updateUnreadCount)
+			uni.$on('message:update', this.updateUnreadCount)
+		},
+		onUnload() {
+			uni.$off('message:unreadUpdate', this.updateUnreadCount)
+			uni.$off('message:update', this.updateUnreadCount)
 		}
 	}
 </script>
+
 <style lang="scss">
-	.pic {
-		width: 45px;
-		height: 45px;
-		margin-bottom: 15px;
+	.home-page {
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 
-	.padmar {
-		padding: 8px 4px 10px 4px;
-		margin-top: 3vw;
+	.home-top {
+		padding: 18px 20px 16px;
+		border-bottom: 2px solid #A0FF82;
+		box-shadow: 0px 4px 4px 0px #A0FF82;
+		box-shadow: 0px 4px 20px 0px #FFFFFF00 inset;
+		border-bottom-left-radius: 12px;
+		border-bottom-right-radius: 12px;
 	}
 
-	.text-purple {
-		color: #6030d1;
+	.home-logo {
+		display: inline-flex;
+		width: auto;
+		height: 88px;
+		max-width: 90%;
+		margin: 3vh auto 5px;
 	}
 
-	.text-yellow {
-		color: #ea9d31;
+	.home-subtitle {
+		display: block;
+		margin: 3px auto 3vh;
+		color: #fff;
+		font-size: 12px;
+		text-align: center;
 	}
 
-	.text-green {
-		color: #44bc6f;
+	.user-info-card {
+		background-color: white;
+		border-radius: 20px;
+		padding: 5px 12px 10px;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		min-height: 90px;
 	}
 
-	.text-blue {
-		color: #52adff;
+	.user-avatar {
+		width: 37px;
+		height: 37px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		flex-shrink: 0;
+		margin-right: 10px;
 	}
 
-	.text-orange {
-		color: #ffa56c;
+	.avatar-img {
+		width: 100%;
+		height: 100%;
+		background-color: #ffffff;
 	}
 
-	.padding-col {
-		padding: 2vw;
-		color: white;
+	.user-details {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.user-id {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.user-id-info {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+		align-items: center;
+		flex-direction: row;
+		font-size: 15px;
+	}
+
+	.id-label,
+	.id-value,
+	.cashout-label,
+	.cashout-value {
+		color: $color-primary;
+	}
+
+	.id-label {
 		font-weight: 600;
 	}
 
-	.dialogs {
-		width: 90vw;
-		height: 50vh;
+	.id-value {
+		font-weight: bold;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
-	.icon {
-		height: 35px;
-		width: 43px;
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-shrink: 0;
 	}
 
-	.logout {
-		position: fixed;
-		bottom: 8px;
-		right: 8px;
-		background-color: white;
-		border-radius: 3px;
-		display: table;
-		height: 42px;
-		width: 70px
+	.bell-btn,
+	.settings-btn {
+		position: relative;
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 	}
 
-	.dialogsTitle {
-		height: 5vh;
-		line-height: 5vh;
-		border-bottom: 1px solid lightgrey;
-		font-size: 16px;
+	.bell-icon,
+	.settings-icon {
+		width: 22px;
+		height: 22px;
+		filter: brightness(0) invert(1);
 	}
 
-	.logout-image {
-		display: table-cell;
-		vertical-align: middle;
-		text-align: center;
-		padding: 5px 0 0 5px;
+	.bell-icon.bell-ring {
+		animation: bellRing 1s ease-in-out infinite;
+		transform-origin: top center;
 	}
 
-	.logout-image image {
-		height: 15px;
-		width: 15px;
-	}
-
-	.logout-label {
-		display: table-cell;
-		vertical-align: middle;
-		text-align: center;
-	}
-
-	.background {
-		// background: url(../../static/image/index.png) no-repeat center center;
-		background-size: cover;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-	}
-
-	.user-row {
-		width: 100%;
-		padding: 0 9px;
-		margin-bottom: 5px;
-	}
-
-	.user-bar {
-		display: table;
-		background-color: rgba(255, 255, 255, 0.9);
-		padding: 3px 0;
-		width: 100%;
-		border-radius: 8px;
-	}
-
-	.user-bar-cell {
-		display: table-cell;
-		text-align: left;
-		vertical-align: middle;
-		height: 100px;
-	}
-
-	.user-info-loading {
-		height: 15px;
-		width: 15px;
+	.bell-badge {
 		position: absolute;
-		right: 5px
+		top: -2px;
+		right: -2px;
+		min-width: 16px;
+		height: 16px;
+		padding: 0 4px;
+		border-radius: 8px;
+		background-color: #FF4444;
+		color: #ffffff;
+		font-size: 10px;
+		font-weight: bold;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		border: 1px solid #ffffff;
+		box-sizing: border-box;
 	}
 
-	.menu-row {
+	.user-balance-row {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 3px;
+	}
+
+	.balance-item {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		gap: 5px;
+		white-space: nowrap;
+	}
+
+	.secondary-balance-row {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.coin-icon {
+		width: 20px;
+		height: 20px;
+		margin-right: 0px;
+	}
+
+	.balance-value {
+		color: $color-primary;
+		font-size: 18px;
+	}
+
+	.cashout-label,
+	.cashout-value {
+		font-size: 12px;
+	}
+
+	.cashout-label {
+		white-space: nowrap;
+		font-weight: bold;
+	}
+
+	@keyframes bellRing {
+		0% {
+			transform: rotate(0);
+		}
+
+		15% {
+			transform: rotate(16deg);
+		}
+
+		30% {
+			transform: rotate(-14deg);
+		}
+
+		45% {
+			transform: rotate(11deg);
+		}
+
+		60% {
+			transform: rotate(-8deg);
+		}
+
+		75% {
+			transform: rotate(4deg);
+		}
+
+		100% {
+			transform: rotate(0);
+		}
+	}
+
+
+	.home-nav {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px 10px;
+		margin-top: 14px;
+	}
+
+	.nav-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 86px;
+		border-radius: 16px;
+		background: #fff;
+		color: $color-primary;
+		font-size: 12px;
+		font-weight: 700;
+	}
+
+	.nav-item image,
+	.nav-item .theme-icon {
+		width: 38px;
+		height: 38px;
+		margin-bottom: 7px;
+		filter: none;
+	}
+
+	.nav-item text {
+		max-width: 100%;
+		text-align: center;
+		line-height: 1.2;
+	}
+
+	.nav-item .referral-icon {
+		filter: none;
+	}
+
+	.home-scroll {
+		flex: 1;
+		min-height: 0;
+		height: 0;
+	}
+
+	.news-section {
+		padding: 18px 20px 32px;
+		background: transparent;
+	}
+
+	.section-title {
+		display: block;
+		margin-bottom: 14px;
+		color: white;
+		font-size: 21px;
+		font-weight: 700;
+	}
+
+	.promotion-swiper,
+	.empty-promotion {
 		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 15px;
+		// background: #e9eeee;
+	}
+
+	.promotion-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.empty-promotion {
 		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
 		align-items: center;
-		border-bottom: 1px solid lightgrey;
+		justify-content: center;
+		color: $color-primary;
 	}
 
-	.menu-row .menu-cell:first-child {
-		border-right: 1px solid lightgrey;
-	}
-
-	.menu-cell {
-		width: 50%;
+	.user-summary {
 		display: flex;
-		flex-direction: row;
 		align-items: center;
-		padding-left: 15px;
-		height: 120px;
+		padding: 8px 4px 14px;
+		color: #fff;
 	}
 
-	.menu-cell view {
-		width: 80px;
+	.user-summary .user-avatar {
+		width: 37px;
+		height: 37px;
+		margin-right: 12px;
+		border: 0;
+		background: transparent;
 	}
 
-	.menu-cell image {
-		width: 80px;
-		height: 80px;
-		margin-right: 10px;
+	.user-summary .user-details {
+		gap: 2px;
+	}
+
+	.greeting {
+		font-size: 12px;
+		color: #fff;
+	}
+
+	.user-summary .id-value {
+		color: #fff;
+		font-size: 15px;
+	}
+
+	.user-summary .header-actions {
+		margin-left: auto;
+	}
+
+	.user-summary .avatar-img {
+		background: transparent;
+	}
+
+	.balance-card {
+		background: #fff;
+		border-radius: 20px;
+		padding: 14px 20px 16px;
+		color: $color-primary;
+	}
+
+	.main-balance-row,
+	.promo-row,
+	.balance-actions {
+		display: flex;
+		align-items: center;
+	}
+
+	.main-balance-row {
+		justify-content: space-between;
+	}
+
+	.balance-value {
+		font-size: 24px;
+		font-weight: 700;
+	}
+
+	.balance-eye {
+		font-size: 20px;
+		color: $color-primary;
+	}
+
+	.promo-row {
+		gap: 8px;
+		margin: 7px 0 12px;
+	}
+
+	.promo-label {
+		padding: 3px 12px;
+		border-radius: 12px;
+		background: $color-secondary-light;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.balance-actions {
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.wallet-action {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+	}
+
+	.wallet-action image {
+		width: 20px;
+		height: 20px;
+	}
+
+	.wallet-action .wallet-action-icon {
+		width: 20px;
+		height: 20px;
+	}
+
+	.cashout-action {
+		white-space: nowrap;
+	}
+
+	.customer-service-wrapper :deep(.customer-btn) {
+		background: $color-primary;
+		border: 0;
+		border-radius: 50%;
+	}
+
+	.customer-service-wrapper :deep(.customer-btn-icon) {
+		width: 24px;
+		height: 24px;
 	}
 </style>

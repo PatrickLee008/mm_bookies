@@ -86,7 +86,7 @@
 	}
 
 	.confirm-dialog-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 12px 16px;
 		text-align: center;
 	}
@@ -104,7 +104,7 @@
 
 	.confirm-dialog-message {
 		font-size: 15px;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: 500;
 		line-height: 1.6;
 		word-break: normal;
@@ -121,7 +121,7 @@
 	.confirm-dialog-btn-cancel {
 		flex: 1;
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 12px;
 		padding: 10px;
 		text-align: center;
@@ -130,7 +130,7 @@
 	.btn-cancel-text {
 		font-size: 15px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.confirm-dialog-btn-confirm {
@@ -155,6 +155,6 @@
 	.confirm-dialog-btn-confirm.btn-ok {
 		flex: 0 1 auto;
 		min-width: 120px;
-		background: #2F5D62;
+		background: $color-primary;
 	}
 </style>

@@ -228,7 +228,7 @@
 				if (_this.amount > parseInt(_this.$store.state.configs.single_max)) {
 					uni.hideLoading();
 			
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('tips'),
 						content: _this.language.single_max + " (" + _this.$store.state.configs.single_max + ")",
 						showCancel: false,
@@ -239,7 +239,7 @@
 				}
 				if (_this.amount < parseInt(_this.$store.state.configs.single_min)) {
 					uni.hideLoading();
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('tips'),
 						content: _this.language.single_min + " (" + _this.$store.state.configs.single_min + ")",
 						showCancel: false,
@@ -257,7 +257,7 @@
 					if (res.statusCode == 200) {
 						changeList = res.data.items;
 						if (changeList.length > 0) {
-							uni.showModal({
+							this.$notice.show({
 								title: 'tips',
 								content: _this.language.odds_change,
 								showCancel: false,
@@ -298,7 +298,7 @@
 							}, (res) => {
 								uni.hideLoading();
 								if (res.statusCode == 200) {
-									uni.showModal({
+									this.$notice.show({
 										content: _this.language.bettingSuccess,
 										title: tips,
 										showCancel: false,
@@ -320,7 +320,7 @@
 									} else {
 										tips = res.data.message;
 									}
-									uni.showModal({
+									this.$notice.show({
 										title: 'tips',
 										content: tips,
 										showCancel: false,

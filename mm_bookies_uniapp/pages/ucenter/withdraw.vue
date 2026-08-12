@@ -1,13 +1,14 @@
 <template>
-	<view class="bg-white">
+	<view class="dark-teal-bg">
 		<zw-header></zw-header>
-		<scroll-view scroll-y style="height: calc(100vh - 120px);">
+		<scroll-view scroll-y style="height: calc(100vh - 120px); background: #fff;">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
-						<image src="/static/icon/basic/back.svg" mode="widthFix" class="width-30px"
-							@click="goto('../index/wallet')"></image>
-						<image src="/static/icon/ucenter/wallet2.svg" mode="widthFix" class="width-20px"></image>
+						<theme-icon name="back" class="width-30px"
+							color="var(--theme-icon-on-primary, #fff)" @click="goto('../index/wallet')"></theme-icon>
+						<theme-icon name="wallet2" class="width-20px"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="title-text" style="">{{language.withdraw}}</text>
 					</view>
 				</view>
@@ -88,7 +89,7 @@
 					<view class="bar-icon">
 						<image class="bar-icon-image" src="../../static/image/pocket.png"></image>
 					</view>
-					<text class="text-grey myfont-bold">{{userInfo.money}}</text>
+					<text class="text-grey myfont-bold">{{$toolbox.floor_format(userInfo.money)}}</text>
 				</view>
 				<view class="action" @click="allWithdrawBtn()">
 					<text class="mycolor-red myfont-bold">{{language.withdraw_all}}</text>
@@ -246,7 +247,7 @@
 				//判断提现金额是否为最小限额  ,如果未满足禁止体现
 				if (_this.amount < parseInt(_this.$store.state.configs['withdraw_min_limit']) || _this.amount < 0) {
 
-					uni.showModal({
+					this.$notice.show({
 						title: 'tips',
 						content: this.language['The minimum withdraw must be equal or greater'] + _this.$store
 							.state.configs['withdraw_min_limit'],
@@ -259,7 +260,7 @@
 				}
 
 				// if (_this.amount > parseInt(_this.$store.state.userInfo.money.replace(',', ''))) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'tips',
 				// 		content: this.language.withdrawTips2,
 				// 		showCancel: false,
@@ -270,7 +271,7 @@
 				// }
 
 				// if (_this.amount < 0) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'tips',
 				// 		content: this.language.withdrawTips1,
 				// 		showCancel: false,
@@ -285,7 +286,7 @@
 				_this.$http.post('/withdraw/apply', para, (res) => {
 					uni.hideLoading()
 					if (res.statusCode == 200) {
-						uni.showModal({
+						this.$notice.show({
 							title: `${_this.$t('Congratulations')}`,
 							content: `${_this.$t('Amount')} (${_this.amount}). ${_this.$t('withdraw_success')}`,
 							showCancel: false,
@@ -319,7 +320,7 @@
 							tips = res.data.message;
 						}
 
-						uni.showModal({
+						this.$notice.show({
 							title: 'tips',
 							content: tips,
 							showCancel: false,
@@ -353,6 +354,10 @@
 </script>
 
 <style lang="scss">
+	.dark-teal-bg {
+		min-height: 100vh;
+	}
+
 	.amount-input {
 		font: inherit;
 		letter-spacing: inherit;

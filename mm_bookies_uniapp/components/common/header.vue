@@ -1,57 +1,84 @@
 <template>
 	<view>
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="new-header-wrapper">
+		<view class="zw-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }"
+			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
-			<view class="header-title-bar">
-				<text class="header-title">MM Bookies</text>
+			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
+				<theme-logo variant="header" height="32px" class="header-logo"></theme-logo>
+				<!-- 收起状态：紧凑余额 + 铃铛 + 设置 -->
+				<view class="collapsed-right" v-if="isLogin">
+					<view class="collapsed-balance">
+						<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+						<text class="collapsed-balance-value">{{displayBalance(userInfo.money)}}</text>
+					</view>
+					<view class="header-actions">
+						<view class="bell-btn" @click="goMessage">
+							<image src="/static/icon/nav/notification.svg" class="bell-icon"
+								:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
+							<view class="bell-badge" v-if="unreadMessageCount > 0">
+								{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
+							</view>
+						</view>
+						<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
+						</view>
+					</view>
+				</view>
 			</view>
 
-			<!-- from tangjq--- 用户信息卡片 -->
-			<view class="user-info-card" v-if="isLogin">
-				<!-- 头像 -->
+			<view class="user-summary" v-if="isLogin">
 				<view class="user-avatar" @click="goto('/pages/ucenter/home', 1)">
-					<image src="/static/icon/nav/user_avatar.png" class="avatar-img" mode="aspectFill"></image>
+					<image src="/static/user_avatar.svg" class="avatar-img" mode="aspectFit"></image>
 				</view>
-
-				<!-- 用户信息 -->
 				<view class="user-details">
-					<view class="user-id">
-						<view class="user-id-info">
-							<text class="id-label">{{ $t('my_phone') }} : </text>
-							<text class="id-value">{{userInfo.phone || ''}}</text>
-						</view>
-						<!-- 右侧操作区：消息铃铛 + 设置 -->
-						<view class="header-actions">
-							<!-- 消息铃铛入口：有未读时变红并摇动 -->
-							<view class="bell-btn" @click="goMessage">
-								<text class="cuIcon-noticefill bell-icon" :class="{ 'bell-ring': unreadMessageCount > 0 }"></text>
-								<view class="bell-badge" v-if="unreadMessageCount > 0">{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}</view>
-							</view>
-							<!-- 设置按钮 -->
-							<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
-								<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
-							</view>
+					<text class="greeting">{{ $t(greetingKey) }}</text>
+					<text class="id-value">My ID : {{userInfo.phone || ''}}</text>
+				</view>
+				<view class="header-actions">
+					<view class="bell-btn" @click="goMessage">
+						<image src="/static/icon/nav/notification.svg" class="bell-icon"
+							:class="{ 'bell-ring': unreadMessageCount > 0 }" mode="aspectFit"></image>
+						<view class="bell-badge" v-if="unreadMessageCount > 0">
+							{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
 						</view>
 					</view>
-					<view class="user-balance-row">
-						<!-- Balance -->
-						<view class="balance-item">
-							<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
-							<text class="balance-label">{{ $t('balance') }}</text>
-							<text class="balance-value">{{$toolbox.num_format(userInfo.money) || '0'}}</text>
-						</view>
-						<!-- Cash Out -->
-						<view class="balance-item">
-							<text class="cashout-label">{{ $t('cash_out') }}</text>
-							<text class="cashout-value">{{$toolbox.num_format(userInfo.total_withdraw) || '0'}}</text>
-						</view>
+					<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+						<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
 					</view>
+				</view>
+			</view>
+
+			<view class="balance-card" v-if="isLogin">
+				<view class="main-balance-row">
+					<view class="balance-item">
+						<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
+						<text class="balance-value">{{displayBalance(userInfo.money)}}</text>
+					</view>
+					<text class="balance-eye"
+						:class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"
+						@click="balanceVisible = !balanceVisible"></text>
+				</view>
+				<view class="promo-row">
+					<text class="promo-label">Promo</text>
+					<text class="cashout-value">{{displayBalance(userInfo.money_promotion)}}</text>
+				</view>
+				<view class="balance-actions">
+					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0', 1)">
+						<theme-icon name="deposit"
+							class="wallet-action-icon"></theme-icon><text>{{$t('Deposit')}}</text>
+					</view>
+					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1', 1)">
+						<theme-icon name="withdraw"
+							class="wallet-action-icon"></theme-icon><text>{{$t('Withdraw')}}</text>
+					</view>
+					<view class="cashout-action">{{$t('cash_out')}} {{displayBalance(userInfo.total_withdraw)}}</view>
 				</view>
 			</view>
 
 			<!-- from tangjq--- 未登录状态 -->
-			<view class="user-info-card login-prompt-card" v-else>
+			<view class="user-info-card login-prompt-card" v-if="!isLogin">
 				<view class="login-prompt-content">
 					<text class="login-prompt-text">{{ $t('please_login') }}</text>
 					<view class="login-buttons">
@@ -65,57 +92,12 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- 导航图标区域 -->
-			<view class="nav-icons-bar">
-				<!-- Single -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'single'}" @click="goto('/pages/match/home?mix=0', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'single' ? '/static/icon/nav/single_active.png' : '/static/icon/nav/single.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'single'}">{{ $t('single') }}</text>
+			<view class="header-page-row">
+				<view class="header-back" @click="goBack">
+					<image src="/static/icon/basic/back.svg" mode="aspectFit"></image>
+					<text>{{$t('Back')}}</text>
 				</view>
-
-				<!-- MPL -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'mpl'}" @click="goto('/pages/match/home?mix=1', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'mpl' ? '/static/icon/nav/mpl_active.png' : '/static/icon/nav/mpl.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'mpl'}">{{ $t('MPL') }}</text>
-				</view>
-
-				<!-- E-Games -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'games'}" @click="goto('/pages/index/game', 1)" v-if="false">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'games' ? '/static/icon/nav/games_active.png' : '/static/icon/nav/games.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'games'}">{{ $t('e_games') }}</text>
-				</view>
-
-				<!-- History -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'history'}" @click="goto('/pages/orders/home', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'history' ? '/static/icon/nav/history_active.png' : '/static/icon/nav/history.png'" class="nav-icon" mode="aspectFit"></image>
-						<!-- from tangjq--- 未读消息红点 -->
-						<view class="nav-badge" v-if="unreadMessageCount > 0">{{unreadMessageCount > 9 ? '9+' : unreadMessageCount}}</view>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'history'}">{{ $t('history') }}</text>
-				</view>
-
-				<!-- Deals 暂时隐藏优惠券功能-->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'deals'}" @click="goto('/pages/index/coupon', 1)" >
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'deals' ? '/static/icon/nav/deals_active.png' : '/static/icon/nav/deals.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'deals'}">{{ $t('Coupon') }}</text>
-				</view>
-
-				<!-- Wallet -->
-				<view class="nav-icon-item" :class="{'nav-icon-active': activeNav === 'wallet'}" @click="goto('/pages/wallet/wallet', 1)">
-					<view class="nav-icon-wrapper">
-						<image :src="activeNav === 'wallet' ? '/static/icon/nav/wallet_active.png' : '/static/icon/nav/wallet.png'" class="nav-icon" mode="aspectFit"></image>
-					</view>
-					<text class="nav-icon-label" :class="{'nav-label-active': activeNav === 'wallet'}">{{ $t('wallet') }}</text>
-				</view>
+				<text class="header-page-title">{{ $t(pageTitle) }}</text>
 			</view>
 		</view>
 	</view>
@@ -125,7 +107,9 @@
 	import {
 		mapGetters
 	} from 'vuex';
-	import { getUnreadCount } from '@/utils/api/message.js'
+	import {
+		getUnreadCount
+	} from '@/utils/api/message.js'
 
 	export default {
 		components: {},
@@ -144,12 +128,60 @@
 				unreadMessageCount: 0, // 未读消息数量
 				activeNav: '', // from tangjq--- 当前激活的导航项
 				headerHeight: 0, // 组件实际高度
+				balanceVisible: true,
+				collapsed: false, // header收起状态
+				expandedHeight: 0, // 展开时的精确高度（用于立即恢复）
+				collapsedHeaderHeight: 82, // 8px 顶部间距 + 32px logo 行 + 42px 页面标题行
 			}
 		},
 		computed: {
+			greetingKey() {
+				const hour = new Date().getHours()
+				if (hour < 12) return 'Good Morning'
+				if (hour < 18) return 'Good Afternoon'
+				return 'Good Evening'
+			},
 			currentRoute() {
 				const pages = getCurrentPages();
 				return pages.length ? pages[pages.length - 1].route : '';
+			},
+			pageTitle() {
+				const titles = {
+					'pages/match/home': 'single',
+					'pages/orders/home': 'history',
+					'pages/index/coupon': 'Deals',
+					'pages/wallet/wallet': 'wallet',
+					'pages/index/game': 'E-Games',
+					'pages/index/contact': 'Contact',
+					'pages/ucenter/home': 'setting',
+					'pages/ucenter/account': 'Account',
+					'pages/ucenter/invite/index': 'Referral',
+					'pages/ucenter/invite/share': 'Share',
+					'pages/ucenter/language': 'Language',
+					'pages/ucenter/bonus': 'Bonus',
+					'pages/ucenter/download': 'Download',
+					'pages/ucenter/message': 'Messages',
+					'pages/ucenter/invite/bonus_dashboard': 'Bonus Dashboard',
+					'pages/ucenter/invite/user_dashboard': 'User Dashboard',
+					'pages/ucenter/withdraw': 'Withdraw',
+					'pages/ucenter/charge': 'Deposit',
+					'pages/wallet/deposit_page': 'Deposit',
+					'pages/wallet/withdraw_page': 'Withdraw',
+					'pages/wallet/promotion_transaction': 'promotion_transaction',
+					'pages/payment/payment': 'Payment'
+				}
+				const pages = getCurrentPages()
+				const current = pages.length ? pages[pages.length - 1] : null
+				if (current && current.route === 'pages/match/home' && current.options.mix === '1') {
+					return 'mixparlay'
+				}
+				return titles[this.currentRoute] || ''
+			},
+			headerHeightStyle() {
+				const height = this.collapsed && this.isLogin ? this.collapsedHeaderHeight : this.expandedHeight
+				return height ? {
+					height: `${height}px`
+				} : {}
 			}
 		},
 		created() {},
@@ -159,8 +191,11 @@
 			this.updateUnreadMessageCount();
 			this.setupWebSocketMessageListener();
 			this.$nextTick(() => {
+				this.$notice.setInstance(this.$refs.globalNotice);
 				this.calculateHeaderHeight();
 			});
+			// 监听页面滚动事件，控制header收起/展开
+			uni.$on('header:setCollapsed', this.handleSetCollapsed);
 		},
 		activated() {
 			this.updateActiveNav();
@@ -175,6 +210,11 @@
 			}
 		},
 		methods: {
+			displayBalance(value) {
+				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
+				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
+				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+			},
 			// from tangjq--- 更新当前激活的导航项
 			updateActiveNav() {
 				if (this.active) {
@@ -221,12 +261,34 @@
 
 			calculateHeaderHeight() {
 				const query = uni.createSelectorQuery().in(this);
-				query.select('.new-header-wrapper').boundingClientRect((rect) => {
+				query.select('.zw-header-wrapper').boundingClientRect((rect) => {
 					if (rect && rect.height) {
 						this.headerHeight = rect.height;
+						// 记录展开状态的高度，用于收起后立即恢复
+						if (!this.collapsed) {
+							this.expandedHeight = rect.height;
+						}
 						this.$emit('headerHeightChange', rect.height);
 					}
 				}).exec();
+			},
+
+			// 接收页面滚动事件，控制header收起/展开
+			handleSetCollapsed(collapsed) {
+				if (this.collapsed === collapsed) return
+				this.collapsed = collapsed
+
+				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
+				if (collapsed) {
+					// 收起状态：8px 顶部间距 + 32px logo 行 + 42px 页面标题行 = 82px
+					if (this.isLogin) {
+						this.$emit('headerHeightChange', this.collapsedHeaderHeight)
+					}
+				} else if (this.expandedHeight) {
+					// 展开：立即恢复到之前测量的精确高度
+					this.$emit('headerHeightChange', this.expandedHeight)
+				}
+
 			},
 
 			goto(url, limit_click) {
@@ -256,10 +318,36 @@
 			// 跳转到消息中心
 			goMessage() {
 				if (!this.isLogin) {
-					uni.reLaunch({ url: '/pages/login/login' })
+					uni.reLaunch({
+						url: '/pages/login/login'
+					})
 					return
 				}
-				uni.navigateTo({ url: '/pages/ucenter/message' })
+				uni.navigateTo({
+					url: '/pages/ucenter/message'
+				})
+			},
+
+			goBack() {
+				if (this.currentRoute === 'pages/match/home') {
+					uni.reLaunch({
+						url: '/pages/index/index'
+					})
+					return
+				}
+				const pages = getCurrentPages()
+				if (pages.length > 1) {
+					uni.navigateBack({
+						delta: 1,
+						fail: () => uni.reLaunch({
+							url: '/pages/index/index'
+						})
+					})
+					return
+				}
+				uni.reLaunch({
+					url: '/pages/index/index'
+				})
 			},
 
 			// 更新未读消息数量（改为从后端接口获取）
@@ -304,22 +392,31 @@
 			uni.$off('message:read')
 			uni.$off('message:update')
 			uni.$off('message:unreadUpdate')
+			uni.$off('header:setCollapsed', this.handleSetCollapsed)
 		}
 	}
 </script>
 
 <style lang="scss">
 	/* from tangjq--- 新的统一顶部样式 - 固定定位 */
-	.new-header-wrapper {
+	.zw-header-wrapper {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		width: 100%;
-		background-color: #2F5D62;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		// padding-bottom: 15px;
 		z-index: 1000;
 		// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.zw-header-wrapper.header-logged-out {
+		min-height: 190px;
 	}
 
 	/* from tangjq--- 顶部标题栏 */
@@ -328,34 +425,66 @@
 		text-align: center;
 	}
 
-	.header-title {
-		color: white;
-		font-size: 16px;
-		font-weight: bold;
+	.header-logo {
+		line-height: 0;
+	}
+
+	.header-page-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 42px;
+		padding: 0 20px;
+		font-size: 14px;
+		color: #ffffff;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		box-sizing: border-box;
+	}
+
+	.header-back {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-weight: 700;
+	}
+
+	.header-back image {
+		width: 18px;
+		height: 18px;
+		filter: brightness(0) invert(1);
+	}
+
+	.header-page-title {
+		color: var(--theme-secondary, #35b6c2);
+		font-weight: 700;
 	}
 
 	/* from tangjq--- 用户信息卡片 */
 	.user-info-card {
 		background-color: white;
 		border-radius: 20px;
-		margin: 5px 15px 10px;
-		padding: 10px 0px;
+		margin: 5px 0 10px;
+		padding: 5px 12px 10px;
+		box-sizing: border-box;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		min-height: 70px;
+		min-height: 90px;
 	}
 
 	.user-avatar {
-		width: 50px;
-		height: 50px;
+		width: 37px;
+		height: 37px;
 		border-radius: 50%;
-		// background-color: #2F5D62;
+		// background-color: $color-primary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
-		margin-right: 15px;
+		margin-right: 10px;
 		flex-shrink: 0;
 	}
 
@@ -383,25 +512,30 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		flex: 1;
+		min-width: 0;
+		font-size: 15px;
 	}
 
 	.id-label {
-		color: #2F5D62;
-		font-size: 14px;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
 	.id-value {
-		color: #2F5D62;
-		font-size: 14px;
+		color: $color-primary;
+		// font-size: 14px;
 		font-weight: bold;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-balance-row {
 		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 15px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 3px;
 	}
 
 	.balance-item {
@@ -409,16 +543,24 @@
 		flex-direction: row;
 		align-items: center;
 		gap: 5px;
+		white-space: nowrap;
+	}
+
+	.secondary-balance-row {
+		display: flex;
+		align-items: center;
+		gap: 5px;
 	}
 
 	.coin-icon {
-		width: 18px;
-		height: 18px;
+		width: 20px;
+		height: 20px;
+		margin-right: 0px;
 	}
 
 	.balance-label,
 	.cashout-label {
-		color: #2F5D62;
+		color: $color-primary;
 		font-size: 12px;
 		white-space: nowrap;
 		font-weight: bold;
@@ -426,7 +568,7 @@
 
 	.balance-value,
 	.cashout-value {
-		color: #2F5D62;
+		color: $color-primary;
 		font-size: 12px;
 	}
 
@@ -442,6 +584,7 @@
 	.settings-icon {
 		width: 24px;
 		height: 24px;
+		filter: brightness(0) invert(1);
 	}
 
 	/* 右侧操作区：铃铛 + 设置 */
@@ -465,25 +608,45 @@
 	}
 
 	.bell-icon {
-		font-size: 22px;
-		color: #2F5D62;
+		width: 22px;
+		height: 22px;
+		filter: brightness(0) invert(1);
 		transform-origin: top center;
 	}
 
-	/* 有未读消息：变红 + 摇动 */
+	/* 有未读消息：摇动 */
 	.bell-ring {
-		color: #FF4444;
 		animation: bellRing 1s ease-in-out infinite;
 	}
 
 	@keyframes bellRing {
-		0% { transform: rotate(0); }
-		15% { transform: rotate(16deg); }
-		30% { transform: rotate(-14deg); }
-		45% { transform: rotate(11deg); }
-		60% { transform: rotate(-8deg); }
-		75% { transform: rotate(4deg); }
-		100% { transform: rotate(0); }
+		0% {
+			transform: rotate(0);
+		}
+
+		15% {
+			transform: rotate(16deg);
+		}
+
+		30% {
+			transform: rotate(-14deg);
+		}
+
+		45% {
+			transform: rotate(11deg);
+		}
+
+		60% {
+			transform: rotate(-8deg);
+		}
+
+		75% {
+			transform: rotate(4deg);
+		}
+
+		100% {
+			transform: rotate(0);
+		}
 	}
 
 	/* 铃铛未读数角标 */
@@ -492,35 +655,40 @@
 		top: -2px;
 		right: -2px;
 		min-width: 16px;
-		height: 16px;
+		min-height: 16px;
 		padding: 0 4px;
 		border-radius: 8px;
 		background-color: #FF4444;
 		color: #ffffff;
 		font-size: 10px;
 		font-weight: bold;
-		line-height: 16px;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
-		border: 1px solid #ffffff;
+		box-sizing: border-box;
+		// border: 1px solid #ffffff;
 	}
 
 	/* from tangjq--- 未登录状态卡片 */
 	.login-prompt-card {
 		flex-direction: column;
 		align-items: stretch;
-		padding: 20px;
-		height: 125px;
+		justify-content: center;
+		padding: 10px 14px;
+		height: 90px;
 	}
 
 	.login-prompt-content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 15px;
+		gap: 6px;
 	}
 
 	.login-prompt-text {
-		color: #2F5D62;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 600;
 	}
@@ -544,7 +712,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		height: 40px;
+		height: 32px;
 		border-radius: 4px;
 		font-size: 14px;
 		font-weight: bold;
@@ -552,12 +720,12 @@
 	}
 
 	.login-btn2 {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		color: white;
 	}
 
 	.register-btn2 {
-		background-color: #5FB5BD;
+		background-color: $color-secondary;
 		color: white;
 	}
 
@@ -598,7 +766,7 @@
 
 	.nav-icon-active .nav-icon-wrapper {
 		background-color: white;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 	}
 
 	.nav-icon {
@@ -622,7 +790,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0 4px;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 	}
 
 	.nav-icon-label {
@@ -638,7 +806,212 @@
 	}
 
 	.nav-label-active {
-		color: #5FB5BD;
+		color: $color-secondary;
 		font-weight: bold;
+	}
+
+	.zw-header-wrapper {
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
+		padding: 0 20px 42px;
+		box-sizing: border-box;
+		overflow: hidden;
+		transition: height 0.3s ease;
+	}
+
+	.zw-header-wrapper.header-collapsed {
+		padding-top: 8px;
+	}
+
+	.header-title-bar {
+		position: relative;
+		padding: 14px 0 8px;
+	}
+
+	/* 收起状态：标题栏左对齐 */
+	.header-title-bar.title-bar-collapsed {
+		height: 32px;
+		padding: 0;
+		box-sizing: border-box;
+		text-align: left;
+	}
+
+	/* collapsed-right 绝对定位，不占据布局空间，避免header高度偏大 */
+	.collapsed-right {
+		position: absolute;
+		right: 0;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		pointer-events: none;
+	}
+
+	.header-collapsed .collapsed-right {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.collapsed-balance {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
+
+	.collapsed-balance-value {
+		color: #fff;
+		font-size: 14px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.collapsed-balance .coin-icon {
+		width: 18px;
+		height: 18px;
+	}
+
+	.collapsed-right .coin-icon {
+		filter: brightness(0) invert(1) !important;
+	}
+
+
+	.header-page-title {
+		color: #fff;
+		font-size: 16px;
+	}
+
+	.user-summary {
+		display: flex;
+		align-items: center;
+		padding: 4px 4px 14px;
+		color: #fff;
+		overflow: hidden;
+		transform: translateY(0);
+		transition: opacity 0.3s ease, transform 0.3s ease;
+		will-change: opacity, transform;
+	}
+
+	.header-collapsed .user-summary {
+		opacity: 0;
+		transform: translateY(-12px);
+		pointer-events: none;
+	}
+
+	.user-summary .user-avatar {
+		width: 37px;
+		height: 37px;
+		margin-right: 10px;
+		border: 0;
+		background: transparent;
+	}
+
+	.user-summary .user-details {
+		gap: 2px;
+	}
+
+	.greeting {
+		color: #fff;
+		font-size: 12px;
+	}
+
+	.user-summary .id-value {
+		color: #fff;
+		font-size: 15px;
+	}
+
+	.user-summary .header-actions {
+		margin-left: auto;
+	}
+
+	.user-summary .avatar-img {
+		background: transparent;
+	}
+
+	.balance-card {
+		background: #fff;
+		border-radius: 20px;
+		padding: 14px 20px 16px;
+		color: $color-primary;
+		overflow: hidden;
+		transform: translateY(0);
+		transition: opacity 0.3s ease, transform 0.3s ease;
+		will-change: opacity, transform;
+	}
+
+	.header-collapsed .balance-card {
+		opacity: 0;
+		transform: translateY(-16px);
+		pointer-events: none;
+	}
+
+	.main-balance-row,
+	.promo-row,
+	.balance-actions {
+		display: flex;
+		align-items: center;
+	}
+
+	.main-balance-row {
+		justify-content: space-between;
+	}
+
+	.balance-value {
+		color: $color-primary;
+		font-size: 23px;
+		font-weight: 700;
+	}
+
+	.balance-eye {
+		font-size: 19px;
+		color: $color-primary;
+	}
+
+	.promo-row {
+		gap: 8px;
+		margin: 6px 0 12px;
+	}
+
+	.promo-label {
+		padding: 3px 12px;
+		border-radius: 12px;
+		background: $color-secondary-light;
+		color: $color-primary;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.balance-actions {
+		justify-content: space-between;
+		gap: 8px;
+		color: $color-primary;
+		font-size: 11px;
+		font-weight: 700;
+	}
+
+	.wallet-action {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+	}
+
+	.wallet-action image {
+		width: 20px;
+		height: 20px;
+	}
+
+	.wallet-action .wallet-action-icon {
+		width: 20px;
+		height: 20px;
+	}
+
+	.cashout-action {
+		white-space: nowrap;
 	}
 </style>

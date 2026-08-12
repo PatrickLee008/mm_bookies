@@ -585,7 +585,7 @@ def get_activity_brief_progress(user_id, activity_id, activity):
                 total_claimable_amount += prog['claimable_amount_in_tier']
 
                 custom_description = share.description if hasattr(share, 'description') and share.description else None
-                auto_description = f"存款 {float(share.min_deposit or 0)}-{float(share.max_deposit or 0) if share.max_deposit else '以上'}，奖励 {float(share.bonus_rate or 0)}%"
+                auto_description = f"deposit {float(share.min_deposit or 0)}-{float(share.max_deposit or 0) if share.max_deposit else 'greater'}，bonus {float(share.bonus_rate or 0)}%"
 
                 deposit_share_progress.append({
                     'tier_id': share.id,
@@ -1469,6 +1469,7 @@ def claim_achievement_reward():
                 bonus_type='method1_achievement',
                 status='Claimed',
                 claimed_at=now,
+                aid=user.aid if hasattr(user, 'aid') else None,
                 create_time=now,
                 create_by_id=user_id,
                 del_flag=0,
@@ -1865,6 +1866,7 @@ def claim_one_time_reward():
                 bonus_type='invitation_share_one_time',
                 status='Claimed',
                 claimed_at=now,
+                aid=user.aid if hasattr(user, 'aid') else None,
                 create_time=now,
                 create_by_id=user_id,
                 del_flag=0,
@@ -2277,6 +2279,7 @@ def claim_deposit_share_reward():
                 bonus_type='deposit_share',
                 status='Claimed',
                 claimed_at=now,
+                aid=user.aid if hasattr(user, 'aid') else None,
                 meta_data=json.dumps({  # ✅ 修复：使用正确的字段名 meta_data
                     'deposit_id': deposit.id,
                     'deposit_amount': float(deposit_amount),

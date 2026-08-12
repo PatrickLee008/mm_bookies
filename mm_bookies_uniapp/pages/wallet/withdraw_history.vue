@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -24,40 +24,40 @@
 				<text class="empty-text">{{ $t('no_withdraw_records') || 'No withdrawal records available at the moment. Please check back later.' }}</text>
 			</view>
 
-			<!-- 记录项 -->
-			<view v-for="(item, index) in recordList" :key="index" class="record-item">
-				<view class="record-header">
-					<view class="flex-row justify-between align-center">
-						<view class="flex-row1 align-center">
-							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`"
-								mode="aspectFit" class="bank-icon"></image>
-							<view class="flex-column1 margin-left-sm">
-								<text class="bank-name">{{item.bank_code || 'KBZ Pay'}}</text>
-								<text class="order-id">{{item.id}}</text>
-							</view>
-						</view>
-						<view class="flex-column1 align-end">
-							<text class="amount-text amount-withdraw">-{{numberFormat(item.amount)}} Ks</text>
-							<text class="status-text" :class="getStatusClass(item.status)">
-								{{getStatusText(item.status)}}
-							</text>
-						</view>
+			<!-- 记录项（参考 wallet/wallet 卡片样式） -->
+			<view v-for="(item, index) in recordList" :key="index" class="record-card">
+				<!-- 顶部：Order ID + 时间 -->
+				<view class="card-top">
+					<text class="order-id">Order ID：{{item.id}}</text>
+					<text class="order-time">{{formatTime(item.create_time)}}</text>
+				</view>
+
+				<!-- 类型行：类型 | 支付方式 logo + 名称 -->
+				<view class="card-type-row">
+					<view class="type-left">
+						<theme-icon :name="item.type === 'Deposit' ? 'deposit' : 'withdraw'" class="type-svg"
+							:color="item.type === 'Deposit' ? 'var(--theme-icon-secondary, var(--theme-secondary))' : 'var(--theme-icon-primary, var(--theme-primary))'"></theme-icon>
+						<text class="type-name">{{item.type || 'Withdraw'}}</text>
+					</view>
+					<view class="pay-right">
+						<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
+						<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
+							class="pay-logo"></image>
 					</view>
 				</view>
 
-				<view class="record-content">
-					<view class="info-row">
-						<text class="label">{{ $t('create_time_label') }}:</text>
-						<text class="value">{{formatTime(item.create_time)}}</text>
-					</view>
-					<view class="info-row" v-if="item.wallet_type">
-						<text class="label">{{ $t('wallet_type_label') }}:</text>
-						<text class="value">{{item.wallet_type}}</text>
-					</view>
-					<view class="info-row" v-if="item.remarks">
-						<text class="label">{{ $t('remarks_label') }}:</text>
-						<text class="value">{{item.remarks}}</text>
-					</view>
+				<!-- 金额行 -->
+				<view class="card-amount-row">
+					<text class="amount-label">Transaction Amount：</text>
+					<text class="amount-value"
+						:class="item.type === 'Deposit' ? 'amount-deposit-color' : 'amount-withdraw-color'">{{item.type === 'Deposit' ? '+' : '-'}}{{numberFormat(item.amount)}}
+						MMK</text>
+				</view>
+
+				<!-- 状态 -->
+				<view class="card-status">
+					<text class="status-text"
+						:class="getStatusClass(item.status)">{{getStatusText(item.status)}}</text>
 				</view>
 			</view>
 
@@ -102,6 +102,10 @@
 			}
 		},
 		methods: {
+			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			onScrollEmit(e) {
+				this.$emit('contentScroll', e)
+			},
 			refreshData() {
 				if (this.refreshing) return;
 				this.refreshing = true;
@@ -129,19 +133,19 @@
 				this.loadRecords();
 			},
 
-			async loadRecords() {
-				if (this.loading) return;
+async loadRecords() {
+			if (this.loading) return;
 
-				this.loading = true;
+			this.loading = true;
 
-				try {
-					const filterParams = this.getFilterParams();
-					const para = {
-						page: this.page,
-						limit: this.pageSize,
-						type: 'Withdraw',
-						...filterParams
-					};
+			try {
+				const filterParams = this.getFilterParams();
+				const para = {
+					page: this.page,
+					limit: this.pageSize,
+					// from tangjq--- 去掉 type=Withdraw 限制，显示所有交易类型（Deposit/Withdraw 都会显示）
+					...filterParams
+				};
 
 					await new Promise((resolve, reject) => {
 						this.$http.get('/withdraw/get', { data: para }, (res) => {
@@ -177,8 +181,16 @@
 			formatTime(time) {
 				if (!time) return '';
 				const convertedTime = dateFormatUtils.convertTimezone(time);
+				const timeMatch = String(convertedTime).match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/
+				);
+				if (timeMatch) {
+					return `${timeMatch[3]}/${timeMatch[2]}/${timeMatch[1]} ${timeMatch[4]}:${timeMatch[5]}`;
+				}
 				const date = typeof convertedTime === 'string' ? new Date(convertedTime) : convertedTime;
-				return dateFormatUtils.formatTime(date);
+				if (!(date instanceof Date) || isNaN(date.getTime())) return '';
+				const pad = value => String(value).padStart(2, '0');
+				return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
 			},
 
 			numberFormat(number) {
@@ -191,6 +203,7 @@
 					'Pending': this.$t('processing') || 'Pending',
 					'Success': this.$t('success') || 'Success',
 					'Rejected': this.$t('Rejected') || 'Rejected',
+					'Time Out': 'Time Out',
 				};
 				return statusMap[s] || status;
 			},
@@ -201,6 +214,7 @@
 					'Pending': 'status-pending',
 					'Success': 'status-success',
 					'Rejected': 'status-failed',
+					'Time Out': 'status-timeout',
 				};
 				return classMap[s] || 'status-default';
 			},
@@ -280,7 +294,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -302,7 +316,7 @@
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 	}
@@ -318,13 +332,13 @@
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 15px;
 		height: 15px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -333,13 +347,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #5FB5BD;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -349,103 +363,132 @@
 		background-color: #ffffff;
 	}
 
-	/* 记录项 */
-	.record-item {
+	/* 记录项（参考 wallet/wallet 卡片样式） */
+	.record-card {
 		margin: 10px 0;
-		background-color: #ffffff;
-		border-radius: 12px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		background-color: $bg-color-info;
+		border-radius: 14px;
 		overflow: hidden;
 	}
 
-	.record-header {
-		padding: 15px;
-		border-bottom: 1px solid #f5f5f5;
-	}
-
-	.bank-icon {
-		width: 40px;
-		height: 40px;
-		border-radius: 8px;
-	}
-
-	.bank-name {
-		font-size: 16px;
-		font-weight: bold;
-		color: #333333;
+	.card-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 14px 16px 8px;
 	}
 
 	.order-id {
 		font-size: 12px;
-		color: #999999;
-		margin-top: 2px;
+		font-weight: 700;
+		color: $color-primary;
+		max-width: 60%;
 	}
 
-	.amount-text {
-		font-size: 18px;
-		font-weight: bold;
-		text-align: right;
-	}
-
-	.amount-withdraw {
-		color: #ff4d4f;
-	}
-
-	.status-text {
+	.order-time {
 		font-size: 12px;
-		margin-top: 4px;
-		padding: 2px 8px;
-		border-radius: 12px;
-		text-align: center;
+		color: $color-primary;
 	}
 
-	.status-success {
-		background-color: #f6ffed;
-		color: #52c41a;
-	}
-
-	.status-failed {
-		background-color: #fff2f0;
-		color: #ff4d4f;
-	}
-
-	.status-pending {
-		background-color: #fff7e6;
-		color: #fa8c16;
-	}
-
-	.status-default {
-		background-color: #fafafa;
-		color: #999999;
-	}
-
-	.record-content {
-		padding: 15px;
-		background-color: #fafafa;
-	}
-
-	.info-row {
+	.card-type-row {
 		display: flex;
 		justify-content: space-between;
-		margin-bottom: 8px;
+		align-items: center;
+		padding: 6px 16px 10px;
 	}
 
-	.info-row:last-child {
-		margin-bottom: 0;
+	.type-left {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
-	.label {
-		font-size: 14px;
-		color: #666666;
+	.type-svg {
+		width: 20px;
+		height: 20px;
 		flex-shrink: 0;
 	}
 
-	.value {
+	.type-name {
+		font-size: 15px;
+		font-weight: 600;
+		color: $color-primary;
+	}
+
+	.pay-right {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.pay-logo {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+	}
+
+	.pay-name {
 		font-size: 14px;
-		color: #333333;
-		text-align: right;
-		flex: 1;
-		margin-left: 10px;
+		font-weight: 600;
+		color: $color-primary;
+	}
+
+	.card-amount-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 4px 16px 12px;
+	}
+
+	.amount-label {
+		font-size: 14px;
+		color: $color-primary;
+	}
+
+	.amount-value {
+		font-size: 17px;
+		font-weight: 700;
+		font-style: italic;
+	}
+
+	.amount-deposit-color {
+		color: $color-secondary-light;
+	}
+
+	.amount-withdraw-color {
+		color: #E74C3C;
+	}
+
+	.card-status {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 0 16px 14px;
+	}
+
+	.status-text {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.status-success {
+		color: $color-secondary-light;
+	}
+
+	.status-pending {
+		color: #888;
+	}
+
+	.status-timeout {
+		color: #E74C3C;
+	}
+
+	.status-failed {
+		color: #E74C3C;
+	}
+
+	.status-default {
+		color: #888;
 	}
 
 	/* 空状态 */
@@ -505,43 +548,5 @@
 		padding: 20px;
 		color: #999999;
 		font-size: 14px;
-	}
-
-	/* 通用 flex 工具类 */
-	.flex-row {
-		display: flex;
-		flex-direction: row;
-	}
-
-	.flex-row1 {
-		display: flex;
-		flex-direction: row;
-		flex: 1;
-	}
-
-	.flex-column1 {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-	}
-
-	.justify-between {
-		justify-content: space-between;
-	}
-
-	.align-center {
-		align-items: center;
-	}
-
-	.align-end {
-		align-items: flex-end;
-	}
-
-	.margin-left-sm {
-		margin-left: 6px;
-	}
-
-	.margin-right-xs {
-		margin-right: 4px;
 	}
 </style>

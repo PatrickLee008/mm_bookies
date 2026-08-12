@@ -1,18 +1,21 @@
 <template>
 	<view class="match-page-container" >
 		<!-- from tangjq--- 使用新的统一header组件 -->
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- Search Bar and Filter Button -->
 		<view class="search-container padding-lr-sm">
 			<view class="search-wrapper">
 				<view class="search-box">
-					<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
+					<theme-icon name="search" class="search-icon"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<input class="search-input" type="text" :placeholder="$t('search')" v-model="searchKeyword" />
-					<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword" @tap="clearSearch"></image>
+					<theme-icon name="close" class="clear-icon"
+						color="var(--theme-icon-secondary, var(--theme-secondary))"
+						v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 				</view>
 				<view class="filter-button" @click="openFilterPopup">
 					<view class="filter-icon">
@@ -25,7 +28,7 @@
 		</view>
 
 		<!-- Game Categories and Game Cards -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" @scroll="handleHeaderScroll" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
 
 			<!-- Loop through game categories -->
 			<view class="flex-column padding-tb-sm" v-for="(category, catIndex) in game_categories" :key="catIndex">
@@ -91,9 +94,11 @@
 
 <script>
 	import siteinfo from '../../siteinfo.js'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {},
+		mixins: [headerCollapse],
 		data() {
 			return {
 				siteinfo: siteinfo,
@@ -109,7 +114,8 @@
 				showFilterPopup: false, // 控制筛选弹窗显示
 				filterOption: 'All', // 当前选中的筛选选项
 				filterOptions: ['All'], // 筛选选项列表（将动态填充游戏类型）
-				allGames: [] // 存储所有原始游戏数据
+				allGames: [], // 存储所有原始游戏数据
+				pendingPlatform: null // 从外部页面跳转传入的厂商平台参数
 			}
 		},
 		computed: {
@@ -196,6 +202,11 @@
 						_this.extractGameTypes()
 						// from tangjq--- 使用过滤后的游戏数据进行分组
 						_this.groupGamesByPlatform(_this.filteredGames)
+						// 如果有外部传入的厂商平台参数，过滤只显示该平台
+						if (_this.pendingPlatform) {
+							_this.game_categories = _this.game_categories.filter(cat => cat.name === _this.pendingPlatform)
+							_this.pendingPlatform = null
+						}
 					} else {
 						uni.showToast({
 							title: res.data.message || _this.$t('failed_load_games'),
@@ -311,7 +322,7 @@
 							const newWindow = window.open(gameUrl, '_blank')
 							if (!newWindow) {
 								// 如果被拦截，提示用户或使用备用方案
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: _this.$t('allow_popups'),
 									confirmText: _this.$t('open_now'),
@@ -337,7 +348,7 @@
 						// #endif
 
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('error_title'),
 							content: res.data.message || _this.$t('failed_launch_game'),
 							showCancel: false,
@@ -426,6 +437,10 @@
 			}
 		},
 		onLoad(options) {
+			// 检查是否从外部页面传入厂商平台参数
+			if (options && options.platform) {
+				this.pendingPlatform = options.platform
+			}
 			// 加载游戏列表
 			this.loadGames()
 		},
@@ -433,12 +448,13 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 255px;
 		width: 100%;
-		background-color: #2F5D62;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	/* Search Container */
@@ -462,7 +478,7 @@
 		background-color: #ffffff;
 		border-radius: 25px;
 		padding: 6px 15px;
-		border: 1px solid #2A6268;
+		border: 1px solid $color-primary;
 	}
 
 	.search-icon {
@@ -492,7 +508,7 @@
 	.filter-button {
 		width: 35px;
 		height: 35px;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -541,7 +557,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 25px;
 		padding: 8px 20px;
 		cursor: pointer;
@@ -575,7 +591,7 @@
 		overflow: hidden;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		width: 48%;
-		background: #2F5D62;
+		background: $color-primary;
 		margin-bottom: 12px;
 		transition: transform 0.2s;
 	}
@@ -602,7 +618,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		padding: 0 12px;
 		min-height: 50px;
 	}
@@ -682,7 +698,7 @@
 	}
 
 	.filter-header {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -711,7 +727,7 @@
 		margin-bottom: 1px;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		background-color: #F1FAFB;
+		background-color: $color-secondary-light;
 	}
 
 	.filter-option:active {
@@ -719,7 +735,7 @@
 	}
 
 	.filter-option-text {
-		color: #2A6268;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 500;
 	}
@@ -727,7 +743,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #5FB5BD;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -736,13 +752,13 @@
 	}
 
 	.filter-radio.active {
-		border-color: #5FB5BD;
+		border-color: $color-secondary;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #5FB5BD;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -754,7 +770,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #2F5D62;
+		background-color: $color-primary;
 		border-radius: 25px;
 		padding: 8px;
 		display: flex;

@@ -1,17 +1,14 @@
 <template name="coupon">
 	<view class="full-page">
-		<zw-header></zw-header>
+		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- 标题栏 -->
 		<view class="title-bar">
 			<!-- Coupon / Promotion 顶部切换 -->
 			<view class="type-toggle" v-if="isLogin">
-				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
-					<text>{{ $t('coupon') }}</text>
-				</view>
 				<view class="type-btn" :class="{ 'active': activity_type === 'promotion' }"
 					@click="change_type('promotion')">
 					<text>{{ $t('Promotion_title') }}</text>
@@ -19,19 +16,23 @@
 						{{ promotionCount > 99 ? '99+' : promotionCount }}
 					</view>
 				</view>
+				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
+					<text>{{ $t('coupon') }}</text>
+				</view>
 			</view>
 
 			<!-- 兑换码输入（仅 Coupon 且已登录） -->
 			<view class="redeem-row" v-if="isLogin && activity_type === 'coupon'">
 				<input class="redeem-input" :class="input_focus ? 'focus-border' : ''"
-					:placeholder="$t('Enter coupon code')" placeholder-class="text-gray" v-model="key_word"
+					:placeholder="$t('Enter coupon code')" placeholder-class=""
+					placeholder-style="color:var(--theme-primary);font-style: italic;font-size:12px" v-model="key_word"
 					maxlength="20" @focus="input_focus = true" @input="allow_en_num" @blur="input_focus = false" />
 				<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
 					@click="submit_code">{{ $t('Claim') }}</view>
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60">
+		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60" @scroll="handleHeaderScroll">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
@@ -58,7 +59,7 @@
 							<view class="ca-stat">
 								<text class="ca-stat-label">Promo Balance</text>
 								<text class="ca-stat-value">
-									{{ currentActivity.status === 'Active' ? $toolbox.num_format(currentActivity.money_promotion || 0) : '-' }}
+									{{ currentActivity.status === 'Active' ? $toolbox.floor_format(currentActivity.money_promotion || 0) : '-' }}
 								</text>
 							</view>
 						</view>
@@ -120,7 +121,8 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/coupon.png"></image>
+						<theme-icon name="deals" class="empty-icon"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="empty-text">No coupons available</text>
 					</view>
 				</view>
@@ -164,7 +166,8 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/coupon.png"></image>
+						<theme-icon name="deals" class="empty-icon"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="empty-text">No promotions available</text>
 					</view>
 				</view>
@@ -191,57 +194,89 @@
 				</view>
 
 				<scroll-view scroll-y class="detail-modal-body">
-					<view class="detail-coupon-title">{{ selectedCoupon.coupon_name }}</view>
-
-					<view class="detail-image-wrapper" v-if="selectedCoupon.p_img_mb && !selectedCoupon._imageError">
-						<image class="detail-image" mode="widthFix" :src="selectedCoupon.p_img_mb" lazy-load
+					<!-- Hero image with coupon name overlay -->
+					<view class="coupon-hero" v-if="selectedCoupon.p_img_mb && !selectedCoupon._imageError">
+						<image class="coupon-hero-image" mode="aspectFill" :src="selectedCoupon.p_img_mb" lazy-load
 							@error="handleImageError(selectedCoupon)"></image>
-					</view>
-
-					<!-- 兑换码 -->
-					<view class="detail-code-row" v-if="selectedCoupon.p_code">
-						<text class="detail-code">{{ selectedCoupon.p_code }}</text>
-						<text class="detail-code-copy" @click="copyCode">Copy code</text>
-					</view>
-
-					<!-- 信息卡片 -->
-					<view class="detail-info-cards">
-						<view class="detail-info-card">
-							<text class="detail-info-label">Expiry Date</text>
-							<text class="detail-info-value">
-								{{ selectedCoupon.expire_time ? formatDateTime(selectedCoupon.expire_time) : '-' }}
-							</text>
-						</view>
-						<view class="detail-info-card">
-							<text class="detail-info-label">Remaining</text>
-							<text class="detail-info-value">
-								{{ selectedCoupon.usage_limit ? (selectedCoupon.usage_limit - (selectedCoupon.used_count || 0)) : 'Unlimited' }}
-							</text>
+						<view class="coupon-hero-overlay">
+							<text class="coupon-hero-title">{{ selectedCoupon.coupon_name }}</text>
 						</view>
 					</view>
-
-					<!-- 奖励 -->
-					<view class="detail-bonus-box">
-						<text class="detail-bonus-title">+ {{ $toolbox.num_format(selectedCoupon.bonus_amount) }}
-							Bonus</text>
-						<text class="detail-bonus-desc">Min bet required:
-							{{ selectedCoupon.min_bet_required || 0 }}</text>
+					<!-- Fallback: title bar when no image -->
+					<view class="coupon-hero-fallback" v-else>
+						<text class="coupon-hero-title">{{ selectedCoupon.coupon_name }}</text>
 					</view>
 
-					<!-- 详情描述 -->
-					<view class="detail-description-section" v-if="selectedCoupon.p_content">
-						<text class="detail-section-title">Details</text>
-						<text class="detail-description-text">{{ selectedCoupon.p_content }}</text>
+					<!-- Description -->
+					<view class="coupon-desc-section" v-if="selectedCoupon.p_content">
+						<text class="coupon-desc-heading">Coupon details</text>
+						<text class="coupon-desc-text">{{ selectedCoupon.p_content }}</text>
 					</view>
 
-					<!-- 使用场景 -->
-					<view class="detail-description-section" v-if="couponScenarios.length > 0">
-						<text class="detail-section-title">Applicable Scenarios</text>
-						<view class="scenario-item" v-for="(sc, i) in couponScenarios" :key="i">
-							<text class="scenario-icon">{{ sc.icon }}</text>
-							<view class="scenario-text">
-								<text class="scenario-label">{{ sc.label }}</text>
-								<text class="scenario-detail" v-if="sc.detail">{{ sc.detail }}</text>
+					<!-- Promo Code -->
+					<view class="coupon-code-pill" v-if="selectedCoupon.p_code">
+						<text class="coupon-code-text">{{ selectedCoupon.p_code }}</text>
+						<view class="coupon-copy-btn" @click="copyCode">
+							<text class="coupon-copy-text">Copy code</text>
+							<theme-icon name="copy" class="coupon-copy-icon"
+								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+						</view>
+					</view>
+
+					<!-- Metadata Grid -->
+					<view class="coupon-meta-grid">
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Expiry Date:</text>
+							<text
+								class="coupon-meta-value">{{ selectedCoupon.expire_time ? formatDateTime(selectedCoupon.expire_time) : '-' }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Remaining:</text>
+							<text
+								class="coupon-meta-value">{{ selectedCoupon.usage_limit ? (selectedCoupon.usage_limit - (selectedCoupon.used_count || 0)) : 'Unlimited' }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Bonus:</text>
+							<text class="coupon-meta-value">+
+								{{ $toolbox.num_format(selectedCoupon.bonus_amount) }}</text>
+						</view>
+						<view class="coupon-meta-row">
+							<text class="coupon-meta-label">Min Bet:</text>
+							<text class="coupon-meta-value">{{ selectedCoupon.min_bet_required || 0 }}</text>
+						</view>
+					</view>
+
+					<!-- Applicable Scenarios -->
+					<view class="coupon-scenarios" v-if="betTypes.length > 0 || displayVendors.length > 0">
+						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+						<view class="coupon-scenarios-icons">
+							<!-- 1x2 Sports Betting -->
+							<view class="coupon-scenario-icon-item" v-if="betTypes.length > 0" @click="openCouponSport">
+								<view class="coupon-scenario-icon-circle">
+									<theme-icon name="single" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								</view>
+								<text class="coupon-scenario-label">Single</text>
+							</view>
+							<!-- Mix Parlay -->
+							<view class="coupon-scenario-icon-item" v-if="displayVendors.length > 0"
+								@click="openVendorGames(displayVendors[0])">
+								<view class="coupon-scenario-icon-diamond">
+									<theme-icon name="mixparlay" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								</view>
+								<text class="coupon-scenario-label">Mix</text>
+							</view>
+						</view>
+						<!-- Vendor list (collapsible below icons) -->
+						<view class="coupon-vendors-grid" v-if="displayVendors.length > 0">
+							<view class="coupon-vendor-card" v-for="(vendor, index) in displayVendors" :key="index"
+								@click="openVendorGames(vendor)">
+								<view class="coupon-vendor-info">
+									<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+										mode="heightFix"></image>
+									<text class="coupon-vendor-name">{{ vendor.platform }}</text>
+								</view>
 							</view>
 						</view>
 					</view>
@@ -249,7 +284,7 @@
 
 				<view class="detail-modal-footer" v-if="selectedCoupon.status === 'Unused'">
 					<view class="detail-claim-btn" @click="claimCoupon(selectedCoupon)">
-						<text class="detail-claim-text">{{ $t('Get promotions') }}</text>
+						<text class="detail-claim-text">Claim</text>
 					</view>
 				</view>
 			</view>
@@ -358,6 +393,43 @@
 						v-if="selectedPromotion.status === 'Available' && selectedPromotion.ineligibility_reason">
 						<text>{{ selectedPromotion.ineligibility_reason }}</text>
 					</view>
+
+					<!-- Applicable Scenarios -->
+				<view class="coupon-scenarios"
+					v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
+					<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+					<view class="coupon-scenarios-icons">
+						<!-- 1x2 Sports Betting -->
+						<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
+							@click="openPromotionSport">
+							<view class="coupon-scenario-icon-circle">
+								<theme-icon name="single" class="coupon-scenario-img"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+							</view>
+							<text class="coupon-scenario-label">Single</text>
+						</view>
+						<!-- Mix Parlay -->
+						<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
+							@click="openPromotionVendorGames(promotionDisplayVendors[0])">
+							<view class="coupon-scenario-icon-diamond">
+								<theme-icon name="mixparlay" class="coupon-scenario-img"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+							</view>
+							<text class="coupon-scenario-label">Mix</text>
+						</view>
+					</view>
+					<!-- Vendor list (collapsible below icons) -->
+					<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
+						<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+							:key="index" @click="openPromotionVendorGames(vendor)">
+							<view class="coupon-vendor-info">
+								<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+									mode="heightFix"></image>
+								<text class="coupon-vendor-name">{{ vendor.platform }}</text>
+							</view>
+						</view>
+					</view>
+				</view>
 				</scroll-view>
 
 				<view class="detail-modal-footer">
@@ -416,12 +488,15 @@
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
 	import siteinfo from '../../siteinfo.js'
+	import dateFormatUtils from '../../utils/utils.js'
 	import CountDown from '../match/components/count_down.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {
 			CountDown,
 		},
+		mixins: [headerCollapse],
 		name: "coupon",
 		data() {
 			return {
@@ -432,7 +507,7 @@
 				loading: false,
 
 				// 顶部切换：coupon / promotion
-				activity_type: 'coupon',
+			activity_type: 'promotion',
 
 				// Coupon Tab
 				tabs: ['Unused', 'Used', 'Expired'],
@@ -458,6 +533,13 @@
 				selectedCoupon: null,
 				couponScenarios: [],
 
+				// Applicable Scenarios - 游戏厂商
+				allGameVendors: [],
+				displayVendors: [],
+				allowedPlatforms: [],
+				betTypes: [],
+				promotionDisplayVendors: [],
+
 				// Promotion 列表分页
 				promotion_list: [],
 				promotion_page: 1,
@@ -481,11 +563,22 @@
 			}
 			if (this.isLogin) {
 				this.userInfo = Object.assign({}, this.$store.state.userInfo)
-				this.getCurrentActivity()
-				this.getCouponList()
-				// 静默预加载 promotion 用于角标与切换
-				this.loadPromotionList(true)
+				if (this.activity_type === 'promotion') {
+					// 默认打开 Promotion，加载 promotion 列表
+					this.loadPromotionList()
+					// 静默预加载 coupon 用于角标与切换
+					this.getCurrentActivity()
+					this.getCouponList(false, true)
+				} else {
+					// 直接打开 Coupon
+					this.getCurrentActivity()
+					this.getCouponList()
+					// 静默预加载 promotion 用于角标与切换
+					this.loadPromotionList(true)
+				}
 			}
+			// 获取所有游戏厂商列表（用于 Applicable Scenarios 展示与跳转）
+			this.fetchAllGameVendors()
 		},
 		mounted() {
 			this.$nextTick(() => {
@@ -508,8 +601,7 @@
 			},
 			formatDateTime(timeStr, sep = '/') {
 				if (!timeStr) return ''
-				// 兼容 'YYYY-MM-DD HH:mm:ss'
-				let str = String(timeStr).replace('T', ' ')
+				let str = this.toMyanmarTime(timeStr)
 				let parts = str.split(' ')
 				let d = parts[0] ? parts[0].split('-') : []
 				let t = parts[1] ? parts[1].split(':') : []
@@ -520,13 +612,37 @@
 			},
 			dateOnly(timeStr, sep = '.') {
 				if (!timeStr) return ''
-				let d = String(timeStr).split(' ')[0].split('-')
+				let d = this.toMyanmarTime(timeStr).split(' ')[0].split('-')
 				if (d.length < 3) return String(timeStr)
 				return `${d[0]}${sep}${d[1]}${sep}${d[2]}`
 			},
+			toMyanmarTime(timeStr) {
+				if (!timeStr) return ''
+				const normalized = String(timeStr).replace('T', ' ').replace(/\.\d+Z?$/, '')
+				try {
+					return dateFormatUtils.convertTimezone(normalized, 'Asia/Yangon')
+				} catch (e) {
+					return normalized
+				}
+			},
+			parseServerTime(timeStr) {
+				if (!timeStr) return null
+				const match = String(timeStr).replace('T', ' ').match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})(?::(\d{2}))?/
+				)
+				if (!match) return new Date(timeStr)
+				return new Date(Date.UTC(
+					Number(match[1]),
+					Number(match[2]) - 1,
+					Number(match[3]),
+					Number(match[4]),
+					Number(match[5]),
+					Number(match[6] || 0)
+				) - 8 * 60 * 60 * 1000)
+			},
 			isWithin48Hours(dateStr) {
 				if (!dateStr) return false
-				let target = new Date(String(dateStr).replace(/-/g, '/'))
+				let target = this.parseServerTime(dateStr)
 				if (isNaN(target.getTime())) return false
 				const diff = target - new Date()
 				return diff > 0 && diff <= 48 * 60 * 60 * 1000
@@ -565,6 +681,8 @@
 				this.activity_type = type
 				if (type === 'promotion' && this.promotion_list.length === 0) {
 					this.loadPromotionList()
+				} else if (type === 'coupon' && this.list.length === 0) {
+					this.getCouponList()
 				}
 			},
 			handleTabClick(index) {
@@ -610,7 +728,7 @@
 					}
 				}, () => {})
 			},
-			getCouponList(isLoadMore = false) {
+			getCouponList(isLoadMore = false, silent = false) {
 				let _this = this
 				if (!isLoadMore) {
 					_this.page = 1
@@ -623,16 +741,20 @@
 					page_size: _this.limit,
 					status: statusParam
 				}
-				_this.loading = true
-				uni.showLoading({
-					title: 'Loading...',
-					mask: true
-				})
+				if (!silent) {
+					_this.loading = true
+					uni.showLoading({
+						title: 'Loading...',
+						mask: true
+					})
+				}
 				_this.$http.get('/coupon/history', {
 					data: params
 				}, (res) => {
-					uni.hideLoading()
-					_this.loading = false
+					if (!silent) {
+						uni.hideLoading()
+						_this.loading = false
+					}
 					if (res.statusCode === 200 && res.data.code === 200) {
 						let coupons = res.data.data.history || []
 						// 若存在进行中的活动，将对应 Used 记录标记为 Active（参考onex2_test逻辑）
@@ -653,21 +775,23 @@
 						}
 					} else {
 						if (!isLoadMore) _this.list = []
-						uni.showToast({
+						if (!silent) uni.showToast({
 							icon: 'none',
 							title: res.data.message || 'Failed to load coupons',
 							duration: 2000
 						})
 					}
 				}, () => {
-					uni.hideLoading()
-					_this.loading = false
+					if (!silent) {
+						uni.hideLoading()
+						_this.loading = false
+						uni.showToast({
+							icon: 'none',
+							title: 'Network error',
+							duration: 2000
+						})
+					}
 					if (!isLoadMore) _this.list = []
-					uni.showToast({
-						icon: 'none',
-						title: 'Network error',
-						duration: 2000
-					})
 				})
 			},
 
@@ -690,9 +814,11 @@
 					})
 					return
 				}
-				uni.showModal({
+				this.$notice.show({
+					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
+					themeIcon: 'question',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -705,9 +831,11 @@
 			claimCoupon(coupon) {
 				let _this = this
 				if (!coupon) return
-				uni.showModal({
+				this.$notice.show({
+					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
+					themeIcon: 'question',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -738,7 +866,7 @@
 						_this.getCouponList()
 						_this.refreshUserInfo()
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: data.message || 'Failed to claim coupon',
 							showCancel: false
@@ -755,13 +883,16 @@
 			},
 			openDetailModal(coupon) {
 				this.selectedCoupon = coupon
-				this.couponScenarios = this.parseScenarios(coupon.usage_scenario_config)
+				this.parseUsageScenarioConfig(coupon.usage_scenario_config)
+				this.filterDisplayVendors()
 				this.showDetailModal = true
 			},
 			closeDetailModal() {
 				this.showDetailModal = false
 				this.selectedCoupon = null
-				this.couponScenarios = []
+				this.displayVendors = []
+				this.allowedPlatforms = []
+				this.betTypes = []
 			},
 			copyCode() {
 				if (!this.selectedCoupon || !this.selectedCoupon.p_code) return
@@ -777,45 +908,87 @@
 				if (status === 'Expired') return 'header-expired'
 				return 'header-unused'
 			},
-			// 解析 usage_scenario_config -> 可展示的场景列表
-			parseScenarios(configStr) {
-				let out = []
-				if (!configStr) return out
+			// 解析 usage_scenario_config -> betTypes / allowedPlatforms
+			parseUsageScenarioConfig(configStr) {
+				this.allowedPlatforms = []
+				this.betTypes = []
+				if (!configStr) return
 				try {
-					const cfg = typeof configStr === 'string' ? JSON.parse(configStr) : configStr
-					if (cfg.type === 'All') {
-						out.push({
-							icon: '✅',
-							label: 'All Games',
-							detail: ''
-						})
-						return out
-					}
-					if (cfg.scenarios && Array.isArray(cfg.scenarios)) {
-						cfg.scenarios.forEach(sc => {
-							if (!sc.enabled) return
-							if (sc.type === '1x2' && sc.config) {
-								const bt = sc.config.bet_types || []
-								out.push({
-									icon: '⚽',
-									label: '1x2 Sports Betting',
-									detail: bt.length ? bt.join(', ') : 'All Bet Types'
-								})
-							} else if (sc.type === 'Egame' && sc.config) {
-								const ps = (sc.config.platforms || []).map(p => typeof p === 'string' ? p : (p
-									.platform_name || p.platform || p.name)).filter(Boolean)
-								out.push({
-									icon: '🎮',
-									label: 'E-Gaming',
-									detail: ps.length ? ps.join(', ') : ''
-								})
+					const config = typeof configStr === 'string' ? JSON.parse(configStr) : configStr
+					if (config.type === 'All') return
+					if (config.scenarios && Array.isArray(config.scenarios)) {
+						config.scenarios.forEach(scenario => {
+							if (!scenario.enabled) return
+							if (scenario.type === '1x2' && scenario.config && scenario.config.bet_types) {
+								this.betTypes = scenario.config.bet_types
+							}
+							if (scenario.type === 'Egame' && scenario.config && scenario.config.platforms) {
+								this.allowedPlatforms = scenario.config.platforms
 							}
 						})
 					}
 				} catch (e) {
-					console.error('parse usage_scenario_config failed', e)
+					console.error('Failed to parse usage_scenario_config:', e)
 				}
-				return out
+			},
+			// 获取所有游戏厂商列表
+			fetchAllGameVendors() {
+				let _this = this
+				_this.$http.get('/awc/getAllVendors', {
+					data: {}
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						_this.allGameVendors = res.data.data.vendors || []
+					}
+				}, (err) => {
+					console.error('Failed to fetch game vendors:', err)
+				})
+			},
+			// 根据平台限制过滤厂商列表
+			filterDisplayVendors() {
+				if (this.allowedPlatforms.length > 0) {
+					this.displayVendors = this.allGameVendors.filter(vendor =>
+						this.allowedPlatforms.includes(vendor.platform)
+					)
+				} else {
+					this.displayVendors = []
+				}
+			},
+			// Coupon - 跳转到 1x2 体育投注
+			openCouponSport() {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				const betTypes = _this.betTypes || []
+				if (betTypes.length === 0) return
+				_this.$notice.confirm(`Do you want to view 1x2 Sports Betting?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
+						_this.closeDetailModal()
+						uni.navigateTo({
+							url: url
+						})
+					}
+				})
+			},
+			// Coupon - 跳转到厂商游戏页面
+			openVendorGames(vendor) {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				_this.$notice.confirm(`Do you want to view ${vendor.platform} games?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						_this.closeDetailModal()
+						uni.navigateTo({
+							url: `/pages/index/game?platform=${vendor.platform}`
+						})
+					}
+				})
 			},
 
 			// ==================== Promotion 数据 ====================
@@ -833,7 +1006,7 @@
 					image: promo.image_url || '/static/image/deals/deals.png',
 					period_start: this.dateOnly(promo.start_date, '.'),
 					period_end: this.dateOnly(promo.end_date, '.'),
-					end_time_full: promo.end_date,
+					end_time_full: this.parseServerTime(promo.end_date),
 					period_start_time: this.formatDateTime(promo.start_date),
 					period_end_time: this.formatDateTime(promo.end_date),
 					terms: promo.description || '',
@@ -848,6 +1021,8 @@
 					max_withdrawal: promo.max_withdrawal_limit || 0,
 					manual_end_enabled: promo.manual_end_enabled || 0,
 					usage_scenario_config: promo.usage_scenario_config || null,
+					usage_scenario_1x2: null,
+					usage_scenario_egame: null,
 				}
 				if (promo.progress) {
 					const p = promo.progress
@@ -945,7 +1120,7 @@
 			showPromotionDetail(promo) {
 				let _this = this
 				if (promo.status === 'Available' && promo.can_participate === false && promo.ineligibility_reason) {
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('title_alert'),
 						content: promo.ineligibility_reason,
 						showCancel: false
@@ -958,10 +1133,110 @@
 				if (promo.status === 'Joined') {
 					_this.loadPromotionProgress(promo.id)
 				}
+				// 解析使用场景配置
+				_this.parseUsageScenario(promo)
+				// 根据 Egame 场景过滤显示的厂商列表
+				if (promo.usage_scenario_egame && promo.usage_scenario_egame.platforms &&
+					promo.usage_scenario_egame.platforms.length > 0) {
+					const allowedNames = promo.usage_scenario_egame.platforms.map(p => {
+						if (typeof p === 'string') return p
+						return p.platform_name || p.platform || p.name
+					}).filter(Boolean)
+					_this.promotionDisplayVendors = _this.allGameVendors.filter(v => allowedNames.includes(v.platform))
+					if (_this.promotionDisplayVendors.length > 0) {
+						const vendorNames = _this.promotionDisplayVendors.map(v => v.platform).join(', ')
+						promo.usage_scenario_egame.detail = `(${vendorNames})`
+					} else {
+						promo.usage_scenario_egame.detail = ''
+					}
+				} else {
+					_this.promotionDisplayVendors = []
+				}
 			},
 			closePromotionDetail() {
 				this.showPromotionDetailModal = false
 				this.selectedPromotion = null
+				this.promotionDisplayVendors = []
+			},
+			// 解析优惠使用场景配置
+			parseUsageScenario(promotion) {
+				promotion.usage_scenario_1x2 = null
+				promotion.usage_scenario_egame = null
+				if (!promotion.usage_scenario_config) return
+				try {
+					const config = typeof promotion.usage_scenario_config === 'string' ?
+						JSON.parse(promotion.usage_scenario_config) :
+						promotion.usage_scenario_config
+					if (!config.scenarios || !Array.isArray(config.scenarios)) return
+					config.scenarios.forEach(scenario => {
+						if (!scenario.enabled) return
+						if (scenario.type === '1x2' && scenario.config) {
+							const betTypes = scenario.config.bet_types || []
+							const betTypeLabels = {
+								'Single': 'Single Bet',
+								'Mix': 'Mix Parlay'
+							}
+							const betTypeText = betTypes.map(t => betTypeLabels[t] || t).join(', ')
+							promotion.usage_scenario_1x2 = {
+								type: '1x2',
+								label: '1x2 Sports Betting',
+								detail: betTypeText ? `(${betTypeText})` : '',
+								bet_types: betTypes
+							}
+						} else if (scenario.type === 'Egame' && scenario.config) {
+							const platforms = scenario.config.platforms || []
+							const platformNames = platforms.map(p => {
+								if (typeof p === 'string') return p
+								return p.platform_name || p.platform || p.name
+							}).filter(Boolean)
+							promotion.usage_scenario_egame = {
+								type: 'Egame',
+								label: 'E-Gaming',
+								detail: platformNames.length > 0 ? `(${platformNames.join(', ')})` : '',
+								platforms: platforms
+							}
+						}
+					})
+				} catch (error) {
+					console.error('Failed to parse usage_scenario_config:', error)
+				}
+			},
+			// Promotion - 跳转到 1x2 体育投注
+			openPromotionSport() {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				const scenario = _this.selectedPromotion && _this.selectedPromotion.usage_scenario_1x2
+				if (!scenario) return
+				_this.$notice.confirm(`Do you want to view ${scenario.label || '1x2 Sports Betting'}?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						const betTypes = scenario.bet_types || []
+						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
+						_this.closePromotionDetail()
+						uni.navigateTo({
+							url: url
+						})
+					}
+				})
+			},
+			// Promotion - 跳转到厂商游戏页面
+			openPromotionVendorGames(vendor) {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				_this.$notice.confirm(`Do you want to view ${vendor.platform} games?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						_this.closePromotionDetail()
+						uni.navigateTo({
+							url: `/pages/index/game?platform=${vendor.platform}`
+						})
+					}
+				})
 			},
 			toggleTerms() {
 				this.isTermsExpanded = !this.isTermsExpanded
@@ -1050,7 +1325,7 @@
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: res.data.message || 'Failed to join promotion',
 							showCancel: false
@@ -1067,7 +1342,7 @@
 			},
 			showEndPromotionDialog() {
 				let _this = this
-				uni.showModal({
+				this.$notice.show({
 					title: _this.$t('title_alert'),
 					content: _this.$t('are you sure end pro'),
 					confirmText: _this.$t('Confirm'),
@@ -1094,7 +1369,7 @@
 						_this.closePromotionDetail()
 						_this.loadPromotionList()
 						_this.refreshUserInfo()
-						uni.showModal({
+						this.$notice.show({
 							title: 'Success',
 							content: 'Promotion ended successfully',
 							showCancel: false
@@ -1104,7 +1379,7 @@
 						if (res.data.data && res.data.data.unmet_conditions) {
 							msg = 'Cannot end promotion:\n' + res.data.data.unmet_conditions.join('\n')
 						}
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('title_alert'),
 							content: msg,
 							showCancel: false
@@ -1126,20 +1401,19 @@
 <style lang="scss">
 	/* header占位元素样式 */
 	.header-placeholder {
-		height: 210px;
+		height: 255px;
 		width: 100%;
 		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	page {
-		background: #2F5D62;
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #2F5D62;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -1175,31 +1449,49 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		background: #e8f4f8;
-		color: #2A6268;
+		background: $color-secondary-light;
+		border: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.type-btn.active {
-		background: #2F5D62;
+		background: $color-primary;
 		color: #fff;
 	}
 
 	.promo-count-badge {
 		position: absolute;
-		top: 2px;
+		// top: 2px;
 		right: 8px;
 		min-width: 16px;
 		height: 16px;
 		padding: 0 3px;
 		border-radius: 8px;
-		background-color: #FFC436;
-		color: #2F5D62;
+		background-color: $color-primary;
+		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
 		line-height: 16px;
 		text-align: center;
+		animation: promoRipple 1.6s ease-in-out infinite;
+	}
+
+	@keyframes promoRipple {
+
+		0%,
+		100% {
+			box-shadow: 0 0 0 0 rgba(47, 93, 98, 0.8);
+		}
+
+		40% {
+			box-shadow: 0 0 0 6px rgba(47, 93, 98, 0.2);
+		}
+
+		60% {
+			box-shadow: 0 0 0 0 rgba(47, 93, 98, 0);
+		}
 	}
 
 	/* 兑换码输入行 */
@@ -1218,12 +1510,12 @@
 		height: 34px;
 		padding: 0 12px;
 		font-size: 14px;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: center;
 	}
 
 	.focus-border {
-		border: solid 2px #2F5D62;
+		border: solid 2px $color-primary;
 	}
 
 	.redeem-btn {
@@ -1234,16 +1526,17 @@
 		border-radius: 8px;
 		font-size: 14px;
 		font-weight: bold;
+		background: $color-primary;
+		color: #fff;
 	}
 
 	.redeem-btn-active {
-		background: #2F5D62;
+		background: $color-primary;
 		color: #fff;
 	}
 
 	.redeem-btn-disabled {
-		background: #D9D9D9;
-		color: #6D6D6D;
+		opacity: 0.5;
 	}
 
 	/* Tab 样式 */
@@ -1298,7 +1591,7 @@
 
 	/* 当前活动卡片 */
 	.current-activity-box {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 12px;
 		padding: 14px 16px;
 		margin-bottom: 16px;
@@ -1347,13 +1640,13 @@
 
 	.ca-credit-label {
 		font-size: 11px;
-		color: #2A6268;
+		color: $color-primary;
 	}
 
 	.ca-credit-value {
 		font-size: 24px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 28px;
 	}
 
@@ -1380,14 +1673,15 @@
 	.ca-stat-value {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	/* 优惠券卡片 */
 	.coupon-card {
 		background: #fff;
 		border-radius: 12px;
-		margin-bottom: 15px;
+		margin-top: 7.5px;
+		margin-bottom: 7.5px;
 		overflow: hidden;
 		border: 1px solid rgba(0, 0, 0, 0.08);
 		box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
@@ -1403,7 +1697,7 @@
 	}
 
 	.header-unused {
-		background: #2F5D62;
+		background: $color-primary;
 	}
 
 	.header-expired {
@@ -1465,7 +1759,7 @@
 	.info-val {
 		font-size: 14px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.coupon-bonus {
@@ -1477,13 +1771,13 @@
 
 	.bonus-label {
 		font-size: 13px;
-		color: #2A6268;
+		color: $color-primary;
 	}
 
 	.bonus-value {
 		font-size: 22px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.coupon-card-footer {
@@ -1501,7 +1795,7 @@
 	}
 
 	.claim-action-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1517,7 +1811,7 @@
 	.status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1582,7 +1876,7 @@
 
 	.promo-period {
 		font-size: 12px;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: bold;
 	}
 
@@ -1590,7 +1884,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: bold;
 		font-size: 13px;
 		margin-top: 2px;
@@ -1598,7 +1892,7 @@
 
 	.promo-terms {
 		font-size: 12px;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 1.4;
 	}
 
@@ -1618,7 +1912,7 @@
 	}
 
 	.promo-status-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1630,7 +1924,7 @@
 	.promo-status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1648,7 +1942,8 @@
 	.empty-icon {
 		height: 60px;
 		margin-bottom: 16px;
-		opacity: 0.4;
+		opacity: 0.6;
+		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
 	}
 
 	.empty-text {
@@ -1683,7 +1978,7 @@
 	}
 
 	.detail-modal-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 12px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -1718,7 +2013,7 @@
 	.detail-coupon-title {
 		font-size: 18px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 12px;
 	}
@@ -1746,7 +2041,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 10px 14px;
 		margin-bottom: 12px;
@@ -1755,7 +2050,7 @@
 	.detail-code {
 		font-size: 15px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.detail-code-copy {
@@ -1773,7 +2068,7 @@
 
 	.detail-info-card {
 		flex: 1;
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 10px 12px;
 		display: flex;
@@ -1793,7 +2088,7 @@
 	.detail-info-value {
 		font-size: 14px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.promo-countdown-block {
@@ -1803,11 +2098,11 @@
 	.ends-in {
 		font-size: 16px;
 		font-weight: bold;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.detail-bonus-box {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 10px;
 		padding: 14px;
 		margin-bottom: 12px;
@@ -1831,7 +2126,7 @@
 	.detail-section-title {
 		font-size: 15px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 		display: block;
 		margin-bottom: 6px;
 	}
@@ -1861,27 +2156,6 @@
 		margin-bottom: 8px;
 	}
 
-	.scenario-icon {
-		font-size: 20px;
-	}
-
-	.scenario-text {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.scenario-label {
-		font-size: 14px;
-		font-weight: bold;
-		color: #2F5D62;
-	}
-
-	.scenario-detail {
-		font-size: 12px;
-		color: #7F8C8D;
-	}
-
 	.progress-row {
 		display: flex;
 		justify-content: space-between;
@@ -1897,7 +2171,7 @@
 	.progress-value {
 		font-size: 13px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.progress-bar-container {
@@ -1926,7 +2200,7 @@
 	}
 
 	.detail-claim-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 10px;
 		padding: 10px;
 		text-align: center;
@@ -1941,6 +2215,234 @@
 		font-size: 15px;
 		font-weight: 700;
 		color: #fff;
+	}
+
+	/* ============ Coupon Detail Modal (coupon-specific) ============ */
+
+	/* Hero image with title overlay */
+	.coupon-hero {
+		width: 100%;
+		aspect-ratio: 16/9;
+		border-radius: 12px;
+		overflow: hidden;
+		margin-bottom: 20px;
+		position: relative;
+	}
+
+	.coupon-hero-image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.coupon-hero-overlay {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: $color-primary;
+		padding: 10px 16px;
+	}
+
+	.coupon-hero-title {
+		font-size: 16px;
+		font-weight: bold;
+		color: #fff;
+		text-align: center;
+	}
+
+	.coupon-hero-fallback {
+		background: $color-primary;
+		border-radius: 12px;
+		padding: 14px 16px;
+		margin-bottom: 20px;
+	}
+
+	/* Description section */
+	.coupon-desc-section {
+		margin-bottom: 20px;
+	}
+
+	.coupon-desc-heading {
+		font-size: 16px;
+		font-weight: bold;
+		color: $color-primary;
+		text-align: center;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	.coupon-desc-text {
+		font-size: 14px;
+		color: #666;
+		text-align: center;
+		line-height: 1.6;
+	}
+
+	/* Promo code pill */
+	.coupon-code-pill {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		background: #F5F5F5;
+		border-radius: 999px;
+		padding: 12px 20px;
+		margin-bottom: 20px;
+	}
+
+	.coupon-code-text {
+		font-size: 18px;
+		font-weight: bold;
+		color: $color-primary;
+	}
+
+	.coupon-copy-btn {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.coupon-copy-icon {
+		width: 16px;
+		height: 16px;
+	}
+
+	.coupon-copy-text {
+		font-size: 13px;
+		color: $color-primary;
+		font-weight: 600;
+	}
+
+	/* Metadata grid */
+	.coupon-meta-grid {
+		margin-bottom: 20px;
+	}
+
+	.coupon-meta-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		height: 25px;
+		color: $color-primary;
+	}
+
+	.coupon-meta-label {
+		font-size: 14px;
+		// color: #666;
+	}
+
+	.coupon-meta-value {
+		font-size: 14px;
+		font-weight: bold;
+		// color: #333;
+	}
+
+	/* Applicable Scenarios */
+	.coupon-scenarios {
+		background: #E8F4F4;
+		border-radius: 12px;
+		padding: 14px 16px;
+		margin-bottom: 8px;
+	}
+
+	.coupon-scenarios-title {
+		font-size: 14px;
+		font-weight: bold;
+		color: $color-primary;
+		display: block;
+		margin-bottom: 14px;
+	}
+
+	.coupon-scenarios-icons {
+		display: flex;
+		flex-direction: row;
+		justify-content: start;
+		gap: 48px;
+	}
+
+	.coupon-scenario-icon-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		// gap: 8px;
+	}
+
+	.coupon-scenario-icon-circle {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		// border: 2px solid $color-primary;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.coupon-scenario-icon-diamond {
+		width: 40px;
+		height: 40px;
+		border: 2px solid $color-primary;
+		transform: rotate(45deg);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.coupon-scenario-emoji {
+		font-size: 18px;
+		line-height: 1;
+	}
+
+	.coupon-scenario-img {
+		width: 100%;
+		height: 100%;
+	}
+
+	.coupon-scenario-icon-diamond .coupon-scenario-img {
+		transform: rotate(-45deg);
+	}
+
+	.coupon-scenario-icon-diamond .coupon-scenario-emoji {
+		transform: rotate(-45deg);
+	}
+
+	.coupon-scenario-label {
+		font-size: 12px;
+		color: #666;
+	}
+
+	/* Vendor grid inside scenarios */
+	.coupon-vendors-grid {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 14px;
+	}
+
+	.coupon-vendor-card {
+		width: calc(33.33% - 6px);
+		background: #fff;
+		border-radius: 8px;
+		padding: 8px 4px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.coupon-vendor-info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.coupon-vendor-name {
+		font-size: 11px;
+		font-weight: 600;
+		color: #333;
+		text-align: center;
 	}
 
 	/* ============ Join Promotion 弹窗 ============ */
@@ -1970,7 +2472,7 @@
 	}
 
 	.join-dialog-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 12px;
 		text-align: center;
 		font-size: 15px;
@@ -1995,7 +2497,7 @@
 
 	.join-hint-label {
 		font-size: 14px;
-		color: #2F5D62;
+		color: $color-primary;
 		display: block;
 		text-align: center;
 		margin-bottom: 10px;
@@ -2003,7 +2505,7 @@
 
 	.join-amount-input,
 	.join-amount-display {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 12px 15px;
 		display: flex;
@@ -2015,19 +2517,19 @@
 	.join-currency {
 		font-size: 16px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.join-input {
 		flex: 1;
 		font-size: 16px;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.join-fixed-value {
 		font-size: 16px;
 		font-weight: 700;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.join-range-hint {
@@ -2064,7 +2566,7 @@
 	}
 
 	.join-continue-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		color: #fff;
 	}
 </style>

@@ -1,5 +1,6 @@
 <template>
 	<view class="profile-page full-page">
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- 顶部栏 -->
 		<view class="profile-header">
 			<text class="header-back-icon" @click="goBack">←</text>
@@ -179,7 +180,7 @@
 						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePwdModal()
 						_this.$nextTick(() => {
-							uni.showModal({
+							this.$notice.show({
 								title: _this.$t('success_word'),
 								content: res.data.message || _this.$t('password_changed_success'),
 								showCancel: false,
@@ -208,13 +209,16 @@
 
 <style lang="scss" scoped>
 	.profile-page {
-		background: #f5f5f5;
 		min-height: 100vh;
 	}
 
 	/* 顶部栏 */
 	.profile-header {
-		background: #3d6877;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		padding: 40px 20px 20px 20px;
 		display: flex;
 		justify-content: space-between;

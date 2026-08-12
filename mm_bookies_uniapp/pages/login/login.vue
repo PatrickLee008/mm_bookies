@@ -1,7 +1,8 @@
 <template>
 	<view>
+		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
-		<view class="splash-screen" v-if="showSplash">
+		<view class="splash-screen theme-bg-no-header" v-if="showSplash">
 			<!-- Skip 按钮（由 enable_skip_button 控制） -->
 			<view class="skip-button" @click="closeSplash" v-if="enableSkipButton">
 				<text class="skip-text">{{ $t('skip') }} {{ splashCountdown }}</text>
@@ -11,14 +12,13 @@
 			<image class="splash-ad-image" :src="splashImageUrl" mode="aspectFill"></image>
 
 			<!-- 动作按钮（由 enable_action_button 控制） -->
-			<view class="splash-action-button" v-if="enableActionButton && actionButtonLabel"
-				@click="onSplashAction">
+			<view class="splash-action-button" v-if="enableActionButton && actionButtonLabel" @click="onSplashAction">
 				<text class="splash-action-text">{{ actionButtonLabel }}</text>
 			</view>
 		</view>
 
 		<!-- 原有登录页面 -->
-		<view class="login-container" v-show="!showSplash">
+		<view class="login-container theme-bg-no-header" v-show="!showSplash">
 			<!-- 语言切换按钮 -->
 			<view class="lang-switch" @click="openLangModal">
 				<image class="lang-switch-icon" src="/static/icon/ucenter/language.png" mode="aspectFit"></image>
@@ -41,7 +41,7 @@
 
 			<!-- 标题图片 -->
 			<view class="login-title-container">
-				<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+				<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
 				<!-- TODO: 替换为正确的缅甸文翻译 -->
 				<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 			</view>
@@ -83,11 +83,11 @@
 				</view>
 
 				<!-- Remember Me -->
-				<view class="remember-row">
-					<text class="remember-text">{{ $t('Remember me') }}</text>
-					<view class="custom-switch" @click="toggleRememberMe">
+				<view class="remember-row" @click="toggleRememberMe">
+					<view class="custom-switch">
 						<view class="switch-dot" :class="{'switch-dot-active': loginInfo.rememberMe}"></view>
 					</view>
+					<text class="remember-text">{{ $t('Remember me') }}</text>
 				</view>
 
 				<!-- Login Button -->
@@ -122,7 +122,7 @@
 
 			<!-- Version Info -->
 			<view class="version-info">{{version}}</view>
-			
+
 			<!-- 客服按钮 -->
 			<customer-service></customer-service>
 		</view>
@@ -197,17 +197,33 @@
 				// 语言切换
 				showLangModal: false,
 				currentLang: uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm',
-				langOptions: [
-					{ value: 'mm', label: 'မြန်မာ' },
-					{ value: 'en', label: 'English' },
-					{ value: 'th', label: 'ภาษาไทย' },
-					{ value: 'cn', label: '中文' }
+				langOptions: [{
+						value: 'mm',
+						label: 'မြန်မာ'
+					},
+					{
+						value: 'en',
+						label: 'English'
+					},
+					{
+						value: 'th',
+						label: 'ภาษาไทย'
+					},
+					{
+						value: 'cn',
+						label: '中文'
+					}
 				]
 			};
 		},
 		computed: {
 			currentLangLabel() {
-				const map = { mm: 'မြန်မာ', en: 'EN', th: 'ไทย', cn: '中文' }
+				const map = {
+					mm: 'မြန်မာ',
+					en: 'EN',
+					th: 'ไทย',
+					cn: '中文'
+				}
 				return map[this.currentLang] || 'EN'
 			},
 			loginDisabled() {
@@ -247,7 +263,7 @@
 					},
 					Password: {
 						value: this.loginInfo.password,
-						isValid: () => this.loginInfo.password && this.loginInfo.password.length >= 8
+						isValid: () => this.loginInfo.password && this.loginInfo.password.length >= 5
 					},
 					// Captcha验证规则 - Commented out as requested
 					// Captcha: {
@@ -334,7 +350,7 @@
 				// let validate = this.mcaptcha.validate(this.Captcha)
 				// let testing = uni.getStorageSync('testing')
 				// if (!validate && !testing) {
-				// 	uni.showModal({
+				// 	this.$notice.show({
 				// 		title: 'Warning',
 				// 		content: 'captcha not match',
 				// 		showCancel: false,
@@ -387,7 +403,7 @@
 						}
 
 						uni.redirectTo({
-							url: '../match/home'
+							url: '/pages/index/index'
 						});
 						uni.setStorageSync('login_success', true)
 						return
@@ -398,7 +414,7 @@
 							duration: 2000,
 						});
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('tips'),
 							content: _this.$t(res.data.message),
 							showCancel: false,
@@ -464,7 +480,9 @@
 				let _this = this
 				const tenant_id = (siteinfo && siteinfo.tenant_id) || '10000'
 				_this.$http.get('/splash_screen/get_active', {
-					data: { tenant_id }
+					data: {
+						tenant_id
+					}
 				}, (res) => {
 					const ok = res.statusCode === 200 && res.data && res.data.code === 200
 					const list = ok && res.data.data ? res.data.data.splash_screens : null
@@ -504,9 +522,9 @@
 			onSplashAction() {
 				const route = this.actionButtonRoute
 				this.closeSplash()
-				// 仅对完整页面路径做跳转，避免未登录时跳转异常
-				if (route && route.charAt(0) === '/') {
-					uni.navigateTo({ url: route })
+				// 关键词路由（如 'home'）或完整路径都交给 toolbox 统一处理
+				if (route) {
+					this.$toolbox.navigateToPage(route)
 				}
 			},
 			toggleRememberMe() {
@@ -545,7 +563,6 @@
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
@@ -560,7 +577,7 @@
 		right: 40rpx;
 		width: 180rpx;
 		height: 60rpx;
-		background-color: #2A6268;
+		background-color: $color-primary;
 		border-radius: 30rpx;
 		display: flex;
 		justify-content: center;
@@ -623,7 +640,7 @@
 		min-width: 300rpx;
 		height: 80rpx;
 		padding: 0 40rpx;
-		background-color: #2A6268;
+		background-color: $color-primary;
 		border-radius: 40rpx;
 		display: flex;
 		align-items: center;
@@ -722,21 +739,20 @@
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: #2A6268;
+		border-color: $color-primary;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: #2A6268;
+		background: $color-primary;
 	}
 
 	/* 原有登录页面样式 */
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -755,8 +771,9 @@
 	}
 
 	.login-title-image {
-		width: 75%;
-		height: auto;
+		width: auto;
+		height: 88px;
+		max-width: 100%;
 	}
 
 	.login-subtitle {
@@ -867,15 +884,16 @@
 
 	/* from tangjq--- 自定义圆形复选框 */
 	.custom-switch {
-		width: 40rpx;
-		height: 40rpx;
-		border: 3rpx solid rgba(255, 255, 255, 0.6);
+		width: 32rpx;
+		height: 32rpx;
+		border: 4rpx solid $color-secondary-light;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		transition: border-color 0.3s;
+		margin-right: 10px;
 	}
 
 	.custom-switch:active {
@@ -885,14 +903,14 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: #50C8CE;
+		background-color: $color-secondary-light;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
 
 	.switch-dot-active {
-		width: 24rpx;
-		height: 24rpx;
+		width: 20rpx;
+		height: 20rpx;
 	}
 
 	.login-btn {
@@ -917,19 +935,17 @@
 	.register-link {
 		text-align: center;
 		font-size: 24rpx;
+		font-weight: bold;
+		font-style: italic;
 	}
 
 	.register-text {
 		color: rgba(255, 255, 255, 0.9);
-		font-style: italic;
-		font-weight: 400;
 	}
 
 	.register-link-text {
-		color: #50C8CE;
+		color: $color-secondary-light;
 		text-decoration: underline;
-		font-style: italic;
-		font-weight: 600;
 	}
 
 	/* Contact Support 区域 */

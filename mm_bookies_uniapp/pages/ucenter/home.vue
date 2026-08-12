@@ -1,11 +1,11 @@
 <template name="ucenter">
-	<view class="bg-white full-page">
+	<view class="full-page ucenter-page">
 		<zw-header @doSomething="" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<scroll-view scroll-y>
+		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll">
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -17,8 +17,12 @@
 
 			<!-- 主列表区域 -->
 			<view class="settings-list-container">
-				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index" @click="list_method(bar.method,bar.args)" v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)" :class="{'setting-item-highlight': bar.highlight}">
-					<text class="setting-item-text" :class="{'setting-item-text-highlight': bar.highlight}">{{$t(bar.title)}}</text>
+				<view class="setting-item" v-for="(bar,index) in bar_list" :key="index"
+					@click="list_method(bar.method,bar.args)"
+					v-if="!bar.para.need_login ||(isLogin&&bar.para.need_login)"
+					:class="{'setting-item-highlight': bar.highlight}">
+					<text class="setting-item-text"
+						:class="{'setting-item-text-highlight': bar.highlight}">{{$t(bar.title)}}</text>
 				</view>
 
 				<!-- #ifdef APP-PLUS -->
@@ -42,18 +46,21 @@
 					<!-- 用户头像 -->
 					<view class="profile-avatar-section">
 						<view class="profile-avatar-circle">
-							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill"></image>
+							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill">
+							</image>
 						</view>
 					</view>
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">{{ $t('my_phone') }} : {{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
+						<text class="profile-info-label">{{ $t('my_phone') }} :
+							{{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
 					<!-- Phone No -->
 					<view class="profile-phone-row">
-						<text class="profile-phone-label">{{ $t('phone_no') }}: {{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
+						<text class="profile-phone-label">{{ $t('phone_no') }}:
+							{{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
 						<!-- <image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image> -->
 					</view>
 
@@ -95,38 +102,41 @@
 
 					<!-- 原来的联系方式列表，用 v-if="false" 隐藏 -->
 					<view v-if="false">
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('viber') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">09789456123</text>
-							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('viber') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">09789456123</text>
+								<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('telegram') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">09789456123</text>
-							<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('telegram') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">09789456123</text>
+								<view class="contact-copy-button" @click="copyToClipboard('09789456123')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 
-					<view class="contact-row-item">
-						<text class="contact-row-label">{{ $t('email') }}</text>
-						<view class="contact-input-wrapper">
-							<text class="contact-input-value">mmbookies@test.com</text>
-							<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
-								<text class="copy-button-text">{{ $t('copy') }}</text>
-								<image class="copy-button-icon" src="/static/icon/ucenter/copy.png" mode="aspectFit"></image>
+						<view class="contact-row-item">
+							<text class="contact-row-label">{{ $t('email') }}</text>
+							<view class="contact-input-wrapper">
+								<text class="contact-input-value">mmbookies@test.com</text>
+								<view class="contact-copy-button" @click="copyToClipboard('mmbookies@test.com')">
+									<text class="copy-button-text">{{ $t('copy') }}</text>
+									<image class="copy-button-icon" src="/static/icon/ucenter/copy.png"
+										mode="aspectFit"></image>
+								</view>
 							</view>
 						</view>
-					</view>
 					</view>
 				</view>
 			</view>
@@ -248,24 +258,34 @@
 				</view>
 				<view class="modal-body">
 					<!-- Old Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
-						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password" :placeholder="$t('enter_old_password')" @focus="old_password_focused = true" @blur="handleOldPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': old_password_focused, 'input-error': old_password_error}">
+						<input class="pwd-input" :type="show_old_password ? 'text' : 'password'" v-model="old_password"
+							:placeholder="$t('enter_old_password')" @focus="old_password_focused = true"
+							@blur="handleOldPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_old_password = !show_old_password">
 							<text :class="show_old_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
 					</view>
 
 					<!-- New Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
-						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password" :placeholder="$t('enter_new_password')" @focus="new_password_focused = true" @blur="handleNewPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': new_password_focused, 'input-error': new_password_error}">
+						<input class="pwd-input" :type="show_new_password ? 'text' : 'password'" v-model="new_password"
+							:placeholder="$t('enter_new_password')" @focus="new_password_focused = true"
+							@blur="handleNewPasswordBlur" @input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_new_password = !show_new_password">
 							<text :class="show_new_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
 					</view>
 
 					<!-- Confirm Password 输入框 -->
-					<view class="pwd-input-wrapper" :class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
-						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'" v-model="confirm_password" :placeholder="$t('enter_confirm_new_password')" @focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur" @input="clearPasswordErrors" />
+					<view class="pwd-input-wrapper"
+						:class="{'input-focused': confirm_password_focused, 'input-error': confirm_password_error}">
+						<input class="pwd-input" :type="show_confirm_password ? 'text' : 'password'"
+							v-model="confirm_password" :placeholder="$t('enter_confirm_new_password')"
+							@focus="confirm_password_focused = true" @blur="handleConfirmPasswordBlur"
+							@input="clearPasswordErrors" />
 						<view class="eye-icon" @click="show_confirm_password = !show_confirm_password">
 							<text :class="show_confirm_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
 						</view>
@@ -310,14 +330,8 @@
 		<customer-service></customer-service>
 
 		<!-- 密码修改结果提示弹窗 -->
-		<ConfirmDialog
-			:visible="showPwdResultDialog"
-			:title="pwdResultDialogTitle"
-			:message="pwdResultDialogMessage"
-			:confirmText="$t('ok')"
-			:showCancel="false"
-			@confirm="showPwdResultDialog = false"
-		/>
+		<ConfirmDialog :visible="showPwdResultDialog" :title="pwdResultDialogTitle" :message="pwdResultDialogMessage"
+			:confirmText="$t('ok')" :showCancel="false" @confirm="showPwdResultDialog = false" />
 	</view>
 </template>
 
@@ -327,12 +341,14 @@
 	import dateFormatUtils from "../../utils/utils.js"
 	import CustomerService from '@/components/common/customer-service.vue'
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
+	import headerCollapse from '@/mixins/headerCollapse.js'
 
 	export default {
 		components: {
 			CustomerService,
 			ConfirmDialog,
 		},
+		mixins: [headerCollapse],
 		name: "ucenter",
 		data() {
 			return {
@@ -343,7 +359,7 @@
 				picker: '',
 				contact2: '',
 				contact: [],
-				headerHeight: 210, // 默认占位高度，等待 header 组件计算后更新
+				headerHeight: uni.getStorageSync('Authorization') ? 270 : 201, // 默认占位高度，等待 header 组件计算后更新
 				bar_list: [
 					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
@@ -361,7 +377,7 @@
 						content: '',
 						method: 'goto',
 						args: ['/pages/ucenter/invite/index'],
-						img: '../../static/icon/ucenter/invite.png',
+						img: '../../static/icon/ucenter/referral.svg',
 						para: {
 							need_login: true
 						},
@@ -428,7 +444,7 @@
 					// 	content: '',
 					// 	method: 'goto',
 					// 	args: ['/pages/ucenter/invite/index'],
-					// 	img: '../../static/icon/ucenter/invite.png',
+					// 	img: '../../static/icon/ucenter/referral.svg',
 					// 	para: {
 					// 		need_login: true
 					// 	},
@@ -590,7 +606,10 @@
 					const isSelfClosing = match[4] === '/'
 
 					if (tagName === 'br' || (isSelfClosing && tagName === 'br')) {
-						const brNode = { name: 'br', attrs: {} }
+						const brNode = {
+							name: 'br',
+							attrs: {}
+						}
 						if (currentParent && currentParent.children) {
 							currentParent.children.push(brNode)
 						} else {
@@ -619,7 +638,11 @@
 								nodes.push(aNode)
 							}
 						} else if (tagName === 'p') {
-							const pNode = { name: 'p', attrs: {}, children: [] }
+							const pNode = {
+								name: 'p',
+								attrs: {},
+								children: []
+							}
 							nodes.push(pNode)
 							currentParent = pNode
 						}
@@ -665,7 +688,10 @@
 					if (m.index > lastIdx) {
 						const before = text.substring(lastIdx, m.index)
 						if (before) {
-							parts.push({ type: 'text', text: before })
+							parts.push({
+								type: 'text',
+								text: before
+							})
 						}
 					}
 					parts.push({
@@ -674,7 +700,10 @@
 							href: m[0],
 							style: 'color: #4fb3bf; text-decoration: underline;'
 						},
-						children: [{ type: 'text', text: m[0] }]
+						children: [{
+							type: 'text',
+							text: m[0]
+						}]
 					})
 					lastIdx = m.index + m[0].length
 				}
@@ -682,12 +711,18 @@
 				if (lastIdx < text.length) {
 					const after = text.substring(lastIdx)
 					if (after) {
-						parts.push({ type: 'text', text: after })
+						parts.push({
+							type: 'text',
+							text: after
+						})
 					}
 				}
 
 				if (parts.length === 0 && text) {
-					parts.push({ type: 'text', text })
+					parts.push({
+						type: 'text',
+						text
+					})
 				}
 				return parts
 			},
@@ -786,7 +821,7 @@
 
 				// 检查是否登录
 				if (!_this.isLogin) {
-					uni.showModal({
+					this.$notice.show({
 						title: _this.$t('tips'),
 						content: _this.$t('please_sign_in_to_receive_the_coupon'),
 						showCancel: false,
@@ -855,7 +890,7 @@
 							const newWindow = window.open(gameUrl, '_blank')
 							if (!newWindow) {
 								// 如果被拦截，提示用户或使用备用方案
-								uni.showModal({
+								this.$notice.show({
 									title: _this.$t('tips'),
 									content: _this.$t('allow_popups'),
 									confirmText: _this.$t('open_now'),
@@ -864,7 +899,8 @@
 										if (modalRes.confirm) {
 											// 用户确认后，跳转到webview页面
 											uni.navigateTo({
-												url: '/pages/webview/index?url=' + encodeURIComponent(gameUrl)
+												url: '/pages/webview/index?url=' +
+													encodeURIComponent(gameUrl)
 											})
 										}
 									}
@@ -881,7 +917,7 @@
 						// #endif
 
 					} else {
-						uni.showModal({
+						this.$notice.show({
 							title: _this.$t('error_title'),
 							content: res.data.message || _this.$t('unable_enter_lobby'),
 							showCancel: false,
@@ -998,7 +1034,8 @@
 
 				if (!isValid) {
 					this.new_password_error = true
-					this.password_error_message = this.$t('password_must_contain') || 'Password must be at least 8 characters with uppercase, lowercase and number'
+					this.password_error_message = this.$t('password_must_contain') ||
+						'Password must be at least 8 characters with uppercase, lowercase and number'
 				} else {
 					this.new_password_error = false
 					this.password_error_message = ''
@@ -1061,7 +1098,8 @@
 					this.hidePasswordChangeModal()
 					this.$nextTick(() => {
 						_this.pwdResultDialogTitle = _this.$t('tips')
-						_this.pwdResultDialogMessage = _this.$t('The new password is the same as the old one') || 'The new password cannot be the same as the old password'
+						_this.pwdResultDialogMessage = _this.$t('The new password is the same as the old one') ||
+							'The new password cannot be the same as the old password'
 						_this.showPwdResultDialog = true
 					})
 					return
@@ -1112,10 +1150,8 @@
 				})
 			},
 		},
-		onLoad() {
-		},
-		onShow() {
-		},
+		onLoad() {},
+		onShow() {},
 		mounted() {
 			this.configs = Object.assign({}, this.$store.state.configs)
 			console.log(this.configs);
@@ -1128,7 +1164,8 @@
 	/* from tangjq--- header占位元素样式 - 高度由动态计算控制 */
 	.header-placeholder {
 		width: 100%;
-		background-color: #2F5D62;
+		flex-shrink: 0;
+		transition: height 0.3s ease;
 	}
 
 	.main-scroll-view {
@@ -1136,15 +1173,26 @@
 		height: 0;
 		background: #fff;
 	}
-	
+
+	.ucenter-content-scroll {
+		flex: 1;
+		height: 0;
+		background: #fff;
+		border-radius: 20px 20px 0 0;
+		position: relative;
+		z-index: 1;
+	}
+
 	.ucenter-page {
-		background: #2F5D62;
 		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 
 	/* 顶部栏 */
 	.ucenter-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 40px 20px 20px 20px;
 		text-align: center;
 	}
@@ -1177,7 +1225,7 @@
 		width: 60px;
 		height: 60px;
 		border-radius: 50%;
-		background: #2F5D62;
+		background: $color-primary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1239,12 +1287,12 @@
 	.settings-icon-img {
 		width: 28px;
 		height: 28px;
-		tint-color: #2F5D62;
+		tint-color: $color-primary;
 	}
 
 	/* 快捷图标区域 */
 	.quick-icons-container {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 0 16px 24px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -1290,7 +1338,7 @@
 
 	.setting-item {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		margin-bottom: 20px;
@@ -1300,18 +1348,18 @@
 	.setting-item-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	/* 高亮提醒样式 - 联系我们、关于我们 */
 	.setting-item-highlight {
-		border-color: #5FB5BD;
-		background: linear-gradient(135deg, #fff 0%, #E8F4F5 100%);
+		border-color: $color-secondary;
+		background: linear-gradient(135deg, #fff 0%, $bg-color-info 100%);
 		box-shadow: 0 2px 8px rgba(47, 93, 98, 0.15);
 	}
 
 	.setting-item-text-highlight {
-		color: #5FB5BD;
+		color: $color-secondary;
 		font-weight: 700;
 		font-size: 17px;
 	}
@@ -1351,7 +1399,7 @@
 	}
 
 	.logout-modal-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 10px;
 		text-align: center;
 		border-radius: 16px 16px 0 0;
@@ -1370,7 +1418,7 @@
 
 	.logout-question {
 		font-size: 16px;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -1382,7 +1430,7 @@
 	}
 
 	.logout-btn-confirm {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1395,7 +1443,7 @@
 	}
 
 	.logout-btn-cancel {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1432,7 +1480,7 @@
 	}
 
 	.modal-header {
-		background: #2F5D62;
+		background: $color-primary;
 		padding: 10px;
 		display: flex;
 		justify-content: space-between;
@@ -1472,7 +1520,7 @@
 		width: 100px;
 		height: 100px;
 		border-radius: 50%;
-		// background: #2F5D62;
+		// background: $color-primary;
 		overflow: hidden;
 	}
 
@@ -1511,7 +1559,7 @@
 
 	.profile-change-pwd-btn {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1521,11 +1569,11 @@
 	.profile-change-pwd-text {
 		font-size: 16px;
 		font-weight: 400;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.profile-save-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1539,7 +1587,7 @@
 
 	/* Contact 弹窗样式 */
 	.live-chat-btn {
-		background: linear-gradient(135deg, #2F5D62, #5FB5BD);
+		background: linear-gradient(135deg, $color-primary, $color-secondary);
 		border-radius: 12px;
 		padding: 16px 20px;
 		display: flex;
@@ -1574,7 +1622,7 @@
 
 	.contact-description {
 		font-size: 14px;
-		color: #2F5D62;
+		color: $color-primary;
 		line-height: 1.5;
 		display: block;
 		margin-bottom: 24px;
@@ -1582,7 +1630,7 @@
 
 	.contact-rich-text {
 		font-size: 14px;
-		color: #1e3a5f;
+		color: $color-primary;
 		line-height: 1.8;
 		margin-bottom: 16px;
 		word-break: break-all;
@@ -1610,7 +1658,7 @@
 		flex-direction: row;
 		align-items: center;
 		background: #fff;
-		border: 2px solid #5FB5BD;
+		border: 2px solid $color-secondary;
 		border-radius: 20px;
 		overflow: hidden;
 		height: 38px;
@@ -1627,7 +1675,7 @@
 	}
 
 	.contact-copy-button {
-		background: #5FB5BD;
+		background: $color-secondary;
 		padding: 8px 14px;
 		display: flex;
 		flex-direction: row;
@@ -1669,7 +1717,7 @@
 
 	.rule-number {
 		font-size: 14px;
-		color: #2F5D62;
+		color: $color-primary;
 		font-weight: 600;
 		margin-right: 8px;
 		flex-shrink: 0;
@@ -1721,7 +1769,7 @@
 	}
 
 	.language-confirm-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1772,7 +1820,7 @@
 
 	.support-link-text {
 		font-size: 14px;
-		color: #2F5D62;
+		color: $color-primary;
 		// text-decoration: underline;
 	}
 
@@ -1835,7 +1883,7 @@
 
 	.pwd-cancel-btn {
 		background: #fff;
-		border: 2px solid #2F5D62;
+		border: 2px solid $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;
@@ -1846,11 +1894,11 @@
 	.pwd-cancel-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #2F5D62;
+		color: $color-primary;
 	}
 
 	.pwd-save-btn {
-		background: #2F5D62;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		text-align: center;

@@ -1,13 +1,14 @@
 <template>
-	<view class="bg-white full-page">
+	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
 		<!-- 顶栏 -->
 		<view class="title-bar" style="height: auto;">
 			<view class="flex-row justify-between align-center" style="padding: 10px 15px;">
 				<view class="flex-row align-center" style="">
-					<image src="/static/icon/basic/back.svg" mode="widthFix" class="width-30px"
-						@click="goBack()"></image>
-					<image src="/static/icon/ucenter/wallet2.svg" mode="widthFix" class="width-20px margin-left-sm"></image>
+					<theme-icon name="back" class="width-30px"
+						color="var(--theme-icon-on-primary, #fff)" @click="goBack()"></theme-icon>
+					<theme-icon name="wallet2" class="width-20px margin-left-sm"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<text class="title-text margin-left-sm">{{$t('charge_history') || 'Charge Records'}}</text>
 				</view>
 				<view class="flex-row align-center">
@@ -293,7 +294,12 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	.dark-teal-bg {
+
+		min-height: 100vh;
+	}
+
 .record-item {
 	margin: 10px 15px;
 	background-color: #ffffff;

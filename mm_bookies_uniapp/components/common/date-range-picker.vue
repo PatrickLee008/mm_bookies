@@ -42,7 +42,8 @@
 					startDate,
 					endDate
 				} = this.getDateRange(result.value)
-				this.$emit('click_option', [this.formatDate(startDate), this.formatDate(endDate)])
+				// from tangjq--- 第三个参数传出预设 label（如 Today / Yesterday / Weekly 等），便于调用方直接显示
+				this.$emit('click_option', [this.formatDate(startDate), this.formatDate(endDate)], result.label)
 				this.set_dialog_hide(true)
 			},
 			formatDate(date) {

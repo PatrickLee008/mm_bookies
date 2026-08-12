@@ -40,7 +40,9 @@
 
 		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
+				<theme-icon name="calendar" class="width-38upx"
+					color="var(--theme-icon-primary, var(--theme-primary))"
+					@click="$refs.date_picker.show()"></theme-icon>
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
@@ -223,7 +225,7 @@
 					<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
 						{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
 					</view>
-					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #2F5D62;color: white;">
+					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: var(--theme-primary);color: white;">
 						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
 						{{$t('Place Bet')}}
 					</button>
@@ -752,20 +754,20 @@
 <style scoped lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		height: 220px;
+		height: 276px;
 		width: 100%;
 		flex-shrink: 0;
 	}
 
 	page {
-		background: #2F5D62;
+		background: $color-primary;
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #2F5D62;
+		background: $color-primary;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -852,7 +854,7 @@
 
 	/* 卡片头部 */
 	.card-header {
-		background: linear-gradient(135deg, #2E7D7C 0%, #366968 100%);
+		background: $color-primary;
 		padding: 5px;
 		display: flex;
 		flex-direction: column;
@@ -894,7 +896,7 @@
 
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
-		color: #5FB5BD;
+		color: $color-secondary;
 		min-width: 0;
 	}
 
