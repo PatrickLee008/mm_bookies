@@ -740,7 +740,8 @@ def single_bet():
                 return response
             # 让球盘HDP和大小盘OU（1\2），singleRatio 来自业务字典（见循环外获取）
             # round 到两位小数，避免 1-0.05 产生 0.9500000000000001 之类的浮点误差
-            BET_ODDS = round(1 - singleRatio, 2) if order_type in (1, 2) else match_attr.ODDS
+            # order_type 来自请求 JSON，实际为字符串（如 '1'），用 str() 归一化后再比较
+            BET_ODDS = round(1 - singleRatio, 2) if str(order_type) in ('1', '2') else match_attr.ODDS
             order_id = "%s-%s" % (user.username, round(time.time() * 1000))
             new_order = Order(ID=str(uuid.uuid4()).replace("-", ""), ORDER_ID=order_id, USER_ID=user.id,
                               USER_NAME=user.username,
