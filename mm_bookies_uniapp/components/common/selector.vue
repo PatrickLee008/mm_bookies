@@ -117,7 +117,7 @@
 
 	/* 触发器（tag）：统一使用订单筛选栏的青绿色样式，页面可按容器覆盖 */
 	.selector-tag {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		color: white;
 		gap: 6upx;
 		position: relative;
@@ -133,7 +133,7 @@
 		min-width: 220upx;
 		background-color: #F0F9FB;
 		border-radius: 16upx;
-		box-shadow: 0 6upx 20upx rgba(28, 102, 124, 0.18);
+		box-shadow: 0 6upx 20upx var(--theme-primary-alpha-18, rgba(28, 102, 124, 0.18));
 		overflow: hidden;
 	}
 
@@ -144,7 +144,7 @@
 		justify-content: space-between;
 		gap: 16upx;
 		padding: 18upx 24upx;
-		background: #1C667C;
+		background: $color-primary;
 		cursor: pointer;
 	}
 
@@ -182,11 +182,11 @@
 	}
 
 	.option-bg:active {
-		background: rgba(28, 102, 124, 0.06);
+		background: var(--theme-primary-alpha-06, rgba(28, 102, 124, 0.06));
 	}
 
 	.option-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 24upx;
 		font-weight: 500;
 		line-height: 32upx;

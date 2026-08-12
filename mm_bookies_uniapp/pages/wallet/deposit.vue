@@ -25,7 +25,9 @@
 
 			<!-- from tangjq--- 顶栏：AUTO/MANUAL 切换 -->
 			<view class="title-tab justify-around" style="box-shadow: none;padding: 10px 0;" v-if="current_progress>0">
-				<view class="register-btn" :style="`width: ${90/charge_way.length}%`" :class="item.checked?'mybg-lprimary':'mycolor-primary route-shadow'" @click="select_option(item,'charge_way')" v-for="(item,index) in charge_way" :key="index">
+				<view class="register-btn" :style="`width: ${90/charge_way.length}%`"
+					:class="item.checked?'mybg-lprimary':'mycolor-primary route-shadow'"
+					@click="select_option(item,'charge_way')" v-for="(item,index) in charge_way" :key="index">
 					{{item.label}}
 				</view>
 			</view>
@@ -38,11 +40,14 @@
 					<view class="myfont-10px height-10px">{{'Select bank you would like to transfer to'}}</view>
 				</view>
 				<view class="flex-row1 justify-center margin-top-sm">
-					<image :src="item.src" mode="heightFix" style="height: 60px;border-radius: 8px;margin: 0 10px;" :style="!item.checked?'opacity:50%':''" @click="select_option(item,'bank_list')" v-for="(item,index) in bank_list" :key="index">
+					<image :src="item.src" mode="heightFix" style="height: 60px;border-radius: 8px;margin: 0 10px;"
+						:style="!item.checked?'opacity:50%':''" @click="select_option(item,'bank_list')"
+						v-for="(item,index) in bank_list" :key="index">
 					</image>
 				</view>
 				<!-- tips -->
-				<view class="width-100 flex-column1 align-start margin-tb padding-lr-sm text-red myfont-13px" style="font-size: 1rem;line-height: 1.1;">
+				<view class="width-100 flex-column1 align-start margin-tb padding-lr-sm text-red myfont-13px"
+					style="font-size: 1rem;line-height: 1.1;">
 					<view class="text-bold">
 						{{$t('important_notice')}}:
 					</view>
@@ -55,12 +60,16 @@
 				</view>
 				<!-- 输入框 -->
 				<view class="flex-column mybg-lprimary text-white width-100" style="position: relative">
-					<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount" placeholder-class="text-white" maxlength="7" placeholder="">
-					<view class="limit">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} and Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</view>
+					<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount"
+						placeholder-class="text-white" maxlength="7" placeholder="">
+					<view class="limit">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} and Maximum
+						{{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</view>
 				</view>
 				<!-- 快速选择 -->
-				<view style="display: flex;flex-direction: row;flex-wrap:wrap;justify-content:space-between;padding: 5px 40px;width: 100%;">
-					<view class="amount-select" style="" v-for="(item,index) in amount_list" :key="index" @click="amount = item">{{numberFormat(item)}}
+				<view
+					style="display: flex;flex-direction: row;flex-wrap:wrap;justify-content:space-between;padding: 5px 40px;width: 100%;">
+					<view class="amount-select" style="" v-for="(item,index) in amount_list" :key="index"
+						@click="amount = item">{{numberFormat(item)}}
 					</view>
 				</view>
 
@@ -79,7 +88,8 @@
 
 			<!-- from tangjq--- Step 1 AUTO: 银行卡选择 -->
 			<view class="" style="margin-left: 10%;width: 80%;" v-if="current_progress==1 && chargeForm.charge_way==0">
-				<input class="search-rec" style="" :placeholder="$t('search')" placeholder-class="cuIcon-search mycolor-info" v-model="card_search" @input="clean_acc" />
+				<input class="search-rec" style="" :placeholder="$t('search')"
+					placeholder-class="cuIcon-search mycolor-info" v-model="card_search" @input="clean_acc" />
 				<view class="flex-row justify-between myfont-15px mycolor-primary margin-top-lg">
 					<view class="myfont-19px">{{$t('Select_your_bank')}}</view>
 					<view class="mybg-grey" style="padding: 0 6px;" v-if="card_list.length>0" @click="edit_card()">
@@ -89,10 +99,15 @@
 				</view>
 
 				<view class="flex-column radius-10px" :class="!editing?'round-border':'no-right-border'" style="">
-					<view class="flex-row justify-between myfont-10px text-black height-70px" v-for="(card,index) in filtered_card_list" :key="index" @click="editing?'':select_option(card,'card_list',1)" style="line-height: 1.1;padding: 8px 0 8px 8px;border-radius: 4px;" :style="index+1<card_list.length?'border-bottom: solid darkgray 1px;':''">
+					<view class="flex-row justify-between myfont-10px text-black height-70px"
+						v-for="(card,index) in filtered_card_list" :key="index"
+						@click="editing?'':select_option(card,'card_list',1)"
+						style="line-height: 1.1;padding: 8px 0 8px 8px;border-radius: 4px;"
+						:style="index+1<card_list.length?'border-bottom: solid darkgray 1px;':''">
 						<view class="flex-row1">
 							<view class="flex-column1 justify-center align-center">
-								<image class="height-50px width-50px" style="border-radius: 8px;" :src="`/static/icon/register/${card.bank_code}.png`"></image>
+								<image class="height-50px width-50px" style="border-radius: 8px;"
+									:src="`/static/icon/register/${card.bank_code}.png`"></image>
 							</view>
 							<view class="flex-column1 justify-center align-start myfont-11px margin-left">
 								<view class="myfont-12px text-bold text-black">{{ $t('account_number') }}</view>
@@ -103,7 +118,9 @@
 							</view>
 						</view>
 						<view class="width-70px">
-							<view class="height-70px flex-column text-white myfont-14px radius-right-6px" :class="card.is_default?'mybg-linfo':''" :style="card.is_default?'color:#666666':'background-color: #E02B2B;'" v-if="editing" @click="card.is_default?'':removeBank(card)">
+							<view class="height-70px flex-column text-white myfont-14px radius-right-6px account-remove-btn"
+								:class="{ 'disabled-action': card.is_default }" v-if="editing"
+								@click="card.is_default?'':removeBank(card)">
 								{{ $t('remove') }}
 							</view>
 							<view class="flex-column1 align-center justify-center" v-else>
@@ -117,21 +134,26 @@
 					</view>
 				</view>
 
-				<view class="flex-row myfont-10px text-black height-70px radius-10px margin-top-lg" style="border: solid darkgray 1px;padding: 8px 20px;border-radius: 4px;" @click="show_add_modal('add')">
+				<view class="flex-row myfont-10px text-black height-70px radius-10px margin-top-lg"
+					style="border: solid darkgray 1px;padding: 8px 20px;border-radius: 4px;"
+					@click="show_add_modal('add')">
 					<text class="cuIcon-roundadd myfont-28px mycolor-lprimary" style="">
 					</text>
 					<text class="myfont-17px margin-left-lg text-black">{{ $t('add_bank_manually') }}</text>
 				</view>
 
-				<view class="height-45px radius-10px margin-top flex-column" :class="acc_checked?'mybg-lprimary':'mybg-linfo'" @click="auto_submit()">
+				<view class="height-45px radius-10px margin-top flex-column mybg-lprimary"
+					:class="{ 'disabled-action': !acc_checked }" @click="auto_submit()">
 					{{$t('proceed_selected_account')}}
 				</view>
-				<view class="flex-row1 width-100vw margin-top-sm align-start height-20px" style="line-height: 1;position: absolute;left: 0;">
+				<view class="flex-row1 width-100vw margin-top-sm align-start height-20px"
+					style="line-height: 1;position: absolute;left: 0;">
 					<view class="width-45 height-50" style="border-bottom: dashed darkgray 1px;"></view>
 					<text class="margin-lr-sm">{{language.or}}</text>
 					<view class="width-45 height-50" style="border-bottom: dashed darkgray 1px;"></view>
 				</view>
-				<view class="mybg-lprimary height-45px radius-10px flex-column" style="margin-top: 40px;" @click="show_add_modal('one-time')">
+				<view class="mybg-lprimary height-45px radius-10px flex-column" style="margin-top: 40px;"
+					@click="show_add_modal('one-time')">
 					{{$t('proceed_one_time_payment')}}
 				</view>
 			</view>
@@ -140,14 +162,18 @@
 			<view v-if="current_progress==1 && chargeForm.charge_way==1">
 				<!-- 收款信息 -->
 				<view class="padding">
-					<view class="flex-row justify-start myfont-10px text-bold text-black" style="line-height: 1.5;box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 8px;padding: 12px;border-radius: 4px;margin-bottom: 15px;">
+					<view class="flex-row justify-start myfont-10px text-bold text-black"
+						style="line-height: 1.5;box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 8px;padding: 12px;border-radius: 4px;margin-bottom: 15px;">
 						<view class="flex-column1 justify-center align-center margin-left-sm" @click="">
-							<image class="title-icon" style="border-radius: 0;" :src="`/static/icon/register/${agent_bankcard.rc_bank_code}.png`"></image>
+							<image class="title-icon" style="border-radius: 0;"
+								:src="`/static/icon/register/${agent_bankcard.rc_bank_code}.png`"></image>
 						</view>
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
 							<view>{{ $t('account_ame') }}</view>
-							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text class="cuIcon-copy mycolor-info text-light margin-left" @click="copy(agent_bankcard.rc_bank_account)"></text>
+							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text
+									class="cuIcon-copy mycolor-info text-light margin-left"
+									@click="copy(agent_bankcard.rc_bank_account)"></text>
 							</view>
 							<view>{{ $t('account_number') }}</view>
 						</view>
@@ -155,14 +181,18 @@
 				</view>
 
 				<!-- 金额显示 -->
-				<view class="flex-row justify-center margin-bottom text-black padding-lr" style="margin: 0px 0px 16px;font-family: __Inter_7be8ac, __Inter_Fallback_7be8ac;font-weight: 600;font-size: 0.875rem;line-height: 1.13;text-align: center;">
+				<view class="flex-row justify-center margin-bottom text-black padding-lr"
+					style="margin: 0px 0px 16px;font-family: __Inter_7be8ac, __Inter_Fallback_7be8ac;font-weight: 600;font-size: 0.875rem;line-height: 1.13;text-align: center;">
 					{{ $t('bank_change_notice') }}
 				</view>
 				<view class="width-100 flex-column padding-lr-lg" v-if="chargeForm.charge_way">
 					<view class="text-center text-red myfont-13px" style="font-size: 1rem;line-height: 1.1;">
 						{{ $t('enter_transaction_id') }}
 					</view>
-					<input class="width-100 margin-tb-sm height-30px radius-3px text-center" style="border: 2px solid #E0E0E0;" :style="transaction_disable?'background:rgb(241,241,241)':''" type="number" @input='' v-model="chargeForm.transaction_id" placeholder-class="text-white" maxlength="32" placeholder="" :disabled="transaction_disable">
+					<input class="width-100 margin-tb-sm height-30px radius-3px text-center"
+						style="border: 2px solid #E0E0E0;" :style="transaction_disable?'background:rgb(241,241,241)':''"
+						type="number" @input='' v-model="chargeForm.transaction_id" placeholder-class="text-white"
+						maxlength="32" placeholder="" :disabled="transaction_disable">
 				</view>
 				<view class="padding-left-lg myfont-16px text-black text-bold">{{language.amount}}</view>
 				<view class="flex-column mycolor-primary" style="position: relative">
@@ -174,12 +204,16 @@
 					<view class="tips" style="">
 						{{ $t('upload_slip_notice') }}
 					</view>
-					<view class="bg-img padding-sm" @tap="ViewImage" :data-url="picture" style="text-align: center;position: relative;">
+					<view class="bg-img padding-sm" @tap="ViewImage" :data-url="picture"
+						style="text-align: center;position: relative;">
 						<image :src="picture" mode="aspectFill" style="width:80px;height:80px;border:1px dashed grey">
 						</image>
 					</view>
-					<view class="mybg-lprimary height-25px myfont-13px padding-sm flex-row1 justify-center align-center radius-3px" @click="ChooseImage">
-						<text class="cuIcon-upload margin-right-xs"></text>{{picture?language.upload_slip_new:language.upload}}
+					<view
+						class="mybg-lprimary height-25px myfont-13px padding-sm flex-row1 justify-center align-center radius-3px"
+						@click="ChooseImage">
+						<text
+							class="cuIcon-upload margin-right-xs"></text>{{picture?language.upload_slip_new:language.upload}}
 					</view>
 				</view>
 			</view>
@@ -206,7 +240,8 @@
 
 				<!-- 银行图标选择 -->
 				<view class="bank-icon-selector">
-					<view class="bank-icon-item" v-for="(bank,index) in bank_add_list" :key="index" @click="select_modal_bank(bank)" :class="card_conf.bank_code==bank.bank_code?'selected':''">
+					<view class="bank-icon-item" v-for="(bank,index) in bank_add_list" :key="index"
+						@click="select_modal_bank(bank)" :class="card_conf.bank_code==bank.bank_code?'selected':''">
 						<image class="bank-icon-img" :src="`/static/icon/register/${bank.bank_code}.png`"></image>
 					</view>
 				</view>
@@ -216,18 +251,21 @@
 					<!-- Account No -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_number') }}</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()"
+							:placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_ame') }}</text>
-						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
+						<input class="form-input" type="text" @input="set_add_disable()"
+							:placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 
 				<!-- Confirm 按钮 -->
-				<button class="confirm-btn" :class="add_disable?'disabled':''" @click="modal_type=='add'?add_card():auto_submit()" :disabled="add_disable">
+				<button class="confirm-btn" :class="add_disable?'disabled':''"
+					@click="modal_type=='add'?add_card():auto_submit()" :disabled="add_disable">
 					{{ $t('confirm') }}
 				</button>
 			</view>
@@ -250,7 +288,8 @@
 					<view class="info-row">
 						<text class="info-label">{{ $t('bank type') }}</text>
 						<view class="bank-type-value">
-							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
+							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`">
+							</image>
 							<text class="bank-type-text">{{selectedCard.bank_code}}</text>
 						</view>
 					</view>
@@ -275,13 +314,16 @@
 				<!-- 金额输入 -->
 				<view class="amount-section">
 					<view class="amount-input-box">
-						<input class="amount-input-field" placeholder-class="myfont-13px" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_deposit_amount')" />
+						<input class="amount-input-field" placeholder-class="myfont-13px" type="number"
+							@input='inputNum' v-model="amount" :placeholder="$t('enter_deposit_amount')" />
 					</view>
-					<text class="amount-hint">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} Ks, Maximum {{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</text>
+					<text class="amount-hint">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} Ks, Maximum
+						{{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
-						<view class="quick-amount-btn" v-for="(item,index) in amount_list" :key="index" @click="amount = item">
+						<view class="quick-amount-btn" v-for="(item,index) in amount_list" :key="index"
+							@click="amount = item">
 							{{numberFormat(item)}}
 						</view>
 					</view>
@@ -350,7 +392,8 @@
 					<view class="confirm-row">
 						<text class="confirm-label">{{ $t('bank type') }}</text>
 						<view class="confirm-bank-value">
-							<image class="confirm-bank-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
+							<image class="confirm-bank-icon"
+								:src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
 							<text class="confirm-bank-text">Kpay</text>
 						</view>
 					</view>
@@ -384,7 +427,8 @@
 					<view class="confirm-row">
 						<text class="confirm-label">{{ $t('bank type') }}</text>
 						<view class="confirm-bank-value">
-							<image class="confirm-bank-icon" :src="`/static/icon/register/${agent_bankcard.rc_bank_code || 'KBZ Pay'}.png`"></image>
+							<image class="confirm-bank-icon"
+								:src="`/static/icon/register/${agent_bankcard.rc_bank_code || 'KBZ Pay'}.png`"></image>
 							<text class="confirm-bank-text">Kpay</text>
 						</view>
 					</view>
@@ -393,7 +437,8 @@
 						<text class="confirm-label">{{ $t('account_number') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_account || 'none'}}</text>
-							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
+							<view class="confirm-copy-btn"
+								@click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
 								<text class="cuIcon-copy"></text>
 							</view>
@@ -404,7 +449,8 @@
 						<text class="confirm-label">{{ $t('account_ame') }}</text>
 						<view class="confirm-copy-box">
 							<text class="confirm-copy-text">{{agent_bankcard.rc_bank_username || 'Payee'}}</text>
-							<view class="confirm-copy-btn" @click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
+							<view class="confirm-copy-btn"
+								@click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
 								<text class="cuIcon-copy"></text>
 							</view>
@@ -518,17 +564,11 @@
 			</view>
 		</view>
 
-	<!-- delete bank confirm dialog -->
-	<ConfirmDialog
-		:visible="showDeleteConfirm"
-		:title="$t('remove_bank_title') || 'Delete Bank Account'"
-		:message="$t('remove_bank_confirm')"
-		:confirmText="$t('Confirm')"
-		:cancelText="$t('Cancel')"
-		@confirm="confirmDeleteBank"
-		@cancel="showDeleteConfirm = false"
-	/>
-</view>
+		<!-- delete bank confirm dialog -->
+		<ConfirmDialog :visible="showDeleteConfirm" :title="$t('remove_bank_title') || 'Delete Bank Account'"
+			:message="$t('remove_bank_confirm')" :confirmText="$t('Confirm')" :cancelText="$t('Cancel')"
+			@confirm="confirmDeleteBank" @cancel="showDeleteConfirm = false" />
+	</view>
 </template>
 
 <script>
@@ -536,7 +576,7 @@
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
-import ConfirmDialog from '@/components/common/confirm-dialog.vue'
+	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	export default {
 		name: 'WalletDeposit',
@@ -1127,7 +1167,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			// 通过接口获取 admin 配置的可用银行列表并过滤 bank_add_list
 			loadAvailableBanks() {
 				var _this = this
-				_this.$http.get('/agent_bankcard/available_banks', { data: {} }, (res) => {
+				_this.$http.get('/agent_bankcard/available_banks', {
+					data: {}
+				}, (res) => {
 					if (res.statusCode == 200 && res.data) {
 						const auto = res.data.auto || []
 						const manual = res.data.manual || []
@@ -1137,12 +1179,31 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						manual.forEach(b => codes.add(b.bank_code))
 						const availableCodes = Array.from(codes)
 
-						const allBanks = [
-							{ bank_code: 'KBZ Pay', label: 'KBZPay', checked: true },
-							{ bank_code: 'Wave Money', label: 'WavePAY', checked: false },
-							{ bank_code: 'AYA', label: 'AYA PAY', checked: false },
-							{ bank_code: 'Citizen Pay', label: 'Citizen Pay', checked: false },
-							{ bank_code: 'UAB Pay', label: 'UAB Pay', checked: false },
+						const allBanks = [{
+								bank_code: 'KBZ Pay',
+								label: 'KBZPay',
+								checked: true
+							},
+							{
+								bank_code: 'Wave Money',
+								label: 'WavePAY',
+								checked: false
+							},
+							{
+								bank_code: 'AYA',
+								label: 'AYA PAY',
+								checked: false
+							},
+							{
+								bank_code: 'Citizen Pay',
+								label: 'Citizen Pay',
+								checked: false
+							},
+							{
+								bank_code: 'UAB Pay',
+								label: 'UAB Pay',
+								checked: false
+							},
 						]
 						_this.bank_add_list = allBanks.filter(bank => availableCodes.includes(bank.bank_code))
 						if (_this.bank_add_list.length > 0) {
@@ -1332,6 +1393,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 </script>
 
 <style lang="scss" scoped>
+	.account-remove-btn {
+		background-color: #E02B2B;
+	}
+
+	.disabled-action {
+		opacity: 0.5;
+	}
 	.deposit-component {
 		width: 100%;
 		height: 100%;
@@ -1483,7 +1551,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-card-item {
 		width: 100%;
 		margin-bottom: 16px;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 		border-radius: 16px;
 		background-color: #fff;
 		overflow: hidden;
@@ -1537,7 +1605,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-btn {
 		width: 100%;
 		height: 60px;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 		border-radius: 16px;
 		background-color: #fff;
 		display: flex;
@@ -1548,7 +1616,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.add-bank-text {
 		font-size: 18px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* from tangjq--- 添加银行卡弹窗样式 */
@@ -1579,7 +1647,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.dialog-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		margin: -24px -20px 0;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
@@ -1675,7 +1743,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-btn {
 		width: 100%;
 		height: 30px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
@@ -1688,8 +1756,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.confirm-btn.disabled {
-		background-color: #ccc;
-		color: #666;
+		opacity: 0.5;
 	}
 
 	/* from tangjq--- 充值弹窗样式 */
@@ -1705,7 +1772,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.deposit-modal-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		border-radius: 16px 16px 0 0;
 		display: flex;
@@ -1732,14 +1799,15 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.user-account-section {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		padding: 20px;
+		margin: 0 10px;
 	}
 
 	.section-title {
 		font-size: 18px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		text-align: center;
 		margin-bottom: 16px;
@@ -1776,7 +1844,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-type-text {
 		font-size: 12px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.info-value-box {
@@ -1792,7 +1860,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.info-value-text {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -1803,7 +1871,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.amount-input-box {
 		width: 100%;
 		height: 40px;
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1814,7 +1882,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.amount-input-field {
 		font-size: 20px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		border: none;
 		background: transparent;
@@ -1837,7 +1905,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.quick-amount-btn {
 		height: 30px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1866,7 +1934,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.payment-channel-btn {
 		flex: 1;
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1878,7 +1946,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.payment-channel-btn.selected {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border: 2px solid #4FB3BF;
 		box-sizing: border-box;
 	}
@@ -1909,7 +1977,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.continue-btn {
 		width: calc(100% - 40px);
 		height: 30px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -1922,8 +1990,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.continue-btn:disabled {
-		background-color: #ccc;
-		color: #666;
+		opacity: 0.5;
 	}
 
 	/* from tangjq--- Transfer Tips弹窗样式 */
@@ -1936,7 +2003,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.transfer-modal-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		display: flex;
 		justify-content: center;
@@ -1962,12 +2029,12 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.tips-content {
-		// background-color: #E8F4F5;
+		// background-color: $bg-color-info;
 		padding: 20px;
 	}
 
 	.tips-row {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -1978,22 +2045,22 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.tips-row.highlight {
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		margin-bottom: 0;
 	}
 
 	.tips-label {
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.tips-value {
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.tips-continue-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -2017,7 +2084,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.confirm-section {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		padding: 20px;
 		margin: 0;
 	}
@@ -2025,7 +2092,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-section-title {
 		font-size: 12px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		text-align: center;
 		margin-bottom: 5px;
@@ -2062,7 +2129,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-bank-text {
 		font-size: 12px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.confirm-value-box {
@@ -2078,7 +2145,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.confirm-value-text {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -2096,7 +2163,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.confirm-copy-text {
 		flex: 1;
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 		padding-left: 16px;
 	}
@@ -2129,7 +2196,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.arrow-icon {
 		font-size: 18px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 	}
 
@@ -2154,7 +2221,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.transfer-info-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.countdown-display {
@@ -2185,7 +2252,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.transfer-final-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 16px;
@@ -2207,7 +2274,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.notice-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		text-align: center;
 	}
@@ -2233,7 +2300,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.notice-confirm-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 14px;
@@ -2257,7 +2324,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.qrcode-modal-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		display: flex;
 		justify-content: center;
@@ -2299,7 +2366,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.save-qr-btn {
 		width: 200px;
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		margin: 20px auto 0;
@@ -2323,7 +2390,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.qrcode-tips {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		padding: 20px;
 		margin: 0;
 		display: flex;
@@ -2333,7 +2400,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.qrcode-tips-text {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		line-height: 1.5;
 	}
@@ -2366,7 +2433,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.qrcode-info-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.qrcode-countdown {
@@ -2384,7 +2451,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.qrcode-continue-btn {
 		width: calc(100% - 40px);
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 18px;

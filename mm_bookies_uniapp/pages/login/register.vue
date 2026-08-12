@@ -396,13 +396,11 @@
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background:
-			/* 第三层（最上层）：左下角光晕 */
-			radial-gradient(circle at 0% 100%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第二层：右上角光晕 */
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第一层（最底层）：线性渐变底色 */
-			linear-gradient(135deg, #103D43 0%, #103D43 56%, #103D43 100%);
+		background-color: var(--theme-register-background-color, #{$theme-page-start});
+		background-image: var(--theme-register-background-image, #{$theme-auth-background});
+		background-position: var(--theme-register-background-position, center);
+		background-size: var(--theme-register-background-size, cover);
+		background-repeat: var(--theme-register-background-repeat, no-repeat);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -495,14 +493,14 @@
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: #1C667C;
+		border-color: $color-primary;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	/* 标题区域 */
@@ -646,7 +644,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: #50C8CE;
+		background-color: $color-secondary-light;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -676,20 +674,19 @@
 	}
 
 	.register-link {
+		font-weight: bold;
 		text-align: center;
 		font-size: 24rpx;
+		font-style: italic;
 	}
 
 	.register-text {
 		color: rgba(255, 255, 255, 0.9);
-		font-style: italic;
-		font-weight: 400;
 	}
 
 	.register-link-text {
-		color: #50C8CE;
+		color: $color-secondary-light;
 		text-decoration: underline;
-		font-weight: 600;
 	}
 
 	/* Contact Support 区域 */

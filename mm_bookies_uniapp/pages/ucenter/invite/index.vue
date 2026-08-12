@@ -653,18 +653,22 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
@@ -695,17 +699,17 @@
 	}
 
 	.invite-dashboards .dashboard-bonus {
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	.invite-dashboards .dashboard-user {
-		background: #236f83;
+		background: $color-secondary;
 	}
 
 	.invite-section-title {
 		display: block;
 		margin: 16px 0 10px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 700;
 	}
@@ -747,8 +751,8 @@
 		margin-top: 14px;
 		padding: 16px 14px 14px;
 		border-radius: 12px;
-		background: #effafa;
-		color: #1C667C;
+		background: $bg-color-info;
+		color: $color-primary;
 	}
 
 	.referral-title {
@@ -771,7 +775,7 @@
 		margin-top: 9px;
 		padding: 8px 12px;
 		border-radius: 10px;
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 	}
 
@@ -783,14 +787,14 @@
 	.code-value {
 		display: block;
 		margin-top: 2px;
-		color: #2bb8ca;
+		color: $color-secondary-light;
 		font-size: 22px;
 		font-weight: 700;
 		letter-spacing: 1px;
 	}
 
 	.copy-icon {
-		color: #2bb8ca;
+		color: $color-primary;
 		font-size: 18px;
 	}
 
@@ -801,7 +805,7 @@
 		height: 31px;
 		margin-top: 8px;
 		border-radius: 10px;
-		background: #236f83;
+		background: $color-secondary;
 		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
@@ -846,7 +850,7 @@
 	}
 
 	.dashboard-user {
-		background-color: #e8f4f8;
+		background-color: $bg-color-info;
 	}
 
 	.rec-btn {
@@ -870,6 +874,7 @@
 		justify-content: center;
 		font-size: 11px;
 		font-weight: bold;
+		background: $color-primary;
 	}
 
 	.dashed-rec {
@@ -906,7 +911,7 @@
 		align-items: center;
 		padding: 8px 20px;
 		margin: 12px 0 0;
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 8px;
 		color: white;
 		font-size: 13px;
@@ -920,7 +925,7 @@
 		border-radius: 12px;
 		margin: 10px 0 14px;
 		overflow: hidden;
-		color: #1C667C;
+		color: $color-primary;
 		box-shadow: 0 1px 3px rgba(18, 63, 70, 0.14);
 	}
 
@@ -930,7 +935,7 @@
 		justify-content: space-between;
 		min-height: 35px;
 		padding: 8px 12px;
-		background: #236f83;
+		background: $color-secondary;
 		color: #fff;
 	}
 
@@ -977,7 +982,7 @@
 
 	.activity-summary-value {
 		margin-top: 2px;
-		color: #22b6c8;
+		color: $color-secondary-light;
 		font-size: 13px;
 		font-weight: 700;
 	}
@@ -999,7 +1004,7 @@
 	.method-card > .method-title {
 		margin: 0;
 		padding: 9px 12px;
-		background: #236f83;
+		background: $color-secondary;
 		color: #fff;
 	}
 
@@ -1043,7 +1048,7 @@
 	.activity-achievement .method-card > .inner-rec > text:first-child {
 		flex: 1;
 		max-width: 47% !important;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 11px;
 		font-weight: 700;
 		line-height: 14px;
@@ -1069,11 +1074,7 @@
 	}
 
 	.activity-achievement .method-card .rec-btn-sm.claim-enabled {
-		background: #1C667C !important;
-	}
-
-	.activity-achievement .method-card .rec-btn-sm.claim-disabled {
-		background: #8DB2BD !important;
+		background: $color-primary !important;
 	}
 
 	.activity-achievement .method-card > .inner-rec > view:last-child > view:last-child {
@@ -1100,7 +1101,7 @@
 		margin: 0;
 		padding: 9px 12px;
 		border-radius: 12px 12px 0 0;
-		background: #236f83;
+		background: $color-secondary;
 		color: #fff;
 	}
 
@@ -1117,7 +1118,7 @@
 		padding: 0;
 		border-radius: 0;
 		background: transparent;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 	}
 
@@ -1158,7 +1159,7 @@
 		margin: 8px 12px 12px;
 		padding: 0;
 		background: transparent;
-		color: #1C667C;
+		color: $color-primary;
 		width: auto;
 	}
 
@@ -1170,17 +1171,18 @@
 		height: 29px;
 		margin: 0 12px 12px;
 		border-radius: 10px;
+		background: $color-primary;
 		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
 	}
 
 	.claim-enabled {
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	.claim-disabled {
-		background: #8DB2BD;
+		opacity: 0.5;
 	}
 
 	.activity-card-body .participate-btn,
@@ -1195,7 +1197,7 @@
 	}
 
 	.activity-card-body .participate-btn {
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	.rules-modal {
@@ -1217,7 +1219,7 @@
 		font-size: 11px;
 		font-weight: bold;
 		background: transparent;
-		color: #22b6c8;
+		color: $color-secondary-light;
 	}
 
 	.activity-status-badge::before {
@@ -1225,12 +1227,12 @@
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
-		background: #22b6c8;
+		background: $color-secondary-light;
 	}
 
 	.status-active {
 		background: transparent;
-		color: #22b6c8;
+		color: $color-secondary-light;
 	}
 
 	.status-inactive {
@@ -1253,7 +1255,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		background: #1C667C;
+		background: $color-primary;
 		color: white;
 		padding: 8px 20px;
 		margin-bottom: 5px;

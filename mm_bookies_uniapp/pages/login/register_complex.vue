@@ -9,7 +9,7 @@
 				<view class="myfont-11px margin-bottom">{{language[title_list[current_progress - 1]]}}</view>
 				<view class="flex-row justify-center width-100">
 					<view class="progress-btn"
-						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, rgb(12, 53, 106) 60%, rgb(50, 106, 178) 100%);'"
+						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, var(--theme-primary) 60%, var(--theme-secondary) 100%);'"
 						@click="progressChange(-1)">
 						<view class="text-white cuIcon-triangleupfill myfont-12px" style="transform: rotate(-90deg);">
 						</view>
@@ -19,7 +19,7 @@
 						<view class="mybg-primary" :style="[{ width:loading?(current_progress*25)+'%':''}]"></view>
 					</view>
 					<view class="progress-btn" @click="progressChange(1)"
-						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, rgb(12, 53, 106) 60%, rgb(50, 106, 178) 100%);'">
+						:style="loginDisabled?'background-color:gray':'background-image: linear-gradient(130deg, var(--theme-primary) 60%, var(--theme-secondary) 100%);'">
 						<view class="text-white cuIcon-triangleupfill myfont-12px" style="transform: rotate(90deg);">
 						</view>
 					</view>
@@ -773,7 +773,11 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-register-background-color, #{$theme-page-start});
+		background-image: var(--theme-register-background-image, #{$theme-auth-background});
+		background-position: var(--theme-register-background-position, center);
+		background-size: var(--theme-register-background-size, cover);
+		background-repeat: var(--theme-register-background-repeat, no-repeat);
 		min-height: 100vh;
 	}
 
@@ -806,7 +810,7 @@
 		width: 25px;
 		height: 25px;
 		border-radius: 50%;
-		filter: drop-shadow(rgb(12, 53, 106) 0px 0px 2px);
+		filter: drop-shadow(var(--theme-header-background-color, #{$theme-header-start}) 0px 0px 2px);
 	}
 
 	// 登录样式

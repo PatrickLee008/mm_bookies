@@ -43,11 +43,11 @@
 					</view>
 					<view class="balance-actions">
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0')">
-							<image class="" src="/static/deposit.svg" mode="aspectFit"></image>
+							<theme-icon name="deposit" class="wallet-action-icon"></theme-icon>
 							<text>{{$t('Deposit')}}</text>
 						</view>
 						<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1')">
-							<image class="" src="/static/withdraw.svg" mode="aspectFit"></image>
+							<theme-icon name="withdraw" class="wallet-action-icon"></theme-icon>
 							<text>{{$t('Withdraw')}}</text>
 						</view>
 						<view class="cashout-action">{{$t('cash_out')}} {{ displayBalance(userInfo.total_withdraw) }}
@@ -57,24 +57,24 @@
 
 				<view class="home-nav">
 					<view class="nav-item" @click="goto('/pages/match/home?mix=0')">
-						<image src="/static/icon/nav/single.png" mode="aspectFit"></image><text>{{$t('single')}}</text>
+						<theme-icon name="single" class="nav-theme-icon"></theme-icon><text>{{$t('single')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
-						<image src="/static/icon/nav/mpl.png" mode="aspectFit"></image><text>{{$t('mixparlay')}}</text>
+						<theme-icon name="mixparlay" class="nav-theme-icon"></theme-icon><text>{{$t('mixparlay')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
-						<image class="referral-icon" src="/static/icon/ucenter/referral.svg" mode="aspectFit"></image>
+						<theme-icon name="referral" class="referral-icon"></theme-icon>
 						<text>{{$t('Referral')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/orders/home')">
-						<image src="/static/icon/nav/history.png" mode="aspectFit"></image>
+						<theme-icon name="history" class="nav-theme-icon"></theme-icon>
 						<text>{{$t('history')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/index/coupon')">
-						<image src="/static/icon/nav/deals.png" mode="aspectFit"></image><text>{{$t('Deals')}}</text>
+						<theme-icon name="deals" class="nav-theme-icon"></theme-icon><text>{{$t('Deals')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/wallet/wallet')">
-						<image src="/static/icon/nav/wallet.png" mode="aspectFit"></image><text>{{$t('wallet')}}</text>
+						<theme-icon name="wallet" class="nav-theme-icon"></theme-icon><text>{{$t('wallet')}}</text>
 					</view>
 				</view>
 			</view>
@@ -201,17 +201,20 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		background:
-			/* 第三层（最上层）：左下角光晕 */
-			radial-gradient(circle at 0% 100%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第二层：右上角光晕 */
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第一层（最底层）：线性渐变底色 */
-			linear-gradient(135deg, #103D43 0%, #103D43 56%, #103D43 100%);
+		background-color: var(--theme-home-background-color, #{$theme-page-start});
+		background-image: var(--theme-home-background-image, #{$theme-home-background});
+		background-position: var(--theme-home-background-position, center);
+		background-size: var(--theme-home-background-size, cover);
+		background-repeat: var(--theme-home-background-repeat, no-repeat);
 	}
 
 	.home-top {
 		padding: 18px 20px 16px;
+		border-bottom: 1px solid #2A626833;
+		box-shadow: 0px 4px 4px 0px #00000040;
+		box-shadow: 0px 4px 20px 0px #FFFFFF40 inset;
+		border-bottom-left-radius: 32px;
+		border-bottom-right-radius: 32px;
 	}
 
 	.home-logo {
@@ -285,7 +288,7 @@
 	.id-value,
 	.cashout-label,
 	.cashout-value {
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.id-label {
@@ -321,6 +324,7 @@
 	.settings-icon {
 		width: 22px;
 		height: 22px;
+		filter: brightness(0) invert(1);
 	}
 
 	.bell-icon.bell-ring {
@@ -377,7 +381,7 @@
 	}
 
 	.balance-value {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 18px;
 	}
 
@@ -437,16 +441,17 @@
 		height: 86px;
 		border-radius: 16px;
 		background: #fff;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 12px;
 		font-weight: 700;
 	}
 
-	.nav-item image {
+	.nav-item image,
+	.nav-item .theme-icon {
 		width: 38px;
 		height: 38px;
 		margin-bottom: 7px;
-		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
+		filter: none;
 	}
 
 	.nav-item text {
@@ -496,7 +501,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.user-summary {
@@ -532,11 +537,6 @@
 		margin-left: auto;
 	}
 
-	.user-summary .bell-icon,
-	.user-summary .settings-icon {
-		filter: brightness(0) invert(1) !important;
-	}
-
 	.user-summary .avatar-img {
 		background: transparent;
 	}
@@ -545,7 +545,7 @@
 		background: #fff;
 		border-radius: 20px;
 		padding: 14px 20px 16px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.main-balance-row,
@@ -566,7 +566,7 @@
 
 	.balance-eye {
 		font-size: 20px;
-		color: #1c667c;
+		color: $color-primary;
 	}
 
 	.promo-row {
@@ -577,7 +577,7 @@
 	.promo-label {
 		padding: 3px 12px;
 		border-radius: 12px;
-		background: #F1FAFB;
+		background: $color-secondary-light;
 		font-size: 11px;
 		font-weight: 700;
 	}
@@ -601,12 +601,17 @@
 		height: 20px;
 	}
 
+	.wallet-action .wallet-action-icon {
+		width: 20px;
+		height: 20px;
+	}
+
 	.cashout-action {
 		white-space: nowrap;
 	}
 
 	.customer-service-wrapper :deep(.customer-btn) {
-		background: #1C667C;
+		background: $color-primary;
 		border: 0;
 		border-radius: 50%;
 	}

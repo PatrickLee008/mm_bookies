@@ -127,11 +127,11 @@
 <style lang="scss">
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
@@ -141,7 +141,11 @@
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 	}
 
 	.title-bar {
@@ -210,7 +214,7 @@
 		width: 50px;
 		height: 50px;
 		border-radius: 30px;
-		background: #1C667C;
+		background: $color-primary;
 		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
 		display: flex;
 		flex-direction: column;

@@ -33,20 +33,24 @@
 				style="line-height: 1.5;">
 				<!-- <view class="flex-column1 justify-center align-center" @click=""> -->
 				<view class="flex-column1 justify-center align-center" @click="goto('../ucenter/charge')">
-					<image mode="widthFix" class="title-icon " src="/static/icon/wallet/deposit.svg" />
+					<theme-icon name="deposit" class="title-icon"
+						color="var(--theme-icon-secondary, var(--theme-secondary))"></theme-icon>
 					<text class="mycolor-lprimary">{{language.deposit}}</text>
 				</view>
 
 				<view class="flex-column1 justify-center align-center" @click="goto('../ucenter/withdraw')">
-					<image mode="widthFix" class="title-icon " src="/static/icon/wallet/withdraw.svg" />
+					<theme-icon name="withdraw" class="title-icon"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<text class="mycolor-lprimary">{{language.withdraw}}</text>
 				</view>
 				<view class="flex-column1 justify-center align-center" @click="goto('../orders/home')">
-					<image mode="widthFix" class="title-icon " src="/static/icon/wallet/history.svg" />
+					<theme-icon name="history" class="title-icon"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<text class="mycolor-lprimary">{{language.bet_history}}</text>
 				</view>
 				<view class="flex-column1 justify-center align-center" @click="relaunch">
-					<image mode="widthFix" class="title-icon " src="/static/icon/wallet/reflesh.svg" />
+					<theme-icon name="refresh" class="title-icon"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 
 					<text class="mycolor-lprimary">{{ $t('refresh') }}</text>
 				</view>
@@ -58,8 +62,9 @@
 		<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
 		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<image mode="widthFix" class="width-38upx " src="/static/image/order/calender.svg"
-					@click="$refs.date_picker.show()" />
+				<theme-icon name="calendar" class="width-38upx"
+					color="var(--theme-icon-primary, var(--theme-primary))"
+					@click="$refs.date_picker.show()"></theme-icon>
 				<!-- <view class="cuIcon-calendar mycolor-info text-bold myfont-18px" @click="$refs.date_picker.show()">
 				</view> -->
 				<view class="filter-row">
@@ -343,7 +348,11 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		min-height: 100vh;
 	}
 

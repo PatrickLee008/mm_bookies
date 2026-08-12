@@ -356,7 +356,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -378,7 +378,7 @@
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 	}
@@ -394,13 +394,13 @@
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 15px;
 		height: 15px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -409,13 +409,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -428,7 +428,7 @@
 	/* 记录项 - 参照设计稿：浅薄荷色卡片 + 底部状态条 */
 	.record-item {
 		margin: 12px 0;
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		padding: 14px 16px;
 		overflow: hidden;
@@ -452,26 +452,26 @@
 	.order-id-label {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.record-date {
 		font-size: 13px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.row-label {
 		font-size: 14px;
 		font-weight: 500;
-		color: #1C667C;
+		color: $color-primary;
 		flex-shrink: 0;
 	}
 
 	.row-value {
 		font-size: 14px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: right;
 		margin-left: 10px;
 		word-break: break-word;
@@ -533,7 +533,7 @@
 	}
 
 	.continue-btn {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		color: white;
 		padding: 10px 20px;
 		border-radius: 8px;

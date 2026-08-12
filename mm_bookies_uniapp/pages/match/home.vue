@@ -22,11 +22,11 @@
 		<!-- from tangjq--- 新的搜索框和筛选按钮布局 -->
 		<view class="new-header-wrapper">
 			<view class="new-search-bar">
-				<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
-				<input class="search-input" placeholder-style="font-style:italic;color:#1C667C" type="text"
+				<theme-icon name="search" class="search-icon" color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+				<input class="search-input" placeholder-style="font-style:italic;color:var(--theme-primary)" type="text"
 					:placeholder="$t('search_by_team')" v-model="searchKeyword" @input="handleSearchInput" />
-				<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword"
-					@tap="clearSearch"></image>
+				<theme-icon name="close" class="clear-icon" color="var(--theme-icon-on-primary, #fff)"
+					v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
 				<view>{{$t('league')}}</view>
@@ -107,8 +107,8 @@
 													:class="{'bet-btn-selected':attr.host_selected,}"
 													@click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Home</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<!-- <text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text> -->
 												</view>
 												<view class="bet-odds">
 													<text>{{calc_real_odds(attr)}}</text>
@@ -117,8 +117,8 @@
 													:class="{'bet-btn-selected':attr.guest_selected,}"
 													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Away</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<!-- <text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text> -->
 												</view>
 											</view>
 										</template>
@@ -135,8 +135,8 @@
 													:class="{'bet-btn-selected':attr.host_selected,}"
 													@click="betClick('host',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Over</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<!-- <text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text> -->
 												</view>
 												<view class="bet-odds">
 													<text>{{attr.LOSE_BALL_NUM}}+{{attr.DRAW_ODDS}}</text>
@@ -145,8 +145,8 @@
 													:class="{'bet-btn-selected':attr.guest_selected,}"
 													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Under</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+													<!-- <text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text> -->
 												</view>
 											</view>
 										</template>
@@ -277,41 +277,42 @@
 					<text class="bet-slip-title">Details</text>
 				</view>
 
-<!-- from tangjq--- 混合投注：可滚动的比赛列表区域 -->
-			<scroll-view scroll-y class="bet-slip-scroll" v-if="match_ref.mixed">
-				<view class="mix-matches-list">
-					<view class="mix-match-item" v-for="(match,index) in bet_list" :key='index'>
-						<!-- from tangjq--- 比赛时间 -->
-						<view class="mix-match-datetime">
-							<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}}
-								{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
-						</view>
-
-						<view class="mix-match-info">
-							<!-- from tangjq--- 队伍对阵 -->
-							<view class="mix-match-row mix-teams-row">
-								<text class="mix-team-name"
-									:class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
-								<text class="mix-vs">vs</text>
-								<text class="mix-team-name"
-									:class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
+				<!-- from tangjq--- 混合投注：可滚动的比赛列表区域 -->
+				<scroll-view scroll-y class="bet-slip-scroll" v-if="match_ref.mixed">
+					<view class="mix-matches-list">
+						<view class="mix-match-item" v-for="(match,index) in bet_list" :key='index'>
+							<!-- from tangjq--- 比赛时间 -->
+							<view class="mix-match-datetime">
+								<text>{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[0] : match.SLIP_DATE}}
+									{{match.SLIP_DATE && match.SLIP_DATE.includes('@') ? match.SLIP_DATE.split('@')[1] : ''}}</text>
 							</view>
 
-							<!-- from tangjq--- 投注类型 + 赔率（2列） -->
-							<view class="mix-match-row">
-								<text class="mix-row-label">{{bet_type.MIX_BODY == match.sa.MATCH_ATTR_TYPE ?'HDP':'O/U'}}</text>
-								<text class="mix-row-value">{{calc_real_odds(match.sa)}}</text>
-							</view>
+							<view class="mix-match-info">
+								<!-- from tangjq--- 队伍对阵 -->
+								<view class="mix-match-row mix-teams-row">
+									<text class="mix-team-name"
+										:class="{'text-red':match.LOSE_TEAM=='1',}">{{match.HOST_TEAM}}</text>
+									<text class="mix-vs">vs</text>
+									<text class="mix-team-name"
+										:class="{'text-red':match.LOSE_TEAM=='2',}">{{match.GUEST_TEAM}}</text>
+								</view>
 
-							<!-- from tangjq--- Bet: + 选中的队伍名（2列） -->
-							<view class="mix-match-row">
-								<text class="mix-row-label">Bet :</text>
-								<text class="mix-row-value mix-bet-choice">{{bet_content(match)}}</text>
+								<!-- from tangjq--- 投注类型 + 赔率（2列） -->
+								<view class="mix-match-row">
+									<text
+										class="mix-row-label">{{bet_type.MIX_BODY == match.sa.MATCH_ATTR_TYPE ?'HDP':'O/U'}}</text>
+									<text class="mix-row-value">{{calc_real_odds(match.sa)}}</text>
+								</view>
+
+								<!-- from tangjq--- Bet: + 选中的队伍名（2列） -->
+								<view class="mix-match-row">
+									<text class="mix-row-label">Bet :</text>
+									<text class="mix-row-value mix-bet-choice">{{bet_content(match)}}</text>
+								</view>
 							</view>
 						</view>
 					</view>
-				</view>
-			</scroll-view>
+				</scroll-view>
 
 				<!-- from tangjq--- 单注：比赛信息（完整版，参考设计稿） -->
 				<view class="single-match-info" v-if="!match_ref.mixed && match_ref.bet_match">
@@ -346,8 +347,8 @@
 							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : 'O/U')}}</text>
 						<text
 							class="bet-odds">{{match_ref.bet_match.sa ? (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
-						<text
-							class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text>
+						<!-- <text
+							class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text> -->
 					</view>
 
 					<!-- from tangjq--- 投注选项 -->
@@ -357,58 +358,62 @@
 					</view>
 				</view>
 
-<!-- from tangjq--- 投注信息和输入区域（固定在底部，不滚动） -->
-			<view class="bet-input-section">
-				<!-- Bet Time 和 Potential Winnings -->
-				<view class="bet-info-rows">
-					<view class="bet-info-row">
-						<text class="info-label">{{$t('Bet Time')}}</text>
-						<text class="info-value">{{new Date().toLocaleString()}}</text>
+				<!-- from tangjq--- 投注信息和输入区域（固定在底部，不滚动） -->
+				<view class="bet-input-section">
+					<!-- Bet Time 和 Potential Winnings -->
+					<view class="bet-info-rows">
+						<view class="bet-info-row">
+							<text class="info-label">{{$t('Bet Time')}}</text>
+							<text class="info-value">{{new Date().toLocaleString()}}</text>
+						</view>
+						<view class="bet-info-row">
+							<text class="info-label">{{$t('Potential Winnings')}}</text>
+							<text class="info-value">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
+						</view>
 					</view>
-					<view class="bet-info-row">
-						<text class="info-label">{{$t('Potential Winnings')}}</text>
-						<text class="info-value">{{$toolbox.num_format(calc_benefit(match_ref.bet_match))}}</text>
-					</view>
-				</view>
 
-				<!-- from tangjq--- Main Wallet / Promo Wallet 并排按钮，参考 MPL_Detial_Overlay.png -->
-				<view class="wallet-buttons">
-					<view class="wallet-btn wallet-btn-main" :class="{'wallet-btn-active': !use_promotion_wallet}"
-						@click="use_promotion_wallet && togglePromotionWallet()">
-						<text class="wallet-btn-label">{{$t('main_wallet')}}</text>
-						<text class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money)}}</text>
+					<!-- from tangjq--- Main Wallet / Promo Wallet 并排按钮，参考 MPL_Detial_Overlay.png -->
+					<view class="wallet-buttons">
+						<view class="wallet-btn wallet-btn-main" :class="{'wallet-btn-active': !use_promotion_wallet}"
+							@click="use_promotion_wallet && togglePromotionWallet()">
+							<text class="wallet-btn-label">{{$t('main_wallet')}}</text>
+							<text class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money)}}</text>
+						</view>
+						<view class="wallet-btn wallet-btn-promo"
+							:class="{'wallet-btn-active': use_promotion_wallet, 'wallet-btn-disabled': !canUsePromotionWallet}"
+							@click="canUsePromotionWallet && !use_promotion_wallet && togglePromotionWallet()">
+							<text class="wallet-btn-label">{{$t('promotion_wallet')}}</text>
+							<text
+								class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</text>
+						</view>
 					</view>
-					<view class="wallet-btn wallet-btn-promo" :class="{'wallet-btn-active': use_promotion_wallet, 'wallet-btn-disabled': !canUsePromotionWallet}"
-						@click="canUsePromotionWallet && !use_promotion_wallet && togglePromotionWallet()">
-						<text class="wallet-btn-label">{{$t('promotion_wallet')}}</text>
-						<text class="wallet-btn-value">{{$toolbox.floor_format($store.state.userInfo.money_promotion || 0)}}</text>
-					</view>
-				</view>
 
-				<!-- 输入框 -->
-				<view class="bet-amount-input">
-					<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum"
-						class="amount-input" />
-				</view>
-
-				<!-- from tangjq--- Min/Max Bet Amount：一行左右两侧，参考 MPL_Detial_Overlay.png -->
-				<view class="min-max-bet-row">
-					<text class="min-bet-label">Min Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_min:single_min)}}</text>
-					<text class="min-bet-label">Max Bet Amount : {{$toolbox.num_format(match_ref.mixed?mix_max:single_max)}}</text>
-				</view>
-
-				<!-- Cancel 和 Confirm 按钮 -->
-				<view class="action-buttons">
-					<view class="cancel-btn" @click="hide_bets_slip = true">
-						<text class="cancel-text">{{$t('Cancel')}}</text>
+					<!-- 输入框 -->
+					<view class="bet-amount-input">
+						<input type="number" placeholder="Please enter bet amount" v-model="amount" @input="inputNum"
+							class="amount-input" />
 					</view>
-					<view class="confirm-btn-action"
-						:class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}"
-						@click="submit()">
-						<text class="confirm-text">{{$t('Confirm')}}</text>
+
+					<!-- from tangjq--- Min/Max Bet Amount：一行左右两侧，参考 MPL_Detial_Overlay.png -->
+					<view class="min-max-bet-row">
+						<text class="min-bet-label">Min Bet Amount :
+							{{$toolbox.num_format(match_ref.mixed?mix_min:single_min)}}</text>
+						<text class="min-bet-label">Max Bet Amount :
+							{{$toolbox.num_format(match_ref.mixed?mix_max:single_max)}}</text>
+					</view>
+
+					<!-- Cancel 和 Confirm 按钮 -->
+					<view class="action-buttons">
+						<view class="cancel-btn" @click="hide_bets_slip = true">
+							<text class="cancel-text">{{$t('Cancel')}}</text>
+						</view>
+						<view class="confirm-btn-action"
+							:class="{'confirm-active': amount >= (match_ref.mixed?mix_min:single_min)}"
+							@click="submit()">
+							<text class="confirm-text">{{$t('Confirm')}}</text>
+						</view>
 					</view>
 				</view>
-			</view>
 			</view>
 		</view>
 
@@ -519,8 +524,8 @@
 
 									<view class="mybg-active round width-75upx height-65upx align-center flex-column"
 										style="">
-										<image mode="widthFix" class="width-20px "
-											src="/static/image/single/wallet-bet.svg"></image>
+										<theme-icon name="wallet" class="width-20px"
+											color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 									</view>
 									<view class="flex-column margin-left-sm align-start gap-5px"
 										style="align-items: start;">
@@ -530,8 +535,8 @@
 								</view>
 								<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-30vw"
 									@click="to_deposit()">
-									<image mode="widthFix" class="width-20px margin-right-xs"
-										src="/static/image/single/deposit.svg"></image>
+									<theme-icon name="deposit" class="width-20px margin-right-xs"
+										color="var(--theme-icon-secondary, var(--theme-secondary))"></theme-icon>
 									<view>{{$t('deposit')}}</view>
 								</button>
 							</view>
@@ -540,8 +545,8 @@
 								class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-start align-center">
 									<view class="mybg-active round width-33px height-65upx align-center flex-column">
-										<image mode="widthFix" class="width-20px"
-											src="/static/image/single/wallet-bet.svg"></image>
+										<theme-icon name="wallet" class="width-20px"
+											color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 									</view>
 									<view class="flex-column1 margin-left-sm align-start gap-5px">
 										<view class="text-light">{{$t('promotion_wallet')}}</view>
@@ -576,10 +581,11 @@
 											@input="inputNum" v-model="amount" />
 
 
-										<image class="width-20px height-20px" src="/static/image/single/close.svg"
+										<theme-icon name="close" class="width-20px height-20px"
+											color="var(--theme-icon-secondary, var(--theme-secondary))"
 											@click="clearAmount()">
 											<!-- @click="amount=match_ref.mixed?mix_min:single_min"> -->
-										</image>
+										</theme-icon>
 									</view>
 									<button class="deposit-btn mybg-active mycolor-primary myfont-12px width-35vw"
 										@click="submit()">
@@ -2038,14 +2044,14 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 	}
@@ -2104,7 +2110,11 @@
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
 		height: 100vh;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -2294,21 +2304,21 @@
 		flex-direction: row;
 		align-items: center;
 		background-color: white;
-		border-radius: 25px;
+		border-radius: $radius-large;
 		padding: 0 5px;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 	}
 
 	.search-icon {
 		width: 22px;
-		height: 2px;
+		height: 22px;
 		margin: 4px 10px 4px 0;
 	}
 
 	.search-input {
 		flex: 1;
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* from tangjq--- 清空按钮样式 */
@@ -2323,12 +2333,12 @@
 	.filter-btn {
 		position: relative;
 		height: 30px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		color: white;
 		font-weight: bold;
 		gap: 5px;
 		padding: 0 10px;
-		border-radius: 16px;
+		border-radius: $radius-large;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2383,8 +2393,8 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		background-color: #1C667C;
-		border-radius: 16px;
+		background-color: $color-primary;
+		border-radius: $radius-medium;
 		padding: 7px 12px;
 		margin-bottom: 10px;
 		width: 100%;
@@ -2428,7 +2438,7 @@
 	/* from tangjq--- 新的比赛卡片样式 */
 	.new-match-card {
 		background-color: white;
-		border-radius: 16px;
+		border-radius: $radius-large;
 		margin-bottom: 12px;
 		overflow: hidden;
 		border: 1px solid #d7e2e3;
@@ -2437,9 +2447,9 @@
 
 	.match-datetime {
 		background-color: transparent;
-		text-align: left;
+		text-align: center;
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 		padding: 10px 14px 2px;
 	}
@@ -2467,7 +2477,7 @@
 
 	.team-name {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 		text-align: center;
 		max-width: 100px;
@@ -2489,8 +2499,8 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		background-color: #1C667C;
-		border-radius: 12px;
+		background-color: $color-primary;
+		border-radius: $radius-medium;
 		padding: 9px 9px 9px 0;
 		margin-bottom: 4px;
 	}
@@ -2527,19 +2537,20 @@
 	.bet-btn {
 		flex: 1;
 		background-color: white;
-		border-radius: 10px;
+		border-radius: $radius-small;
 		padding: 10px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		min-height: 46px;
 	}
 
 	.bet-btn-selected {
-		background-color: #FFC857 !important;
+		background-color: $color-active !important;
 	}
 
 	.bet-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 600;
 	}
@@ -2556,13 +2567,13 @@
 	}
 
 	.bet-text-small {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: bold;
 	}
 
 	.bet-odds-small {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: bold;
 		font-style: italic;
@@ -2581,14 +2592,14 @@
 	}
 
 	.match-expand-btn {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		height: 28px;
 		margin: 4px 12px 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		color: white;
-		border-radius: 15px;
+		border-radius: $radius-medium;
 		cursor: pointer;
 	}
 
@@ -2624,7 +2635,7 @@
 		flex: 1;
 		background-color: #E0E0E0;
 		border-radius: 20px;
-		padding: 5px;
+		padding: 5px 10px;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -2632,20 +2643,20 @@
 	}
 
 	.total-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.total-count {
-		color: #00BCD4;
+		color: $color-secondary;
 		font-size: 18px;
 		font-weight: bold;
 	}
 
 	.confirm-btn {
 		flex: 1;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 10px;
 		padding: 5px;
 		display: flex;
@@ -2700,7 +2711,7 @@
 	}
 
 	.detail-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 20px;
 		text-align: center;
 		flex-shrink: 0;
@@ -2721,7 +2732,7 @@
 	}
 
 	.detail-match-card {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 15px;
 		padding: 15px;
 		margin-bottom: 20px;
@@ -2730,7 +2741,7 @@
 	.detail-datetime {
 		text-align: center;
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 		margin-bottom: 15px;
 	}
@@ -2756,7 +2767,7 @@
 
 	.detail-team-name {
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 		text-align: center;
 	}
@@ -2812,7 +2823,7 @@
 	}
 
 	.bet-slip-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		text-align: center;
 		flex-shrink: 0;
@@ -2841,7 +2852,7 @@
 
 	/* from tangjq--- 混合投注列表项，与左右边框有距离 */
 	.mix-match-item {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		padding: 12px 15px;
 		margin: 0 15px 12px 15px;
@@ -2860,7 +2871,7 @@
 
 	.mix-match-datetime text {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -2899,7 +2910,7 @@
 	.mix-vs {
 		font-size: 14px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		flex-shrink: 0;
 		/* from tangjq--- 防止vs文字被压缩 */
 		padding: 0 5px;
@@ -2912,17 +2923,17 @@
 		justify-content: space-between;
 		align-items: center;
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* from tangjq--- mix-match-item 卡片内的字段行：左 label / 右 value */
 	.mix-row-label {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
 	.mix-row-value {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 		text-align: right;
 	}
@@ -2934,7 +2945,7 @@
 
 	/* from tangjq--- 单注比赛信息样式 */
 	.single-match-info {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 12px;
 		padding: 10px;
 		margin: 15px;
@@ -2949,7 +2960,7 @@
 
 	.match-time {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -2985,7 +2996,7 @@
 
 	.vs-text {
 		font-size: 16px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 		margin: 0 10px;
 	}
@@ -2998,7 +3009,7 @@
 		align-items: center;
 		margin-bottom: 12px;
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.bet-type {
@@ -3023,12 +3034,12 @@
 	}
 
 	.choice-team {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
 	.choice-type {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -3042,7 +3053,7 @@
 	}
 
 	.bet-info-rows {
-		background-color: #E8F4F5;
+		background-color: $bg-color-info;
 		border-radius: 10px;
 		padding: 12px 15px;
 		margin-bottom: 15px;
@@ -3062,13 +3073,13 @@
 	}
 
 	.bet-info-row .info-label {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
 	.info-value {
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* from tangjq--- Main/Promo Wallet 并排按钮，参考 MPL_Detial_Overlay.png */
@@ -3088,22 +3099,22 @@
 		gap: 2px;
 		padding: 4px;
 		border-radius: 12px;
-		border: 1.5px solid #1C667C;
-		background: #FFFFFF;
+		border: 1.5px solid $color-primary;
+		background: $bg-color-info;
 		cursor: pointer;
 		transition: background 0.2s ease;
 	}
 
 	.wallet-btn-label {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 		line-height: 16px;
 	}
 
 	.wallet-btn-value {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 700;
 		line-height: 18px;
 	}
@@ -3111,7 +3122,7 @@
 	/* Main Wallet 默认（未选中态）：白底 + 青绿边框 + 青绿文字 */
 	.wallet-btn-main.wallet-btn-active,
 	.wallet-btn-promo.wallet-btn-active {
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	.wallet-btn-main.wallet-btn-active .wallet-btn-label,
@@ -3128,13 +3139,13 @@
 
 	.wallet-label {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
 	.wallet-value {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 	}
 
@@ -3148,7 +3159,7 @@
 	.amount-input {
 		width: 100%;
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 500;
 		text-align: center;
 		font-style: italic;
@@ -3213,7 +3224,7 @@
 	}
 
 	.confirm-btn-action.confirm-active {
-		background-color: #1C667C;
+		background-color: $color-primary;
 	}
 
 	.confirm-btn-action .confirm-text {
@@ -3262,7 +3273,7 @@
 	}
 
 	.success-popup-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 8px;
 		text-align: center;
 	}
@@ -3288,7 +3299,7 @@
 	}
 
 	.success-popup-subtitle {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 20px;
 		font-weight: bold;
 		text-align: center;
@@ -3301,7 +3312,7 @@
 	}
 
 	.success-ok-btn {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 12px;
 		padding: 8px;
 		min-width: 100px;

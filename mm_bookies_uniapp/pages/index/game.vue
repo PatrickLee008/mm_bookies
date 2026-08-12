@@ -10,9 +10,12 @@
 		<view class="search-container padding-lr-sm">
 			<view class="search-wrapper">
 				<view class="search-box">
-					<image class="search-icon" src="/static/image/single/search.png" mode="widthFix"></image>
+					<theme-icon name="search" class="search-icon"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<input class="search-input" type="text" :placeholder="$t('search')" v-model="searchKeyword" />
-					<image class="clear-icon" src="/static/image/single/close.svg" mode="widthFix" v-show="searchKeyword" @tap="clearSearch"></image>
+					<theme-icon name="close" class="clear-icon"
+						color="var(--theme-icon-secondary, var(--theme-secondary))"
+						v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 				</view>
 				<view class="filter-button" @click="openFilterPopup">
 					<view class="filter-icon">
@@ -445,17 +448,16 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
-		background-color: #02455F;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
@@ -481,7 +483,7 @@
 		background-color: #ffffff;
 		border-radius: 25px;
 		padding: 6px 15px;
-		border: 1px solid #1C667C;
+		border: 1px solid $color-primary;
 	}
 
 	.search-icon {
@@ -511,7 +513,7 @@
 	.filter-button {
 		width: 35px;
 		height: 35px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -560,7 +562,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 25px;
 		padding: 8px 20px;
 		cursor: pointer;
@@ -594,7 +596,7 @@
 		overflow: hidden;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		width: 48%;
-		background: #1C667C;
+		background: $color-primary;
 		margin-bottom: 12px;
 		transition: transform 0.2s;
 	}
@@ -621,7 +623,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 0 12px;
 		min-height: 50px;
 	}
@@ -701,7 +703,7 @@
 	}
 
 	.filter-header {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -730,7 +732,7 @@
 		margin-bottom: 1px;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		background-color: #F1FAFB;
+		background-color: $color-secondary-light;
 	}
 
 	.filter-option:active {
@@ -738,7 +740,7 @@
 	}
 
 	.filter-option-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 500;
 	}
@@ -746,7 +748,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -755,13 +757,13 @@
 	}
 
 	.filter-radio.active {
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -773,7 +775,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 25px;
 		padding: 8px;
 		display: flex;

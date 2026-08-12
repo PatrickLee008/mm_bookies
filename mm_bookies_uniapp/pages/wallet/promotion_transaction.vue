@@ -349,17 +349,21 @@
 		min-height: 0;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 	}
 
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
@@ -379,7 +383,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 10px 14px;
 		display: flex;
@@ -402,7 +406,7 @@
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 		margin-bottom: 8px;
@@ -420,13 +424,13 @@
 	.option-text {
 		font-size: 13px;
 		font-weight: 500;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 18px;
 		height: 18px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -435,13 +439,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 10px;
 		height: 10px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -455,7 +459,7 @@
 	/* ====== 卡片样式（参考 Wallet_Page.png）====== */
 	.record-card {
 		margin: 10px 0;
-		background-color: #F1FAFB;
+		background-color: $bg-color-info;
 		border-radius: 14px;
 		overflow: hidden;
 	}
@@ -471,7 +475,7 @@
 	.order-id {
 		font-size: 12px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		max-width: 60%;
 	}
 
@@ -497,7 +501,7 @@
 	.type-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.pay-right {
@@ -515,7 +519,7 @@
 	.pay-name {
 		font-size: 14px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* 金额行 */
@@ -528,13 +532,13 @@
 
 	.amount-label {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.amount-value {
 		font-size: 17px;
 		font-weight: 700;
-		color: #17A2B8;
+		color: $color-secondary-light;
 		font-style: italic;
 	}
 
@@ -552,7 +556,7 @@
 	}
 
 	.status-success {
-		color: #17A2B8;
+		color: $color-secondary-light;
 	}
 
 	.status-pending {

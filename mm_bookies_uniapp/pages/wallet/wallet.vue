@@ -8,13 +8,15 @@
 		<!-- from tangjq--- 入口按钮栏：Deposit / Withdraw / Promotion Transaction（图标使用首页index的同款图标） -->
 		<view class="entry-bar">
 			<view class="entry-item" @click="goto('/pages/wallet/deposit_page')">
-				<image class="entry-icon entry-icon-svg" mode="aspectFit" src="/static/deposit.svg" />
+				<theme-icon name="deposit" class="entry-icon entry-icon-svg"
+					color="var(--theme-icon-secondary, var(--theme-secondary))"></theme-icon>
 				<view class="flex-column align-center" style="min-height: 34px;">
 					<text class="entry-text">{{ $t('deposit') }}</text>
 				</view>
 			</view>
 			<view class="entry-item" @click="goto('/pages/wallet/withdraw_page')">
-				<image class="entry-icon entry-icon-svg" mode="aspectFit" src="/static/withdraw.svg" />
+				<theme-icon name="withdraw" class="entry-icon entry-icon-svg"
+					color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 				<view class="flex-column align-center" style="min-height: 34px;">
 					<text class="entry-text">{{ $t('withdraw') }}</text>
 				</view>
@@ -67,8 +69,8 @@
 					<!-- 类型行：● + 类型 | 支付方式logo+名称 -->
 					<view class="card-type-row">
 						<view class="type-left">
-							<image class="type-svg" mode="aspectFit"
-								:src="item.type === 'Deposit' ? '/static/deposit.svg' : '/static/withdraw.svg'" />
+							<theme-icon :name="item.type === 'Deposit' ? 'deposit' : 'withdraw'" class="type-svg"
+								:color="item.type === 'Deposit' ? 'var(--theme-icon-secondary, var(--theme-secondary))' : 'var(--theme-icon-primary, var(--theme-primary))'"></theme-icon>
 							<text class="type-name">{{item.type || 'Deposit'}}</text>
 						</view>
 						<view class="pay-right">
@@ -333,11 +335,11 @@
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
@@ -347,7 +349,11 @@
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 	}
 
 	/* from tangjq--- 入口按钮栏（参考 Wallet_Page.png：3个圆角矩形按钮，圆形icon背景+文字） */
@@ -371,7 +377,7 @@
 		gap: 8px;
 		cursor: pointer;
 		padding: 16px 6px 10px;
-		border: 1.5px solid #1C667C;
+		border: 1.5px solid $color-primary;
 		border-radius: 14px;
 		background: #FFFFFF;
 		transition: background 0.2s ease;
@@ -393,7 +399,7 @@
 
 	.entry-text {
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 		line-height: 17px;
 		text-align: center;
@@ -411,7 +417,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 10px 14px;
 		display: flex;
@@ -433,7 +439,7 @@
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 		margin-bottom: 8px;
@@ -451,13 +457,13 @@
 	.option-text {
 		font-size: 13px;
 		font-weight: 500;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 18px;
 		height: 18px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -466,13 +472,13 @@
 	}
 
 	.option-radio.active {
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 10px;
 		height: 10px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -485,7 +491,7 @@
 	/* ====== 卡片样式（参考 Wallet_Page.png）====== */
 	.record-card {
 		margin: 10px 0;
-		background-color: #F1FAFB;
+		background-color: $bg-color-info;
 		border-radius: 14px;
 		overflow: hidden;
 	}
@@ -501,13 +507,13 @@
 	.order-id {
 		font-size: 12px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		max-width: 60%;
 	}
 
 	.order-time {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* 类型行：●类型 | 支付方式 */
@@ -535,7 +541,7 @@
 	.type-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.pay-right {
@@ -553,7 +559,7 @@
 	.pay-name {
 		font-size: 14px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* 金额行 */
@@ -566,7 +572,7 @@
 
 	.amount-label {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.amount-value {
@@ -576,7 +582,7 @@
 	}
 
 	.amount-deposit-color {
-		color: #17A2B8;
+		color: $color-secondary-light;
 	}
 
 	.amount-withdraw-color {
@@ -597,7 +603,7 @@
 	}
 
 	.status-success {
-		color: #17A2B8;
+		color: $color-secondary-light;
 	}
 
 	.status-pending {
@@ -680,7 +686,7 @@
 		width: 50px;
 		height: 50px;
 		border-radius: 30px;
-		background: #1C667C;
+		background: $color-primary;
 		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
 		display: flex;
 		flex-direction: column;

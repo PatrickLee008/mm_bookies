@@ -5,9 +5,10 @@
 		<view class="title-bar" style="height: auto;">
 			<view class="flex-row justify-between" style="height: 50px;">
 				<view class="flex-row align-center" style="">
-					<image src="/static/icon/basic/back.svg" mode="widthFix" class="width-30px"
-						@click="goto('../index/wallet')"></image>
-					<image src="/static/icon/ucenter/wallet2.svg" mode="widthFix" class="width-20px"></image>
+					<theme-icon name="back" class="width-30px"
+						color="var(--theme-icon-on-primary, #fff)" @click="goto('../index/wallet')"></theme-icon>
+					<theme-icon name="wallet2" class="width-20px"
+						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<text class="title-text" style="">{{language.deposit}}</text>
 				</view>
 				<view class="align-center" style="">
@@ -117,9 +118,8 @@
 							</view>
 						</view>
 						<view class="width-70px">
-							<view class="height-70px flex-column text-white myfont-14px radius-right-6px"
-								:class="card.is_default?'mybg-linfo':''"
-								:style="card.is_default?'color:#666666':'background-color: #E02B2B;'" v-if="editing"
+							<view class="height-70px flex-column text-white myfont-14px radius-right-6px account-remove-btn"
+								:class="{ 'disabled-action': card.is_default }" v-if="editing"
 								@click="card.is_default?'':removeBank(card)">
 								{{ $t('remove') }}
 							</view>
@@ -142,8 +142,8 @@
 					<text class="myfont-17px margin-left-lg text-black">{{ $t('add_bank_manually') }}</text>
 				</view>
 
-				<view class="height-45px radius-10px margin-top flex-column"
-					:class="acc_checked?'mybg-lprimary':'mybg-linfo'" @click="auto_submit()">
+				<view class="height-45px radius-10px margin-top flex-column mybg-lprimary"
+					:class="{ 'disabled-action': !acc_checked }" @click="auto_submit()">
 					{{$t('proceed_selected_account')}}
 				</view>
 				<view class="flex-row1 width-100vw margin-top-sm align-start height-20px"
@@ -224,7 +224,8 @@
 
 
 			<!-- 提交 -->
-			<button class="login-btn" style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="confirmDisabled"
+			<button class="login-btn" :class="{ 'disabled-action': confirmDisabled }"
+				style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="confirmDisabled"
 				v-if="(!chargeForm.charge_way&&current_progress!=1 ) || chargeForm.charge_way"
 				@click="next_or_submit()">
 				{{language.submit}}</button>
@@ -290,7 +291,7 @@
 							{{$t('add_bank_tips')}}
 						</view>
 					</view>
-					<button class="radius-12px width-50" :class="add_disable?'mybg-linfo':'mybg-primary'"
+					<button class="radius-12px width-50 mybg-primary" :class="{ 'disabled-action': add_disable }"
 						style="position: absolute;bottom: 20px;left: 25%;"
 						@click="modal_type=='add'?add_card():auto_submit()"
 						:disabled="add_disable">{{modal_type=='add'?language.save:language.confirm }}</button>
@@ -1043,9 +1044,21 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+	.account-remove-btn {
+		background-color: #E02B2B;
+	}
+
+	.disabled-action {
+		opacity: 0.5;
+	}
+
 	.full-page {
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 	}
 
 	.myrect {

@@ -25,7 +25,8 @@
 		<view class="title-bar">
 			<view class="order-filter">
 				<view class="order-filter-pill order-filter-calendar-pill" @click="$refs.date_picker.show()">
-					<image mode="widthFix" class="order-filter-calendar" src="/static/image/order/calender.svg" />
+					<theme-icon name="calendar" class="order-filter-calendar"
+						color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 					<text class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
 					<text class="cuIcon-unfold pill-arrow"></text>
 				</view>
@@ -257,7 +258,7 @@
 						{{$t(current_page ==='pending'?'no_pending_bets':'no_settled_bets')}}
 					</view>
 					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single"
-						style="background-color: #1C667C;color: white;">
+						style="background-color: var(--theme-primary);color: white;">
 						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm">
 						</image>
 						{{$t('Place Bet')}}
@@ -831,25 +832,33 @@
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
 
 	page {
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -883,7 +892,7 @@
 		height: 56upx;
 		border: none;
 		border-radius: 999upx;
-		background: #1C667C;
+		background: $color-primary;
 		color: #FFFFFF;
 		cursor: pointer;
 		flex: 1 1 0;
@@ -970,7 +979,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		border-bottom: 2px solid #1C667C33;
+		border-bottom: 2px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
 	}
 
 	.tab-item {
@@ -989,7 +998,7 @@
 	}
 
 	.tab-item.active .tab-text {
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.slide-indicator {
@@ -997,7 +1006,7 @@
 		bottom: 0;
 		left: 0;
 		height: 2px;
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 		width: 60px;
@@ -1028,13 +1037,13 @@
 		background: #FFFFFF;
 		border-radius: 15px;
 		overflow: hidden;
-		box-shadow: 0px 2px 2px 0px #1C667C33;
-		border: 1px solid #1C667C33
+		box-shadow: 0px 2px 2px 0px var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		border: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2))
 	}
 
 	/* 卡片头部 */
 	.card-header {
-		background: #1C667C;
+		background: $color-primary;
 		padding: 5px;
 		display: flex;
 		flex-direction: column;
@@ -1068,7 +1077,7 @@
 
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
-		color: #37BDCC;
+		color: $color-secondary;
 		min-width: 0;
 	}
 
@@ -1113,7 +1122,7 @@
 
 	.label {
 		font-size: 24upx;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 400;
 	}
 
@@ -1125,7 +1134,7 @@
 	}
 
 	.value-amount {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 700;
 	}
 
@@ -1147,11 +1156,11 @@
 	}
 
 	.user-label-badge.badge-main {
-		background-color: #02455F;
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
 	}
 
 	.user-label-badge.badge-promo {
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 	}
 
 	.user-label-text {
@@ -1179,7 +1188,7 @@
 	}
 
 	.result-win {
-		color: #37BDCC;
+		color: $color-secondary;
 	}
 
 	.result-lose {
@@ -1208,7 +1217,7 @@
 		justify-content: center;
 		align-items: center;
 		padding: 5upx;
-		background: #F1FAFB;
+		background: $color-secondary-light;
 		cursor: pointer;
 		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
 		border-radius: 0 0 15px 15px;
@@ -1216,7 +1225,7 @@
 
 	.parlay-label {
 		font-size: 28upx;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 		/* from tangjq--- 文字左右两侧留出箭头间距 */
 		margin: 0 16upx;
@@ -1233,7 +1242,7 @@
 	.toggle-icon .arrow {
 		font-size: 22upx;
 		line-height: 0.55;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 	}
 

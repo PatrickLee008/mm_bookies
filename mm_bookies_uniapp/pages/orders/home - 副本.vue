@@ -40,7 +40,9 @@
 
 		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<image mode="widthFix" class="width-38upx" src="/static/image/order/calender.svg" @click="$refs.date_picker.show()" />
+				<theme-icon name="calendar" class="width-38upx"
+					color="var(--theme-icon-primary, var(--theme-primary))"
+					@click="$refs.date_picker.show()"></theme-icon>
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
@@ -223,7 +225,7 @@
 					<view class="myfont-14px mycolor-info width-60 myfont-17px line-height-25px">
 						{{$t(current_page ==='Pending'?'no_pending_bets':'no_settled_bets')}}
 					</view>
-					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: #1C667C;color: white;">
+					<button class="cu-btn radius-12px height-10vw" @click="navi_to_single" style="background-color: var(--theme-primary);color: white;">
 						<image src="/static/image/order/new_bet.svg" class="width-8vw height-8vw margin-right-sm"></image>
 						{{$t('Place Bet')}}
 					</button>
@@ -753,24 +755,24 @@
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		height: 276px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -276px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 	}
 
 	page {
-		background: #1C667C;
+		background: $color-primary;
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: #1C667C;
+		background: $color-primary;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -857,7 +859,7 @@
 
 	/* 卡片头部 */
 	.card-header {
-		background: #1C667C;
+		background: $color-primary;
 		padding: 5px;
 		display: flex;
 		flex-direction: column;
@@ -899,7 +901,7 @@
 
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
-		color: #37BDCC;
+		color: $color-secondary;
 		min-width: 0;
 	}
 

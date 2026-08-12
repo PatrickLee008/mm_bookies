@@ -9,8 +9,8 @@
 			<view class="padding-sm bonus-dashboard-content">
 				<view class="dashboard-filters">
 					<view class="dashboard-filter period-filter" @click="openPeriodPicker">
-						<image mode="widthFix" class="dashboard-filter-icon" src="/static/image/order/calender.svg"
-							/>
+						<theme-icon name="calendar" class="dashboard-filter-icon"
+							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 						<text class="period-filter-text">{{ periodDisplay }}</text>
 						<text class="cuIcon-unfold dashboard-filter-arrow"></text>
 					</view>
@@ -406,18 +406,22 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
@@ -432,7 +436,7 @@
 	}
 
 	.bonus-dashboard-content {
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.dashboard-filters {
@@ -455,7 +459,7 @@
 		flex: 1;
 		height: 30px;
 		border-radius: 14px;
-		background: #1C6B80;
+		background: $color-primary;
 		color: #fff;
 		font-size: 12px;
 		font-weight: 700;
@@ -491,7 +495,7 @@
 		background: #fff;
 		box-shadow: 0 2px 8px rgba(18, 63, 70, 0.2);
 		box-sizing: border-box;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.type-option {
@@ -509,14 +513,13 @@
 	}
 
 	.type-option:active {
-		background: #effafa;
+		background: $bg-color-info;
 	}
 
 	.dashboard-filter-icon {
 		width: 12px;
 		height: 12px;
 		margin-right: 5px;
-		filter: brightness(0) invert(1);
 	}
 
 	.dashboard-filter-arrow {
@@ -543,9 +546,9 @@
 		min-height: 53px;
 		margin-bottom: 14px;
 		padding: 0 15px;
-		border-radius: 11px;
-		background: #effafa;
-		color: #1C667C;
+		border-radius: 12px;
+		background: $bg-color-info;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 700;
 		line-height: 18px;
@@ -567,7 +570,7 @@
 	.bonus-card-title {
 		display: block;
 		margin-bottom: 10px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 700;
 		line-height: 18px;
@@ -597,7 +600,7 @@
 	.bonus-overview-value {
 		min-width: 42px;
 		margin-left: 8px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 700;
 		text-align: right;
 		white-space: nowrap;
@@ -614,7 +617,7 @@
 		justify-content: space-between;
 		margin-top: 4px;
 		padding-top: 2px;
-		color: #2bb8ca;
+		color: $color-primary;
 		font-size: 11px;
 		font-weight: 700;
 		line-height: 16px;
@@ -662,7 +665,7 @@
 		flex-wrap: wrap;
 		gap: 9px;
 		margin: 0 0 24px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 8px;
 		line-height: 11px;
 	}
@@ -690,7 +693,7 @@
 
 	.chart-table-header {
 		padding: 0 0 5px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 8px;
 		line-height: 11px;
 	}

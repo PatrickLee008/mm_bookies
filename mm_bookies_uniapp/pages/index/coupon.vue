@@ -25,7 +25,7 @@
 			<view class="redeem-row" v-if="isLogin && activity_type === 'coupon'">
 				<input class="redeem-input" :class="input_focus ? 'focus-border' : ''"
 					:placeholder="$t('Enter coupon code')" placeholder-class=""
-					placeholder-style="color:#1C667C;font-style: italic;font-size:12px" v-model="key_word"
+					placeholder-style="color:var(--theme-primary);font-style: italic;font-size:12px" v-model="key_word"
 					maxlength="20" @focus="input_focus = true" @input="allow_en_num" @blur="input_focus = false" />
 				<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
 					@click="submit_code">{{ $t('Claim') }}</view>
@@ -121,7 +121,8 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/nav/deals.png"></image>
+						<theme-icon name="deals" class="empty-icon"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="empty-text">No coupons available</text>
 					</view>
 				</view>
@@ -165,7 +166,8 @@
 
 					<!-- 空状态 -->
 					<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-						<image class="empty-icon" mode="heightFix" src="/static/icon/nav/deals.png"></image>
+						<theme-icon name="deals" class="empty-icon"
+							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="empty-text">No promotions available</text>
 					</view>
 				</view>
@@ -216,7 +218,8 @@
 						<text class="coupon-code-text">{{ selectedCoupon.p_code }}</text>
 						<view class="coupon-copy-btn" @click="copyCode">
 							<text class="coupon-copy-text">Copy code</text>
-							<image class="coupon-copy-icon" src="/static/icon/copy.svg" mode="aspectFit"></image>
+							<theme-icon name="copy" class="coupon-copy-icon"
+								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 						</view>
 					</view>
 
@@ -250,7 +253,8 @@
 							<!-- 1x2 Sports Betting -->
 							<view class="coupon-scenario-icon-item" v-if="betTypes.length > 0" @click="openCouponSport">
 								<view class="coupon-scenario-icon-circle">
-									<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
+									<theme-icon name="single" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 								</view>
 								<text class="coupon-scenario-label">Single</text>
 							</view>
@@ -258,7 +262,8 @@
 							<view class="coupon-scenario-icon-item" v-if="displayVendors.length > 0"
 								@click="openVendorGames(displayVendors[0])">
 								<view class="coupon-scenario-icon-diamond">
-									<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
+									<theme-icon name="mixparlay" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 								</view>
 								<text class="coupon-scenario-label">Mix</text>
 							</view>
@@ -398,7 +403,8 @@
 						<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
 							@click="openPromotionSport">
 							<view class="coupon-scenario-icon-circle">
-								<image src="/static/icon/nav/single.png" class="coupon-scenario-img" mode="aspectFit"></image>
+								<theme-icon name="single" class="coupon-scenario-img"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 							<text class="coupon-scenario-label">Single</text>
 						</view>
@@ -406,7 +412,8 @@
 						<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
 							@click="openPromotionVendorGames(promotionDisplayVendors[0])">
 							<view class="coupon-scenario-icon-diamond">
-								<image src="/static/icon/nav/mpl.png" class="coupon-scenario-img" mode="aspectFit"></image>
+								<theme-icon name="mixparlay" class="coupon-scenario-img"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 							<text class="coupon-scenario-label">Mix</text>
 						</view>
@@ -811,7 +818,7 @@
 					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
-					image: '/static/icon/question.svg',
+					themeIcon: 'question',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -828,7 +835,7 @@
 					type: 'notice',
 					title: _this.$t('title_alert'),
 					content: _this.$t('Do you want to claim this coupon') + '?',
-					image: '/static/icon/question.svg',
+					themeIcon: 'question',
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
@@ -1395,25 +1402,33 @@
 	/* header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
 
 	page {
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		height: 100vh;
 		overflow: hidden;
 	}
 
 	.full-page {
 		height: 100vh;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -1449,15 +1464,15 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		background: #F1FAFB;
-		border: 1px solid #1C667C33;
-		color: #1C667C;
+		background: $color-secondary-light;
+		border: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.type-btn.active {
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 	}
 
@@ -1469,7 +1484,7 @@
 		height: 16px;
 		padding: 0 3px;
 		border-radius: 8px;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		color: #fff;
 		font-size: 10px;
 		font-weight: 700;
@@ -1510,12 +1525,12 @@
 		height: 34px;
 		padding: 0 12px;
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 	}
 
 	.focus-border {
-		border: solid 2px #1C667C;
+		border: solid 2px $color-primary;
 	}
 
 	.redeem-btn {
@@ -1526,16 +1541,17 @@
 		border-radius: 8px;
 		font-size: 14px;
 		font-weight: bold;
+		background: $color-primary;
+		color: #fff;
 	}
 
 	.redeem-btn-active {
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 	}
 
 	.redeem-btn-disabled {
-		background: #D9D9D9;
-		color: #6D6D6D;
+		opacity: 0.5;
 	}
 
 	/* Tab 样式 */
@@ -1590,7 +1606,7 @@
 
 	/* 当前活动卡片 */
 	.current-activity-box {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 12px;
 		padding: 14px 16px;
 		margin-bottom: 16px;
@@ -1639,13 +1655,13 @@
 
 	.ca-credit-label {
 		font-size: 11px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.ca-credit-value {
 		font-size: 24px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		line-height: 28px;
 	}
 
@@ -1672,7 +1688,7 @@
 	.ca-stat-value {
 		font-size: 15px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	/* 优惠券卡片 */
@@ -1696,7 +1712,7 @@
 	}
 
 	.header-unused {
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	.header-expired {
@@ -1758,7 +1774,7 @@
 	.info-val {
 		font-size: 14px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.coupon-bonus {
@@ -1770,13 +1786,13 @@
 
 	.bonus-label {
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.bonus-value {
 		font-size: 22px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.coupon-card-footer {
@@ -1794,7 +1810,7 @@
 	}
 
 	.claim-action-btn {
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1810,7 +1826,7 @@
 	.status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1875,7 +1891,7 @@
 
 	.promo-period {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 	}
 
@@ -1883,7 +1899,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: bold;
 		font-size: 13px;
 		margin-top: 2px;
@@ -1891,7 +1907,7 @@
 
 	.promo-terms {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 		line-height: 1.4;
 	}
 
@@ -1911,7 +1927,7 @@
 	}
 
 	.promo-status-btn {
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 		line-height: 34px;
 		text-align: center;
@@ -1923,7 +1939,7 @@
 	.promo-status-text {
 		font-size: 13px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		min-width: 100px;
 		padding: 8px 0;
@@ -1977,7 +1993,7 @@
 	}
 
 	.detail-modal-header {
-		background: #1C667C;
+		background: $color-primary;
 		padding: 12px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -2012,7 +2028,7 @@
 	.detail-coupon-title {
 		font-size: 18px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 12px;
 	}
@@ -2040,7 +2056,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 10px 14px;
 		margin-bottom: 12px;
@@ -2049,7 +2065,7 @@
 	.detail-code {
 		font-size: 15px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.detail-code-copy {
@@ -2067,7 +2083,7 @@
 
 	.detail-info-card {
 		flex: 1;
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 10px 12px;
 		display: flex;
@@ -2087,7 +2103,7 @@
 	.detail-info-value {
 		font-size: 14px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.promo-countdown-block {
@@ -2097,11 +2113,11 @@
 	.ends-in {
 		font-size: 16px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.detail-bonus-box {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 10px;
 		padding: 14px;
 		margin-bottom: 12px;
@@ -2125,7 +2141,7 @@
 	.detail-section-title {
 		font-size: 15px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		margin-bottom: 6px;
 	}
@@ -2170,7 +2186,7 @@
 	.progress-value {
 		font-size: 13px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.progress-bar-container {
@@ -2199,7 +2215,7 @@
 	}
 
 	.detail-claim-btn {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 10px;
 		padding: 10px;
 		text-align: center;
@@ -2238,7 +2254,7 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: #1C667C;
+		background: $color-primary;
 		padding: 10px 16px;
 	}
 
@@ -2250,7 +2266,7 @@
 	}
 
 	.coupon-hero-fallback {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 12px;
 		padding: 14px 16px;
 		margin-bottom: 20px;
@@ -2264,7 +2280,7 @@
 	.coupon-desc-heading {
 		font-size: 16px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		text-align: center;
 		display: block;
 		margin-bottom: 8px;
@@ -2292,7 +2308,7 @@
 	.coupon-code-text {
 		font-size: 18px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.coupon-copy-btn {
@@ -2309,7 +2325,7 @@
 
 	.coupon-copy-text {
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -2324,7 +2340,7 @@
 		align-items: center;
 		justify-content: space-between;
 		height: 25px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.coupon-meta-label {
@@ -2349,7 +2365,7 @@
 	.coupon-scenarios-title {
 		font-size: 14px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		margin-bottom: 14px;
 	}
@@ -2372,7 +2388,7 @@
 		width: 40px;
 		height: 40px;
 		border-radius: 50%;
-		// border: 2px solid #1C667C;
+		// border: 2px solid $color-primary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2381,7 +2397,7 @@
 	.coupon-scenario-icon-diamond {
 		width: 40px;
 		height: 40px;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 		transform: rotate(45deg);
 		display: flex;
 		align-items: center;
@@ -2396,7 +2412,6 @@
 	.coupon-scenario-img {
 		width: 100%;
 		height: 100%;
-		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
 	}
 
 	.coupon-scenario-icon-diamond .coupon-scenario-img {
@@ -2472,7 +2487,7 @@
 	}
 
 	.join-dialog-header {
-		background: #1C667C;
+		background: $color-primary;
 		padding: 12px;
 		text-align: center;
 		font-size: 15px;
@@ -2497,7 +2512,7 @@
 
 	.join-hint-label {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		text-align: center;
 		margin-bottom: 10px;
@@ -2505,7 +2520,7 @@
 
 	.join-amount-input,
 	.join-amount-display {
-		background: #e8f4f8;
+		background: $bg-color-info;
 		border-radius: 8px;
 		padding: 12px 15px;
 		display: flex;
@@ -2517,19 +2532,19 @@
 	.join-currency {
 		font-size: 16px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.join-input {
 		flex: 1;
 		font-size: 16px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.join-fixed-value {
 		font-size: 16px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.join-range-hint {
@@ -2566,7 +2581,7 @@
 	}
 
 	.join-continue-btn {
-		background: #1C667C;
+		background: $color-primary;
 		color: #fff;
 	}
 </style>

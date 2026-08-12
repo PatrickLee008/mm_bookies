@@ -42,7 +42,7 @@
 
 		<!-- 下拉刷新容器 -->
 		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
-			@refresherrefresh="onRefresh" :style="{ height: scrollHeight }" @scroll="handleHeaderScroll">
+			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll">
 
 			<!-- 消息列表 -->
 			<view class="message-list">
@@ -193,10 +193,6 @@
 		computed: {
 			hasUnreadMessages() {
 				return this.messages.some(msg => !msg.read)
-			},
-			// 列表滚动区域高度：视口高度 - header占位(210) - 页头(约50) - 标签(约45)
-			scrollHeight() {
-				return 'calc(100vh - 305px)'
 			}
 		},
 
@@ -666,20 +662,27 @@
 
 <style lang="scss" scoped>
 	.full-page {
-		min-height: 100vh;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		height: 100vh;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 	}
 
 	/* header 占位 */
 	.header-placeholder {
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
-		background-color: #02455F;
+		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
 
@@ -689,8 +692,9 @@
 		justify-content: space-between;
 		padding: 12px 10px;
 		font-weight: bold;
-		color: #1C667C;
+		color: $color-primary;
 		background-color: white;
+		flex-shrink: 0;
 	}
 
 	.header-left {
@@ -720,7 +724,7 @@
 		align-items: center;
 		font-weight: 500;
 		font-size: 13px;
-		color: #1C667C;
+		color: $color-primary;
 		padding: 6px 12px;
 		background: #E8F0FE;
 		border-radius: 6px;
@@ -744,6 +748,7 @@
 		border-top: 1px solid #E5E7EB;
 		border-bottom: 1px solid #E5E7EB;
 		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+		flex-shrink: 0;
 	}
 
 	.tab-item {
@@ -766,7 +771,7 @@
 		color: #8B8891;
 
 		.tab-item.active & {
-			color: #1C667C;
+			color: $color-primary;
 			font-weight: 700;
 		}
 	}
@@ -778,7 +783,7 @@
 		transform: translateX(-50%);
 		width: 40px;
 		height: 3px;
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 2px 2px 0 0;
 		animation: slideIn 0.2s ease-out;
 	}
@@ -809,6 +814,9 @@
 	}
 
 	.message-scroll {
+		flex: 1;
+		height: 0;
+		min-height: 0;
 		background-color: #E1E1E1;
 	}
 
@@ -833,13 +841,13 @@
 			border: 1px solid rgba(47, 93, 98, 0.1);
 
 			.card-header {
-				background: #1C667C;
+				background: $color-primary;
 				font-weight: 700;
 			}
 
 			.message-title {
 				font-weight: 700;
-				color: #1C667C;
+				color: $color-primary;
 			}
 
 			.message-description {
@@ -860,7 +868,7 @@
 		top: 0;
 		bottom: 0;
 		width: 6px;
-		background: #37BDCC;
+		background: $color-secondary;
 		border-radius: 12px 0 0 12px;
 		animation: pulse 2s ease-in-out infinite;
 		box-shadow: 2px 0 8px rgba(95, 181, 189, 0.5);
@@ -878,7 +886,7 @@
 	}
 
 	.card-header {
-		background: #1C667C;
+		background: $color-primary;
 		padding: 8px 16px;
 		display: flex;
 		justify-content: space-between;
@@ -911,7 +919,7 @@
 		font-weight: 600;
 		font-size: 13px;
 		line-height: 1.4;
-		color: #1C667C;
+		color: $color-primary;
 		display: block;
 		margin-bottom: 6px;
 		overflow: hidden;
@@ -944,7 +952,7 @@
 		width: 20px;
 		height: 20px;
 		border: 2px solid #EDEDED;
-		border-top: 2px solid #1C667C;
+		border-top: 2px solid $color-primary;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 8px;
@@ -1070,7 +1078,7 @@
 	.detail-title-text {
 		font-size: 16px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 		line-height: 1.5;
 		display: block;
 		margin-top: 8px;
@@ -1078,7 +1086,7 @@
 
 	.detail-content-text {
 		font-size: 15px;
-		color: #1C667C;
+		color: $color-primary;
 		line-height: 1.6;
 		display: block;
 		margin-top: 8px;
@@ -1112,7 +1120,7 @@
 	}
 
 	.primary-btn {
-		background: #1C667C;
+		background: $color-primary;
 
 		.btn-text {
 			color: #FFFFFF;
@@ -1148,7 +1156,7 @@
 	.confirm-title {
 		font-size: 17px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		line-height: 1.5;
 		word-break: break-word;
 		white-space: normal;
@@ -1190,11 +1198,11 @@
 
 	.cancel-btn {
 		background: #FFFFFF;
-		border: 1px solid #1C667C;
+		border: 1px solid $color-primary;
 	}
 
 	.ok-btn {
-		background: #1C667C;
+		background: $color-primary;
 
 		&:active {
 			background: #244a4e;

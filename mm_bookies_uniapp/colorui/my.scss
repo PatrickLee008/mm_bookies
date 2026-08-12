@@ -1,3 +1,62 @@
+@import "../uni";
+
+:root {
+	--theme-primary: #{$theme-primary-value};
+	--theme-secondary: #{$theme-secondary-value};
+	--theme-secondary-light: #{$theme-secondary-light-value};
+	--theme-active: #{$theme-active-value};
+	--theme-text-primary: #{$theme-text-value};
+	--theme-text-secondary: #{$theme-text-secondary-value};
+	--theme-bg-light: #{$theme-bg-light-value};
+	--theme-bg-info: #{$theme-bg-info-value};
+	--theme-radius-large: #{$theme-radius-large-value};
+	--theme-radius-medium: #{$theme-radius-medium-value};
+	--theme-radius-small: #{$theme-radius-small-value};
+	--theme-page-start: #{$theme-page-start};
+	--theme-page-end: #{$theme-page-end};
+	--theme-glow: #{$theme-glow};
+	--theme-header-start: #{$theme-header-start};
+	--theme-header-end: #{$theme-header-end};
+	--theme-primary-alpha-06: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .06);
+	--theme-primary-alpha-18: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .18);
+	--theme-primary-alpha-20: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .2);
+	--theme-secondary-alpha-20: rgba(#{red($theme-secondary-value)}, #{green($theme-secondary-value)}, #{blue($theme-secondary-value)}, .2);
+	--theme-icon-primary: #{$theme-primary-value};
+	--theme-icon-secondary: #{$theme-secondary-value};
+	--theme-icon-on-primary: #{$text-color-inverse};
+	--theme-home-background-image: #{$theme-home-background};
+	--theme-home-background-color: #{$theme-page-start};
+	--theme-home-background-position: center;
+	--theme-home-background-size: cover;
+	--theme-home-background-repeat: no-repeat;
+	--theme-auth-background-image: #{$theme-auth-background};
+	--theme-auth-background-color: #{$theme-page-start};
+	--theme-auth-background-position: center;
+	--theme-auth-background-size: cover;
+	--theme-auth-background-repeat: no-repeat;
+	--theme-login-background-image: #{$theme-auth-background};
+	--theme-login-background-color: #{$theme-page-start};
+	--theme-login-background-position: center;
+	--theme-login-background-size: cover;
+	--theme-login-background-repeat: no-repeat;
+	--theme-register-background-image: #{$theme-auth-background};
+	--theme-register-background-color: #{$theme-page-start};
+	--theme-register-background-position: center;
+	--theme-register-background-size: cover;
+	--theme-register-background-repeat: no-repeat;
+	--theme-header-background-image: #{$theme-header-background};
+	--theme-header-background-color: #{$theme-header-start};
+	--theme-header-background-position: center top;
+	--theme-header-background-size: 100% 552px;
+	--theme-header-background-repeat: no-repeat;
+	--theme-header-placeholder-position: center -255px;
+	--theme-page-background-image: #{$theme-page-background};
+	--theme-page-background-color: #{$theme-header-start};
+	--theme-page-background-position: center;
+	--theme-page-background-size: cover;
+	--theme-page-background-repeat: no-repeat;
+}
+
 
 $attr-list:(
 	'width','height','min-width','min-height','max-width','max-height','line-height','gap','border-radius',
@@ -111,11 +170,11 @@ $unit-list:(
 
 $border-colors: (
 	// 主要颜色
-	primary: #1C667C,
-	lprimary:#37BDCC,
-	active: rgb(255, 196, 54),
-	info: rgb(161, 160, 161),
-	linfo: rgb(217, 217, 217),
+	primary: $color-primary,
+	lprimary: $color-secondary,
+	active: $color-active,
+	info: $color-info,
+	linfo: $color-linfo,
 	
     white: white,
 	lgrey: rgb(220, 220, 220),
@@ -151,11 +210,11 @@ $border-positions:(
 
 $colors-list: (
 	// 主要颜色
-	primary: #1C667C,
-	lprimary:rgb(1, 116, 190),
-	active: rgb(255, 196, 54),
-	info: rgb(161, 160, 161),
-	linfo: rgb(217, 217, 217),
+	primary: $color-primary,
+	lprimary: $color-secondary,
+	active: $color-active,
+	info: $color-info,
+	linfo: $color-linfo,
 	league: rgb(50, 106, 178),
 	
 	
@@ -179,4 +238,45 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
     .mycolor-#{$key} {
          color: $color !important;
     }
+}
+
+// Shared theme classes used while page-level hardcoded colors are migrated.
+.theme-bg-home {
+	background-color: var(--theme-home-background-color, $theme-page-start);
+	background-image: var(--theme-home-background-image, #{$theme-home-background});
+	background-position: var(--theme-home-background-position, center);
+	background-size: var(--theme-home-background-size, cover);
+	background-repeat: var(--theme-home-background-repeat, no-repeat);
+}
+
+.theme-bg-auth {
+	background-color: var(--theme-auth-background-color, $theme-page-start);
+	background-image: var(--theme-auth-background-image, #{$theme-auth-background});
+	background-position: var(--theme-auth-background-position, center);
+	background-size: var(--theme-auth-background-size, cover);
+	background-repeat: var(--theme-auth-background-repeat, no-repeat);
+}
+
+.theme-bg-header {
+	background-color: var(--theme-header-background-color, $theme-header-start);
+	background-image: var(--theme-header-background-image, #{$theme-header-background});
+	background-position: var(--theme-header-background-position, center top);
+	background-size: var(--theme-header-background-size, 100% 552px);
+	background-repeat: var(--theme-header-background-repeat, no-repeat);
+}
+
+.theme-page-background {
+	background-color: var(--theme-page-background-color, $theme-header-start);
+	background-image: var(--theme-page-background-image, #{$theme-page-background});
+	background-position: var(--theme-page-background-position, center);
+	background-size: var(--theme-page-background-size, cover);
+	background-repeat: var(--theme-page-background-repeat, no-repeat);
+}
+
+.theme-color-primary {
+	color: $color-primary !important;
+}
+
+.theme-color-secondary {
+	color: $color-secondary !important;
 }

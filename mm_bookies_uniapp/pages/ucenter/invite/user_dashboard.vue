@@ -49,8 +49,8 @@
 				<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
 				<view class="dashboard-filters">
 					<view class="user-filter-pill date-filter" @click="$refs.date_picker.show()">
-						<image mode="widthFix" class="user-filter-calendar"
-							src="/static/image/order/calender.svg" />
+						<theme-icon name="calendar" class="user-filter-calendar"
+							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 						<text class="calendar-text">{{ dateDisplay }}</text>
 						<text class="cuIcon-unfold filter-arrow"></text>
 					</view>
@@ -309,18 +309,22 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background: linear-gradient(to right, #02455F 0%, #02455F 56%, #1F879B 100%);
+		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-image: var(--theme-page-background-image, #{$theme-page-background});
+		background-position: var(--theme-page-background-position, center);
+		background-size: var(--theme-page-background-size, cover);
+		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
 		height: 255px;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center -255px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-placeholder-position, center -255px);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
@@ -337,7 +341,7 @@
 	.dashboard-content {
 		padding: 15px 20px;
 		box-sizing: border-box;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.dashboard-card {
@@ -360,7 +364,7 @@
 	.card-label {
 		max-width: 70%;
 		overflow: hidden;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 13px;
 		font-weight: 600;
 		line-height: 20px;
@@ -369,7 +373,7 @@
 	}
 
 	.money-value {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 700;
 		line-height: 20px;
@@ -389,7 +393,7 @@
 
 	.invitation-title {
 		display: block;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 20px;
 		font-weight: 700;
 		line-height: 25px;
@@ -402,8 +406,8 @@
 		align-items: stretch;
 		margin-top: 9px;
 		padding: 13px 6px;
-		border-radius: 11px;
-		background: #effafa;
+		border-radius: 12px;
+		background: $bg-color-info;
 		box-sizing: border-box;
 	}
 
@@ -418,7 +422,7 @@
 
 	.invitation-stat-label {
 		overflow: hidden;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 12px;
 		line-height: 16px;
 		text-align: center;
@@ -428,7 +432,7 @@
 
 	.invitation-stat-value {
 		margin-top: 7px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 700;
 		line-height: 20px;
@@ -462,7 +466,7 @@
 		align-items: center;
 		justify-content: center;
 		flex: 1 1 0;
-		background: #1c667c;
+		background: $color-primary;
 		color: #ffffff;
 	}
 
@@ -545,9 +549,9 @@
 		align-items: center;
 		min-width: 0;
 		padding: 0 10px;
-		border: 2px solid #1c667c;
+		border: 2px solid $color-primary;
 		border-radius: 999upx;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.search-icon {
@@ -565,13 +569,13 @@
 		border: 0;
 		outline: 0;
 		background: transparent;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 12px;
 		line-height: 27px;
 	}
 
 	.search-box input::placeholder {
-		color: #1C667C;
+		color: $color-primary;
 		font-style: italic;
 	}
 
@@ -598,7 +602,7 @@
 		justify-content: space-between;
 		min-height: 40px;
 		padding: 0 19px;
-		background: #1c6b80;
+		background: $color-primary;
 		box-sizing: border-box;
 	}
 
@@ -651,7 +655,7 @@
 
 	.status-pending {
 		background: #e7f0f2;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.status-signed {
@@ -661,7 +665,7 @@
 
 	.status-default {
 		background: #e7f0f2;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.user-card-body {
@@ -696,7 +700,7 @@
 	.stat-label {
 		display: block;
 		overflow: hidden;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 11px;
 		line-height: 15px;
 		text-overflow: ellipsis;
@@ -707,7 +711,7 @@
 		display: block;
 		margin-top: 3px;
 		overflow: hidden;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 700;
 		line-height: 20px;
@@ -718,7 +722,7 @@
 	.user-footer-row {
 		display: flex;
 		justify-content: space-between;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.user-footer-row .joined-text:last-child {

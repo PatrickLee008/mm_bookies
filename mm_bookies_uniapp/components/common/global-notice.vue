@@ -10,7 +10,9 @@
 			<!-- 内容区域 -->
 			<view class="notice-body" :class="hasHeader ? 'notice-body-with-header' : 'notice-body-simple'">
 				<!-- 图片显示 -->
-				<image v-if="image" :src="image" class="notice-image" mode="aspectFit"></image>
+				<theme-icon v-if="themeIcon" :name="themeIcon" class="notice-image"
+					color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+				<image v-else-if="image" :src="image" class="notice-image" mode="aspectFit"></image>
 				<text class="notice-content" :class="{'notice-content-error': type === 'error'}">{{content}}</text>
 			</view>
 
@@ -56,6 +58,7 @@
 				onFail: null,
 				duration: 0, // 自动消失时间（毫秒），0则不消失
 				image: '', // 图片路径
+				themeIcon: '', // 内联主题图标名称
 				autoCloseTimer: null, // 自动关闭定时器
 				noticeQueue: [], // 通知队列
 				isShowing: false // 是否正在显示通知（包括关闭动画期间）
@@ -169,6 +172,7 @@
 				this.onFail = options.fail || null
 				this.duration = options.duration || 0
 				this.image = options.image || ''
+				this.themeIcon = options.themeIcon || ''
 				this.closing = false
 				this.visible = true
 
@@ -202,6 +206,7 @@
 						this.onFail = null
 						this.duration = 0
 						this.image = ''
+						this.themeIcon = ''
 						this.isShowing = false
 
 						// 检查队列中是否有等待显示的通知
@@ -254,7 +259,7 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	.notice-overlay {
 		position: fixed;
 		top: 0;
@@ -307,7 +312,7 @@
 	}
 
 	.notice-header-notice {
-		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
+		background: linear-gradient(135deg, $color-primary 0%, $color-primary 100%);
 	}
 
 	.notice-header-alert {
@@ -345,7 +350,7 @@
 	.notice-content {
 		font-size: 28upx;
 		line-height: 1.6;
-		color: #1C667C;
+		color: $color-primary;
 		word-wrap: break-word;
 		white-space: pre-wrap;
 	}
@@ -382,12 +387,12 @@
 
 	.notice-btn-cancel-simple {
 		background-color: transparent;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 		max-width: 300upx;
 	}
 
 	.notice-btn-confirm-simple {
-		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
+		background: linear-gradient(135deg, $color-primary 0%, $color-primary 100%);
 	}
 
 	.notice-btn-simple-text {
@@ -417,7 +422,7 @@
 		cursor: pointer;
 		transition: all 0.2s;
 		background-color: transparent;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 	}
 
 	.notice-btn-normal:active {
@@ -426,7 +431,7 @@
 	}
 
 	.notice-btn-confirm-border {
-		background: linear-gradient(135deg, #1C667C 0%, #1C667C 100%);
+		background: linear-gradient(135deg, $color-primary 0%, $color-primary 100%);
 		border: none;
 	}
 

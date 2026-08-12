@@ -78,6 +78,7 @@ export default {
 		 * header 高度变化回调，更新占位元素高度
 		 */
 		onHeaderHeightChange(height) {
+			if (this.headerHeight === height) return
 			this.headerHeight = height
 		},
 	},

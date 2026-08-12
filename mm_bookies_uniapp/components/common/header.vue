@@ -2,7 +2,8 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }">
+		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }"
+			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
 			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
 				<text class="header-title">MM Bookies</text>
@@ -55,7 +56,9 @@
 						<image src="/static/icon/nav/coin.png" class="coin-icon" mode="aspectFit"></image>
 						<text class="balance-value">{{displayBalance(userInfo.money)}}</text>
 					</view>
-					<text class="balance-eye" :class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'" @click="balanceVisible = !balanceVisible"></text>
+					<text class="balance-eye"
+						:class="balanceVisible ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"
+						@click="balanceVisible = !balanceVisible"></text>
 				</view>
 				<view class="promo-row">
 					<text class="promo-label">Promo</text>
@@ -63,10 +66,12 @@
 				</view>
 				<view class="balance-actions">
 					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=0', 1)">
-						<image class="" src="/static/deposit.svg" mode="aspectFit"></image><text>{{$t('Deposit')}}</text>
+						<theme-icon name="deposit"
+							class="wallet-action-icon"></theme-icon><text>{{$t('Deposit')}}</text>
 					</view>
 					<view class="wallet-action" @click="goto('/pages/wallet/wallet?tab=1', 1)">
-						<image class="" src="/static/withdraw.svg" mode="aspectFit"></image><text>{{$t('Withdraw')}}</text>
+						<theme-icon name="withdraw"
+							class="wallet-action-icon"></theme-icon><text>{{$t('Withdraw')}}</text>
 					</view>
 					<view class="cashout-action">{{$t('cash_out')}} {{displayBalance(userInfo.total_withdraw)}}</view>
 				</view>
@@ -157,19 +162,25 @@
 					'pages/ucenter/message': 'Messages',
 					'pages/ucenter/invite/bonus_dashboard': 'Bonus Dashboard',
 					'pages/ucenter/invite/user_dashboard': 'User Dashboard',
-				'pages/ucenter/withdraw': 'Withdraw',
-				'pages/ucenter/charge': 'Deposit',
-				'pages/wallet/deposit_page': 'Deposit',
-				'pages/wallet/withdraw_page': 'Withdraw',
-				'pages/wallet/promotion_transaction': 'promotion_transaction',
-				'pages/payment/payment': 'Payment'
+					'pages/ucenter/withdraw': 'Withdraw',
+					'pages/ucenter/charge': 'Deposit',
+					'pages/wallet/deposit_page': 'Deposit',
+					'pages/wallet/withdraw_page': 'Withdraw',
+					'pages/wallet/promotion_transaction': 'promotion_transaction',
+					'pages/payment/payment': 'Payment'
 				}
 				const pages = getCurrentPages()
 				const current = pages.length ? pages[pages.length - 1] : null
 				if (current && current.route === 'pages/match/home' && current.options.mix === '1') {
-					return 'MPL'
+					return 'mixparlay'
 				}
 				return titles[this.currentRoute] || ''
+			},
+			headerHeightStyle() {
+				const height = this.collapsed && this.isLogin ? 85 : this.expandedHeight
+				return height ? {
+					height: `${height}px`
+				} : {}
 			}
 		},
 		created() {},
@@ -265,7 +276,7 @@
 			handleSetCollapsed(collapsed) {
 				if (this.collapsed === collapsed) return
 				this.collapsed = collapsed
-				
+
 				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
 				if (collapsed) {
 					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
@@ -276,11 +287,7 @@
 					// 展开：立即恢复到之前测量的精确高度
 					this.$emit('headerHeightChange', this.expandedHeight)
 				}
-				
-				// CSS过渡完成后(0.3s)，测量实际高度进行精确校正
-				setTimeout(() => {
-					this.calculateHeaderHeight()
-				}, 320)
+
 			},
 
 			goto(url, limit_click) {
@@ -397,11 +404,11 @@
 		left: 0;
 		right: 0;
 		width: 100%;
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center top;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		// padding-bottom: 15px;
 		z-index: 1000;
 		// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -431,6 +438,11 @@
 		padding: 0 20px;
 		font-size: 14px;
 		color: #ffffff;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		box-sizing: border-box;
 	}
 
 	.header-back {
@@ -447,7 +459,7 @@
 	}
 
 	.header-page-title {
-		color: #35b6c2;
+		color: var(--theme-secondary, #35b6c2);
 		font-weight: 700;
 	}
 
@@ -468,7 +480,7 @@
 		width: 37px;
 		height: 37px;
 		border-radius: 50%;
-		// background-color: #1C667C;
+		// background-color: $color-primary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -507,12 +519,12 @@
 	}
 
 	.id-label {
-		color: #1C667C;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
 	.id-value {
-		color: #1C667C;
+		color: $color-primary;
 		// font-size: 14px;
 		font-weight: bold;
 		overflow: hidden;
@@ -549,7 +561,7 @@
 
 	.balance-label,
 	.cashout-label {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 12px;
 		white-space: nowrap;
 		font-weight: bold;
@@ -557,7 +569,7 @@
 
 	.balance-value,
 	.cashout-value {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 12px;
 	}
 
@@ -573,6 +585,7 @@
 	.settings-icon {
 		width: 24px;
 		height: 24px;
+		filter: brightness(0) invert(1);
 	}
 
 	/* 右侧操作区：铃铛 + 设置 */
@@ -598,12 +611,12 @@
 	.bell-icon {
 		width: 22px;
 		height: 22px;
+		filter: brightness(0) invert(1);
 		transform-origin: top center;
 	}
 
-	/* 有未读消息：变红 + 摇动 */
+	/* 有未读消息：摇动 */
 	.bell-ring {
-		color: #FF4444;
 		animation: bellRing 1s ease-in-out infinite;
 	}
 
@@ -676,7 +689,7 @@
 	}
 
 	.login-prompt-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 16px;
 		font-weight: 600;
 	}
@@ -708,12 +721,12 @@
 	}
 
 	.login-btn2 {
-		background-color: #1C667C;
+		background-color: $color-primary;
 		color: white;
 	}
 
 	.register-btn2 {
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		color: white;
 	}
 
@@ -754,7 +767,7 @@
 
 	.nav-icon-active .nav-icon-wrapper {
 		background-color: white;
-		background-color: #1C667C;
+		background-color: $color-primary;
 	}
 
 	.nav-icon {
@@ -778,7 +791,7 @@
 		align-items: center;
 		justify-content: center;
 		padding: 0 4px;
-		border: 2px solid #1C667C;
+		border: 2px solid $color-primary;
 	}
 
 	.nav-icon-label {
@@ -794,18 +807,20 @@
 	}
 
 	.nav-label-active {
-		color: #37BDCC;
+		color: $color-secondary;
 		font-weight: bold;
 	}
 
 	.new-header-wrapper {
-		background:
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #1F879B 34%, rgba(31, 135, 155, 0) 68%),
-			linear-gradient(135deg, #02455F 0%, #02455F 56%, #1F879B 100%);
-		background-size: 100% 552px;
-		background-position: center top;
-		padding: 0 20px;
+		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-header-background-image, #{$theme-header-background});
+		background-position: var(--theme-header-background-position, center top);
+		background-size: var(--theme-header-background-size, 100% 552px);
+		background-repeat: var(--theme-header-background-repeat, no-repeat);
+		padding: 0 20px 42px;
 		box-sizing: border-box;
+		overflow: hidden;
+		transition: height 0.3s ease;
 	}
 
 	.header-title-bar {
@@ -855,16 +870,10 @@
 		height: 18px;
 	}
 
-	/* 收起状态的图标滤镜：确保白色 */
-	.collapsed-right .bell-icon,
-	.collapsed-right .settings-icon,
 	.collapsed-right .coin-icon {
 		filter: brightness(0) invert(1) !important;
 	}
 
-	.header-page-row {
-		padding: 0 4px;
-	}
 
 	.header-page-title {
 		color: #fff;
@@ -877,14 +886,15 @@
 		padding: 4px 4px 14px;
 		color: #fff;
 		overflow: hidden;
-		max-height: 100px;
-		transition: opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease;
+		transform: translateY(0);
+		transition: opacity 0.3s ease, transform 0.3s ease;
+		will-change: opacity, transform;
 	}
 
 	.header-collapsed .user-summary {
 		opacity: 0;
-		max-height: 0;
-		padding: 0;
+		transform: translateY(-12px);
+		pointer-events: none;
 	}
 
 	.user-summary .user-avatar {
@@ -913,11 +923,6 @@
 		margin-left: auto;
 	}
 
-	.user-summary .bell-icon,
-	.user-summary .settings-icon {
-		filter: brightness(0) invert(1) !important;
-	}
-
 	.user-summary .avatar-img {
 		background: transparent;
 	}
@@ -926,17 +931,17 @@
 		background: #fff;
 		border-radius: 20px;
 		padding: 14px 20px 16px;
-		color: #1C667C;
+		color: $color-primary;
 		overflow: hidden;
-		max-height: 300px;
-		transition: opacity 0.3s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+		transform: translateY(0);
+		transition: opacity 0.3s ease, transform 0.3s ease;
+		will-change: opacity, transform;
 	}
 
 	.header-collapsed .balance-card {
 		opacity: 0;
-		max-height: 0;
-		margin: 0;
-		padding: 0;
+		transform: translateY(-16px);
+		pointer-events: none;
 	}
 
 	.main-balance-row,
@@ -951,14 +956,14 @@
 	}
 
 	.balance-value {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 23px;
 		font-weight: 700;
 	}
 
 	.balance-eye {
 		font-size: 19px;
-		color: #1c667c;
+		color: $color-primary;
 	}
 
 	.promo-row {
@@ -969,8 +974,8 @@
 	.promo-label {
 		padding: 3px 12px;
 		border-radius: 12px;
-		background: #F1FAFB;
-		color: #1C667C;
+		background: $color-secondary-light;
+		color: $color-primary;
 		font-size: 11px;
 		font-weight: 700;
 	}
@@ -978,7 +983,7 @@
 	.balance-actions {
 		justify-content: space-between;
 		gap: 8px;
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 11px;
 		font-weight: 700;
 	}
@@ -991,6 +996,11 @@
 	}
 
 	.wallet-action image {
+		width: 20px;
+		height: 20px;
+	}
+
+	.wallet-action .wallet-action-icon {
 		width: 20px;
 		height: 20px;
 	}

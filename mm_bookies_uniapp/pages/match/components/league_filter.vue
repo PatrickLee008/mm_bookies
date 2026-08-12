@@ -206,7 +206,7 @@
 
 	/* from tangjq--- 标题栏 */
 	.filter-header {
-		background-color: #1C667C;
+		background-color: $color-secondary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -231,11 +231,14 @@
 
 	.filter-list {
 		padding: 0;
+		background-color: $bg-color-info;
+		border-radius: $radius-medium;
+		overflow: hidden;
 	}
 
 	/* from tangjq--- 过滤项样式 */
 	.filter-item {
-		background-color: #F1FAFB;
+		background-color: $bg-color-info;
 		margin-bottom: 1px;
 		padding: 8px 25px;
 		display: flex;
@@ -244,7 +247,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		border-bottom: 1px solid #1C667C33;
+		border-bottom: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
 	}
 
 	.filter-item:active {
@@ -252,7 +255,7 @@
 	}
 
 	.filter-item-text {
-		color: #1C667C;
+		color: $color-primary;
 		font-size: 14px;
 		font-weight: 500;
 		flex: 1;
@@ -262,7 +265,7 @@
 	.filter-radio {
 		width: 22px;
 		height: 22px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -273,13 +276,13 @@
 
 	.filter-radio-checked {
 		background-color: white;
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.filter-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -293,8 +296,8 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: #1C667C;
-		border-radius: 25px;
+		background-color: $color-secondary;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 		cursor: pointer;

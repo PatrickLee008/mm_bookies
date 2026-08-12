@@ -517,7 +517,7 @@
 
 .input-focused .cuIcon-mobile,
 .input-focused .cuIcon-lock {
-	color: $color-primary;
+	color: var(--theme-primary);
 }
 
 .input-error .cuIcon-mobile,
@@ -695,7 +695,7 @@
 }
 
 .input-focused {
-	border-color: $color-primary;
+	border-color: var(--theme-primary);
 }
 
 .input-error {
@@ -703,7 +703,7 @@
 }
 
 .input-focused .label-focused {
-	color: $color-primary;
+	color: var(--theme-primary);
 }
 
 .input-error .label-focused {

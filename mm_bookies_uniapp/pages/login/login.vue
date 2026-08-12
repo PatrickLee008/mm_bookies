@@ -83,11 +83,11 @@
 				</view>
 
 				<!-- Remember Me -->
-				<view class="remember-row">
-					<text class="remember-text">{{ $t('Remember me') }}</text>
-					<view class="custom-switch" @click="toggleRememberMe">
+				<view class="remember-row" @click="toggleRememberMe">
+					<view class="custom-switch">
 						<view class="switch-dot" :class="{'switch-dot-active': loginInfo.rememberMe}"></view>
 					</view>
+					<text class="remember-text">{{ $t('Remember me') }}</text>
 				</view>
 
 				<!-- Login Button -->
@@ -563,7 +563,11 @@
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background: linear-gradient(180deg, #28454a 0%, #274850 100%);
+		background-color: var(--theme-login-background-color, #{$theme-page-start});
+		background-image: var(--theme-login-background-image, #{$theme-auth-background});
+		background-position: var(--theme-login-background-position, center);
+		background-size: var(--theme-login-background-size, cover);
+		background-repeat: var(--theme-login-background-repeat, no-repeat);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
@@ -578,7 +582,7 @@
 		right: 40rpx;
 		width: 180rpx;
 		height: 60rpx;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 30rpx;
 		display: flex;
 		justify-content: center;
@@ -641,7 +645,7 @@
 		min-width: 300rpx;
 		height: 80rpx;
 		padding: 0 40rpx;
-		background-color: #1C667C;
+		background-color: $color-primary;
 		border-radius: 40rpx;
 		display: flex;
 		align-items: center;
@@ -740,27 +744,25 @@
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: #1C667C;
+		border-color: $color-primary;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: #1C667C;
+		background: $color-primary;
 	}
 
 	/* 原有登录页面样式 */
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background:
-			/* 第三层（最上层）：左下角光晕 */
-			radial-gradient(circle at 0% 100%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第二层：右上角光晕 */
-			radial-gradient(circle at 100% 0%, #36BCCB 0%, #103D43 30%, rgba(31, 135, 155, 0) 50%),
-			/* 第一层（最底层）：线性渐变底色 */
-			linear-gradient(135deg, #103D43 0%, #103D43 56%, #103D43 100%);
+		background-color: var(--theme-login-background-color, #{$theme-page-start});
+		background-image: var(--theme-login-background-image, #{$theme-auth-background});
+		background-position: var(--theme-login-background-position, center);
+		background-size: var(--theme-login-background-size, cover);
+		background-repeat: var(--theme-login-background-repeat, no-repeat);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -891,15 +893,16 @@
 
 	/* from tangjq--- 自定义圆形复选框 */
 	.custom-switch {
-		width: 40rpx;
-		height: 40rpx;
-		border: 3rpx solid rgba(255, 255, 255, 0.6);
+		width: 32rpx;
+		height: 32rpx;
+		border: 4rpx solid $color-secondary-light;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		transition: border-color 0.3s;
+		margin-right: 10px;
 	}
 
 	.custom-switch:active {
@@ -909,14 +912,14 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: #50C8CE;
+		background-color: $color-secondary-light;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
 
 	.switch-dot-active {
-		width: 24rpx;
-		height: 24rpx;
+		width: 20rpx;
+		height: 20rpx;
 	}
 
 	.login-btn {
@@ -941,19 +944,17 @@
 	.register-link {
 		text-align: center;
 		font-size: 24rpx;
+		font-weight: bold;
+		font-style: italic;
 	}
 
 	.register-text {
 		color: rgba(255, 255, 255, 0.9);
-		font-style: italic;
-		font-weight: 400;
 	}
 
 	.register-link-text {
-		color: #50C8CE;
+		color: $color-secondary-light;
 		text-decoration: underline;
-		font-style: italic;
-		font-weight: 600;
 	}
 
 	/* Contact Support 区域 */

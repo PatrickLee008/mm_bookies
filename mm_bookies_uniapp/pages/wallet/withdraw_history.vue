@@ -35,8 +35,8 @@
 				<!-- 类型行：类型 | 支付方式 logo + 名称 -->
 				<view class="card-type-row">
 					<view class="type-left">
-						<image class="type-svg" mode="aspectFit"
-							:src="item.type === 'Deposit' ? '/static/deposit.svg' : '/static/withdraw.svg'" />
+						<theme-icon :name="item.type === 'Deposit' ? 'deposit' : 'withdraw'" class="type-svg"
+							:color="item.type === 'Deposit' ? 'var(--theme-icon-secondary, var(--theme-secondary))' : 'var(--theme-icon-primary, var(--theme-primary))'"></theme-icon>
 						<text class="type-name">{{item.type || 'Withdraw'}}</text>
 					</view>
 					<view class="pay-right">
@@ -294,7 +294,7 @@ async loadRecords() {
 
 	/* 筛选器 */
 	.filter-bar {
-		background: #1C667C;
+		background: $color-primary;
 		border-radius: 20px;
 		padding: 8px 10px;
 		display: flex;
@@ -316,7 +316,7 @@ async loadRecords() {
 	}
 
 	.filter-dropdown {
-		background: #E8F4F5;
+		background: $bg-color-info;
 		border-radius: 12px;
 		flex-shrink: 0;
 	}
@@ -332,13 +332,13 @@ async loadRecords() {
 	.option-text {
 		font-size: 12px;
 		font-weight: 500;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.option-radio {
 		width: 15px;
 		height: 15px;
-		border: 2px solid #37BDCC;
+		border: 2px solid $color-secondary;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
@@ -347,13 +347,13 @@ async loadRecords() {
 	}
 
 	.option-radio.active {
-		border-color: #37BDCC;
+		border-color: $color-secondary;
 	}
 
 	.option-radio-inner {
 		width: 12px;
 		height: 12px;
-		background-color: #37BDCC;
+		background-color: $color-secondary;
 		border-radius: 50%;
 	}
 
@@ -366,7 +366,7 @@ async loadRecords() {
 	/* 记录项（参考 wallet/wallet 卡片样式） */
 	.record-card {
 		margin: 10px 0;
-		background-color: #F1FAFB;
+		background-color: $bg-color-info;
 		border-radius: 14px;
 		overflow: hidden;
 	}
@@ -381,13 +381,13 @@ async loadRecords() {
 	.order-id {
 		font-size: 12px;
 		font-weight: 700;
-		color: #1C667C;
+		color: $color-primary;
 		max-width: 60%;
 	}
 
 	.order-time {
 		font-size: 12px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.card-type-row {
@@ -412,7 +412,7 @@ async loadRecords() {
 	.type-name {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.pay-right {
@@ -430,7 +430,7 @@ async loadRecords() {
 	.pay-name {
 		font-size: 14px;
 		font-weight: 600;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.card-amount-row {
@@ -442,7 +442,7 @@ async loadRecords() {
 
 	.amount-label {
 		font-size: 14px;
-		color: #1C667C;
+		color: $color-primary;
 	}
 
 	.amount-value {
@@ -452,7 +452,7 @@ async loadRecords() {
 	}
 
 	.amount-deposit-color {
-		color: #17A2B8;
+		color: $color-secondary-light;
 	}
 
 	.amount-withdraw-color {
@@ -472,7 +472,7 @@ async loadRecords() {
 	}
 
 	.status-success {
-		color: #17A2B8;
+		color: $color-secondary-light;
 	}
 
 	.status-pending {

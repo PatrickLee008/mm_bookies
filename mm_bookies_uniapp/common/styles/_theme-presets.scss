@@ -1,0 +1,71 @@
+// Sass-only theme presets used during the frontend migration.
+$theme-presets: (
+	legacy: (
+		// 主色：主按钮、主要文字、边框和单色业务图标。
+		primary: #1C667C,
+		// 副色：充值图标、次级按钮、辅助强调文字。
+		secondary: #37BDCC,
+		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
+		secondary-light: #F1FAFB,
+		// 行为强调色：激活标签、选中项和需要突出显示的状态。
+		active: #FFC857,
+		// 主要文字：页面标题、重要数据和主要内容文字。
+		text: #1C667C,
+		// 次要文字：说明文字、占位文字和弱化信息。
+		text-secondary: #1C667C,
+		// 通用浅背景：浅色提示区和非主内容背景。
+		bg-light: #17A2B8,
+		// 信息背景：提示区、筛选下拉和浅色内容卡片。
+		bg-info: #E8F4F5,
+		// 首页渐变起始色：深色页面背景的主要底色。
+		page-start: #103D43,
+		// 首页渐变结束色：页面背景渐变的收束色。
+		page-end: #103D43,
+		// 首页渐变光晕：背景角落的高亮扩散色。
+		glow: #36BCCB,
+		// Header 渐变起始色：顶部导航背景的主要底色。
+		header-start: #02455F,
+		// Header 渐变结束色：顶部导航背景的收束色。
+		header-end: #1F879B,
+		// 大圆角：搜索框、比赛卡片和筛选按钮。
+		radius-large: 12px,
+		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
+		radius-medium: 8px,
+		// 小圆角：投注按钮。
+		radius-small: 4px
+	),
+	test: (
+		// 主色：主按钮、主要文字、边框和单色业务图标。
+		primary: #136201,
+		// 副色：充值图标、次级按钮、辅助强调文字。
+		secondary: #3C9320,
+		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
+		secondary-light: #81BB1D,
+		// 行为强调色：激活标签、选中项和需要突出显示的状态。
+		active: #89D423,
+		// 主要文字：页面标题、重要数据和主要内容文字。
+		text: #136201,
+		// 次要文字：说明文字、占位文字和弱化信息。
+		text-secondary: #3C9320,
+		// 通用浅背景：浅色提示区和非主内容背景。
+		bg-light: #17A2B8,
+		// 信息背景：提示区、筛选下拉和浅色内容卡片。
+		bg-info: #F2F2F2,
+		// 首页渐变起始色：深色页面背景的主要底色。
+		page-start: #136201,
+		// 首页渐变结束色：页面背景渐变的收束色。
+		page-end: #103D43,
+		// 首页渐变光晕：背景角落的高亮扩散色。
+		glow: #81BB1D,
+		// Header 渐变起始色：顶部导航背景的主要底色。
+		header-start: #81BB1D,
+		// Header 渐变结束色：顶部导航背景的收束色。
+		header-end: #136201,
+		// 大圆角：搜索框、比赛卡片和筛选按钮。
+		radius-large: 12px,
+		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
+		radius-medium: 8px,
+		// 小圆角：投注按钮。
+		radius-small: 4px
+	)
+);
