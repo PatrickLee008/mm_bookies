@@ -738,10 +738,7 @@ def single_bet():
                 response = jsonify({'message': "Bet failed: this match has reached the order limit."})
                 response.status_code = 400
                 return response
-            # 让球盘HDP和大小盘OU（1\2），singleRatio 来自业务字典（见循环外获取）
-            # round 到两位小数，避免 1-0.05 产生 0.9500000000000001 之类的浮点误差
-            # order_type 来自请求 JSON，实际为字符串（如 '1'），用 str() 归一化后再比较
-            BET_ODDS = round(1 - singleRatio, 2) if str(order_type) in ('1', '2') else match_attr.ODDS
+
             order_id = "%s-%s" % (user.username, round(time.time() * 1000))
             new_order = Order(ID=str(uuid.uuid4()).replace("-", ""), ORDER_ID=order_id, USER_ID=user.id,
                               USER_NAME=user.username,
@@ -749,13 +746,13 @@ def single_bet():
                               ORDER_DESC="%s || %s" % (match.HOST_TEAM, match.GUEST_TEAM),
                               BET_MONEY=bet['amount'], order_type_desc="暂无", STATUS="1", IS_MIX="0", IS_WIN="2",
                               BONUS="0", LOSE_TEAM=match_attr.LOSE_TEAM,
-                              BET_ODDS=BET_ODDS, LEAGUE=match.LEAGUE,
+                              BET_ODDS=match_attr.ODDS, LEAGUE=match.LEAGUE,
                               DRAW_BUNKO=0 if match_attr.DRAW_BUNKO == '' else match_attr.DRAW_BUNKO,
                               DRAW_ODDS=match_attr.DRAW_ODDS,
                               LOSE_BALL_NUM=0 if match_attr.LOSE_BALL_NUM == '' else match_attr.LOSE_BALL_NUM,
                               MATCH_TIME=match.MATCH_MD_TIME, IP=int(ipaddress.IPv4Address(request.remote_addr)))
             # 设置下注信息
-            match_attr.set_bet_info(new_order)
+            match_attr.set_bet_info(new_order,singleRatio)
             # 设置代理ID
             if user.aid:
                 new_order.AGENT_CODE = user.aid

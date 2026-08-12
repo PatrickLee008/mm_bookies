@@ -94,14 +94,18 @@ class MatchAttr(db.Model):
             return MatchAttr.query.filter_by(MATCH_ID=match_id, MATCH_ATTR_TYPE=attr_type).first()
 
     # 设置订单下注赔率等信息
-    def set_bet_info(self,order: Order):
+    def set_bet_info(self,order: Order,singleRatio):
         attr_type = order.ORDER_TYPE
         bet_type = order.BET_TYPE
         if attr_type in ('1'):#HDP（胜负让球盘）
-            order.BET_ODDS = self.ODDS
+            # 让球盘HDP和大小盘OU（1\2），singleRatio 来自业务字典（见循环外获取）
+            # round 到两位小数，避免 1-0.05 产生 0.9500000000000001 之类的浮点误差
+            order.BET_ODDS = round(1 - singleRatio, 2) #self.ODDS
             order.BET_TYPE_INFO = "Home" if bet_type == 1 else "Away"
         elif attr_type in ('2'):#大小盘OU
-            order.BET_ODDS = self.ODDS
+            # 让球盘HDP和大小盘OU（1\2），singleRatio 来自业务字典（见循环外获取）
+            # round 到两位小数，避免 1-0.05 产生 0.9500000000000001 之类的浮点误差
+            order.BET_ODDS = round(1 - singleRatio, 2) #self.ODDS
             #记录买大小（1大，2小）
             order.BALL_TYPE = bet_type
             order.BET_TYPE_INFO = "Over" if bet_type == 1 else "Under"
