@@ -357,7 +357,7 @@
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
+		border-radius: $radius-large;
 		padding: 8px 10px;
 		display: flex;
 		align-items: center;
@@ -429,6 +429,7 @@
 	.record-item {
 		margin: 12px 0;
 		background-color: $bg-color-info;
+		border: 1px solid $color-border;
 		border-radius: 12px;
 		padding: 14px 16px;
 		overflow: hidden;

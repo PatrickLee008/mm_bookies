@@ -1,5 +1,5 @@
 <template>
-	<view class="match-page-container" >
+	<view class="match-page-container">
 		<!-- from tangjq--- 使用新的统一header组件 -->
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
@@ -14,8 +14,8 @@
 						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 					<input class="search-input" type="text" :placeholder="$t('search')" v-model="searchKeyword" />
 					<theme-icon name="close" class="clear-icon"
-						color="var(--theme-icon-secondary, var(--theme-secondary))"
-						v-show="searchKeyword" @tap="clearSearch"></theme-icon>
+						color="var(--theme-icon-secondary, var(--theme-secondary))" v-show="searchKeyword"
+						@tap="clearSearch"></theme-icon>
 				</view>
 				<view class="filter-button" @click="openFilterPopup">
 					<view class="filter-icon">
@@ -28,7 +28,9 @@
 		</view>
 
 		<!-- Game Categories and Game Cards -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container" @scroll="handleHeaderScroll" :style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container"
+			@scroll="handleHeaderScroll"
+			:style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
 
 			<!-- Loop through game categories -->
 			<view class="flex-column padding-tb-sm" v-for="(category, catIndex) in game_categories" :key="catIndex">
@@ -40,7 +42,8 @@
 
 				<!-- Game Grid -->
 				<view v-show="category.expanded" class="game-grid margin-top-sm">
-					<view class="game-card" v-for="(game, gameIndex) in category.games" :key="gameIndex" @click="openGame(game)">
+					<view class="game-card" v-for="(game, gameIndex) in category.games" :key="gameIndex"
+						@click="openGame(game)">
 						<!-- Game Image -->
 						<view class="game-image-wrapper">
 							<image :src="game.image" mode="aspectFill" class="game-image" lazy-load></image>
@@ -53,7 +56,8 @@
 								<text class="game-desc">{{game.description}}</text>
 							</view>
 							<view class="game-favorite" @click.stop="toggleFavorite(game)">
-								<view class="favorite-icon" :class="[game.favorite ? 'cuIcon-favorfill' : 'cuIcon-favor', 'text-white']"></view>
+								<view class="favorite-icon"
+									:class="[game.favorite ? 'cuIcon-favorfill' : 'cuIcon-favor', 'text-white']"></view>
 							</view>
 						</view>
 					</view>
@@ -71,7 +75,8 @@
 
 				<!-- Filter Options -->
 				<view class="filter-options">
-					<view class="filter-option" v-for="(option, index) in filterOptions" :key="index" @click="selectFilterOption(option)">
+					<view class="filter-option" v-for="(option, index) in filterOptions" :key="index"
+						@click="selectFilterOption(option)">
 						<text class="filter-option-text">{{option}}</text>
 						<view class="filter-radio" :class="{'active': filterOption === option}">
 							<view class="filter-radio-inner" v-if="filterOption === option"></view>
@@ -193,7 +198,8 @@
 							gameCode: game.gameCode,
 							name: game.nameZh || game.nameEn || 'Unknown',
 							description: `RTP: ${game.rtp || 'N/A'}%`,
-							image: game.iconUrl ? `${_this.siteinfo.awcImgUrl}${game.iconUrl}` : (game.thumbnailUrl || '/static/image/game/default-game.png'),
+							image: game.iconUrl ? `${_this.siteinfo.awcImgUrl}${game.iconUrl}` : (game
+								.thumbnailUrl || '/static/image/game/default-game.png'),
 							favorite: game.isFavourite === 1,
 							isHot: game.isHot === 1,
 							isNew: game.isNew === 1
@@ -204,7 +210,8 @@
 						_this.groupGamesByPlatform(_this.filteredGames)
 						// 如果有外部传入的厂商平台参数，过滤只显示该平台
 						if (_this.pendingPlatform) {
-							_this.game_categories = _this.game_categories.filter(cat => cat.name === _this.pendingPlatform)
+							_this.game_categories = _this.game_categories.filter(cat => cat.name === _this
+								.pendingPlatform)
 							_this.pendingPlatform = null
 						}
 					} else {
@@ -385,7 +392,8 @@
 					if (res.statusCode == 200 && res.data.code == 200) {
 						game.favorite = !isFavorite
 						uni.showToast({
-							title: isFavorite ? _this.$t('removed_from_favorites') : _this.$t('added_to_favorites'),
+							title: isFavorite ? _this.$t('removed_from_favorites') : _this.$t(
+								'added_to_favorites'),
 							icon: 'success'
 						})
 					} else {
@@ -459,7 +467,7 @@
 
 	/* Search Container */
 	.search-container {
-		    padding: 10px;
+		padding: 10px;
 		background-color: #f5f5f5;
 	}
 
@@ -702,6 +710,7 @@
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		border-radius: 10px 0 0 0;
 	}
 

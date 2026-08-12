@@ -34,7 +34,7 @@
 				</view>
 				<view class="user-details">
 					<text class="greeting">{{ $t(greetingKey) }}</text>
-					<text class="id-value">My ID : {{userInfo.phone || ''}}</text>
+					<text class="id-value">My ID : {{userInfo.id || ''}}</text>
 				</view>
 				<view class="header-actions">
 					<view class="bell-btn" @click="goMessage">
@@ -131,7 +131,6 @@
 				balanceVisible: true,
 				collapsed: false, // header收起状态
 				expandedHeight: 0, // 展开时的精确高度（用于立即恢复）
-				collapsedHeaderHeight: 82, // 8px 顶部间距 + 32px logo 行 + 42px 页面标题行
 			}
 		},
 		computed: {
@@ -178,7 +177,7 @@
 				return titles[this.currentRoute] || ''
 			},
 			headerHeightStyle() {
-				const height = this.collapsed && this.isLogin ? this.collapsedHeaderHeight : this.expandedHeight
+				const height = this.collapsed && this.isLogin ? 85 : this.expandedHeight
 				return height ? {
 					height: `${height}px`
 				} : {}
@@ -211,9 +210,8 @@
 		},
 		methods: {
 			displayBalance(value) {
-				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
-				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
-				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+				const formattedBalance = this.$toolbox.floor_format(value || 0)
+				return this.balanceVisible ? formattedBalance : formattedBalance.replace(/\d/g, '*')
 			},
 			// from tangjq--- 更新当前激活的导航项
 			updateActiveNav() {
@@ -280,9 +278,9 @@
 
 				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
 				if (collapsed) {
-					// 收起状态：8px 顶部间距 + 32px logo 行 + 42px 页面标题行 = 82px
+					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
 					if (this.isLogin) {
-						this.$emit('headerHeightChange', this.collapsedHeaderHeight)
+						this.$emit('headerHeightChange', 85)
 					}
 				} else if (this.expandedHeight) {
 					// 展开：立即恢复到之前测量的精确高度
@@ -570,6 +568,7 @@
 	.cashout-value {
 		color: $color-primary;
 		font-size: 12px;
+		font-weight: bold;
 	}
 
 	.settings-btn {
@@ -652,23 +651,24 @@
 	/* 铃铛未读数角标 */
 	.bell-badge {
 		position: absolute;
-		top: -2px;
+		top: -5px;
 		right: -2px;
-		min-width: 16px;
-		min-height: 16px;
-		padding: 0 4px;
-		border-radius: 8px;
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		padding: 0;
+		border-radius: 50%;
 		background-color: #FF4444;
 		color: #ffffff;
-		font-size: 10px;
+		font-size: 8px;
 		font-weight: bold;
-		line-height: normal;
+		line-height: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
 		box-sizing: border-box;
-		// border: 1px solid #ffffff;
+		white-space: nowrap;
 	}
 
 	/* from tangjq--- 未登录状态卡片 */
@@ -779,18 +779,21 @@
 		position: absolute;
 		top: -2px;
 		right: -2px;
-		min-width: 18px;
-		height: 18px;
-		border-radius: 9px;
+		width: 20px;
+		height: 20px;
+		min-width: 20px;
+		border-radius: 50%;
 		background-color: #FF4444;
 		color: white;
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: bold;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: 0 4px;
+		padding: 0;
 		border: 2px solid $color-primary;
+		box-sizing: border-box;
+		white-space: nowrap;
 	}
 
 	.nav-icon-label {
@@ -816,19 +819,21 @@
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);
 		background-repeat: var(--theme-header-background-repeat, no-repeat);
+		min-height: 270px;
 		padding: 0 20px 42px;
 		box-sizing: border-box;
 		overflow: hidden;
 		transition: height 0.3s ease;
 	}
 
-	.zw-header-wrapper.header-collapsed {
-		padding-top: 8px;
-	}
-
 	.header-title-bar {
 		position: relative;
 		padding: 14px 0 8px;
+	}
+
+	.zw-header-wrapper.header-collapsed {
+		min-height: 85px;
+		padding-top: 8px;
 	}
 
 	/* 收起状态：标题栏左对齐 */
@@ -935,7 +940,8 @@
 
 	.balance-card {
 		background: #fff;
-		border-radius: 20px;
+		border: 1px solid $color-border;
+		border-radius: 16px;
 		padding: 14px 20px 16px;
 		color: $color-primary;
 		overflow: hidden;

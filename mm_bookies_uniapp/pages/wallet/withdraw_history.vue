@@ -295,7 +295,7 @@ async loadRecords() {
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
+		border-radius: $radius-large;
 		padding: 8px 10px;
 		display: flex;
 		align-items: center;
@@ -367,7 +367,8 @@ async loadRecords() {
 	.record-card {
 		margin: 10px 0;
 		background-color: $bg-color-info;
-		border-radius: 14px;
+		border: 1px solid $color-border;
+		border-radius: $radius-medium;
 		overflow: hidden;
 	}
 

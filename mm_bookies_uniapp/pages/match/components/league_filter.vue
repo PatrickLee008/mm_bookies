@@ -210,6 +210,7 @@
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 		border-radius: 10px 0 0 0;
 	}

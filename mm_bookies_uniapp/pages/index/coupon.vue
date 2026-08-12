@@ -32,7 +32,8 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60" @scroll="handleHeaderScroll">
+		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60"
+			@scroll="handleHeaderScroll">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
@@ -128,26 +129,26 @@
 				</view>
 
 				<!-- ============ Promotion 区域 ============ -->
-				<view class="list-container" v-else-if="activity_type === 'promotion'">
+				<view class="list-container promotion-list-container" v-else-if="activity_type === 'promotion'">
 					<view class="promotion-card2" v-for="(promo, index) in promotion_list" :key="index"
 						@click="showPromotionDetail(promo)">
 						<view class="promotion-card2-header" :class="getPromotionHeaderClass(promo.status)">
 							<text class="promotion-card2-title">{{ promo.name }}</text>
 						</view>
+						<view class="promotion-card2-image">
+							<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
+								@error="handlePromotionImageError(promo)"></image>
+						</view>
 						<view class="promotion-card2-body">
-							<view class="promo-thumb-wrap">
-								<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
-									@error="handlePromotionImageError(promo)"></image>
-							</view>
 							<view class="promo-info">
-								<text class="promo-label">Promotion Period</text>
+								<text class="promo-label">Promotion Period:</text>
 								<text class="promo-period">{{ promo.period_start }} - {{ promo.period_end }}</text>
 								<view class="promo-countdown"
 									v-if="promo.end_time_full && isWithin48Hours(promo.end_time_full)">
 									<count-down :count_time="promo.end_time_full"></count-down>
 								</view>
 								<text class="promo-label promo-label-mt">Terms & Conditions</text>
-								<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 60) }}</text>
+								<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
 							</view>
 						</view>
 						<view class="promotion-card2-footer">
@@ -395,41 +396,41 @@
 					</view>
 
 					<!-- Applicable Scenarios -->
-				<view class="coupon-scenarios"
-					v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
-					<text class="coupon-scenarios-title">Applicable Scenarios:</text>
-					<view class="coupon-scenarios-icons">
-						<!-- 1x2 Sports Betting -->
-						<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
-							@click="openPromotionSport">
-							<view class="coupon-scenario-icon-circle">
-								<theme-icon name="single" class="coupon-scenario-img"
-									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+					<view class="coupon-scenarios"
+						v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
+						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
+						<view class="coupon-scenarios-icons">
+							<!-- 1x2 Sports Betting -->
+							<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
+								@click="openPromotionSport">
+								<view class="coupon-scenario-icon-circle">
+									<theme-icon name="single" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								</view>
+								<text class="coupon-scenario-label">Single</text>
 							</view>
-							<text class="coupon-scenario-label">Single</text>
+							<!-- Mix Parlay -->
+							<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
+								@click="openPromotionVendorGames(promotionDisplayVendors[0])">
+								<view class="coupon-scenario-icon-diamond">
+									<theme-icon name="mixparlay" class="coupon-scenario-img"
+										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								</view>
+								<text class="coupon-scenario-label">Mix</text>
+							</view>
 						</view>
-						<!-- Mix Parlay -->
-						<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
-							@click="openPromotionVendorGames(promotionDisplayVendors[0])">
-							<view class="coupon-scenario-icon-diamond">
-								<theme-icon name="mixparlay" class="coupon-scenario-img"
-									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+						<!-- Vendor list (collapsible below icons) -->
+						<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
+							<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+								:key="index" @click="openPromotionVendorGames(vendor)">
+								<view class="coupon-vendor-info">
+									<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
+										mode="heightFix"></image>
+									<text class="coupon-vendor-name">{{ vendor.platform }}</text>
+								</view>
 							</view>
-							<text class="coupon-scenario-label">Mix</text>
 						</view>
 					</view>
-					<!-- Vendor list (collapsible below icons) -->
-					<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
-						<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
-							:key="index" @click="openPromotionVendorGames(vendor)">
-							<view class="coupon-vendor-info">
-								<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
-									mode="heightFix"></image>
-								<text class="coupon-vendor-name">{{ vendor.platform }}</text>
-							</view>
-						</view>
-					</view>
-				</view>
 				</scroll-view>
 
 				<view class="detail-modal-footer">
@@ -507,7 +508,7 @@
 				loading: false,
 
 				// 顶部切换：coupon / promotion
-			activity_type: 'promotion',
+				activity_type: 'promotion',
 
 				// Coupon Tab
 				tabs: ['Unused', 'Used', 'Expired'],
@@ -614,7 +615,7 @@
 				if (!timeStr) return ''
 				let d = this.toMyanmarTime(timeStr).split(' ')[0].split('-')
 				if (d.length < 3) return String(timeStr)
-				return `${d[0]}${sep}${d[1]}${sep}${d[2]}`
+				return `${d[2]}${sep}${d[1]}${sep}${d[0]}`
 			},
 			toMyanmarTime(timeStr) {
 				if (!timeStr) return ''
@@ -1004,8 +1005,8 @@
 					name: promo.title || 'PROMOTION',
 					slogan: promo.slogan || '',
 					image: promo.image_url || '/static/image/deals/deals.png',
-					period_start: this.dateOnly(promo.start_date, '.'),
-					period_end: this.dateOnly(promo.end_date, '.'),
+					period_start: this.dateOnly(promo.start_date, '/'),
+					period_end: this.dateOnly(promo.end_date, '/'),
 					end_time_full: this.parseServerTime(promo.end_date),
 					period_start_time: this.formatDateTime(promo.start_date),
 					period_end_time: this.formatDateTime(promo.end_date),
@@ -1449,8 +1450,8 @@
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		background: $color-secondary-light;
-		border: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		background: white;
+		border: 1px solid var(--theme-secondary);
 		color: $color-primary;
 		font-size: 14px;
 		font-weight: 600;
@@ -1463,18 +1464,25 @@
 
 	.promo-count-badge {
 		position: absolute;
-		// top: 2px;
+		top: 50%;
 		right: 8px;
-		min-width: 16px;
-		height: 16px;
-		padding: 0 3px;
-		border-radius: 8px;
+		transform: translateY(-50%);
+		width: 20px;
+		height: 20px;
+		min-width: 20px;
+		padding: 0;
+		border-radius: 50%;
 		background-color: $color-primary;
 		color: #fff;
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: 700;
-		line-height: 16px;
+		line-height: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
+		white-space: nowrap;
+		box-sizing: border-box;
 		animation: promoRipple 1.6s ease-in-out infinite;
 	}
 
@@ -1569,7 +1577,7 @@
 	}
 
 	.tab-item.active .tab-text {
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -1578,7 +1586,7 @@
 		bottom: 0;
 		left: 0;
 		height: 2px;
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	}
@@ -1615,7 +1623,7 @@
 		padding: 2px 8px;
 		border-radius: 6px;
 		color: #fff;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.ca-status-active {
@@ -1623,7 +1631,7 @@
 	}
 
 	.ca-status-completed {
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.ca-status-cancelled,
@@ -1683,7 +1691,7 @@
 		margin-top: 7.5px;
 		margin-bottom: 7.5px;
 		overflow: hidden;
-		border: 1px solid rgba(0, 0, 0, 0.08);
+		border: 1px solid $color-border;
 		box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
 	}
 
@@ -1818,66 +1826,74 @@
 	}
 
 	/* Promotion 卡片 */
+	.promotion-list-container {
+		padding: 8px 20px 20px;
+	}
+
 	.promotion-card2 {
 		background: #fff;
-		border-radius: 12px;
-		margin-bottom: 15px;
+		border: 1px solid $color-border;
+		border-radius: $radius-large;
+		margin: 12px 0 20px;
 		overflow: hidden;
-		border: 1px solid rgba(0, 0, 0, 0.08);
-		box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.12);
+		box-shadow: none;
 	}
 
 	.promotion-card2-header {
-		padding: 10px 15px;
+		min-height: 52px;
+		padding: 0 16px;
 		color: #fff;
 		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.promotion-card2-title {
-		font-size: 15px;
-		font-weight: 600;
+		font-size: 16px;
+		font-weight: 700;
 	}
 
-	.promotion-card2-body {
-		padding: 12px 15px;
-		display: flex;
-		flex-direction: row;
-		gap: 12px;
-	}
-
-	.promo-thumb-wrap {
-		width: 130px;
-		height: 92px;
-		flex-shrink: 0;
-		border-radius: 8px;
+	.promotion-card2-image {
+		width: 100%;
+		height: 128px;
+		background: $bg-color-info;
 		overflow: hidden;
 	}
 
 	.promo-thumb {
 		width: 100%;
 		height: 100%;
+		display: block;
+	}
+
+	.promotion-card2-body {
+		padding: 18px 19px 17px;
+		display: block;
 	}
 
 	.promo-info {
-		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
 	}
 
 	.promo-label {
 		font-size: 12px;
-		color: #8B8891;
+		color: $color-primary;
+		font-weight: 500;
+		line-height: 16px;
 	}
 
 	.promo-label-mt {
-		margin-top: 4px;
+		margin-top: 14px;
 	}
 
 	.promo-period {
-		font-size: 12px;
+		margin-top: 1px;
+		font-size: 16px;
+		line-height: 24px;
 		color: $color-primary;
-		font-weight: bold;
+		font-weight: 700;
 	}
 
 	.promo-countdown {
@@ -1887,38 +1903,48 @@
 		color: $color-primary;
 		font-weight: bold;
 		font-size: 13px;
-		margin-top: 2px;
+		margin-top: 6px;
 	}
 
 	.promo-terms {
-		font-size: 12px;
+		font-size: 16px;
 		color: $color-primary;
-		line-height: 1.4;
+		font-weight: 700;
+		line-height: 1.35;
+		max-height: 44px;
+		overflow: hidden;
 	}
 
 	.promotion-card2-footer {
-		padding: 0 0 0 15px;
+		min-height: 68px;
+		padding: 14px 16px 15px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-top: 1px solid rgba(0, 0, 0, 0.06);
+		border-top: 1px dashed rgba(0, 0, 0, 0.12);
+		box-sizing: border-box;
 	}
 
 	.promo-amount {
-		font-size: 14px;
-		font-weight: bold;
-		color: #1e3a5f;
+		font-size: 20px;
+		line-height: 26px;
+		font-weight: 700;
+		color: $color-primary;
 		flex: 1;
 	}
 
 	.promo-status-btn {
 		background: $color-primary;
 		color: #fff;
-		line-height: 34px;
-		text-align: center;
-		min-width: 100px;
-		font-size: 13px;
-		font-weight: bold;
+		width: 117px;
+		height: 36px;
+		border-radius: $radius-medium;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 14px;
+		font-weight: 700;
+		box-sizing: border-box;
 	}
 
 	.promo-status-text {
@@ -1926,8 +1952,8 @@
 		font-weight: 700;
 		color: $color-primary;
 		text-align: center;
-		min-width: 100px;
-		padding: 8px 0;
+		min-width: 117px;
+		padding: 10px 0;
 	}
 
 	/* 空状态 */
@@ -2055,7 +2081,7 @@
 
 	.detail-code-copy {
 		font-size: 13px;
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -2139,7 +2165,7 @@
 
 	.read-more {
 		font-size: 13px;
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: bold;
 		margin-top: 4px;
 		display: inline-block;
@@ -2184,7 +2210,7 @@
 
 	.progress-bar-fill {
 		height: 100%;
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 4px;
 		transition: width 0.3s ease;
 	}
@@ -2285,8 +2311,8 @@
 		align-items: center;
 		justify-content: space-between;
 		background: #F5F5F5;
-		border-radius: 999px;
-		padding: 12px 20px;
+		border-radius: $radius-large;
+		padding: 10px 20px;
 		margin-bottom: 20px;
 	}
 

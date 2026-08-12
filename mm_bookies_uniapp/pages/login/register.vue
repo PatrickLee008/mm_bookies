@@ -22,8 +22,7 @@
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
-			<!-- TODO: 替换为正确的缅甸文翻译 -->
-			<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
+			<view class="login-subtitle"></view>
 		</view>
 
 		<!-- 广告区域 -->
@@ -521,6 +520,10 @@
 		letter-spacing: 2rpx;
 	}
 
+	.login-subtitle::after {
+		content: $theme-subtitle-value;
+	}
+
 	/* 广告区域 */
 	.ad-container {
 		width: 800rpx;
@@ -575,7 +578,7 @@
 	}
 
 	.input-error {
-		border: 2rpx solid #e54d42;
+		border: 2rpx solid #D0342C;
 	}
 
 	.password-toggle {

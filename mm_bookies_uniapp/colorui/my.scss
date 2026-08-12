@@ -9,6 +9,7 @@
 	--theme-text-secondary: #{$theme-text-secondary-value};
 	--theme-bg-light: #{$theme-bg-light-value};
 	--theme-bg-info: #{$theme-bg-info-value};
+	--theme-border: #{$theme-border-value};
 	--theme-radius-large: #{$theme-radius-large-value};
 	--theme-radius-medium: #{$theme-radius-medium-value};
 	--theme-radius-small: #{$theme-radius-small-value};
@@ -304,12 +305,12 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	display: none;
 }
 
-@if "#{$theme-preset}" == "test" {
-	.theme-logo-image-test {
+@if "#{$theme-preset}" == "shwe-goal" {
+	.theme-logo-image-shwe-goal {
 		display: block;
 	}
-} @else if "#{$theme-preset}" == "test-old" {
-	.theme-logo-image-test-old {
+} @else if "#{$theme-preset}" == "phoe-wa-maung" {
+	.theme-logo-image-phoe-wa-maung {
 		display: block;
 	}
 } @else {

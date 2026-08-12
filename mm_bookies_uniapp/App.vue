@@ -340,7 +340,7 @@
 			Vue.prototype.ColorList = [{
 					title: '嫣红',
 					name: 'red',
-					color: '#e54d42'
+					color: '#D0342C'
 				},
 				{
 					title: '桔橙',

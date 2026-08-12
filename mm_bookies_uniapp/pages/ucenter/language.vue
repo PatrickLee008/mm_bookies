@@ -154,14 +154,14 @@
 	}
 
 	.radio-circle.radio-selected {
-		border-color: #4fb3bf;
+		border-color: $color-primary;
 	}
 
 	.radio-dot {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.confirm-btn {

@@ -826,7 +826,7 @@
 	}
 
 	.input-error {
-		border-color: #e54d42;
+		border-color: #D0342C;
 	}
 
 	.input-focused .label-focused {
@@ -834,6 +834,6 @@
 	}
 
 	.input-error .label-focused {
-		color: #e54d42;
+		color: #D0342C;
 	}
 </style>

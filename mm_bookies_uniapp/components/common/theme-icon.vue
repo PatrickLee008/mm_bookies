@@ -37,6 +37,7 @@ const defaultColors = {
 	share: 'var(--theme-icon-primary, var(--theme-primary, #000000))',
 	copy: 'var(--theme-icon-primary, var(--theme-primary, #1C667C))',
 	question: 'var(--theme-icon-primary, var(--theme-primary, #1C667C))',
+	'user-avatar': 'var(--theme-icon-primary, var(--theme-primary, #1C667C))',
 }
 
 // These definitions use the original SVG dimensions and path data. Only the
@@ -62,6 +63,20 @@ const inlineIcons = {
 			type: 'path',
 			attrs: {
 				d: 'M10 0C15.52 0 20 4.48 20 10C20 15.52 15.52 20 10 20C4.48 20 0 15.52 0 10C0 4.48 4.48 0 10 0ZM11 10V6H9V10H6L10 14L14 10H11Z',
+				fill: 'currentColor',
+			},
+		}],
+	},
+	'user-avatar': {
+		width: 37,
+		height: 37,
+		viewBox: '0 0 37 37',
+		elements: [{
+			type: 'path',
+			attrs: {
+				'fill-rule': 'evenodd',
+				'clip-rule': 'evenodd',
+				d: 'M18.3333 2.01435e-10C20.7409 -1.12853e-05 23.1249 0.474185 25.3492 1.39551C27.5735 2.31684 29.5946 3.66726 31.297 5.36967C32.9994 7.07208 34.3498 9.09313 35.2711 11.3174C36.1925 13.5417 36.6667 15.9257 36.6667 18.3333C36.6667 28.4585 28.4585 36.6667 18.3333 36.6667C8.20815 36.6667 0 28.4585 0 18.3333C0 8.20815 8.20815 2.01435e-10 18.3333 2.01435e-10ZM20.1667 20.1667H16.5C11.9612 20.1667 8.06455 22.9156 6.38387 26.8396C9.04312 30.5685 13.4043 33 18.3333 33C23.2623 33 27.6235 30.5685 30.2828 26.8393C28.6022 22.9156 24.7055 20.1667 20.1667 20.1667ZM18.3333 5.5C15.2958 5.5 12.8333 7.96245 12.8333 11C12.8333 14.0375 15.2958 16.5 18.3333 16.5C21.3709 16.5 23.8333 14.0375 23.8333 11C23.8333 7.96245 21.3709 5.5 18.3333 5.5Z',
 				fill: 'currentColor',
 			},
 		}],

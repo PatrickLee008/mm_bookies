@@ -11,8 +11,7 @@
 export default {
 	data() {
 		return {
-			// Logo 改为固定高度后，先使用不小于实际 Header 的安全占位，测量完成后再更新为精确值。
-			headerHeight: uni.getStorageSync('Authorization') ? 270 : 201,
+			headerHeight: uni.getStorageSync('Authorization') ? 270 : 201, // 默认占位高度，等待 header 组件计算后更新
 			_headerCollapsed: null, // 当前收起状态（防止重复触发）
 			_headerTransitioning: false, // 收缩动画期间忽略布局变化触发的滚动事件
 			_headerTransitionTimer: null,

@@ -810,7 +810,7 @@
 	}
 
 	.tab-item.active .tab-text {
-		color: #4fb3bf;
+		color: $color-primary;
 	}
 
 	.slide-indicator {
@@ -818,7 +818,7 @@
 		bottom: 0;
 		left: 10px;
 		height: 1px;
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 		width: 60px;

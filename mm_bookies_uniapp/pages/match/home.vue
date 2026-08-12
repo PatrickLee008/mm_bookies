@@ -8,7 +8,7 @@
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"
-			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+			:style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -26,8 +26,7 @@
 					color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 				<input class="search-input" placeholder-style="font-style:italic;color:var(--theme-primary)" type="text"
 					:placeholder="$t('search_by_team')" v-model="searchKeyword" @input="handleSearchInput" />
-				<theme-icon name="close" class="clear-icon"
-					color="var(--theme-icon-secondary, var(--theme-secondary))"
+				<theme-icon name="close" class="clear-icon" color="var(--theme-icon-secondary, var(--theme-secondary))"
 					v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
@@ -37,7 +36,9 @@
 					<view class="filter-line"></view>
 					<view class="filter-line"></view>
 				</view>
-				<view class='filter-badge' v-if="league_checked_count > 0">{{league_checked_count}}</view>
+				<view class='filter-badge' v-if="league_checked_count > 0">
+					{{ league_checked_count > 99 ? '99+' : league_checked_count }}
+				</view>
 			</view>
 		</view>
 
@@ -2368,14 +2369,18 @@
 		right: -5px;
 		background-color: #ff4444;
 		color: white;
-		border-radius: 10px;
-		min-width: 16px;
-		height: 16px;
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 9px;
-		padding: 0 4px;
+		font-size: 8px;
+		line-height: 1;
+		padding: 0;
+		white-space: nowrap;
+		box-sizing: border-box;
 	}
 
 	/* from tangjq--- 新的联赛标题栏样式 */
@@ -2845,7 +2850,7 @@
 	/* from tangjq--- 混合投注列表项，与左右边框有距离 */
 	.mix-match-item {
 		background-color: $bg-color-info;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		padding: 12px 15px;
 		margin: 0 15px 12px 15px;
 	}
@@ -2938,7 +2943,7 @@
 	/* from tangjq--- 单注比赛信息样式 */
 	.single-match-info {
 		background-color: $bg-color-info;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		padding: 10px;
 		margin: 15px;
 		margin-bottom: 15px;
@@ -3046,7 +3051,7 @@
 
 	.bet-info-rows {
 		background-color: $bg-color-info;
-		border-radius: 10px;
+		border-radius: $radius-small;
 		padding: 12px 15px;
 		margin-bottom: 15px;
 	}
@@ -3090,7 +3095,7 @@
 		justify-content: center;
 		gap: 2px;
 		padding: 4px;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		border: 1.5px solid $color-primary;
 		background: $bg-color-info;
 		cursor: pointer;
@@ -3143,7 +3148,7 @@
 
 	.bet-amount-input {
 		background-color: #BDD4D6;
-		border-radius: 10px;
+		border-radius: $radius-small;
 		padding: 8px;
 		margin-bottom: 5px;
 	}
@@ -3191,8 +3196,8 @@
 	.cancel-btn {
 		flex: 1;
 		background-color: white;
-		border: 2px solid #C8434C;
-		border-radius: 12px;
+		border: 2px solid $color-primary;
+		border-radius: $radius-medium;
 		padding: 5px;
 		display: flex;
 		align-items: center;
@@ -3208,7 +3213,7 @@
 	.confirm-btn-action {
 		flex: 1;
 		background-color: #BDD4D6;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 5px;
 		display: flex;
 		align-items: center;

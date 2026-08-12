@@ -142,7 +142,7 @@
 						name: 'a',
 						attrs: {
 							href: href,
-							style: 'color: #4fb3bf; text-decoration: underline;'
+							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 						},
 						children: [{
 							type: 'text',
@@ -317,7 +317,7 @@
 	}
 
 	.copy-btn {
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 8px;
 		padding: 8px 16px;
 		display: flex;

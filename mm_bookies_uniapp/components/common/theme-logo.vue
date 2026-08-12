@@ -3,10 +3,10 @@
 		<image class="theme-logo-image theme-logo-image-legacy"
 			src="/static/theme/legacy/mm_bookies_logo.png" mode="heightFix"
 			:style="{ height: cssHeight }"></image>
-		<image class="theme-logo-image theme-logo-image-test"
+		<image class="theme-logo-image theme-logo-image-shwe-goal"
 			src="/static/theme/test/shwegoal_logo.png" mode="heightFix"
 			:style="{ height: cssHeight }"></image>
-		<image class="theme-logo-image theme-logo-image-test-old"
+		<image class="theme-logo-image theme-logo-image-phoe-wa-maung"
 			src="/static/theme/test-old/phoewaa_maung_logo.png" mode="heightFix"
 			:style="{ height: cssHeight }"></image>
 	</view>

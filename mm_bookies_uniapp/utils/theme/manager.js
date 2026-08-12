@@ -163,6 +163,7 @@ function normalizeTheme(theme) {
 		version: source.version || defaultTheme.version,
 		tokens: {
 			primary,
+			border: safeColor(tokens.border, primary),
 			secondary,
 			secondaryLight: safeColor(tokens.secondaryLight, defaults.secondaryLight),
 			active: safeColor(tokens.active, defaults.active),
@@ -211,6 +212,7 @@ function applyCssVariables(theme) {
 	const tokens = theme.tokens;
 	const variables = {
 		'--theme-primary': tokens.primary,
+		'--theme-border': tokens.border,
 		'--theme-secondary': tokens.secondary,
 		'--theme-secondary-light': tokens.secondaryLight,
 		'--theme-active': tokens.active,
@@ -296,8 +298,9 @@ function coerceTheme(value) {
 
 	const tokens = parseObject(source.tokens) || {};
 	const backgrounds = parseObject(source.backgrounds) || {};
-	const hasToken = ['primary', 'secondary', 'primaryColor', 'secondaryColor', 'primary_color',
-		'secondary_color'].some((name) => source[name] !== undefined || tokens[name] !== undefined);
+	const hasToken = ['primary', 'secondary', 'border', 'primaryColor', 'secondaryColor', 'borderColor',
+		'primary_color', 'secondary_color', 'border_color'].some((name) =>
+		source[name] !== undefined || tokens[name] !== undefined);
 	const hasBackground = Object.keys(backgrounds).length > 0 ||
 		['noHeader', 'withHeader', 'home', 'login', 'register', 'header', 'page', 'noHeaderBackground',
 			'withHeaderBackground', 'homeBackground', 'headerBackground'].some((name) =>
@@ -309,6 +312,7 @@ function coerceTheme(value) {
 
 	const tokenAliases = {
 		primary: ['primary', 'primaryColor', 'primary_color'],
+		border: ['border', 'borderColor', 'border_color'],
 		secondary: ['secondary', 'secondaryColor', 'secondary_color'],
 		secondaryLight: ['secondaryLight', 'secondary_light'],
 		active: ['active', 'activeColor', 'active_color'],

@@ -46,8 +46,8 @@
 					<!-- 用户头像 -->
 					<view class="profile-avatar-section">
 						<view class="profile-avatar-circle">
-							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill">
-							</image>
+							<theme-icon name="user-avatar" color="var(--theme-primary, #1C667C)"
+								class="profile-avatar-img"></theme-icon>
 						</view>
 					</view>
 
@@ -359,7 +359,6 @@
 				picker: '',
 				contact2: '',
 				contact: [],
-				headerHeight: uni.getStorageSync('Authorization') ? 270 : 201, // 默认占位高度，等待 header 组件计算后更新
 				bar_list: [
 					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
@@ -628,7 +627,7 @@
 								name: 'a',
 								attrs: {
 									href: href,
-									style: 'color: #4fb3bf; text-decoration: underline;'
+									style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 								},
 								children: []
 							}
@@ -698,7 +697,7 @@
 						name: 'a',
 						attrs: {
 							href: m[0],
-							style: 'color: #4fb3bf; text-decoration: underline;'
+							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 						},
 						children: [{
 							type: 'text',
@@ -1272,7 +1271,7 @@
 	.cashout-value {
 		font-size: 13px;
 		color: #1e3a5f;
-		font-weight: 700;
+		font-weight: bold;
 		margin-right: 12px;
 	}
 
@@ -1324,7 +1323,7 @@
 
 	.icon-label {
 		font-size: 12px;
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -1758,14 +1757,14 @@
 	}
 
 	.radio-circle.radio-selected {
-		border-color: #4fb3bf;
+		border-color: $color-primary;
 	}
 
 	.radio-dot {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.language-confirm-btn {
@@ -1842,7 +1841,7 @@
 	}
 
 	// .pwd-input-wrapper.input-error {
-	// 	border: 2px solid #e54d42;
+	// 	border: 2px solid #D0342C;
 	// }
 
 	.pwd-input {
@@ -1875,7 +1874,7 @@
 	.pwd-error-message {
 		display: block;
 		font-size: 13px;
-		color: #e54d42;
+		color: #D0342C;
 		margin-top: -10px;
 		margin-bottom: 10px;
 		padding-left: 5px;

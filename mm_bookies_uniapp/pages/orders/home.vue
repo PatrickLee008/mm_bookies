@@ -1023,7 +1023,7 @@
 		border-radius: 15px;
 		overflow: hidden;
 		box-shadow: 0px 2px 2px 0px var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
-		border: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2))
+		border: 1px solid $color-border;
 	}
 
 	/* 卡片头部 */

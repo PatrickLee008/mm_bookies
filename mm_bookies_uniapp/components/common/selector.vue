@@ -197,7 +197,7 @@
 	.option-radio {
 		width: 28upx;
 		height: 28upx;
-		border: 2upx solid #4fb3bf;
+		border: 2upx solid $color-primary;
 		border-radius: 50%;
 		background: transparent;
 		flex-shrink: 0;
@@ -214,7 +214,7 @@
 		width: 14upx;
 		height: 14upx;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	/* 旧 option-active 不再使用浅色背景，由 radio-checked 表达选中态 */

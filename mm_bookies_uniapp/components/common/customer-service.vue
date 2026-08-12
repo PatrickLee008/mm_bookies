@@ -507,8 +507,8 @@
 	}
 
 	.customer-btn-icon {
-		width: 24px;
-		height: 24px;
+		width: 20px;
+		height: 20px;
 		display: block;
 	}
 

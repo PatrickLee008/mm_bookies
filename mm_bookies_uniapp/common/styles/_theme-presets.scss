@@ -1,8 +1,12 @@
 // Sass-only theme presets used during the frontend migration.
 $theme-presets: (
-	legacy: (
+	mm-bookies: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #1C667C,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #1C667C,
+		// 首页顶部区域底部边框色。
+		home-top-border: #44696E,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #37BDCC,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -28,17 +32,23 @@ $theme-presets: (
 		// 有 header 页面 App 背景和顶部导航的渐变结束色。
 		header-end: #1F879B,
 		// 品牌 logo：首页、登录注册和 Header 的默认 logo。
-		logo-image: "/static/theme/legacy/mm_bookies_logo.png",
+		logo-image: "/static/theme/mm-bookies/mm-bookies_logo.png",
+		// 首页、登录和注册页副标题。
+		subtitle: "ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်",
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
-		radius-large: 12px,
+		radius-large: 16px,
 		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
-		radius-medium: 8px,
+		radius-medium: 12px,
 		// 小圆角：投注按钮。
-		radius-small: 4px
+		radius-small: 8px
 	),
-	test: (
+	shwe-goal: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #136201,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #136201,
+		// 首页顶部区域底部边框色。
+		home-top-border: #A0FF82,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -52,7 +62,15 @@ $theme-presets: (
 		// 通用浅背景：浅色提示区和非主内容背景。
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
-		bg-info: #F2F2F2,
+		bg-info: #EDEDED,
+
+		// 大圆角：搜索框、比赛卡片和筛选按钮。
+		radius-large: 8px,
+		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
+		radius-medium: 8px,
+		// 小圆角：投注按钮。
+		radius-small: 4px,
+
 		// 无 header 页面背景渐变起始色：首页、登录和注册的主要底色。
 		page-start: #136201,
 		// 无 header 页面背景渐变结束色：页面背景渐变的收束色。
@@ -60,7 +78,7 @@ $theme-presets: (
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
 		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #81BB1D,
+		header-start: none,
 		// 有 header 页面 App 背景和顶部导航的渐变结束色。
 		header-end: #136201,
 		// 无 header 页面、header 页面和顶部 header 统一使用测试背景图片。
@@ -69,16 +87,16 @@ $theme-presets: (
 		header-background-image: "/static/theme/bg-green.png",
 		// 品牌 logo：首页、登录注册和 Header 使用绿色 ShweGoal logo。
 		logo-image: "/static/theme/test/shwegoal_logo.png",
-		// 大圆角：搜索框、比赛卡片和筛选按钮。
-		radius-large: 12px,
-		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
-		radius-medium: 8px,
-		// 小圆角：投注按钮。
-		radius-small: 4px
+		// 首页、登录和注册页副标题。
+		subtitle: "အနိုင်ရဖို့ ရွှေဂိုးတစ်ဂိုးသာလိုပါတယ်",
 	),
-	test-old: (
+	phoe-wa-maung: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #136201,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #136201,
+		// 首页顶部区域底部边框色。
+		home-top-border: #A0FF82,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -108,7 +126,7 @@ $theme-presets: (
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
 		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #81BB1D,
+		header-start: none,
 		// 有 header 页面 App 背景和顶部导航的渐变结束色。
 		header-end: #136201,
 		// 无 header 页面背景图片：首页、登录和注册使用。
@@ -119,5 +137,7 @@ $theme-presets: (
 		header-background-image: "/static/theme/header-bg-white.png",
 		// 品牌 logo：首页、登录注册和 Header 使用 Phoewaa Maung logo。
 		logo-image: "/static/theme/test-old/phoewaa_maung_logo.png",
+		// 首页、登录和注册页副标题။
+		subtitle: "ငွေကြေးခိုင်မာ ယုံကြည်စိတ်ချ ညီကိုတိုအားလုံးအတွက် ဖိုးဝ",
 	)
 );

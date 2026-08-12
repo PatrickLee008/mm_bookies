@@ -174,7 +174,7 @@
 	}
 
 	.tab-item.active .tab-text {
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: 600;
 	}
 
@@ -182,7 +182,7 @@
 		position: absolute;
 		bottom: 0;
 		height: 2px;
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	}

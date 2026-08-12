@@ -4,6 +4,7 @@ const testTheme = {
 	version: 'test',
 	tokens: {
 		primary: '#6D28D9',
+		border: '#6D28D9',
 		secondary: '#06B6D4',
 		secondaryLight: '#ECFEFF',
 		active: '#F59E0B',

@@ -487,7 +487,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-card-item {
 		width: 100%;
 		margin-bottom: 16px;
-		border: 2px solid $color-primary;
+		border: 2px solid $color-border;
 		border-radius: 16px;
 		background-color: #fff;
 		overflow: hidden;

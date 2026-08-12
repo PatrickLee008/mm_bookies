@@ -1,11 +1,11 @@
 /* 颜色变量 */
-// Frontend debug mode: edit the "test" palette in common/styles/_theme-presets.scss.
-$theme-preset: test !default;
+// Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
+$theme-preset: shwe-goal !default;
 @import "./common/styles/theme-presets";
 
 $theme-config: map-get($theme-presets, $theme-preset);
 @if $theme-config == null {
-	$theme-config: map-get($theme-presets, legacy);
+	$theme-config: map-get($theme-presets, mm-bookies);
 }
 
 @function theme-color($name) {
@@ -32,6 +32,7 @@ $theme-radius-large-value: theme-color(radius-large);
 $theme-radius-medium-value: theme-color(radius-medium);
 $theme-radius-small-value: theme-color(radius-small);
 $theme-logo-image-value: theme-color(logo-image);
+$theme-subtitle-value: theme-color(subtitle);
 
 // Keep the compile-time values available for Sass color functions while the
 // public color variables resolve through runtime CSS custom properties.
@@ -46,6 +47,11 @@ $color-primary: var(--theme-primary, #{$theme-primary-value});
 $color-secondary: var(--theme-secondary, #{$theme-secondary-value});
 $color-secondary-light: var(--theme-secondary-light, #{$theme-secondary-light-value});
 $color-active: var(--theme-active, #{$theme-active-value});
+$theme-border-value: theme-color(border);
+$border-color: var(--theme-border, #{$theme-border-value});
+$color-border: $border-color;
+$theme-home-top-border-value: theme-color(home-top-border);
+$color-home-top-border: var(--theme-home-top-border, #{$theme-home-top-border-value});
 
 /* 文字基本颜色 */
 $text-color: var(--theme-text-primary, #{$theme-text-value});//基本色
@@ -104,8 +110,6 @@ $text-color-inverse:#fff;//反色
 $text-color-grey:#999;//辅助灰色，如加载更多的提示信息
 $text-color-placeholder: #808080;
 $text-color-disable:#c0c0c0;
-/* 边框颜色 */
-$border-color:#e0e0e0;
 /* 页面宽度 */
 $page-width: 1226px;
 // flex布局且垂直居中

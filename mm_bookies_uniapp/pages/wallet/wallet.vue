@@ -368,7 +368,7 @@
 		cursor: pointer;
 		padding: 16px 6px 10px;
 		border: 1.5px solid $color-primary;
-		border-radius: 14px;
+		border-radius: $radius-medium;
 		background: #FFFFFF;
 		transition: background 0.2s ease;
 		min-width: 0;
@@ -408,7 +408,7 @@
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
+		border-radius: $radius-large;
 		padding: 10px 14px;
 		display: flex;
 		align-items: center;
@@ -482,7 +482,8 @@
 	.record-card {
 		margin: 10px 0;
 		background-color: $bg-color-info;
-		border-radius: 14px;
+		border: 1px solid $color-border;
+		border-radius: $radius-medium;
 		overflow: hidden;
 	}
 
