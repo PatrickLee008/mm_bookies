@@ -2633,9 +2633,9 @@
 
 	.total-matches-btn {
 		flex: 1;
-		background-color: #E0E0E0;
-		border-radius: 20px;
-		padding: 5px 10px;
+		// background-color: #E0E0E0;
+		border-radius: $radius-medium;
+		padding: 5px;
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -2644,12 +2644,12 @@
 
 	.total-text {
 		color: $color-primary;
-		font-size: 14px;
-		font-weight: 600;
+		font-size: 16px;
+		font-weight: bold;
 	}
 
 	.total-count {
-		color: $color-secondary;
+		color: $color-secondary-light;
 		font-size: 18px;
 		font-weight: bold;
 	}
@@ -2657,7 +2657,7 @@
 	.confirm-btn {
 		flex: 1;
 		background-color: $color-primary;
-		border-radius: 10px;
+		border-radius: $radius-medium;
 		padding: 5px;
 		display: flex;
 		align-items: center;
