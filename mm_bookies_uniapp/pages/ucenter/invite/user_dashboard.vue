@@ -309,22 +309,12 @@
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
-		background-image: var(--theme-page-background-image, #{$theme-page-background});
-		background-position: var(--theme-page-background-position, center);
-		background-size: var(--theme-page-background-size, cover);
-		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 	}
 
 	.invite-header-placeholder {
 		width: 100%;
 		height: 255px;
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-header-background-image, #{$theme-header-background});
-		background-position: var(--theme-header-placeholder-position, center -255px);
-		background-size: var(--theme-header-background-size, 100% 552px);
-		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}

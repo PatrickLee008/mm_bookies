@@ -12,6 +12,7 @@
 	--theme-radius-large: #{$theme-radius-large-value};
 	--theme-radius-medium: #{$theme-radius-medium-value};
 	--theme-radius-small: #{$theme-radius-small-value};
+	--theme-logo-image: #{$theme-logo-image};
 	--theme-page-start: #{$theme-page-start};
 	--theme-page-end: #{$theme-page-end};
 	--theme-glow: #{$theme-glow};
@@ -55,6 +56,16 @@
 	--theme-page-background-position: center;
 	--theme-page-background-size: cover;
 	--theme-page-background-repeat: no-repeat;
+	--theme-no-header-background-image: #{$theme-no-header-background};
+	--theme-no-header-background-color: #{$theme-page-start};
+	--theme-no-header-background-position: center;
+	--theme-no-header-background-size: cover;
+	--theme-no-header-background-repeat: no-repeat;
+	--theme-with-header-background-image: #{$theme-with-header-background};
+	--theme-with-header-background-color: #{$theme-header-start};
+	--theme-with-header-background-position: center;
+	--theme-with-header-background-size: cover;
+	--theme-with-header-background-repeat: no-repeat;
 }
 
 
@@ -266,11 +277,45 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-page-background {
-	background-color: var(--theme-page-background-color, $theme-header-start);
-	background-image: var(--theme-page-background-image, #{$theme-page-background});
-	background-position: var(--theme-page-background-position, center);
-	background-size: var(--theme-page-background-size, cover);
-	background-repeat: var(--theme-page-background-repeat, no-repeat);
+	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
+	background-position: var(--theme-with-header-background-position, center);
+	background-size: var(--theme-with-header-background-size, cover);
+	background-repeat: var(--theme-with-header-background-repeat, no-repeat);
+}
+
+.theme-bg-no-header {
+	background-color: var(--theme-no-header-background-color, $theme-page-start);
+	background-image: var(--theme-no-header-background-image, #{$theme-no-header-background});
+	background-position: var(--theme-no-header-background-position, center);
+	background-size: var(--theme-no-header-background-size, cover);
+	background-repeat: var(--theme-no-header-background-repeat, no-repeat);
+}
+
+.theme-bg-with-header {
+	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
+	background-position: var(--theme-with-header-background-position, center);
+	background-size: var(--theme-with-header-background-size, cover);
+	background-repeat: var(--theme-with-header-background-repeat, no-repeat);
+}
+
+.theme-logo-image {
+	display: none;
+}
+
+@if "#{$theme-preset}" == "test" {
+	.theme-logo-image-test {
+		display: block;
+	}
+} @else if "#{$theme-preset}" == "test-old" {
+	.theme-logo-image-test-old {
+		display: block;
+	}
+} @else {
+	.theme-logo-image-legacy {
+		display: block;
+	}
 }
 
 .theme-color-primary {

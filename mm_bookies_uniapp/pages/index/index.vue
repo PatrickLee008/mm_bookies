@@ -1,9 +1,9 @@
 <template>
-	<view class="home-page">
+	<view class="home-page theme-bg-no-header">
 		<global-notice ref="globalNotice"></global-notice>
 		<scroll-view scroll-y class="home-scroll">
 			<view class="home-top">
-				<image class="home-logo" src="../../figma/login/title.png" mode="widthFix"></image>
+				<theme-logo variant="page" height="88px" class="home-logo"></theme-logo>
 				<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 
 				<view class="user-summary">
@@ -201,25 +201,21 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		background-color: var(--theme-home-background-color, #{$theme-page-start});
-		background-image: var(--theme-home-background-image, #{$theme-home-background});
-		background-position: var(--theme-home-background-position, center);
-		background-size: var(--theme-home-background-size, cover);
-		background-repeat: var(--theme-home-background-repeat, no-repeat);
 	}
 
 	.home-top {
 		padding: 18px 20px 16px;
-		border-bottom: 1px solid #2A626833;
-		box-shadow: 0px 4px 4px 0px #00000040;
-		box-shadow: 0px 4px 20px 0px #FFFFFF40 inset;
-		border-bottom-left-radius: 32px;
-		border-bottom-right-radius: 32px;
+		border-bottom: 2px solid #A0FF82;
+		box-shadow: 0px 4px 4px 0px #A0FF82;
+		box-shadow: 0px 4px 20px 0px #FFFFFF00 inset;
+		border-bottom-left-radius: 12px;
+		border-bottom-right-radius: 12px;
 	}
 
 	.home-logo {
-		display: block;
-		width: 320px;
+		display: inline-flex;
+		width: auto;
+		height: 88px;
 		max-width: 90%;
 		margin: 3vh auto 5px;
 	}

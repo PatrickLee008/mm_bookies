@@ -150,6 +150,10 @@ function normalizeTheme(theme) {
 	const defaultAuth = renderBackground(defaultBackgrounds.auth, '#1E1B4B');
 	const defaultHeader = renderBackground(defaultBackgrounds.header, '#312E81');
 	const defaultPage = renderBackground(defaultBackgrounds.page, '#312E81');
+	const defaultNoHeader = renderBackground(defaultBackgrounds.noHeader || defaultBackgrounds.home, '#1E1B4B',
+		defaultHome.image);
+	const defaultWithHeader = renderBackground(defaultBackgrounds.withHeader || defaultBackgrounds.page, '#312E81',
+		defaultPage.image);
 	const defaultLogin = renderBackground(defaultBackgrounds.login || defaultBackgrounds.auth, '#1E1B4B', defaultAuth.image);
 	const defaultRegister = renderBackground(defaultBackgrounds.register || defaultBackgrounds.auth, '#1E1B4B', defaultAuth.image);
 	const primary = safeColor(tokens.primary, defaults.primary);
@@ -175,6 +179,10 @@ function normalizeTheme(theme) {
 			radiusSmall: safeRadius(tokens.radiusSmall, defaults.radiusSmall),
 		},
 		backgrounds: {
+			noHeader: renderBackground(backgrounds.noHeader || backgrounds.home || backgrounds.auth ||
+				defaultBackgrounds.noHeader || defaultBackgrounds.home, '#1E1B4B', defaultNoHeader.image),
+			withHeader: renderBackground(backgrounds.withHeader || backgrounds.page ||
+				defaultBackgrounds.withHeader || defaultBackgrounds.page, '#312E81', defaultWithHeader.image),
 			home: renderBackground(backgrounds.home || defaultBackgrounds.home, '#1E1B4B', defaultHome.image),
 			auth: renderBackground(backgrounds.auth || defaultBackgrounds.auth, '#1E1B4B', defaultAuth.image),
 			login: renderBackground(backgrounds.login || backgrounds.auth || defaultBackgrounds.login || defaultBackgrounds.auth,
@@ -291,7 +299,8 @@ function coerceTheme(value) {
 	const hasToken = ['primary', 'secondary', 'primaryColor', 'secondaryColor', 'primary_color',
 		'secondary_color'].some((name) => source[name] !== undefined || tokens[name] !== undefined);
 	const hasBackground = Object.keys(backgrounds).length > 0 ||
-		['home', 'login', 'register', 'header', 'page', 'homeBackground', 'headerBackground'].some((name) =>
+		['noHeader', 'withHeader', 'home', 'login', 'register', 'header', 'page', 'noHeaderBackground',
+			'withHeaderBackground', 'homeBackground', 'headerBackground'].some((name) =>
 			source[name] !== undefined);
 
 	if (!hasToken && !hasBackground) {
@@ -323,7 +332,7 @@ function coerceTheme(value) {
 	});
 
 	const normalizedBackgrounds = { ...backgrounds };
-	['home', 'login', 'register', 'header', 'page'].forEach((name) => {
+	['noHeader', 'withHeader', 'home', 'login', 'register', 'header', 'page'].forEach((name) => {
 		if (normalizedBackgrounds[name] !== undefined) {
 			normalizedBackgrounds[name] = parseObject(normalizedBackgrounds[name]) || normalizedBackgrounds[name];
 			return;

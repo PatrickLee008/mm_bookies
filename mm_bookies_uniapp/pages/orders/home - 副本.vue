@@ -755,11 +755,6 @@
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		height: 276px;
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-header-background-image, #{$theme-header-background});
-		background-position: var(--theme-header-placeholder-position, center -255px);
-		background-size: var(--theme-header-background-size, 100% 552px);
-		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 	}

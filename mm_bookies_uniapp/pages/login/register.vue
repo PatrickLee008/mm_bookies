@@ -1,5 +1,5 @@
 <template>
-	<view class="login-container">
+	<view class="login-container theme-bg-no-header">
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- 语言切换按钮 -->
 		<view class="lang-switch" @click="openLangModal">
@@ -21,7 +21,7 @@
 		</view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
-			<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
 			<!-- TODO: 替换为正确的缅甸文翻译 -->
 			<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 		</view>
@@ -396,11 +396,6 @@
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background-color: var(--theme-register-background-color, #{$theme-page-start});
-		background-image: var(--theme-register-background-image, #{$theme-auth-background});
-		background-position: var(--theme-register-background-position, center);
-		background-size: var(--theme-register-background-size, cover);
-		background-repeat: var(--theme-register-background-repeat, no-repeat);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -514,8 +509,9 @@
 	}
 
 	.login-title-image {
-		width: 75%;
-		height: auto;
+		width: auto;
+		height: 88px;
+		max-width: 100%;
 	}
 
 	.login-subtitle {

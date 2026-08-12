@@ -717,7 +717,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.bank-icon-item.selected {
-		border-color: #4FB3BF;
+		border-color: $color-secondary;
 	}
 
 	.bank-icon-img {
@@ -747,7 +747,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.form-input {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: $color-secondary-light;
 		border-radius: 12px;
 		font-size: 12px;
 		color: #000;
@@ -863,7 +863,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.info-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: $color-secondary-light;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -963,11 +963,11 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	}
 
 	.quick-amount-btn.selected {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.quick-amount-btn:active {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.continue-btn {

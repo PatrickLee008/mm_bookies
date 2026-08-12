@@ -138,4 +138,9 @@ const testTheme = {
 	},
 };
 
+// Canonical app-shell names. Keep home/page above for compatibility with the
+// earlier theme contract and expose the two backgrounds used by page groups.
+testTheme.backgrounds.noHeader = testTheme.backgrounds.home;
+testTheme.backgrounds.withHeader = testTheme.backgrounds.page;
+
 export default testTheme;

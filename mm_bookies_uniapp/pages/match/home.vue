@@ -8,7 +8,7 @@
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"
-			:style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
+			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -22,10 +22,12 @@
 		<!-- from tangjq--- 新的搜索框和筛选按钮布局 -->
 		<view class="new-header-wrapper">
 			<view class="new-search-bar">
-				<theme-icon name="search" class="search-icon" color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+				<theme-icon name="search" class="search-icon"
+					color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 				<input class="search-input" placeholder-style="font-style:italic;color:var(--theme-primary)" type="text"
 					:placeholder="$t('search_by_team')" v-model="searchKeyword" @input="handleSearchInput" />
-				<theme-icon name="close" class="clear-icon" color="var(--theme-icon-on-primary, #fff)"
+				<theme-icon name="close" class="clear-icon"
+					color="var(--theme-icon-secondary, var(--theme-secondary))"
 					v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
@@ -2047,11 +2049,6 @@
 <style lang="scss">
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-header-background-image, #{$theme-header-background});
-		background-position: var(--theme-header-placeholder-position, center -255px);
-		background-size: var(--theme-header-background-size, 100% 552px);
-		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 	}
@@ -2110,11 +2107,6 @@
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
 		height: 100vh;
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
-		background-image: var(--theme-page-background-image, #{$theme-page-background});
-		background-position: var(--theme-page-background-position, center);
-		background-size: var(--theme-page-background-size, cover);
-		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -2337,7 +2329,7 @@
 		color: white;
 		font-weight: bold;
 		gap: 5px;
-		padding: 0 10px;
+		padding: 0 15px;
 		border-radius: $radius-large;
 		display: flex;
 		align-items: center;

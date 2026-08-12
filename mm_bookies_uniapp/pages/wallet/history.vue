@@ -504,11 +504,11 @@
 	}
 
 	.status-bar.status-success {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.status-bar.status-new {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.status-bar.status-pending {

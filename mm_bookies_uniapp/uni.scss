@@ -12,6 +12,13 @@ $theme-config: map-get($theme-presets, $theme-preset);
 	@return map-get($theme-config, $name);
 }
 
+@function theme-background-image($path, $fallback) {
+	@if $path != null and $path != "" {
+		@return url("#{$path}");
+	}
+	@return $fallback;
+}
+
 $theme-page-start: theme-color(page-start);
 $theme-page-end: theme-color(page-end);
 $theme-glow: theme-color(glow);
@@ -24,6 +31,7 @@ $theme-bg-info-value: theme-color(bg-info);
 $theme-radius-large-value: theme-color(radius-large);
 $theme-radius-medium-value: theme-color(radius-medium);
 $theme-radius-small-value: theme-color(radius-small);
+$theme-logo-image-value: theme-color(logo-image);
 
 // Keep the compile-time values available for Sass color functions while the
 // public color variables resolve through runtime CSS custom properties.
@@ -53,16 +61,26 @@ $radius-large: var(--theme-radius-large, #{$theme-radius-large-value});
 $radius-medium: var(--theme-radius-medium, #{$theme-radius-medium-value});
 $radius-small: var(--theme-radius-small, #{$theme-radius-small-value});
 
-// Shared gradients. Change only $theme-preset to preview another palette.
-$theme-home-background:
+// Shared gradients are fallbacks when a preset does not provide an image.
+$theme-home-background-fallback:
 	radial-gradient(circle at 0% 100%, $theme-glow 0%, $theme-page-start 30%, rgba(255, 255, 255, 0) 50%),
 	radial-gradient(circle at 100% 0%, $theme-glow 0%, $theme-page-start 30%, rgba(255, 255, 255, 0) 50%),
 	linear-gradient(135deg, $theme-page-start 0%, $theme-page-start 56%, $theme-page-end 100%);
+$theme-home-background: theme-background-image(theme-color(no-header-background-image), $theme-home-background-fallback);
 $theme-auth-background: $theme-home-background;
-$theme-header-background:
+$theme-header-background-fallback:
 	radial-gradient(circle at 100% 0%, $theme-glow 0%, $theme-header-end 34%, rgba(255, 255, 255, 0) 68%),
 	linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
-$theme-page-background: linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-header-background: theme-background-image(theme-color(header-background-image), $theme-header-background-fallback);
+$theme-page-background-fallback: linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-page-background: theme-background-image(theme-color(with-header-background-image), $theme-page-background-fallback);
+
+// The app shell uses two backgrounds: pages without the shared header use the
+// home/auth background, while all header pages expose the app shell background
+// behind transparent page containers and header placeholders.
+$theme-no-header-background: $theme-home-background;
+$theme-with-header-background: $theme-page-background;
+$theme-logo-image: theme-background-image($theme-logo-image-value, none);
 
 
 

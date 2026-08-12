@@ -48,6 +48,7 @@ Vue.component('zw-header', () => import('@/components/common/header.vue'));
 Vue.component('zw-footer', () => import('@/components/common/footer.vue'));
 Vue.component('global-notice', () => import('@/components/common/global-notice.vue'));
 Vue.component('theme-icon', () => import('@/components/common/theme-icon.vue'));
+Vue.component('theme-logo', () => import('@/components/common/theme-logo.vue'));
 
 Vue.config.productionTip = false
 

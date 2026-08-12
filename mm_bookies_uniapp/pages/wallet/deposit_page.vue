@@ -1,5 +1,5 @@
 <template name="deposit_page">
-	<view class="bg-white full-page">
+	<view class="full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
@@ -127,11 +127,6 @@
 <style lang="scss">
 	.header-placeholder {
 		height: 255px;
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-header-background-image, #{$theme-header-background});
-		background-position: var(--theme-header-placeholder-position, center -255px);
-		background-size: var(--theme-header-background-size, 100% 552px);
-		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		width: 100%;
 		flex-shrink: 0;
 		transition: height 0.3s ease;
@@ -141,11 +136,6 @@
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
-		background-image: var(--theme-page-background-image, #{$theme-page-background});
-		background-position: var(--theme-page-background-position, center);
-		background-size: var(--theme-page-background-size, cover);
-		background-repeat: var(--theme-page-background-repeat, no-repeat);
 	}
 
 	.title-bar {

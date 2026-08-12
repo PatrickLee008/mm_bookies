@@ -2,7 +2,7 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
-		<view class="splash-screen" v-if="showSplash">
+		<view class="splash-screen theme-bg-no-header" v-if="showSplash">
 			<!-- Skip 按钮（由 enable_skip_button 控制） -->
 			<view class="skip-button" @click="closeSplash" v-if="enableSkipButton">
 				<text class="skip-text">{{ $t('skip') }} {{ splashCountdown }}</text>
@@ -18,7 +18,7 @@
 		</view>
 
 		<!-- 原有登录页面 -->
-		<view class="login-container" v-show="!showSplash">
+		<view class="login-container theme-bg-no-header" v-show="!showSplash">
 			<!-- 语言切换按钮 -->
 			<view class="lang-switch" @click="openLangModal">
 				<image class="lang-switch-icon" src="/static/icon/ucenter/language.png" mode="aspectFit"></image>
@@ -41,7 +41,7 @@
 
 			<!-- 标题图片 -->
 			<view class="login-title-container">
-				<image class="login-title-image" src="../../figma/login/title.png" mode="widthFix"></image>
+				<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
 				<!-- TODO: 替换为正确的缅甸文翻译 -->
 				<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
 			</view>
@@ -563,11 +563,6 @@
 		left: 0;
 		width: 100vw;
 		height: 100vh;
-		background-color: var(--theme-login-background-color, #{$theme-page-start});
-		background-image: var(--theme-login-background-image, #{$theme-auth-background});
-		background-position: var(--theme-login-background-position, center);
-		background-size: var(--theme-login-background-size, cover);
-		background-repeat: var(--theme-login-background-repeat, no-repeat);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
@@ -758,11 +753,6 @@
 	.login-container {
 		position: relative;
 		min-height: 100vh;
-		background-color: var(--theme-login-background-color, #{$theme-page-start});
-		background-image: var(--theme-login-background-image, #{$theme-auth-background});
-		background-position: var(--theme-login-background-position, center);
-		background-size: var(--theme-login-background-size, cover);
-		background-repeat: var(--theme-login-background-repeat, no-repeat);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -781,8 +771,9 @@
 	}
 
 	.login-title-image {
-		width: 75%;
-		height: auto;
+		width: auto;
+		height: 88px;
+		max-width: 100%;
 	}
 
 	.login-subtitle {

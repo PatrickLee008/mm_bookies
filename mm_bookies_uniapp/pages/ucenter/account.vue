@@ -306,14 +306,6 @@
 </script>
 
 <style lang="scss">
-	.full-page {
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
-		background-image: var(--theme-page-background-image, #{$theme-page-background});
-		background-position: var(--theme-page-background-position, center);
-		background-size: var(--theme-page-background-size, cover);
-		background-repeat: var(--theme-page-background-repeat, no-repeat);
-	}
-
 	.info-rec {
 		padding: 10px;
 		margin: 10px 10px 0;

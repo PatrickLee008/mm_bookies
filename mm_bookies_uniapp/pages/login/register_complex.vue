@@ -773,11 +773,6 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		background-color: var(--theme-register-background-color, #{$theme-page-start});
-		background-image: var(--theme-register-background-image, #{$theme-auth-background});
-		background-position: var(--theme-register-background-position, center);
-		background-size: var(--theme-register-background-size, cover);
-		background-repeat: var(--theme-register-background-repeat, no-repeat);
 		min-height: 100vh;
 	}
 

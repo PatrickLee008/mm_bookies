@@ -63,7 +63,8 @@
 					<input class="amount-input" style="" type="number" @input='inputNum' v-model="amount"
 						placeholder-class="text-white" maxlength="7" placeholder="">
 					<view class="limit">Minimum {{numberFormat(configs.deposit_min_limit || 3000)}} and Maximum
-						{{numberFormat(configs.deposit_max_limit || 1000000)}} Ks</view>
+						{{numberFormat(configs.deposit_max_limit || 1000000)}} Ks
+					</view>
 				</view>
 				<!-- 快速选择 -->
 				<view
@@ -118,7 +119,8 @@
 							</view>
 						</view>
 						<view class="width-70px">
-							<view class="height-70px flex-column text-white myfont-14px radius-right-6px account-remove-btn"
+							<view
+								class="height-70px flex-column text-white myfont-14px radius-right-6px account-remove-btn"
 								:class="{ 'disabled-action': card.is_default }" v-if="editing"
 								@click="card.is_default?'':removeBank(card)">
 								{{ $t('remove') }}
@@ -1400,6 +1402,7 @@
 	.disabled-action {
 		opacity: 0.5;
 	}
+
 	.deposit-component {
 		width: 100%;
 		height: 100%;
@@ -1703,7 +1706,7 @@
 	}
 
 	.bank-icon-item.selected {
-		border-color: #4FB3BF;
+		border-color: $color-secondary;
 	}
 
 	.bank-icon-img {
@@ -1733,7 +1736,7 @@
 	.form-input {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		font-size: 12px;
 		color: #000;
@@ -1850,7 +1853,7 @@
 	.info-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1917,7 +1920,7 @@
 	}
 
 	.quick-amount-btn:active {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 	}
 
 	.payment-channel-section {
@@ -1947,7 +1950,7 @@
 
 	.payment-channel-btn.selected {
 		background-color: $color-primary;
-		border: 2px solid #4FB3BF;
+		border: 2px solid $color-secondary;
 		box-sizing: border-box;
 	}
 
@@ -1962,8 +1965,8 @@
 	.payment-channel-name {
 		flex: 1;
 		height: 35px;
-		background-color: #4FB3BF;
-		border: 2px solid #4FB3BF;
+		background-color: $color-secondary;
+		border: 2px solid $color-secondary;
 		box-sizing: border-box;
 		border-radius: 12px;
 		display: flex;
@@ -1971,7 +1974,7 @@
 		justify-content: center;
 		font-size: 14px;
 		font-weight: 700;
-		color: #fff;
+		color: white;
 	}
 
 	.continue-btn {
@@ -2135,7 +2138,7 @@
 	.confirm-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -2152,7 +2155,7 @@
 	.confirm-copy-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid #4FB3BF;
+		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		display: flex;
 		flex-direction: row;
@@ -2169,7 +2172,7 @@
 	}
 
 	.confirm-copy-btn {
-		background-color: #4FB3BF;
+		background-color: $color-secondary;
 		height: 100%;
 		padding: 0 5px;
 		display: flex;

@@ -1,5 +1,5 @@
 <template name="ucenter">
-	<view class="bg-white full-page ucenter-page">
+	<view class="full-page ucenter-page">
 		<zw-header @doSomething="" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
@@ -359,7 +359,7 @@
 				picker: '',
 				contact2: '',
 				contact: [],
-				headerHeight: 210, // 默认占位高度，等待 header 组件计算后更新
+				headerHeight: uni.getStorageSync('Authorization') ? 270 : 201, // 默认占位高度，等待 header 组件计算后更新
 				bar_list: [
 					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
@@ -1164,11 +1164,6 @@
 	/* from tangjq--- header占位元素样式 - 高度由动态计算控制 */
 	.header-placeholder {
 		width: 100%;
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-header-background-image, #{$theme-header-background});
-		background-position: var(--theme-header-placeholder-position, center -255px);
-		background-size: var(--theme-header-background-size, 100% 552px);
-		background-repeat: var(--theme-header-background-repeat, no-repeat);
 		flex-shrink: 0;
 		transition: height 0.3s ease;
 	}
@@ -1189,11 +1184,6 @@
 	}
 
 	.ucenter-page {
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
-		background-image: var(--theme-page-background-image, #{$theme-page-background});
-		background-position: var(--theme-page-background-position, center);
-		background-size: var(--theme-page-background-size, cover);
-		background-repeat: var(--theme-page-background-repeat, no-repeat);
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;

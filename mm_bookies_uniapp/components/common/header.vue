@@ -2,11 +2,11 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="new-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }"
+		<view class="zw-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }"
 			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
 			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
-				<text class="header-title">MM Bookies</text>
+				<theme-logo variant="header" height="32px" class="header-logo"></theme-logo>
 				<!-- 收起状态：紧凑余额 + 铃铛 + 设置 -->
 				<view class="collapsed-right" v-if="isLogin">
 					<view class="collapsed-balance">
@@ -131,6 +131,7 @@
 				balanceVisible: true,
 				collapsed: false, // header收起状态
 				expandedHeight: 0, // 展开时的精确高度（用于立即恢复）
+				collapsedHeaderHeight: 82, // 8px 顶部间距 + 32px logo 行 + 42px 页面标题行
 			}
 		},
 		computed: {
@@ -177,7 +178,7 @@
 				return titles[this.currentRoute] || ''
 			},
 			headerHeightStyle() {
-				const height = this.collapsed && this.isLogin ? 85 : this.expandedHeight
+				const height = this.collapsed && this.isLogin ? this.collapsedHeaderHeight : this.expandedHeight
 				return height ? {
 					height: `${height}px`
 				} : {}
@@ -260,7 +261,7 @@
 
 			calculateHeaderHeight() {
 				const query = uni.createSelectorQuery().in(this);
-				query.select('.new-header-wrapper').boundingClientRect((rect) => {
+				query.select('.zw-header-wrapper').boundingClientRect((rect) => {
 					if (rect && rect.height) {
 						this.headerHeight = rect.height;
 						// 记录展开状态的高度，用于收起后立即恢复
@@ -279,9 +280,9 @@
 
 				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
 				if (collapsed) {
-					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
+					// 收起状态：8px 顶部间距 + 32px logo 行 + 42px 页面标题行 = 82px
 					if (this.isLogin) {
-						this.$emit('headerHeightChange', 85)
+						this.$emit('headerHeightChange', this.collapsedHeaderHeight)
 					}
 				} else if (this.expandedHeight) {
 					// 展开：立即恢复到之前测量的精确高度
@@ -398,7 +399,7 @@
 
 <style lang="scss">
 	/* from tangjq--- 新的统一顶部样式 - 固定定位 */
-	.new-header-wrapper {
+	.zw-header-wrapper {
 		position: fixed;
 		top: 0;
 		left: 0;
@@ -414,7 +415,7 @@
 		// box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-	.new-header-wrapper.header-logged-out {
+	.zw-header-wrapper.header-logged-out {
 		min-height: 190px;
 	}
 
@@ -424,10 +425,8 @@
 		text-align: center;
 	}
 
-	.header-title {
-		color: white;
-		font-size: 16px;
-		font-weight: bold;
+	.header-logo {
+		line-height: 0;
 	}
 
 	.header-page-row {
@@ -811,7 +810,7 @@
 		font-weight: bold;
 	}
 
-	.new-header-wrapper {
+	.zw-header-wrapper {
 		background-color: var(--theme-header-background-color, #{$theme-header-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
@@ -823,6 +822,10 @@
 		transition: height 0.3s ease;
 	}
 
+	.zw-header-wrapper.header-collapsed {
+		padding-top: 8px;
+	}
+
 	.header-title-bar {
 		position: relative;
 		padding: 14px 0 8px;
@@ -830,6 +833,9 @@
 
 	/* 收起状态：标题栏左对齐 */
 	.header-title-bar.title-bar-collapsed {
+		height: 32px;
+		padding: 0;
+		box-sizing: border-box;
 		text-align: left;
 	}
 

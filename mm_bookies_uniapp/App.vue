@@ -462,6 +462,18 @@
 		font-family: 'regular';
 	}
 
+	// Keep the app shell background behind transparent page containers and
+	// rounded header edges. Individual no-header pages opt into their own theme.
+	page,
+	body,
+	#app {
+		background-color: var(--theme-with-header-background-color, #{$theme-header-start});
+		background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
+		background-position: var(--theme-with-header-background-position, center);
+		background-size: var(--theme-with-header-background-size, cover);
+		background-repeat: var(--theme-with-header-background-repeat, no-repeat);
+	}
+
 	.nav-list {
 		display: flex;
 		flex-wrap: wrap;
