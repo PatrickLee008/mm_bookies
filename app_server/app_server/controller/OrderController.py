@@ -735,7 +735,8 @@ def single_bet():
                 response = jsonify({'message': "Bet failed: this match has reached the order limit."})
                 response.status_code = 400
                 return response
-
+            # 让球盘HDP和大小盘OU（1\2）
+            BET_ODDS = 1 if order_type in (1, 2) else match_attr.ODDS
             order_id = "%s-%s" % (user.username, round(time.time() * 1000))
             new_order = Order(ID=str(uuid.uuid4()).replace("-", ""), ORDER_ID=order_id, USER_ID=user.id,
                               USER_NAME=user.username,
@@ -743,7 +744,7 @@ def single_bet():
                               ORDER_DESC="%s || %s" % (match.HOST_TEAM, match.GUEST_TEAM),
                               BET_MONEY=bet['amount'], order_type_desc="暂无", STATUS="1", IS_MIX="0", IS_WIN="2",
                               BONUS="0", LOSE_TEAM=match_attr.LOSE_TEAM,
-                              BET_ODDS=match_attr.ODDS, LEAGUE=match.LEAGUE,
+                              BET_ODDS=BET_ODDS, LEAGUE=match.LEAGUE,
                               DRAW_BUNKO=0 if match_attr.DRAW_BUNKO == '' else match_attr.DRAW_BUNKO,
                               DRAW_ODDS=match_attr.DRAW_ODDS,
                               LOSE_BALL_NUM=0 if match_attr.LOSE_BALL_NUM == '' else match_attr.LOSE_BALL_NUM,
