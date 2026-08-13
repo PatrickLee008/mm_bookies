@@ -48,14 +48,14 @@ const mmBookiesGradient = {
 	repeat: 'no-repeat',
 };
 
-function imageBackground(url, fallbackColor) {
+function imageBackground(url, fallbackColor, options = {}) {
 	return {
 		type: 'image',
 		url,
 		fallbackColor,
-		position: 'center',
-		size: 'cover',
-		repeat: 'no-repeat',
+		position: options.position || 'center',
+		size: options.size || 'cover',
+		repeat: options.repeat || 'no-repeat',
 	};
 }
 
@@ -104,6 +104,10 @@ const mmBookies = {
 };
 
 const shweGoalBackground = imageBackground('/static/theme/bg-green.png', '#136201');
+const shweGoalHeaderBackground = imageBackground('/static/theme/bg-green.png', '#136201', {
+	position: 'center top',
+	size: '100% 552px',
+});
 
 const shweGoal = {
 	version: 'test-shwe-goal',
@@ -144,10 +148,16 @@ const shweGoal = {
 		register: shweGoalBackground,
 		noHeader: shweGoalBackground,
 		withHeader: shweGoalBackground,
-		header: shweGoalBackground,
+		header: shweGoalHeaderBackground,
 		page: shweGoalBackground,
 	},
 };
+
+const phoeWaMaungWithHeaderBackground = imageBackground('/static/theme/bg-green.png', '#136201');
+const phoeWaMaungHeaderBackground = imageBackground('/static/theme/bg-green.png', '#136201', {
+	position: 'center top',
+	size: '100% 552px',
+});
 
 const phoeWaMaung = {
 	version: 'test-phoe-wa-maung',
@@ -187,9 +197,9 @@ const phoeWaMaung = {
 		login: imageBackground('/static/theme/bg-white.png', '#136201'),
 		register: imageBackground('/static/theme/bg-white.png', '#136201'),
 		noHeader: imageBackground('/static/theme/bg-white.png', '#136201'),
-		withHeader: imageBackground('/static/theme/header-bg-white.png', '#136201'),
-		header: imageBackground('/static/theme/header-bg-white.png', '#136201'),
-		page: imageBackground('/static/theme/header-bg-white.png', '#136201'),
+		withHeader: phoeWaMaungWithHeaderBackground,
+		header: phoeWaMaungHeaderBackground,
+		page: phoeWaMaungWithHeaderBackground,
 	},
 };
 

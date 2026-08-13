@@ -118,9 +118,11 @@ function renderLayer(layer, fallbackColor) {
 	return `linear-gradient(${angle}deg, ${stops})`;
 }
 
-function renderBackground(background, fallbackBackground, fallbackImage = '') {
+function renderBackground(background, fallbackBackground, fallbackImage = '', options = {}) {
 	const source = background && typeof background === 'object' ? background : {};
 	const fallbackColor = safeColor(source.fallbackColor, fallbackBackground);
+	const defaultPosition = options.position || 'center';
+	const defaultSize = options.size || 'cover';
 	let image = '';
 
 	if (source.type === 'image') {
@@ -142,9 +144,9 @@ function renderBackground(background, fallbackBackground, fallbackImage = '') {
 	return {
 		image: image || fallbackImage,
 		color: fallbackColor,
-		position: safePosition(source.position),
-		placeholderPosition: safePosition(source.placeholderPosition, safePosition(source.position)),
-		size: safeSize(source.size),
+		position: safePosition(source.position, defaultPosition),
+		placeholderPosition: safePosition(source.placeholderPosition, safePosition(source.position, defaultPosition)),
+		size: safeSize(source.size, defaultSize),
 		repeat: REPEAT_VALUES.has(source.repeat) ? source.repeat : 'no-repeat',
 	};
 }
@@ -188,7 +190,10 @@ function normalizeTheme(theme) {
 			'#1E1B4B', defaultLogin.image),
 		register: renderBackground(backgrounds.register || backgrounds.auth || defaultBackgrounds.register ||
 			defaultBackgrounds.auth, '#1E1B4B', defaultRegister.image),
-		header: renderBackground(rawHeader, '#1E1B4B', defaultHeader.image),
+		header: renderBackground(rawHeader, '#1E1B4B', defaultHeader.image, {
+			position: 'center top',
+			size: '100% 552px',
+		}),
 		page: renderBackground(backgrounds.page || defaultBackgrounds.page, '#1E1B4B', defaultPage.image),
 	};
 

@@ -2,7 +2,8 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="zw-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed }"
+		<view class="zw-header-wrapper"
+			:class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed && isLogin }"
 			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
 			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
@@ -273,11 +274,13 @@
 
 			// 接收页面滚动事件，控制header收起/展开
 			handleSetCollapsed(collapsed) {
-				if (this.collapsed === collapsed) return
-				this.collapsed = collapsed
+				// 未登录时保持完整 header，避免标题栏与登录卡片因收缩样式重新排版。
+				const nextCollapsed = this.isLogin ? collapsed : false
+				if (this.collapsed === nextCollapsed) return
+				this.collapsed = nextCollapsed
 
 				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
-				if (collapsed) {
+				if (nextCollapsed) {
 					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
 					if (this.isLogin) {
 						this.$emit('headerHeightChange', 85)
@@ -494,9 +497,11 @@
 
 	.user-details {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
+		overflow: hidden;
 	}
 
 	.user-id {
@@ -928,6 +933,12 @@
 	.user-summary .id-value {
 		color: $theme-header-background-foreground;
 		font-size: 15px;
+		display: block;
+		max-width: 100%;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-summary .header-actions {
