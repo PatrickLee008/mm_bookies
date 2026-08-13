@@ -24,7 +24,7 @@
 				</view>
 			</view>
 
-			<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltolower="loadMore"
+			<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltoupper="handleHeaderTop" @scrolltolower="loadMore"
 				:refresher-enabled="true" @refresherrefresh="onRefresh" @refresherrestore="onRefresherRestore"
 				@refresherabort="onRefresherAbort" :refresher-triggered="refresherTriggered">
 
@@ -576,8 +576,8 @@
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 

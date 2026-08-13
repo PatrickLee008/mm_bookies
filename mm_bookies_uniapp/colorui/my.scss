@@ -27,11 +27,11 @@
 	--theme-radius-small: #{$theme-radius-small-value};
 	--theme-logo-image: #{$theme-logo-image};
 	--theme-title: "#{$theme-title-value}";
+	--theme-header-logo-padding: #{$theme-header-logo-padding-value};
+	--theme-header-logo-radius: #{$theme-header-logo-radius-value};
 	--theme-page-start: #{$theme-page-start};
 	--theme-page-end: #{$theme-page-end};
 	--theme-glow: #{$theme-glow};
-	--theme-header-start: #{$theme-header-start};
-	--theme-header-end: #{$theme-header-end};
 	--theme-primary-alpha-06: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .06);
 	--theme-primary-alpha-18: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .18);
 	--theme-primary-alpha-20: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .2);
@@ -288,7 +288,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-bg-header {
-	background-color: var(--theme-header-background-color, $theme-header-start);
+	background-color: var(--theme-header-background-color, $theme-page-start);
 	background-image: var(--theme-header-background-image, #{$theme-header-background});
 	background-position: var(--theme-header-background-position, center top);
 	background-size: var(--theme-header-background-size, 100% 552px);
@@ -296,7 +296,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-page-background {
-	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-color: var(--theme-with-header-background-color, $theme-page-start);
 	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
 	background-position: var(--theme-with-header-background-position, center);
 	background-size: var(--theme-with-header-background-size, cover);
@@ -312,7 +312,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-bg-with-header {
-	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-color: var(--theme-with-header-background-color, $theme-page-start);
 	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
 	background-position: var(--theme-with-header-background-position, center);
 	background-size: var(--theme-with-header-background-size, cover);
@@ -335,6 +335,18 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	.theme-logo-image-legacy {
 		display: block;
 	}
+}
+
+:root[data-theme-preset="mm-bookies"] .theme-logo-image,
+:root[data-theme-preset="shwe-goal"] .theme-logo-image,
+:root[data-theme-preset="phoe-wa-maung"] .theme-logo-image {
+	display: none;
+}
+
+:root[data-theme-preset="mm-bookies"] .theme-logo-image-legacy,
+:root[data-theme-preset="shwe-goal"] .theme-logo-image-shwe-goal,
+:root[data-theme-preset="phoe-wa-maung"] .theme-logo-image-phoe-wa-maung {
+	display: block;
 }
 
 .theme-color-primary {

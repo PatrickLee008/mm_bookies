@@ -1,7 +1,7 @@
 /* 颜色变量 */
 // Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
 // 默认主题
-$theme-preset: shwe-goal !default;
+$theme-preset: phoe-wa-maung !default;
 @import "./common/styles/theme-presets";
 
 $theme-config: map-get($theme-presets, $theme-preset);
@@ -23,8 +23,6 @@ $theme-config: map-get($theme-presets, $theme-preset);
 $theme-page-start: theme-color(page-start);
 $theme-page-end: theme-color(page-end);
 $theme-glow: theme-color(glow);
-$theme-header-start: theme-color(header-start);
-$theme-header-end: theme-color(header-end);
 $theme-background-value: theme-color(background);
 $theme-header-background-value: theme-color(header-background);
 $theme-text-value: theme-color(text);
@@ -38,6 +36,11 @@ $theme-logo-image-value: theme-color(logo-image);
 $theme-title-value: theme-color(title);
 $theme-subtitle-value: theme-color(subtitle);
 $theme-header-logo-bg-value: theme-color(header-logo-bg);
+$theme-header-logo-radius-value: theme-color(header-logo-radius);
+@if $theme-header-logo-radius-value == null {
+	$theme-header-logo-radius-value: if($theme-header-logo-bg-value != none, $theme-radius-large-value, 0);
+}
+$theme-header-logo-padding-value: if($theme-header-logo-bg-value != none, 0 12px, 0);
 
 // Keep the compile-time values available for Sass color functions while the
 // public color variables resolve through runtime CSS custom properties.
@@ -112,18 +115,16 @@ $theme-home-background-fallback:
 	linear-gradient(135deg, $theme-page-start 0%, $theme-page-start 56%, $theme-page-end 100%);
 $theme-home-background: theme-background-image(theme-color(no-header-background-image), $theme-home-background-fallback);
 $theme-auth-background: $theme-home-background;
-$theme-header-background-fallback:
-	radial-gradient(circle at 100% 0%, $theme-glow 0%, $theme-header-end 34%, rgba(255, 255, 255, 0) 68%),
-	linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-header-background-fallback: $theme-home-background-fallback;
 $theme-header-background: theme-background-image(theme-color(header-background-image), $theme-header-background-fallback);
-$theme-page-background-fallback: linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-page-background-fallback: $theme-home-background-fallback;
 $theme-page-background: theme-background-image(theme-color(with-header-background-image), $theme-page-background-fallback);
 
 $theme-no-header-background: $theme-home-background;
 $theme-with-header-background: $theme-page-background;
-$theme-header-background-color: $theme-header-start;
-$theme-page-background-color: $theme-header-start;
-$theme-with-header-background-color: $theme-header-start;
+$theme-header-background-color: $theme-page-start;
+$theme-page-background-color: $theme-page-start;
+$theme-with-header-background-color: $theme-page-start;
 $theme-app-background: $theme-with-header-background;
 $theme-app-background-color: $theme-with-header-background-color;
 

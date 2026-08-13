@@ -43,6 +43,13 @@
 		overflow: visible;
 	}
 
+	.theme-logo-header {
+		background: var(--theme-header-logo-bg, none);
+		padding: var(--theme-header-logo-padding, 0);
+		border-radius: var(--theme-header-logo-radius, 0);
+		overflow: hidden;
+	}
+
 	.theme-logo-page {
 		display: flex;
 		width: 100%;

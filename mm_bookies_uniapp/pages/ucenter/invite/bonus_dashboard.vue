@@ -5,25 +5,23 @@
 			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 		<scroll-view scroll-y class="padding-bottom invite-scroll" @scroll="handleHeaderScroll"
 			@scrolltoupper="handleHeaderTop">
-			<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
 			<view class="padding-sm bonus-dashboard-content">
 				<view class="dashboard-filters">
-					<view class="dashboard-filter period-filter" @click="openPeriodPicker">
-						<theme-icon name="calendar" class="dashboard-filter-icon"
-							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
-						<text class="period-filter-text">{{ periodDisplay }}</text>
-						<text class="cuIcon-unfold dashboard-filter-arrow"></text>
+					<view class="dashboard-filter-container">
+						<view class="dashboard-filter period-filter" :class="{ 'date-filter-selected': date_filtered }"
+							@click="openPeriodPicker">
+							<theme-icon v-if="!date_filtered" name="calendar" class="dashboard-filter-icon"
+								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+							<text class="period-filter-text">{{ periodDisplay }}</text>
+							<text v-if="!date_filtered" class="cuIcon-unfold dashboard-filter-arrow"></text>
+						</view>
+						<date-range-picker ref="date_picker" :inline="true"
+							@click_option="date_click"></date-range-picker>
 					</view>
 					<view class="type-filter-container">
-						<view class="dashboard-filter type-filter" @click="typeMenuVisible = !typeMenuVisible">
-							<text class="type-filter-label">{{ typeDisplay }}</text>
-							<text class="cuIcon-unfold dashboard-filter-arrow"></text>
-						</view>
-						<view v-if="typeMenuVisible" class="type-options">
-							<view v-for="option in type_list" :key="option.value" class="type-option"
-								@click="onTypeSelect(option)">
-								{{ $t(option.label) }}
-							</view>
+						<view class="dashboard-filter type-filter">
+							<selector :option_list.sync="type_list" :default_label="$t('Type')"
+								@click_option="onTypeSelect"></selector>
 						</view>
 					</view>
 				</view>
@@ -131,14 +129,17 @@
 <script>
 	import config from '@/utils/config.js'
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import Selector from '@/components/common/selector.vue'
 
 	export default {
 		mixins: [headerCollapse],
+		components: {
+			Selector,
+		},
 		data() {
 			return {
 				language: config.language,
 				userInfo: null,
-				typeMenuVisible: false,
 				bonusStats: {
 					total_amount: 0,
 					bonus_type_breakdown: {
@@ -170,6 +171,7 @@
 				},
 				type_list: [],
 				date_preset: '',
+				date_filtered: false,
 				date_range: [{
 					show: "00/00/0000",
 					value: "0000-00-00",
@@ -188,12 +190,18 @@
 					padding: [0, 0, 0, 0],
 					dataLabel: false,
 					enableLegend: false,
+					title: {
+						name: '',
+					},
+					subtitle: {
+						name: '',
+					},
 					legend: {
 						show: false
 					},
 					extra: {
 						ring: {
-							ringWidth: 40,
+							ringWidth: 60,
 							activeOpacity: 0.5,
 							activeRadius: 10,
 							offsetAngle: 90,
@@ -214,13 +222,9 @@
 			periodDisplay() {
 				if (this.date_preset) return this.date_preset;
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
-					return this.$t('All');
+					return this.$t('date');
 				}
 				return `${this.date_range[0].show} - ${this.date_range[1].show}`;
-			},
-			typeDisplay() {
-				const selected = this.type_list.find(option => option.checked);
-				return selected && selected.value !== 'all' ? this.$t(selected.label) : this.$t('Type');
 			},
 			pieLabels() {
 				if (!this.hasChartData) return [];
@@ -236,8 +240,8 @@
 					return {
 						index,
 						text: `${Math.round(ratio * 100)}%`,
-						left: `${50 + Math.cos(middleAngle) * 31}%`,
-						top: `${50 + Math.sin(middleAngle) * 34}%`,
+						left: `${50 + Math.cos(middleAngle) * 32}%`,
+						top: `${50 + Math.sin(middleAngle) * 38}%`,
 						ratio
 					};
 				}).filter(item => item.ratio >= 0.04);
@@ -266,7 +270,7 @@
 					}
 					return list.map((ele, index) => {
 						return {
-							label: index === 0 ? 'Type' : ele,
+							label: index === 0 ? 'All' : ele,
 							checked: index === 0,
 							value: list_value[ele] || '',
 						}
@@ -340,6 +344,7 @@
 			date_click(range, presetLabel) {
 				this.date_preset = presetLabel || '';
 				this.date_range = range;
+				this.date_filtered = true;
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
 					this.date_preset = '';
 					this.date_range = [{
@@ -387,14 +392,12 @@
 				return this.color_list[index % this.color_list.length];
 			},
 			openPeriodPicker() {
-				this.typeMenuVisible = false;
 				this.$refs.date_picker.show();
 			},
 			onTypeSelect(selectedOption) {
 				this.type_list.forEach((option) => {
 					option.checked = (option.value === selectedOption.value);
 				});
-				this.typeMenuVisible = false;
 				this.get_summary();
 			},
 		}
@@ -426,6 +429,7 @@
 	}
 
 	.bonus-dashboard-content {
+		padding: 20px 20px 0;
 		color: $color-primary;
 	}
 
@@ -433,25 +437,28 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: 3px;
-		margin-bottom: 14px;
+		gap: 8px;
+		margin-bottom: 15px;
 	}
 
+	.dashboard-filter-container,
 	.type-filter-container {
 		position: relative;
 		flex: 1;
+		min-width: 0;
 	}
 
 	.dashboard-filter {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		flex: 1;
-		height: 30px;
-		border-radius: 14px;
+		width: 100%;
+		min-width: 0;
+		height: 32px;
+		border-radius: 999px;
 		background: $color-primary;
 		color: #fff;
-		font-size: 12px;
+		font-size: 13px;
 		font-weight: 700;
 		line-height: 24px;
 		box-sizing: border-box;
@@ -463,57 +470,58 @@
 		gap: 5px;
 	}
 
-	.type-filter-label {
-		// max-width: 84px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
 	.period-filter>text:first-child {
 		line-height: 22px;
 	}
 
-	.type-options {
-		position: absolute;
-		top: 27px;
-		left: 0;
-		z-index: 20;
-		width: 100%;
-		padding: 5px;
-		border-radius: 8px;
-		background: #fff;
-		box-shadow: 0 2px 8px rgba(18, 63, 70, 0.2);
-		box-sizing: border-box;
-		color: $color-primary;
-	}
-
-	.type-option {
+	.type-filter ::v-deep .selector-wrapper {
 		display: flex;
 		align-items: center;
-		min-height: 26px;
-		padding: 0 8px;
-		border-radius: 5px;
+		width: 100%;
+	}
+
+	.type-filter ::v-deep .selector-tag {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 32px;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background-color: transparent !important;
+		color: #fff !important;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 24px;
+		gap: 4px;
+	}
+
+	.type-filter ::v-deep .selector-tag text {
+		overflow: hidden;
+		color: #fff;
+		font-size: 13px;
+		font-weight: 600;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.type-filter ::v-deep .selector-tag .cuIcon-unfold,
+	.type-filter ::v-deep .selector-tag .cuIcon-fold {
+		flex-shrink: 0;
+		margin-left: 2px;
+		color: #fff;
 		font-size: 10px;
-		line-height: 14px;
-	}
-
-	.type-option+.type-option {
-		margin-top: 2px;
-	}
-
-	.type-option:active {
-		background: $bg-color-info;
 	}
 
 	.dashboard-filter-icon {
-		width: 12px;
-		height: 12px;
-		margin-right: 5px;
+		width: 16px;
+		height: 16px;
+		margin-right: 6px;
 	}
 
 	.dashboard-filter-arrow {
-		font-size: 8px;
+		font-size: 10px;
 		line-height: 22px;
 	}
 
@@ -530,49 +538,54 @@
 		text-align: center;
 	}
 
+	.period-filter.date-filter-selected {
+		gap: 0;
+	}
+
 	.bonus-source-banner {
 		display: flex;
 		align-items: center;
-		min-height: 53px;
-		margin-bottom: 14px;
-		padding: 0 15px;
-		border-radius: 12px;
+		min-height: 50px;
+		margin-bottom: 12px;
+		padding: 0 20px;
+		border-radius: 16px;
 		background: $bg-color-info;
 		color: $color-primary;
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: 700;
-		line-height: 18px;
+		line-height: 24px;
 		box-sizing: border-box;
 	}
 
 	.bonus-card {
-		border: 1px solid #d7e5e7;
-		border-radius: 10px;
+		border: 1px solid $color-border-other;
+		border-radius: $radius-medium;
 		background: #fff;
-		box-shadow: 0 1px 2px rgba(18, 63, 70, 0.2);
+		border: 1px solid #2A626833;
+		box-shadow: 0px 2px 2px 0px #2A626833;
 		box-sizing: border-box;
 	}
 
 	.bonus-overview-card {
-		padding: 18px 13px 13px;
+		padding: 22px 20px 16px;
 	}
 
 	.bonus-card-title {
 		display: block;
-		margin-bottom: 10px;
+		margin-bottom: 16px;
 		color: $color-primary;
-		font-size: 14px;
+		font-size: 18px;
 		font-weight: 700;
-		line-height: 18px;
+		line-height: 24px;
 	}
 
 	.bonus-overview-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 32px;
-		font-size: 10px;
-		line-height: 14px;
+		min-height: 40px;
+		font-size: 15px;
+		line-height: 20px;
 	}
 
 	.bonus-overview-label {
@@ -583,58 +596,59 @@
 	}
 
 	.bonus-index {
-		flex: 0 0 18px;
+		flex: 0 0 28px;
 		font-weight: 700;
 	}
 
 	.bonus-overview-value {
-		min-width: 42px;
-		margin-left: 8px;
+		min-width: 58px;
+		margin-left: 12px;
 		color: $color-primary;
 		font-weight: 700;
+		font-size: 15px;
 		text-align: right;
 		white-space: nowrap;
 	}
 
 	.bonus-currency {
-		margin-left: 4px;
-		font-size: 9px;
+		margin-left: 5px;
+		font-size: 13px;
 	}
 
 	.bonus-total-row {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-top: 4px;
-		padding-top: 2px;
-		color: $color-primary;
-		font-size: 11px;
+		margin-top: 8px;
+		padding-top: 8px;
+		color: $color-secondary;
+		font-size: 16px;
 		font-weight: 700;
-		line-height: 16px;
+		line-height: 22px;
 	}
 
 	.bonus-chart-card {
-		margin-top: 14px;
-		padding: 16px 13px 10px;
+		margin-top: 20px;
+		padding: 22px 20px 16px;
 	}
 
 	.bonus-chart-card .bonus-card-title {
-		margin-bottom: 2px;
-		font-size: 11px;
-		line-height: 15px;
+		margin-bottom: 8px;
+		font-size: 17px;
+		line-height: 23px;
 	}
 
 	.bonus-chart-wrap {
 		position: relative;
 		width: 100%;
-		height: 220px;
-		margin-top: 27px;
+		height: 300px;
+		margin-top: 12px;
 	}
 
 	.bonus-pie-chart {
 		display: block;
 		width: 100%;
-		height: 220px;
+		height: 300px;
 	}
 
 	.pie-label {
@@ -642,9 +656,9 @@
 		z-index: 2;
 		transform: translate(-50%, -50%);
 		color: #fff;
-		font-size: 11px;
+		font-size: 15px;
 		font-weight: 700;
-		line-height: 13px;
+		line-height: 18px;
 		pointer-events: none;
 	}
 
@@ -653,11 +667,11 @@
 		align-items: center;
 		justify-content: center;
 		flex-wrap: wrap;
-		gap: 9px;
-		margin: 0 0 24px;
+		gap: 16px;
+		margin: 0 0 28px;
 		color: $color-primary;
-		font-size: 8px;
-		line-height: 11px;
+		font-size: 13px;
+		line-height: 18px;
 	}
 
 	.chart-legend-item {
@@ -667,9 +681,9 @@
 	}
 
 	.chart-legend-dot {
-		width: 7px;
-		height: 7px;
-		margin-right: 3px;
+		width: 10px;
+		height: 10px;
+		margin-right: 5px;
 		border-radius: 50%;
 	}
 
@@ -682,10 +696,10 @@
 	}
 
 	.chart-table-header {
-		padding: 0 0 5px;
+		padding: 0 0 8px;
 		color: $color-primary;
-		font-size: 8px;
-		line-height: 11px;
+		font-size: 13px;
+		line-height: 18px;
 	}
 
 	.chart-table-header>text:first-child,
@@ -707,14 +721,14 @@
 	}
 
 	.chart-table-row {
-		min-height: 29px;
-		margin-bottom: 7px;
-		padding: 6px;
-		border-radius: 5px;
+		min-height: 58px;
+		margin-bottom: 8px;
+		padding: 8px 10px;
+		border-radius: 8px;
 		color: #fff;
-		font-size: 9px;
+		font-size: 14px;
 		font-weight: 700;
-		line-height: 13px;
+		line-height: 19px;
 	}
 
 	.chart-table-title {

@@ -13,6 +13,8 @@ $theme-presets: (
 		header-background: dark,
 		// Header logo 背景色；none 表示不显示额外背景。
 		header-logo-bg: none,
+		// Header logo 背景圆角。
+		header-logo-radius: 0,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #2A626833,
 		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
@@ -40,10 +42,6 @@ $theme-presets: (
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #36BCCB,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #02455F,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #1F879B,
 		// 品牌 logo：首页、登录注册和 Header 的默认 logo。
 		logo-image: "/static/theme/mm-bookies/mm-bookies_logo.png",
 		// 注册页欢迎标题。
@@ -66,6 +64,8 @@ $theme-presets: (
 		header-background: dark,
 		// Header logo 背景色；none 表示不显示额外背景。
 		header-logo-bg: none,
+		// Header logo 背景圆角。
+		header-logo-radius: 0,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #136201,
 		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
@@ -104,10 +104,6 @@ $theme-presets: (
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: none,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #136201,
 		// 无 header 页面、header 页面和顶部 header 统一使用测试背景图片。
 		no-header-background-image: "/static/theme/bg-green.png",
 		with-header-background-image: "/static/theme/bg-green.png",
@@ -128,6 +124,8 @@ $theme-presets: (
 		header-background: dark,
 		// Header logo 背景色。
 		header-logo-bg: white,
+		// Header logo 背景圆角。
+		header-logo-radius: 20px,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #136201,
 		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
@@ -166,10 +164,6 @@ $theme-presets: (
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: none,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #136201,
 		// 无 header 页面背景图片：首页、登录和注册使用。
 		no-header-background-image: "/static/theme/bg-white.png",
 		// 有 header 页面 App 根背景图片。

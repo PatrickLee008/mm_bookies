@@ -28,11 +28,11 @@
 		<!-- from tangjq--- Tab 内容区域 -->
 		<view class="tab-content">
 			<!-- Deposit 表单（现有 deposit.vue 子组件） -->
-			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll"></wallet-deposit>
+			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-deposit>
 
 			<!-- Deposit History 列表（现有 history.vue 子组件） -->
 			<wallet-history v-if="tab_index === 1" ref="depositHistory"
-				@contentScroll="handleHeaderScroll"></wallet-history>
+				@contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-history>
 		</view>
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在 Deposit History tab 显示 -->

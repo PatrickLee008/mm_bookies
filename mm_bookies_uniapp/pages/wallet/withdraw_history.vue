@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -105,6 +105,10 @@
 			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
+			},
+			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			onScrollTopEmit() {
+				this.$emit('contentScrollTop')
 			},
 			refreshData() {
 				if (this.refreshing) return;
@@ -502,8 +506,8 @@ async loadRecords() {
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 
@@ -511,6 +515,7 @@ async loadRecords() {
 		font-size: 16px;
 		color: #999999;
 		margin-top: 20px;
+		text-align: center;
 	}
 
 	/* 加载更多 */

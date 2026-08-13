@@ -1,7 +1,7 @@
 <template>
 	<view class="withdraw-component">
 		<!-- from tangjq--- Withdraw 组件内容从 withdraw.vue 提取 -->
-		<scroll-view scroll-y class="withdraw-scroll" @scroll="onScrollEmit">
+		<scroll-view scroll-y class="withdraw-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit">
 			<!-- from tangjq--- 银行卡列表界面（仿照deposit.vue） -->
 			<view class="bank-list-container">
 				<!-- 银行卡列表 -->
@@ -253,6 +253,10 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
+			},
+			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			onScrollTopEmit() {
+				this.$emit('contentScrollTop')
 			},
 			inputNum: function(evt) {
 				let amount = evt.detail.value.replace('.', '')

@@ -48,7 +48,7 @@
 				</view>
 			</view>
 
-			<scroll-view scroll-y class="history-scroll" @scroll="handleHeaderScroll" @scrolltolower="loadMore"
+			<scroll-view scroll-y class="history-scroll" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop" @scrolltolower="loadMore"
 				:refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 				<!-- 空状态 -->
@@ -440,7 +440,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 12px 16px;
+		padding: 8px 16px;
 		cursor: pointer;
 	}
 
@@ -623,8 +623,8 @@
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 
@@ -632,6 +632,7 @@
 		font-size: 14px;
 		color: #999999;
 		margin-top: 20px;
+		text-align: center;
 	}
 
 	/* 加载更多 */

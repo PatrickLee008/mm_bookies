@@ -44,7 +44,7 @@
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
-			@scroll="onScrollHandler"
+			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop"
 			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px - ${headerHeight}px)` : `calc(${calc_page_height} - 80px - ${headerHeight}px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
 			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"

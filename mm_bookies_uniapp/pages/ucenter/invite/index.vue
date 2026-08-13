@@ -6,7 +6,7 @@
 		<view class="invite-header-placeholder"
 			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
-		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll">
+		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<!-- 两个仪表盘入口 -->
 			<view class="flex-row justify-between text-black invite-dashboards">
 				<view class="dashboard-rec dashboard-bonus" @click="goto('./bonus_dashboard')">

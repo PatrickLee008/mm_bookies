@@ -33,7 +33,7 @@
 		</view>
 
 		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60"
-			@scroll="handleHeaderScroll">
+			@scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<view v-if="isLogin">
 				<!-- ============ Coupon 区域 ============ -->
 				<view class="list-container" v-if="activity_type === 'coupon'">
@@ -1975,6 +1975,7 @@
 	.empty-text {
 		font-size: 16px;
 		color: #999;
+		text-align: center;
 	}
 
 	/* ============ 详情弹窗（通用） ============ */

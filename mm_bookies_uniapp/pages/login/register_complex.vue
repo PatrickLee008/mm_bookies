@@ -805,7 +805,7 @@
 		width: 25px;
 		height: 25px;
 		border-radius: 50%;
-		filter: drop-shadow(var(--theme-header-background-color, #{$theme-header-start}) 0px 0px 2px);
+		filter: drop-shadow(var(--theme-header-background-color, #{$theme-page-start}) 0px 0px 2px);
 	}
 
 	// 登录样式

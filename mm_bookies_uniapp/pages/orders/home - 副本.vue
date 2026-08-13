@@ -40,9 +40,17 @@
 
 		<view class="padding-sm bg-white">
 			<view class="flex-row flex-wrap justify-start filter padding-lr-sm" style="">
-				<theme-icon name="calendar" class="width-38upx"
-					color="var(--theme-icon-primary, var(--theme-primary))"
-					@click="$refs.date_picker.show()"></theme-icon>
+				<view class="legacy-date-filter-container">
+					<view class="legacy-date-filter" :class="{ 'date-filter-selected': date_filtered }"
+						@click="$refs.date_picker.show()">
+						<theme-icon v-if="!date_filtered" name="calendar" class="legacy-date-icon"
+							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+						<text class="legacy-date-text">{{date_range[0].show}}{{' - '}}{{date_range[1].show}}</text>
+						<text v-if="!date_filtered" class="cuIcon-unfold legacy-date-arrow"></text>
+					</view>
+					<date-range-picker ref="date_picker" :inline="true"
+						@click_option="date_click"></date-range-picker>
+				</view>
 				<view class="filter-row">
 					<view class="text mycolor-primary">{{$t('type')}}</view>
 					<selector :option_list.sync="type_list" @click_option="click_option"></selector>
@@ -233,8 +241,6 @@
 			</view>
 		</scroll-view>
 
-		<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
-
 	</view>
 </template>
 
@@ -269,6 +275,7 @@
 				type_list: [],
 				status_list: [],
 				wallet_list: [],
+				date_filtered: false,
 				date_range: [{}, {}],
 				report: {
 					all_stake: 0,
@@ -307,10 +314,11 @@
 				this.reset_list()
 				this.get_list()
 			},
-			date_click(arr) {
+			date_click(arr, presetLabel) {
 				// let start = arr[0]
 				// let end = arr[1]
 				this.date_range = arr
+				this.date_filtered = presetLabel !== this.$t('today')
 				this.reset_list()
 				this.get_list()
 			},
@@ -1089,5 +1097,57 @@
 		margin-right: 15upx;
 		padding: 10upx 13upx;
 		line-height: 1;
+	}
+
+	.legacy-date-filter-container {
+		position: relative;
+		flex: 1 1 100%;
+		min-width: 0;
+		margin-bottom: 8px;
+	}
+
+	.legacy-date-filter {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 34px;
+		padding: 0 12px;
+		border-radius: 999upx;
+		background-color: $color-primary;
+		color: #fff;
+		box-sizing: border-box;
+	}
+
+	.legacy-date-icon {
+		width: 17px;
+		height: 17px;
+		flex-shrink: 0;
+		margin-right: 6px;
+	}
+
+	.legacy-date-text {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		color: #fff;
+		font-size: 11px;
+		font-weight: 600;
+		line-height: 16px;
+		text-align: center;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.legacy-date-filter.date-filter-selected .legacy-date-text {
+		flex: 0 1 auto;
+		text-align: center;
+	}
+
+	.legacy-date-arrow {
+		flex-shrink: 0;
+		margin-left: 6px;
+		color: #fff;
+		font-size: 10px;
 	}
 </style>

@@ -28,10 +28,10 @@
 		<!-- from tangjq--- Tab 内容区域 -->
 		<view class="tab-content">
 			<!-- Withdraw 表单（现有 withdraw.vue 子组件） -->
-			<wallet-withdraw v-if="tab_index === 0" @contentScroll="handleHeaderScroll"></wallet-withdraw>
+			<wallet-withdraw v-if="tab_index === 0" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-withdraw>
 
 			<!-- Withdraw History 列表（现有 withdraw_history.vue 子组件，已去掉 type 限制） -->
-			<wallet-withdraw-history v-if="tab_index === 1" ref="withdrawHistory" @contentScroll="handleHeaderScroll"></wallet-withdraw-history>
+			<wallet-withdraw-history v-if="tab_index === 1" ref="withdrawHistory" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-withdraw-history>
 		</view>
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在 Withdraw History tab 显示 -->

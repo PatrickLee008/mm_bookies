@@ -446,8 +446,8 @@ export default {
 }
 
 .empty-icon {
-	width: 120px;
-	height: 120px;
+	width: 60px;
+	height: 60px;
 	opacity: 0.6;
 }
 
@@ -455,6 +455,7 @@ export default {
 	font-size: 16px;
 	color: #999999;
 	margin-top: 20px;
+	text-align: center;
 }
 
 .loading-more {

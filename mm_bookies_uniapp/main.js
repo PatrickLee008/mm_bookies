@@ -18,6 +18,9 @@ Vue.prototype.$httpPay =httpPay.httpPay;
 import config from './utils/config.js'
 Vue.prototype.$config =config;
 
+import themeManager from './utils/theme/manager.js'
+themeManager.initPreset()
+
 import noticeManager from './utils/notice.js'
 Vue.prototype.$notice = noticeManager;
 

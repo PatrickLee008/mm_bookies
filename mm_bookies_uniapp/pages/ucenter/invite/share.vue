@@ -2,7 +2,7 @@
 	<view class="invite-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
-		<scroll-view scroll-y class="padding-bottom invite-scroll" @scroll="handleHeaderScroll">
+		<scroll-view scroll-y class="padding-bottom invite-scroll" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
 					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->

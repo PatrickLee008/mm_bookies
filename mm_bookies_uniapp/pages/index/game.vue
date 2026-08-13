@@ -29,7 +29,7 @@
 
 		<!-- Game Categories and Game Cards -->
 		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px scroll-container"
-			@scroll="handleHeaderScroll"
+			@scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop"
 			:style="{height:isLogin?`calc(${calc_page_height} - 55px - 70px - 65px)`:`calc(${calc_page_height} - 55px - 60px - 70px - 65px)`,}">
 
 			<!-- Loop through game categories -->

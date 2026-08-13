@@ -94,7 +94,7 @@
 
 	/* 顶部栏 */
 	.language-header {
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-color: var(--theme-header-background-color, #{$theme-page-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);

@@ -42,7 +42,7 @@
 
 		<!-- 下拉刷新容器 -->
 		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
-			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll">
+			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 
 			<!-- 消息列表 -->
 			<view class="message-list">

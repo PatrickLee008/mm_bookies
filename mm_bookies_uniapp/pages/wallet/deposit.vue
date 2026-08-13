@@ -1,7 +1,7 @@
 <template>
 	<view class="deposit-component">
 		<global-notice ref="globalNotice"></global-notice>
-		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit">
+		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit">
 			<!-- from tangjq--- 银行卡列表界面（默认显示） -->
 			<view class="bank-list-container" v-if="current_progress==0">
 				<!-- 银行卡列表 -->
@@ -732,6 +732,10 @@
 			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
+			},
+			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			onScrollTopEmit() {
+				this.$emit('contentScrollTop')
 			},
 			select_option(selected, list, allow_false) {
 				if (selected.checked && !allow_false) return

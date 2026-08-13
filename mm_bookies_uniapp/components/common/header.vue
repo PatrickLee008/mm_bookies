@@ -403,7 +403,7 @@
 		left: 0;
 		right: 0;
 		width: 100%;
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-color: var(--theme-header-background-color, #{$theme-page-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);
@@ -425,12 +425,6 @@
 
 	.header-logo {
 		line-height: 0;
-		background: $theme-header-logo-bg;
-
-		@if $theme-header-logo-bg-value !=none {
-			padding: 0 12px;
-			border-radius: 20px;
-		}
 	}
 
 	.header-page-row {
@@ -820,7 +814,7 @@
 	}
 
 	.zw-header-wrapper {
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-color: var(--theme-header-background-color, #{$theme-page-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);

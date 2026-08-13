@@ -230,7 +230,7 @@
 	}
 
 	.home-subtitle::after {
-		content: $theme-subtitle-value;
+		content: var(--theme-subtitle, "#{$theme-subtitle-value}");
 	}
 
 	.user-info-card {

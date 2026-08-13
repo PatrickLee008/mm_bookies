@@ -24,11 +24,16 @@
 		<!-- from tangjq--- 标题栏 -->
 		<view class="title-bar">
 			<view class="order-filter">
-				<view class="order-filter-pill order-filter-calendar-pill" @click="$refs.date_picker.show()">
-					<theme-icon name="calendar" class="order-filter-calendar"
-						color="var(--theme-icon-on-primary, #fff)"></theme-icon>
-					<text class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
-					<text class="cuIcon-unfold pill-arrow"></text>
+				<view class="order-filter-pill order-filter-calendar-pill">
+					<view class="date-filter-trigger" :class="{ 'date-filter-selected': date_filtered }"
+						@click="$refs.date_picker.show()">
+						<theme-icon v-if="!date_filtered" name="calendar" class="order-filter-calendar"
+							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+						<text class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
+						<text v-if="!date_filtered" class="cuIcon-unfold pill-arrow"></text>
+					</view>
+					<date-range-picker ref="date_picker" :inline="true"
+						@click_option="date_click"></date-range-picker>
 				</view>
 				<view class="order-filter-pill">
 					<selector :option_list.sync="type_list" :default_label="$t('type')" @click_option="click_option">
@@ -62,7 +67,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="main-scroll-view" @scroll="handleHeaderScroll">
+		<scroll-view scroll-y class="main-scroll-view" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<view class="history-container">
 				<view v-for="(item,index) in history_list" :key='index' class="history-item">
 					<!-- 单笔投注 -->
@@ -267,8 +272,6 @@
 			</view>
 		</scroll-view>
 
-		<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
-
 	</view>
 </template>
 
@@ -350,6 +353,7 @@
 				// from tangjq--- 优先使用预设 label；presetLabel 为空时回退到日期范围拼接
 				this.date_preset = presetLabel || ''
 				this.date_range = arr
+				this.date_filtered = presetLabel !== this.$t('today')
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
 					this.send_date = false
 					this.date_preset = ''
@@ -872,6 +876,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		position: relative;
+		min-width: 0;
 		gap: 6upx;
 		padding: 0 0;
 		height: 56upx;
@@ -884,8 +890,19 @@
 	}
 
 	.order-filter-calendar-pill {
-		flex: 0 0 auto;
-		padding: 0 18upx;
+		padding: 0;
+		overflow: visible;
+	}
+
+	.date-filter-trigger {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-width: 0;
+		height: 100%;
+		padding: 0 10upx;
+		box-sizing: border-box;
 	}
 
 	.order-filter-calendar {
@@ -906,6 +923,11 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		text-align: left;
+	}
+
+	.date-filter-selected .calendar-text {
+		flex: 0 1 auto;
+		text-align: center;
 	}
 
 	.pill-arrow {
@@ -1141,7 +1163,7 @@
 	}
 
 	.user-label-badge.badge-main {
-		background-color: var(--theme-page-background-color, #{$theme-header-start});
+		background-color: var(--theme-page-background-color, #{$theme-page-start});
 	}
 
 	.user-label-badge.badge-promo {

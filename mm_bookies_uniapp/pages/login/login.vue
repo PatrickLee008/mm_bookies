@@ -783,7 +783,7 @@
 	}
 
 	.login-subtitle::after {
-		content: $theme-subtitle-value;
+		content: var(--theme-subtitle, "#{$theme-subtitle-value}");
 	}
 
 	/* 广告区域 */
