@@ -31,7 +31,8 @@
 			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll"></wallet-deposit>
 
 			<!-- Deposit History 列表（现有 history.vue 子组件） -->
-			<wallet-history v-if="tab_index === 1" ref="depositHistory" @contentScroll="handleHeaderScroll"></wallet-history>
+			<wallet-history v-if="tab_index === 1" ref="depositHistory"
+				@contentScroll="handleHeaderScroll"></wallet-history>
 		</view>
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在 Deposit History tab 显示 -->
@@ -205,7 +206,8 @@
 		height: 50px;
 		border-radius: 30px;
 		background: $color-primary;
-		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		// box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		border: 1px solid $color-border-other;
 		display: flex;
 		flex-direction: column;
 		align-items: center;

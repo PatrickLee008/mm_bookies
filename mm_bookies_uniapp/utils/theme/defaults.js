@@ -3,8 +3,10 @@
 const testTheme = {
 	version: 'test',
 	tokens: {
+		title: 'MM Bookies',
 		primary: '#6D28D9',
 		border: '#6D28D9',
+		borderOther: '#A5B4FC',
 		secondary: '#06B6D4',
 		secondaryLight: '#ECFEFF',
 		active: '#F59E0B',
@@ -12,6 +14,8 @@ const testTheme = {
 		textSecondary: '#475569',
 		backgroundLight: '#0891B2',
 		backgroundInfo: '#E8F4F5',
+		bgLoginInput: 'rgba(105, 145, 149, 0.6)',
+		colorLoginInput: '#FFFFFF',
 		iconPrimary: '#6D28D9',
 		iconSecondary: '#06B6D4',
 		iconOnPrimary: '#FFFFFF',

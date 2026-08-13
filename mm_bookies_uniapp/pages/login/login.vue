@@ -705,7 +705,7 @@
 	.lang-modal-title {
 		font-size: 32rpx;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 20rpx;
 	}
@@ -724,7 +724,7 @@
 	.lang-option-label {
 		font-size: 30rpx;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.lang-radio {
@@ -777,7 +777,7 @@
 
 	.login-subtitle {
 		margin-top: 10rpx;
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 		font-size: 24rpx;
 		letter-spacing: 2rpx;
 	}
@@ -798,6 +798,8 @@
 		width: 100%;
 		height: auto;
 		border-radius: 32rpx;
+		border: 1px solid $color-border-other;
+		box-sizing: border-box;
 	}
 
 	/* 表单区域 */
@@ -809,7 +811,7 @@
 	.welcome-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		text-align: center;
 		margin-bottom: 30rpx;
 	}
@@ -821,19 +823,19 @@
 
 	.input-field {
 		height: 85rpx;
-		background-color: rgba(105, 145, 149, 0.6);
-		border: none;
+		background-color: $bg-login-input;
+		border: 2rpx solid $color-border-other;
 		border-radius: 20rpx;
 		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
-		color: #ffffff;
+		color: $color-login-input;
 		box-sizing: border-box;
 		text-align: center;
 		font-style: italic;
 	}
 
 	.input-placeholder {
-		color: #103C42;
+		color: $color-login-input;
 		text-align: center;
 		font-style: italic;
 		font-size: 24rpx;
@@ -880,7 +882,7 @@
 	.remember-text {
 		font-size: 24rpx;
 		font-weight: 400;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		font-style: italic;
 		margin-right: auto;
 	}
@@ -889,7 +891,7 @@
 	.custom-switch {
 		width: 32rpx;
 		height: 32rpx;
-		border: 4rpx solid $color-secondary-light;
+		border: 4rpx solid $theme-background-foreground;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -906,7 +908,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $color-secondary-light;
+		background-color: $theme-background-foreground;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -918,14 +920,14 @@
 
 	.login-btn {
 		height: 70rpx;
-		background-color: #ffffff;
+		background-color: $theme-auth-button-background;
 		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #2A5F63;
+		color: $theme-auth-button-foreground;
 		margin-bottom: 30rpx;
 		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	}
@@ -943,7 +945,7 @@
 	}
 
 	.register-text {
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 	}
 
 	.register-link-text {

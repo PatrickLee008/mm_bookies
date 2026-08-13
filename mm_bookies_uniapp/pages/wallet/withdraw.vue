@@ -747,7 +747,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.form-input {
 		flex: 1;
 		height: 24px;
-		border: $color-secondary-light;
+		border:  2px solid $color-secondary-light;
 		border-radius: 12px;
 		font-size: 12px;
 		color: #000;
@@ -911,6 +911,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		width: 100%;
 		height: 40px;
 		background-color: $bg-color-info;
+		border: 1px solid $color-border-other;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;

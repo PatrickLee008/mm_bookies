@@ -171,9 +171,10 @@
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
 							<view>{{ $t('account_ame') }}</view>
-							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text
-									class="cuIcon-copy mycolor-info text-light margin-left"
-									@click="copy(agent_bankcard.rc_bank_account)"></text>
+							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<theme-icon name="copy"
+									size="16px" color="rgb(161, 160, 161)" class="margin-left"
+									style="display: inline-block; vertical-align: middle;"
+									@click="copy(agent_bankcard.rc_bank_account)"></theme-icon>
 							</view>
 							<view>{{ $t('account_number') }}</view>
 						</view>

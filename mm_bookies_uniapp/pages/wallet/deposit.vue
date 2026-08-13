@@ -173,9 +173,10 @@
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
 							<view>{{ $t('account_ame') }}</view>
-							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text
-									class="cuIcon-copy mycolor-info text-light margin-left"
-									@click="copy(agent_bankcard.rc_bank_account)"></text>
+							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<theme-icon name="copy"
+									size="16px" color="rgb(161, 160, 161)" class="margin-left"
+									style="display: inline-block; vertical-align: middle;"
+									@click="copy(agent_bankcard.rc_bank_account)"></theme-icon>
 							</view>
 							<view>{{ $t('account_number') }}</view>
 						</view>
@@ -442,7 +443,8 @@
 							<view class="confirm-copy-btn"
 								@click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
-								<text class="cuIcon-copy"></text>
+								<theme-icon name="copy" size="14px"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 						</view>
 					</view>
@@ -454,7 +456,8 @@
 							<view class="confirm-copy-btn"
 								@click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
-								<text class="cuIcon-copy"></text>
+								<theme-icon name="copy" size="14px"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 						</view>
 					</view>
@@ -1875,6 +1878,7 @@
 		width: 100%;
 		height: 40px;
 		background-color: $bg-color-info;
+		border: 1px solid $color-border-other;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;

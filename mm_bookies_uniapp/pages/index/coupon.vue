@@ -220,7 +220,7 @@
 						<view class="coupon-copy-btn" @click="copyCode">
 							<text class="coupon-copy-text">Copy code</text>
 							<theme-icon name="copy" class="coupon-copy-icon"
-								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						</view>
 					</view>
 
@@ -1445,7 +1445,7 @@
 	.type-btn {
 		flex: 1;
 		height: 34px;
-		border-radius: 8px;
+		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1514,7 +1514,7 @@
 	.redeem-input {
 		flex: 1;
 		border: solid 1px #D6D6D6;
-		border-radius: 8px;
+		border-radius: $radius-medium;
 		height: 34px;
 		padding: 0 12px;
 		font-size: 14px;
@@ -1531,7 +1531,7 @@
 		height: 34px;
 		line-height: 34px;
 		text-align: center;
-		border-radius: 8px;
+		border-radius: $radius-medium;
 		font-size: 14px;
 		font-weight: bold;
 		background: $color-primary;
@@ -1600,7 +1600,7 @@
 	/* 当前活动卡片 */
 	.current-activity-box {
 		background: $bg-color-info;
-		border-radius: 12px;
+		border-radius: $radius-large;
 		padding: 14px 16px;
 		margin-bottom: 16px;
 	}
@@ -2249,7 +2249,7 @@
 	.coupon-hero {
 		width: 100%;
 		aspect-ratio: 16/9;
-		border-radius: 12px;
+		border-radius: $radius-large;
 		overflow: hidden;
 		margin-bottom: 20px;
 		position: relative;
@@ -2299,7 +2299,7 @@
 
 	.coupon-desc-text {
 		font-size: 14px;
-		color: #666;
+		color: $color-secondary;
 		text-align: center;
 		line-height: 1.6;
 	}
@@ -2310,7 +2310,7 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		background: #F5F5F5;
+		background: $bg-color-info;
 		border-radius: $radius-large;
 		padding: 10px 20px;
 		margin-bottom: 20px;
@@ -2336,7 +2336,7 @@
 
 	.coupon-copy-text {
 		font-size: 13px;
-		color: $color-primary;
+		color: $color-secondary;
 		font-weight: 600;
 	}
 
@@ -2367,8 +2367,8 @@
 
 	/* Applicable Scenarios */
 	.coupon-scenarios {
-		background: #E8F4F4;
-		border-radius: 12px;
+		background: $bg-color-info;
+		border-radius: $radius-large;
 		padding: 14px 16px;
 		margin-bottom: 8px;
 	}
@@ -2435,7 +2435,7 @@
 
 	.coupon-scenario-label {
 		font-size: 12px;
-		color: #666;
+		color: $color-primary;
 	}
 
 	/* Vendor grid inside scenarios */

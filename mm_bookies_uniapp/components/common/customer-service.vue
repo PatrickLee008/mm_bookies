@@ -502,8 +502,9 @@
 		align-items: center;
 		justify-content: center;
 		background: $color-primary;
-		border: 0;
+		border: 1px solid $color-border-other;
 		border-radius: 50%;
+		box-sizing: border-box;
 	}
 
 	.customer-btn-icon {

@@ -1338,7 +1338,7 @@
 	.setting-item {
 		background: #fff;
 		border: 2px solid $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-large;
 		padding: 8px;
 		margin-bottom: 20px;
 		text-align: center;
@@ -1535,7 +1535,7 @@
 	.profile-info-label {
 		font-size: 16px;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.profile-phone-row {
@@ -1548,7 +1548,7 @@
 	.profile-phone-label {
 		font-size: 15px;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.profile-edit-icon {
@@ -1559,7 +1559,7 @@
 	.profile-change-pwd-btn {
 		background: #fff;
 		border: 2px solid $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 		margin-bottom: 12px;
@@ -1573,7 +1573,7 @@
 
 	.profile-save-btn {
 		background: $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 	}
@@ -1742,7 +1742,7 @@
 	.language-label {
 		font-size: 16px;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.radio-circle {

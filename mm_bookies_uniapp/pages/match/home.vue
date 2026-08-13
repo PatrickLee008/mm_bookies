@@ -8,7 +8,7 @@
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"
-			:style="{ height: (isLogin ? headerHeight : 190) + 'px', transition: 'height 0.3s ease' }"></view>
+			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -2438,7 +2438,7 @@
 		border-radius: $radius-large;
 		margin-bottom: 12px;
 		overflow: hidden;
-		border: 1px solid #d7e2e3;
+		border: 1px solid $color-border;
 		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
 	}
 
@@ -2850,6 +2850,7 @@
 	/* from tangjq--- 混合投注列表项，与左右边框有距离 */
 	.mix-match-item {
 		background-color: $bg-color-info;
+		border: 1px solid $color-border-other;
 		border-radius: $radius-small;
 		padding: 12px 15px;
 		margin: 0 15px 12px 15px;
@@ -2881,7 +2882,7 @@
 	/* from tangjq--- 队伍对阵行特殊样式 */
 	.mix-teams-row {
 		padding-bottom: 10px;
-		border-bottom: 1px solid #D0E8EA;
+		border-bottom: 1px solid $color-border-other;
 		margin-bottom: 2px;
 		align-items: flex-start;
 		/* from tangjq--- 改为顶部对齐，支持换行后的布局 */
@@ -2969,7 +2970,7 @@
 		align-items: center;
 		margin-bottom: 10px;
 		padding-bottom: 10px;
-		border-bottom: 1px solid #D0E8EA;
+		border-bottom: 1px solid $color-border-other;
 	}
 
 	.team-section {

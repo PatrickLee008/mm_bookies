@@ -425,6 +425,12 @@
 
 	.header-logo {
 		line-height: 0;
+		background: $theme-header-logo-bg;
+
+		@if $theme-header-logo-bg-value !=none {
+			padding: 0 12px;
+			border-radius: 20px;
+		}
 	}
 
 	.header-page-row {
@@ -583,7 +589,7 @@
 	.settings-icon {
 		width: 24px;
 		height: 24px;
-		filter: brightness(0) invert(1);
+		filter: $theme-header-background-foreground-filter;
 	}
 
 	/* 右侧操作区：铃铛 + 设置 */
@@ -609,7 +615,7 @@
 	.bell-icon {
 		width: 22px;
 		height: 22px;
-		filter: brightness(0) invert(1);
+		filter: $theme-header-background-foreground-filter;
 		transform-origin: top center;
 	}
 
@@ -895,7 +901,7 @@
 		display: flex;
 		align-items: center;
 		padding: 4px 4px 14px;
-		color: #fff;
+		color: $theme-header-background-foreground;
 		overflow: hidden;
 		transform: translateY(0);
 		transition: opacity 0.3s ease, transform 0.3s ease;
@@ -921,12 +927,12 @@
 	}
 
 	.greeting {
-		color: #fff;
+		color: $theme-header-background-foreground;
 		font-size: 12px;
 	}
 
 	.user-summary .id-value {
-		color: #fff;
+		color: $theme-header-background-foreground;
 		font-size: 15px;
 	}
 
@@ -936,6 +942,7 @@
 
 	.user-summary .avatar-img {
 		background: transparent;
+		filter: $theme-header-background-foreground-filter;
 	}
 
 	.balance-card {

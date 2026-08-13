@@ -3,8 +3,16 @@ $theme-presets: (
 	mm-bookies: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #1C667C,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: dark,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色；none 表示不显示额外背景。
+		header-logo-bg: none,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #1C667C,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: #D0E8EA,
 		// 首页顶部区域底部边框色。
 		home-top-border: #44696E,
 		// 副色：充值图标、次级按钮、辅助强调文字。
@@ -21,6 +29,10 @@ $theme-presets: (
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
 		bg-info: #E8F4F5,
+		// 登录注册输入框背景色。
+		bg-login-input: rgba(105, 145, 149, 0.6),
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #FFFFFF,
 		// 无 header 页面背景渐变起始色：首页、登录和注册的主要底色。
 		page-start: #103D43,
 		// 无 header 页面背景渐变结束色：页面背景渐变的收束色。
@@ -33,6 +45,8 @@ $theme-presets: (
 		header-end: #1F879B,
 		// 品牌 logo：首页、登录注册和 Header 的默认 logo。
 		logo-image: "/static/theme/mm-bookies/mm-bookies_logo.png",
+		// 注册页欢迎标题。
+		title: "MM Bookies",
 		// 首页、登录和注册页副标题。
 		subtitle: "ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်",
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
@@ -45,8 +59,16 @@ $theme-presets: (
 	shwe-goal: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #136201,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: dark,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色；none 表示不显示额外背景。
+		header-logo-bg: none,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #136201,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: #A0FF82,
 		// 首页顶部区域底部边框色。
 		home-top-border: #A0FF82,
 		// 副色：充值图标、次级按钮、辅助强调文字。
@@ -63,6 +85,10 @@ $theme-presets: (
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
 		bg-info: #EDEDED,
+		// 登录注册输入框背景色。
+		bg-login-input: rgba(0, 0, 0, 0.3),
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #FFFFFF,
 
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
 		radius-large: 8px,
@@ -87,16 +113,26 @@ $theme-presets: (
 		header-background-image: "/static/theme/bg-green.png",
 		// 品牌 logo：首页、登录注册和 Header 使用绿色 ShweGoal logo。
 		logo-image: "/static/theme/test/shwegoal_logo.png",
+		// 注册页欢迎标题。
+		title: "Shwe Goal",
 		// 首页、登录和注册页副标题。
 		subtitle: "အနိုင်ရဖို့ ရွှေဂိုးတစ်ဂိုးသာလိုပါတယ်",
 	),
 	phoe-wa-maung: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
-		primary: #136201,
+		primary: #005E12,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: light,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色。
+		header-logo-bg: white,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
 		border: #136201,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: #99BA4A,
 		// 首页顶部区域底部边框色。
-		home-top-border: #A0FF82,
+		home-top-border: #028206,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -111,6 +147,10 @@ $theme-presets: (
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
 		bg-info: #F2F2F2,
+		// 登录注册输入框背景色。
+		bg-login-input: white,
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #005E12,
 
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
 		radius-large: 12px,
@@ -137,6 +177,8 @@ $theme-presets: (
 		header-background-image: "/static/theme/header-bg-white.png",
 		// 品牌 logo：首页、登录注册和 Header 使用 Phoewaa Maung logo。
 		logo-image: "/static/theme/test-old/phoewaa_maung_logo.png",
+		// 注册页欢迎标题。
+		title: "Phoe Wa Maung",
 		// 首页、登录和注册页副标题။
 		subtitle: "ငွေကြေးခိုင်မာ ယုံကြည်စိတ်ချ ညီကိုတိုအားလုံးအတွက် ဖိုးဝ",
 	)

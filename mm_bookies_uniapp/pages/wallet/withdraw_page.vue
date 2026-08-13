@@ -205,7 +205,8 @@
 		height: 50px;
 		border-radius: 30px;
 		background: $color-primary;
-		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		// box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		border: 1px solid $color-border-other;
 		display: flex;
 		flex-direction: column;
 		align-items: center;

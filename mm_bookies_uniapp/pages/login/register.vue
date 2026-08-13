@@ -33,7 +33,16 @@
 		<!-- Login Form -->
 		<view class="login-form">
 			<!-- Welcome Text -->
-			<view class="welcome-text">{{ $t('Welcome to MM Bookies') }}</view>
+			<view class="welcome-text">
+				<template v-if="currentLang === 'mm'">
+					<text class="welcome-title"></text>
+					<text>{{ $t('welcome_to') }}</text>
+				</template>
+				<template v-else>
+					<text>{{ $t('welcome_to') }}</text>
+					<text class="welcome-title"></text>
+				</template>
+			</view>
 
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
@@ -74,6 +83,13 @@
 				<view class="error-message" v-if="confirm_password_error">
 					{{$t("those_passwords")}}
 				</view>
+			</view>
+
+			<!-- Referral ID -->
+			<view class="referral-field">
+				<input class="input-field referral-input" :class="{ 'referral-input-disabled': r_code_disabled }"
+					v-model="loginInfo.r_code" :disabled="r_code_disabled" placeholder-class="input-placeholder"
+					:placeholder="$t('enter_referral_id_optional')" maxlength="32" @input="handle_r_code_input" />
 			</view>
 
 			<!-- Sign up Button -->
@@ -161,6 +177,7 @@
 				phone_error: false,
 				password_error: false,
 				confirm_password_error: false,
+				r_code_disabled: false,
 
 				// 密码显隐状态
 				showPassword: false,
@@ -200,6 +217,15 @@
 			},
 			handle_confirm_password_blur() {
 				this.confirm_password_error = this.loginInfo.password !== this.loginInfo.confirm_password;
+			},
+			handle_r_code_input() {
+				this.loginInfo.r_code = String(this.loginInfo.r_code || '')
+					.replace(/[^a-zA-Z0-9]/g, '')
+					.slice(0, 32)
+					.toUpperCase();
+				if (!this.loginInfo.r_code && !this.r_code_disabled) {
+					uni.removeStorageSync('default_r_code');
+				}
 			},
 			togglePasswordVisibility() {
 				this.showPassword = !this.showPassword;
@@ -382,10 +408,16 @@
 		onLoad(option) {
 			uni.removeStorageSync('login_success');
 			// 捕获邀请码（推荐链接 ?iv=xxx），用于注册时绑定推荐人
-			const iv = option && (option.iv || option.r_code)
-			if (iv) {
-				this.loginInfo.r_code = iv
-				uni.setStorageSync('default_r_code', iv)
+			const inviteCode = option && (option.iv || option.r_code)
+			const cachedCode = uni.getStorageSync('default_r_code')
+			const rCode = inviteCode || cachedCode
+			this.r_code_disabled = Boolean(inviteCode)
+			if (rCode) {
+				this.loginInfo.r_code = String(rCode).trim()
+				this.handle_r_code_input()
+				if (inviteCode) {
+					uni.setStorageSync('default_r_code', this.loginInfo.r_code)
+				}
 			}
 		},
 	}
@@ -454,7 +486,7 @@
 	.lang-modal-title {
 		font-size: 32rpx;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 20rpx;
 	}
@@ -473,28 +505,28 @@
 	.lang-option-label {
 		font-size: 30rpx;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.lang-radio {
 		width: 40rpx;
 		height: 40rpx;
 		border-radius: 50%;
-		border: 3rpx solid #ccc;
+		border: 3rpx solid $color-secondary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: $color-primary;
+		border-color: $color-secondary;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: $color-primary;
+		background: $color-secondary;
 	}
 
 	/* 标题区域 */
@@ -515,13 +547,34 @@
 
 	.login-subtitle {
 		margin-top: 10rpx;
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 		font-size: 24rpx;
 		letter-spacing: 2rpx;
 	}
 
 	.login-subtitle::after {
 		content: $theme-subtitle-value;
+	}
+
+	.referral-field {
+		width: 100%;
+		margin-bottom: 30rpx;
+	}
+
+	.referral-label {
+		display: block;
+		margin: 0 0 10rpx 10rpx;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 24rpx;
+	}
+
+	.referral-input {
+		width: 100%;
+		text-align: left;
+	}
+
+	.referral-input-disabled {
+		opacity: 0.8;
 	}
 
 	/* 广告区域 */
@@ -536,6 +589,8 @@
 		width: 100%;
 		height: auto;
 		border-radius: 32rpx;
+		border: 1px solid $color-border-other;
+		box-sizing: border-box;
 	}
 
 	/* 表单区域 */
@@ -547,9 +602,18 @@
 	.welcome-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		text-align: center;
 		margin-bottom: 30rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8rpx;
+		flex-wrap: wrap;
+	}
+
+	.welcome-title::after {
+		content: var(--theme-title, "#{$theme-title-value}");
 	}
 
 	.input-wrapper {
@@ -559,19 +623,19 @@
 
 	.input-field {
 		height: 85rpx;
-		background-color: rgba(105, 145, 149, 0.6);
-		border: none;
+		background-color: $bg-login-input;
+		border: 2rpx solid $color-border-other;
 		border-radius: 20rpx;
 		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
-		color: #ffffff;
+		color: $color-login-input;
 		box-sizing: border-box;
 		text-align: center;
 		font-style: italic;
 	}
 
 	.input-placeholder {
-		color: #103C42;
+		color: $color-login-input;
 		text-align: center;
 		font-style: italic;
 		font-size: 24rpx;
@@ -618,7 +682,7 @@
 	.remember-text {
 		font-size: 24rpx;
 		font-weight: 400;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		font-style: italic;
 		margin-right: auto;
 	}
@@ -627,7 +691,7 @@
 	.custom-switch {
 		width: 40rpx;
 		height: 40rpx;
-		border: 3rpx solid rgba(255, 255, 255, 0.6);
+		border: 3rpx solid $theme-background-foreground;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -643,7 +707,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $color-secondary-light;
+		background-color: $theme-background-foreground;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -655,14 +719,14 @@
 
 	.login-btn {
 		height: 70rpx;
-		background-color: #ffffff;
+		background-color: $theme-auth-button-background;
 		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #2A5F63;
+		color: $theme-auth-button-foreground;
 		margin-bottom: 30rpx;
 		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	}
@@ -680,7 +744,7 @@
 	}
 
 	.register-text {
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 	}
 
 	.register-link-text {

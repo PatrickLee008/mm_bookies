@@ -294,12 +294,12 @@
 
 	/* 简单样式容器(success/error) - 圆角更大 */
 	.notice-container-simple {
-		border-radius: 24upx;
+		border-radius: $radius-large;
 	}
 
 	/* 带头部的容器(notice/alert) - 圆角稍小 */
 	.notice-container-normal {
-		border-radius: 16upx;
+		border-radius: $radius-medium;
 	}
 
 	/* ============ 头部样式 ============ */
@@ -370,7 +370,7 @@
 	.notice-btn-simple {
 		flex: 1;
 		height: 60upx;
-		border-radius: 16upx;
+		border-radius: $radius-large;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -415,7 +415,7 @@
 	.notice-btn-normal {
 		flex: 1;
 		height: 60upx;
-		border-radius: 16upx;
+		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
 		justify-content: center;

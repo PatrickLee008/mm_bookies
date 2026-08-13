@@ -65,7 +65,9 @@
 				<view class="copy-rec flex-row1 justify-between mycolor-dgray" :style="{ opacity: canInvite ? 1 : 0.5 }">
 					<text class="width-90 text-cut" v-if="canInvite">{{ share_url }}</text>
 					<text class="width-100 text-cut" v-else>{{ $t("You've reached the maximum invites") }}</text>
-					<text class="cuIcon-copy myfont-20px mycolor-primary" @click="copy" v-if="canInvite"></text>
+					<theme-icon name="copy" size="20px"
+						color="var(--theme-icon-primary, var(--theme-primary))" @click="copy"
+						v-if="canInvite"></theme-icon>
 				</view>
 			</view>
 

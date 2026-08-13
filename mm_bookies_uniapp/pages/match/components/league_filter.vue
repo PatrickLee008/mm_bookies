@@ -233,6 +233,7 @@
 	.filter-list {
 		padding: 0;
 		background-color: $bg-color-info;
+		border: 1px solid $color-border-other;
 		border-radius: $radius-medium;
 		overflow: hidden;
 	}
@@ -248,7 +249,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		border-bottom: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		border-bottom: 1px solid $color-border-other;
 	}
 
 	.filter-item:active {

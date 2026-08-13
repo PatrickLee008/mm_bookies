@@ -23,6 +23,16 @@ function safeRadius(value, fallback) {
 	return typeof value === 'string' && RADIUS_PATTERN.test(value.trim()) ? value.trim() : fallback;
 }
 
+function safeText(value, fallback) {
+	if (typeof value !== 'string') {
+		return fallback;
+	}
+	const normalized = value.trim();
+	return normalized.length > 0 && normalized.length <= 80 && !/[<>"'\\{};\r\n]/.test(normalized) ?
+		normalized :
+		fallback;
+}
+
 function safeUrl(value) {
 	if (typeof value !== 'string' || value.trim().length > 2048 || !URL_PATTERN.test(value.trim())) {
 		return '';
@@ -162,8 +172,10 @@ function normalizeTheme(theme) {
 	return {
 		version: source.version || defaultTheme.version,
 		tokens: {
+			title: safeText(tokens.title, defaults.title || 'MM Bookies'),
 			primary,
 			border: safeColor(tokens.border, primary),
+			borderOther: safeColor(tokens.borderOther, defaults.borderOther || primary),
 			secondary,
 			secondaryLight: safeColor(tokens.secondaryLight, defaults.secondaryLight),
 			active: safeColor(tokens.active, defaults.active),
@@ -171,6 +183,8 @@ function normalizeTheme(theme) {
 			textSecondary: safeColor(tokens.textSecondary, defaults.textSecondary),
 			backgroundLight: safeColor(tokens.backgroundLight, defaults.backgroundLight || secondary),
 			backgroundInfo: safeColor(tokens.backgroundInfo, defaults.backgroundInfo || '#E8F4F5'),
+			bgLoginInput: safeColor(tokens.bgLoginInput, defaults.bgLoginInput || 'rgba(105, 145, 149, 0.6)'),
+			colorLoginInput: safeColor(tokens.colorLoginInput, defaults.colorLoginInput || '#FFFFFF'),
 			iconPrimary: safeColor(tokens.iconPrimary, primary),
 			iconSecondary: safeColor(tokens.iconSecondary, secondary),
 			iconOnPrimary: safeColor(tokens.iconOnPrimary, defaults.iconOnPrimary),
@@ -212,7 +226,9 @@ function applyCssVariables(theme) {
 	const tokens = theme.tokens;
 	const variables = {
 		'--theme-primary': tokens.primary,
+		'--theme-title': `"${tokens.title}"`,
 		'--theme-border': tokens.border,
+		'--theme-border-other': tokens.borderOther,
 		'--theme-secondary': tokens.secondary,
 		'--theme-secondary-light': tokens.secondaryLight,
 		'--theme-active': tokens.active,
@@ -220,6 +236,8 @@ function applyCssVariables(theme) {
 		'--theme-text-secondary': tokens.textSecondary,
 		'--theme-bg-light': tokens.backgroundLight,
 		'--theme-bg-info': tokens.backgroundInfo,
+		'--theme-bg-login-input': tokens.bgLoginInput,
+		'--theme-color-login-input': tokens.colorLoginInput,
 		'--theme-icon-primary': tokens.iconPrimary,
 		'--theme-icon-secondary': tokens.iconSecondary,
 		'--theme-icon-on-primary': tokens.iconOnPrimary,
@@ -298,8 +316,10 @@ function coerceTheme(value) {
 
 	const tokens = parseObject(source.tokens) || {};
 	const backgrounds = parseObject(source.backgrounds) || {};
-	const hasToken = ['primary', 'secondary', 'border', 'primaryColor', 'secondaryColor', 'borderColor',
-		'primary_color', 'secondary_color', 'border_color'].some((name) =>
+	const hasToken = ['title', 'themeTitle', 'theme_title', 'primary', 'secondary', 'border', 'borderOther', 'borderOtherColor', 'bgLoginInput',
+		'backgroundLoginInput', 'colorLoginInput', 'loginInputColor', 'primaryColor', 'secondaryColor',
+		'borderColor', 'border_other', 'border_other_color', 'bg_login_input', 'background_login_input',
+		'color_login_input', 'login_input_color', 'primary_color', 'secondary_color', 'border_color'].some((name) =>
 		source[name] !== undefined || tokens[name] !== undefined);
 	const hasBackground = Object.keys(backgrounds).length > 0 ||
 		['noHeader', 'withHeader', 'home', 'login', 'register', 'header', 'page', 'noHeaderBackground',
@@ -311,14 +331,18 @@ function coerceTheme(value) {
 	}
 
 	const tokenAliases = {
+		title: ['title', 'themeTitle', 'theme_title'],
 		primary: ['primary', 'primaryColor', 'primary_color'],
 		border: ['border', 'borderColor', 'border_color'],
+		borderOther: ['borderOther', 'border_other', 'borderOtherColor', 'border_other_color'],
 		secondary: ['secondary', 'secondaryColor', 'secondary_color'],
 		secondaryLight: ['secondaryLight', 'secondary_light'],
 		active: ['active', 'activeColor', 'active_color'],
 		textPrimary: ['textPrimary', 'text_primary'],
 		textSecondary: ['textSecondary', 'text_secondary'],
 		backgroundLight: ['backgroundLight', 'background_light'],
+		bgLoginInput: ['bgLoginInput', 'bg_login_input', 'backgroundLoginInput', 'background_login_input'],
+		colorLoginInput: ['colorLoginInput', 'color_login_input', 'loginInputColor', 'login_input_color'],
 		iconPrimary: ['iconPrimary', 'icon_primary'],
 		iconSecondary: ['iconSecondary', 'icon_secondary'],
 		iconOnPrimary: ['iconOnPrimary', 'icon_on_primary'],
@@ -329,9 +353,10 @@ function coerceTheme(value) {
 		if (normalizedTokens[name] !== undefined) {
 			return;
 		}
-		const alias = tokenAliases[name].find((key) => source[key] !== undefined);
+		const alias = tokenAliases[name].find((key) =>
+			source[key] !== undefined || tokens[key] !== undefined);
 		if (alias) {
-			normalizedTokens[name] = source[alias];
+			normalizedTokens[name] = source[alias] !== undefined ? source[alias] : tokens[alias];
 		}
 	});
 

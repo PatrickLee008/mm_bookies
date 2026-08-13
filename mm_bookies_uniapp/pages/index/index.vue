@@ -224,7 +224,7 @@
 	.home-subtitle {
 		display: block;
 		margin: 3px auto 3vh;
-		color: #fff;
+		color: $theme-background-foreground;
 		font-size: 12px;
 		text-align: center;
 	}
@@ -325,7 +325,7 @@
 	.settings-icon {
 		width: 22px;
 		height: 22px;
-		filter: brightness(0) invert(1);
+		filter: $theme-background-foreground-filter;
 	}
 
 	.bell-icon.bell-ring {
@@ -512,7 +512,7 @@
 		display: flex;
 		align-items: center;
 		padding: 8px 4px 14px;
-		color: #fff;
+		color: $theme-background-foreground;
 	}
 
 	.user-summary .user-avatar {
@@ -529,11 +529,11 @@
 
 	.greeting {
 		font-size: 12px;
-		color: #fff;
+		color: $theme-background-foreground;
 	}
 
 	.user-summary .id-value {
-		color: #fff;
+		color: $theme-background-foreground;
 		font-size: 15px;
 	}
 
@@ -543,6 +543,7 @@
 
 	.user-summary .avatar-img {
 		background: transparent;
+		filter: $theme-background-foreground-filter;
 	}
 
 	.balance-card {
@@ -617,8 +618,9 @@
 
 	.customer-service-wrapper :deep(.customer-btn) {
 		background: $color-primary;
-		border: 0;
+		border: 1px solid $color-border-other;
 		border-radius: 50%;
+		box-sizing: border-box;
 	}
 
 	.customer-service-wrapper :deep(.customer-btn-icon) {

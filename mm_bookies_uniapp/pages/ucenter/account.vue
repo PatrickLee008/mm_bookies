@@ -23,7 +23,8 @@
 					</view>
 					<view class="flex-row1 justify-between align-center">
 						<text>{{userInfo.id}}</text>
-						<text class="cuIcon-copy myfont-18px" @click="copy"></text>
+						<theme-icon name="copy" size="18px"
+							color="var(--theme-icon-on-primary, #fff)" @click="copy"></theme-icon>
 					</view>
 				</view>
 				<view class="bank-rec" v-if="card_list[0]">
