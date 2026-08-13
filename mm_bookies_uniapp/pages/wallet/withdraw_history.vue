@@ -453,7 +453,7 @@ async loadRecords() {
 	}
 
 	.amount-deposit-color {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.amount-withdraw-color {
@@ -473,7 +473,7 @@ async loadRecords() {
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {

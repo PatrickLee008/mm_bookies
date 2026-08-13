@@ -1,7 +1,7 @@
 /* 颜色变量 */
 // Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
 // 默认主题
-$theme-preset: mm-bookies !default;
+$theme-preset: shwe-goal !default;
 @import "./common/styles/theme-presets";
 
 $theme-config: map-get($theme-presets, $theme-preset);
@@ -119,11 +119,31 @@ $theme-header-background: theme-background-image(theme-color(header-background-i
 $theme-page-background-fallback: linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
 $theme-page-background: theme-background-image(theme-color(with-header-background-image), $theme-page-background-fallback);
 
-// The app shell uses two backgrounds: pages without the shared header use the
-// home/auth background, while all header pages expose the app shell background
-// behind transparent page containers and header placeholders.
 $theme-no-header-background: $theme-home-background;
 $theme-with-header-background: $theme-page-background;
+$theme-header-background-color: $theme-header-start;
+$theme-page-background-color: $theme-header-start;
+$theme-with-header-background-color: $theme-header-start;
+$theme-app-background: $theme-with-header-background;
+$theme-app-background-color: $theme-with-header-background-color;
+
+$theme-is-gradient-background:
+	(theme-color(no-header-background-image) == null or theme-color(no-header-background-image) == "") and
+	(theme-color(with-header-background-image) == null or theme-color(with-header-background-image) == "") and
+	(theme-color(header-background-image) == null or theme-color(header-background-image) == "");
+
+@if $theme-is-gradient-background {
+	// Gradient themes use the home background once at the app root so the
+	// fixed header and page content share the same coordinate system.
+	$theme-header-background: none;
+	$theme-header-background-color: transparent;
+	$theme-page-background: none;
+	$theme-with-header-background: none;
+	$theme-with-header-background-color: transparent;
+	$theme-app-background: $theme-home-background;
+	$theme-app-background-color: $theme-page-start;
+}
+
 $theme-logo-image: theme-background-image($theme-logo-image-value, none);
 
 

@@ -467,11 +467,11 @@
 	page,
 	body,
 	#app {
-		background-color: var(--theme-with-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
-		background-position: var(--theme-with-header-background-position, center);
-		background-size: var(--theme-with-header-background-size, cover);
-		background-repeat: var(--theme-with-header-background-repeat, no-repeat);
+		background-color: var(--theme-app-background-color, #{$theme-app-background-color});
+		background-image: var(--theme-app-background-image, #{$theme-app-background});
+		background-position: var(--theme-app-background-position, center);
+		background-size: var(--theme-app-background-size, cover);
+		background-repeat: var(--theme-app-background-repeat, no-repeat);
 	}
 
 	.nav-list {

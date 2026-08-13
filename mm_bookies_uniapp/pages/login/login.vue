@@ -949,7 +949,7 @@
 	}
 
 	.register-link-text {
-		color: $color-secondary-light;
+		color: $color-secondary;
 		text-decoration: underline;
 	}
 

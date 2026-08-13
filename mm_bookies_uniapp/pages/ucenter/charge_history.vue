@@ -359,7 +359,7 @@ export default {
 
 .status-success {
 	background-color: #f6ffed;
-	color: #52c41a;
+	color: $color-secondary;
 }
 
 .status-failed {

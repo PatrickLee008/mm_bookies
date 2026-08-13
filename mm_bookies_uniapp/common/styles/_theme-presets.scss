@@ -3,6 +3,10 @@ $theme-presets: (
 	mm-bookies: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #1C667C,
+		// 副色：充值图标、次级按钮、辅助强调文字。
+		secondary: #37BDCC,
+		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
+		secondary-light: #F1FAFB,
 		// 背景明暗模式：控制无 header 页面上的前景色。
 		background: dark,
 		// Header、登录和注册页面的背景明暗模式。
@@ -10,15 +14,12 @@ $theme-presets: (
 		// Header logo 背景色；none 表示不显示额外背景。
 		header-logo-bg: none,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
-		border: #1C667C,
+		border: #2A626833,
 		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
-		border-other: #D0E8EA,
+		border-other: none,
 		// 首页顶部区域底部边框色。
 		home-top-border: #44696E,
-		// 副色：充值图标、次级按钮、辅助强调文字。
-		secondary: #37BDCC,
-		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
-		secondary-light: #F1FAFB,
+		
 		// 行为强调色：激活标签、选中项和需要突出显示的状态。
 		active: #FFC857,
 		// 主要文字：页面标题、重要数据和主要内容文字。

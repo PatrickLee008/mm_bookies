@@ -480,7 +480,7 @@
 
 	/* 交易金额：斜体青色，突出显示 */
 	.amount-value {
-		color: #2E9BA8;
+		color: $color-secondary;
 		font-style: italic;
 		font-weight: 700;
 	}

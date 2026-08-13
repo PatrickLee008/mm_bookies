@@ -573,7 +573,7 @@
 	}
 
 	.amount-deposit-color {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.amount-withdraw-color {
@@ -594,7 +594,7 @@
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {

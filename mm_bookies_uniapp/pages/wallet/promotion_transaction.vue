@@ -529,7 +529,7 @@
 	.amount-value {
 		font-size: 17px;
 		font-weight: 700;
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-style: italic;
 	}
 
@@ -547,7 +547,7 @@
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {

@@ -60,13 +60,13 @@
 	--theme-register-background-size: cover;
 	--theme-register-background-repeat: no-repeat;
 	--theme-header-background-image: #{$theme-header-background};
-	--theme-header-background-color: #{$theme-header-start};
+	--theme-header-background-color: #{$theme-header-background-color};
 	--theme-header-background-position: center top;
 	--theme-header-background-size: 100% 552px;
 	--theme-header-background-repeat: no-repeat;
 	--theme-header-placeholder-position: center -255px;
 	--theme-page-background-image: #{$theme-page-background};
-	--theme-page-background-color: #{$theme-header-start};
+	--theme-page-background-color: #{$theme-page-background-color};
 	--theme-page-background-position: center;
 	--theme-page-background-size: cover;
 	--theme-page-background-repeat: no-repeat;
@@ -76,10 +76,15 @@
 	--theme-no-header-background-size: cover;
 	--theme-no-header-background-repeat: no-repeat;
 	--theme-with-header-background-image: #{$theme-with-header-background};
-	--theme-with-header-background-color: #{$theme-header-start};
+	--theme-with-header-background-color: #{$theme-with-header-background-color};
 	--theme-with-header-background-position: center;
 	--theme-with-header-background-size: cover;
 	--theme-with-header-background-repeat: no-repeat;
+	--theme-app-background-image: #{$theme-app-background};
+	--theme-app-background-color: #{$theme-app-background-color};
+	--theme-app-background-position: center;
+	--theme-app-background-size: cover;
+	--theme-app-background-repeat: no-repeat;
 }
 
 
