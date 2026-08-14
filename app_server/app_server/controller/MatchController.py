@@ -31,12 +31,6 @@ def league_name_match_score(requested_name, candidate_name):
     if requested_name == candidate_name:
         return 100000 + len(candidate_name)
 
-    if (
-        requested_name.endswith(f' {candidate_name}')
-        or candidate_name.endswith(f' {requested_name}')
-    ):
-        return 10000 + len(min(requested_name, candidate_name, key=len))
-
     return -1
 
 
