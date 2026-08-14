@@ -355,8 +355,9 @@
 
 					<!-- from tangjq--- 投注选项 -->
 					<view class="bet-choice-row">
+						<text class="mix-row-label">Bet :</text>
 						<text class="choice-team">{{bet_content(match_ref.bet_match)}}</text>
-						<text class="choice-type"></text>
+						<!-- <text class="choice-type"></text> -->
 					</view>
 				</view>
 
@@ -2654,7 +2655,7 @@
 	}
 
 	.total-count {
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-size: 18px;
 		font-weight: bold;
 	}

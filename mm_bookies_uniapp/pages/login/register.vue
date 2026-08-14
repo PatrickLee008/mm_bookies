@@ -19,6 +19,7 @@
 				</view>
 			</view>
 		</view>
+		<view class="height-8vh" v-if="!advertisements.length"></view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
@@ -26,9 +27,16 @@
 		</view>
 
 		<!-- 广告区域 -->
-		<view class="ad-container">
-			<image class="ad-image" src="../../figma/login/login_ad.png" mode="widthFix"></image>
+		<view class="ad-container" v-if="advertisements.length">
+			<swiper class="ad-swiper" :circular="advertisements.length > 1"
+				:autoplay="advertisements.length > 1" interval="3500" duration="500"
+				:indicator-dots="advertisements.length > 1">
+				<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+					<image class="ad-image" :src="getAdvertisementImage(ad)" mode="aspectFill"></image>
+				</swiper-item>
+			</swiper>
 		</view>
+		<view class="height-8vh" v-else></view>
 
 		<!-- Login Form -->
 		<view class="login-form">
@@ -182,6 +190,7 @@
 				// 密码显隐状态
 				showPassword: false,
 				showConfirmPassword: false,
+				advertisements: [],
 			}
 		},
 		computed: {
@@ -255,6 +264,27 @@
 				uni.setLocale(value)
 				this.$i18n.locale = value
 				this.showLangModal = false
+			},
+			getAdvertisements() {
+				this.advertisements = []
+				this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'register',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						const items = res.data.data && res.data.data.items ? res.data.data.items : []
+						this.advertisements = items.filter((ad) => this.getAdvertisementImage(ad))
+					}
+				})
+			},
+			getAdvertisementImage(ad) {
+				if (!ad) return ''
+				return ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url || ''
+			},
+			handleAdClick(ad) {
+				if (!ad || !ad.link_url) return
+				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
 			},
 			register() {
 				if (this.$toolbox.click_too_fast(1)) return
@@ -407,6 +437,7 @@
 		},
 		onLoad(option) {
 			uni.removeStorageSync('login_success');
+			this.getAdvertisements()
 			// 捕获邀请码（推荐链接 ?iv=xxx），用于注册时绑定推荐人
 			const inviteCode = option && (option.iv || option.r_code)
 			const cachedCode = uni.getStorageSync('default_r_code')
@@ -585,9 +616,16 @@
 		margin-top: 30rpx;
 	}
 
+	.ad-swiper {
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 32rpx;
+	}
+
 	.ad-image {
 		width: 100%;
-		height: auto;
+		height: 100%;
 		border-radius: 32rpx;
 		border: 1px solid $color-border-other;
 		box-sizing: border-box;

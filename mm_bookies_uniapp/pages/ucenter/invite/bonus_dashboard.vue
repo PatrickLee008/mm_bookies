@@ -7,6 +7,12 @@
 			@scrolltoupper="handleHeaderTop">
 			<view class="padding-sm bonus-dashboard-content">
 				<view class="dashboard-filters">
+					<view class="type-filter-container">
+						<view class="dashboard-filter type-filter">
+							<selector :option_list.sync="type_list" :default_label="$t('Type')"
+								@click_option="onTypeSelect"></selector>
+						</view>
+					</view>
 					<view class="dashboard-filter-container">
 						<view class="dashboard-filter period-filter" :class="{ 'date-filter-selected': date_filtered }"
 							@click="openPeriodPicker">
@@ -17,12 +23,6 @@
 						</view>
 						<date-range-picker ref="date_picker" :inline="true"
 							@click_option="date_click"></date-range-picker>
-					</view>
-					<view class="type-filter-container">
-						<view class="dashboard-filter type-filter">
-							<selector :option_list.sync="type_list" :default_label="$t('Type')"
-								@click_option="onTypeSelect"></selector>
-						</view>
 					</view>
 				</view>
 

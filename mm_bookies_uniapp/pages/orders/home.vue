@@ -108,8 +108,10 @@
 								<text class="value value-amount">{{item.real_odds}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">{{$t('total bet amount')}}<text v-if="item.pay_wallet">
-										({{getWalletBadgeLabel(item.pay_wallet)}})</text></text>
+								<text class="label">{{$t('total bet amount')}}
+									<!-- <text v-if="item.pay_wallet">
+										({{getWalletBadgeLabel(item.pay_wallet)}})</text> -->
+								</text>
 								<text class="value  value-amount"
 									style="font-style: italic;">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
