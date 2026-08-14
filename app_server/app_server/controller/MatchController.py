@@ -18,6 +18,40 @@ match = Blueprint('match', __name__)
 key_prefix = 'live_matches'
 
 
+def get_league_logo_map(league_names):
+    """Build a league-name-to-logo map for the match list response."""
+    names = {
+        name.strip()
+        for name in league_names
+        if isinstance(name, str) and name.strip()
+    }
+    if not names:
+        return {}
+
+    leagues = MAppLeague.query.filter(
+        MAppLeague.del_flag == 0,
+        MAppLeague.status == 1,
+        or_(
+            MAppLeague.name.in_(names),
+            MAppLeague.scraper_name.in_(names),
+        ),
+    ).all()
+
+    logo_map = {}
+    for league in leagues:
+        logo = (league.logo2 or league.logo or '').strip()
+        if not logo:
+            continue
+
+        for name in (league.name, league.scraper_name):
+            if isinstance(name, str) and name.strip():
+                normalized_name = name.strip()
+                logo_map[normalized_name] = logo
+                logo_map[normalized_name.casefold()] = logo
+
+    return logo_map
+
+
 # 获取比赛列表
 @match.route('/get', methods=['GET'])
 # @auth.login_required
@@ -112,6 +146,16 @@ def get_match_list():
         valid_items.append(item)
 
     items = valid_items
+
+    league_logo_map = get_league_logo_map(
+        item.get('LEAGUE') for item in items
+    )
+    for item in items:
+        league_name = item.get('LEAGUE')
+        item['league_logo'] = league_logo_map.get(
+            league_name,
+            league_logo_map.get(league_name.casefold()) if isinstance(league_name, str) else None,
+        )
 
     # 获取联赛排序和过滤
     leagues_sort = MAppLeague.get_scraper_leagues(True)
