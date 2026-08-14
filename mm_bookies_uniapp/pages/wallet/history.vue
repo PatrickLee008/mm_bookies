@@ -397,7 +397,7 @@
 
 	.option-text {
 		font-size: 12px;
-		font-weight: 500;
+		font-weight: bold;
 		color: $color-primary;
 	}
 

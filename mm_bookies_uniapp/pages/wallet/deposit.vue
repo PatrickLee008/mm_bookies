@@ -676,8 +676,19 @@
 				deep: true,
 				immediate: true
 			},
+			// App.vue 异步加载配置，监听 Vuex 确保动态金额限额及时同步
+			globalConfigs: {
+				handler(val) {
+					this.configs = Object.assign({}, val || {})
+				},
+				deep: true,
+				immediate: true
+			},
 		},
 		computed: {
+			globalConfigs() {
+				return this.$store.state.configs || {}
+			},
 			confirmDisabled() {
 				if (this.current_progress == 0 && this.amount_error) return true
 				else if (this.current_progress == 1 && this.chargeForm.charge_way == 1 && (!this.picture || !this
@@ -1561,7 +1572,7 @@
 	.bank-card-item {
 		width: 100%;
 		margin-bottom: 16px;
-		border: 2px solid $color-border;
+		border: 2px solid $color-primary;
 		border-radius: 16px;
 		background-color: #fff;
 		overflow: hidden;
@@ -1707,9 +1718,9 @@
 	.bank-icon-item {
 		width: 40px;
 		height: 40px;
-		border-radius: 8px;
+		border-radius: $radius-small;
 		overflow: hidden;
-		border: 2px solid transparent;
+		border: 3px solid transparent;
 	}
 
 	.bank-icon-item.selected {
@@ -1742,7 +1753,7 @@
 
 	.form-input {
 		flex: 1;
-		height: 24px;
+		height: 28px;
 		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		font-size: 12px;
@@ -1752,13 +1763,13 @@
 
 	.confirm-btn {
 		width: 100%;
-		height: 30px;
+		height: 35px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
 		font-weight: 700;
-		color: #fff;
+		color: white;
 		padding: 8px;
 		display: flex;
 		align-items: center;
@@ -1767,6 +1778,8 @@
 
 	.confirm-btn.disabled {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: white;
 	}
 
 	/* from tangjq--- 充值弹窗样式 */
@@ -1811,12 +1824,13 @@
 	.user-account-section {
 		background-color: $bg-color-info;
 		padding: 20px;
-		margin: 0 10px;
+		margin: 20px 20px 0;
+		border-radius: $radius-medium;
 	}
 
 	.section-title {
-		font-size: 18px;
-		font-weight: 700;
+		font-size: 14px;
+		font-weight: bold;
 		color: $color-primary;
 		display: block;
 		text-align: center;
@@ -1833,7 +1847,7 @@
 	.info-label {
 		font-size: 12px;
 		font-weight: 600;
-		color: #000;
+		color: $color-primary;
 		width: 120px;
 		flex-shrink: 0;
 	}
@@ -1841,7 +1855,9 @@
 	.bank-type-value {
 		display: flex;
 		flex-direction: row;
+		justify-content: center;
 		align-items: center;
+		width: calc(100% - 120px);
 		gap: 8px;
 	}
 
@@ -1860,7 +1876,7 @@
 	.info-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid $color-secondary;
+		border: 1px solid $color-secondary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1883,7 +1899,7 @@
 		height: 40px;
 		background-color: $bg-color-info;
 		border: 1px solid $color-border-other;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1987,7 +2003,7 @@
 
 	.continue-btn {
 		width: calc(100% - 40px);
-		height: 30px;
+		height: 40px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
@@ -1998,10 +2014,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		padding: 8px;
 	}
 
-	.continue-btn:disabled {
+	.continue-btn[disabled] {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: #fff;
 	}
 
 	/* from tangjq--- Transfer Tips弹窗样式 */
@@ -2472,5 +2491,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+</style>
+
+<style lang="scss">
+	.amount-input-box .uni-input-placeholder {
+		font-size: 14px !important;
+		font-weight: 400 !important;
+		font-style: italic !important;
+		color: $color-primary !important;
+		opacity: 1 !important;
 	}
 </style>

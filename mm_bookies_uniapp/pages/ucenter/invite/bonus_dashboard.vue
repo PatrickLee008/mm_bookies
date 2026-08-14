@@ -492,7 +492,7 @@
 		background-color: transparent !important;
 		color: #fff !important;
 		font-size: 13px;
-		font-weight: 600;
+		font-weight: bold;
 		line-height: 24px;
 		gap: 4px;
 	}

@@ -1,7 +1,7 @@
 <template>
 	<view class="selector-wrapper">
 		<view class="cu-tag round sm selector-tag" :style="tag_style" @click="set_dialog_status(!hidden)">
-			<text>{{translateLabel(current_tag.label)}}</text>
+			<text class="text-bold">{{translateLabel(current_tag.label)}}</text>
 			<text v-if="show_selector_arrow" :class="hidden?'cuIcon-unfold':'cuIcon-fold'"></text>
 		</view>
 		<view class="selector-bg" v-if="!hidden" :style="{'top':top,'left':left}">
@@ -203,7 +203,7 @@
 	.option-text {
 		color: $color-primary;
 		font-size: 24upx;
-		font-weight: 500;
+		font-weight: bold;
 		line-height: 32upx;
 		flex: 1;
 	}

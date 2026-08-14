@@ -5,196 +5,204 @@
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<!-- 标题栏 -->
-		<view class="title-bar">
-			<!-- Coupon / Promotion 顶部切换 -->
-			<view class="type-toggle" v-if="isLogin">
-				<view class="type-btn" :class="{ 'active': activity_type === 'promotion' }"
-					@click="change_type('promotion')">
-					<text>{{ $t('Promotion_title') }}</text>
-					<view class="promo-count-badge" v-if="activity_type !== 'promotion' && promotionCount > 0">
-						{{ promotionCount > 99 ? '99+' : promotionCount }}
+		<view class="coupon-list-view" v-if="!showDetailModal && !showPromotionDetailModal">
+			<!-- 标题栏 -->
+			<view class="title-bar">
+				<!-- Coupon / Promotion 顶部切换 -->
+				<view class="type-toggle" v-if="isLogin">
+					<view class="type-btn" :class="{ 'active': activity_type === 'promotion' }"
+						@click="change_type('promotion')">
+						<text>{{ $t('Promotion_title') }}</text>
+						<view class="promo-count-badge" v-if="activity_type !== 'promotion' && promotionCount > 0">
+							{{ promotionCount > 99 ? '99+' : promotionCount }}
+						</view>
+					</view>
+					<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }"
+						@click="change_type('coupon')">
+						<text>{{ $t('coupon') }}</text>
 					</view>
 				</view>
-				<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }" @click="change_type('coupon')">
-					<text>{{ $t('coupon') }}</text>
+
+				<!-- 兑换码输入（仅 Coupon 且已登录） -->
+				<view class="redeem-row" v-if="isLogin && activity_type === 'coupon'">
+					<input class="redeem-input" :class="input_focus ? 'focus-border' : ''"
+						:placeholder="$t('Enter coupon code')" placeholder-class=""
+						placeholder-style="color:var(--theme-primary);font-style: italic;font-size:12px"
+						v-model="key_word" maxlength="20" @focus="input_focus = true" @input="allow_en_num"
+						@blur="input_focus = false" />
+					<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
+						@click="submit_code">{{ $t('Claim') }}</view>
 				</view>
 			</view>
 
-			<!-- 兑换码输入（仅 Coupon 且已登录） -->
-			<view class="redeem-row" v-if="isLogin && activity_type === 'coupon'">
-				<input class="redeem-input" :class="input_focus ? 'focus-border' : ''"
-					:placeholder="$t('Enter coupon code')" placeholder-class=""
-					placeholder-style="color:var(--theme-primary);font-style: italic;font-size:12px" v-model="key_word"
-					maxlength="20" @focus="input_focus = true" @input="allow_en_num" @blur="input_focus = false" />
-				<view class="redeem-btn" :class="key_word ? 'redeem-btn-active' : 'redeem-btn-disabled'"
-					@click="submit_code">{{ $t('Claim') }}</view>
-			</view>
-		</view>
-
-		<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60"
-			@scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
-			<view v-if="isLogin">
-				<!-- ============ Coupon 区域 ============ -->
-				<view class="list-container" v-if="activity_type === 'coupon'">
-					<!-- 当前进行中的优惠券活动（随页面滚动） -->
-					<view class="current-activity-box" v-if="currentActivity.has_activity">
-						<view class="ca-title-row">
-							<text class="ca-title">{{ currentActivity.activity_name || 'Coupon Activity' }}</text>
-							<text class="ca-status"
-								:class="'ca-status-' + (currentActivity.status || '').toLowerCase()">
-								{{ currentActivity.status || '-' }}
-							</text>
-						</view>
-						<view class="ca-credit">
-							<text class="ca-credit-label">Credit</text>
-							<text
-								class="ca-credit-value">{{ $toolbox.num_format(currentActivity.bonus_amount || 0) }}</text>
-						</view>
-						<view class="ca-stats">
-							<view class="ca-stat">
-								<text class="ca-stat-label">Turnover</text>
-								<text
-									class="ca-stat-value">{{ $toolbox.num_format(currentActivity.total_stake || 0) }}</text>
-							</view>
-							<view class="ca-stat">
-								<text class="ca-stat-label">Promo Balance</text>
-								<text class="ca-stat-value">
-									{{ currentActivity.status === 'Active' ? $toolbox.floor_format(currentActivity.money_promotion || 0) : '-' }}
+			<scroll-view scroll-y class="main-scroll-view" @scrolltolower="loadMore" :lower-threshold="60"
+				@scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
+				<view v-if="isLogin">
+					<!-- ============ Coupon 区域 ============ -->
+					<view class="list-container" v-if="activity_type === 'coupon'">
+						<!-- 当前进行中的优惠券活动（随页面滚动） -->
+						<view class="current-activity-box" v-if="currentActivity.has_activity">
+							<view class="ca-title-row">
+								<text class="ca-title">{{ currentActivity.activity_name || 'Coupon Activity' }}</text>
+								<text class="ca-status"
+									:class="'ca-status-' + (currentActivity.status || '').toLowerCase()">
+									{{ currentActivity.status || '-' }}
 								</text>
 							</view>
-						</view>
-					</view>
-
-					<!-- Tab选择器（仅 Coupon，在当前活动卡片下方，随页面滚动） -->
-					<view class="tab-selector" v-if="isLogin && activity_type === 'coupon'">
-						<view class="tab-container" ref="container">
-							<view v-for="(item, index) in tabs" :key="index" class="tab-item"
-								:class="{ 'active': tab_index === index }" @click="handleTabClick(index)">
-								<text class="tab-text">{{ $t(item) }}</text>
+							<view class="ca-credit">
+								<text class="ca-credit-label">Credit</text>
+								<text
+									class="ca-credit-value">{{ $toolbox.num_format(currentActivity.bonus_amount || 0) }}</text>
 							</view>
-							<!-- 底部滑动指示器 -->
-							<view class="slide-indicator" :style="{
+							<view class="ca-stats">
+								<view class="ca-stat">
+									<text class="ca-stat-label">Turnover</text>
+									<text
+										class="ca-stat-value">{{ $toolbox.num_format(currentActivity.total_stake || 0) }}</text>
+								</view>
+								<view class="ca-stat">
+									<text class="ca-stat-label">Promo Balance</text>
+									<text class="ca-stat-value">
+										{{ currentActivity.status === 'Active' ? $toolbox.floor_format(currentActivity.money_promotion || 0) : '-' }}
+									</text>
+								</view>
+							</view>
+						</view>
+
+						<!-- Tab选择器（仅 Coupon，在当前活动卡片下方，随页面滚动） -->
+						<view class="tab-selector" v-if="isLogin && activity_type === 'coupon'">
+							<view class="tab-container" ref="container">
+								<view v-for="(item, index) in tabs" :key="index" class="tab-item"
+									:class="{ 'active': tab_index === index }" @click="handleTabClick(index)">
+									<text class="tab-text">{{ $t(item) }}</text>
+								</view>
+								<!-- 底部滑动指示器 -->
+								<view class="slide-indicator" :style="{
 					          width: indicator_width + 'px',
 					          transform: `translateX(${indicator_offset}px)`
 					        }"></view>
+							</view>
+						</view>
+
+						<!-- 优惠券卡片列表 -->
+						<view class="coupon-card" v-for="(coupon, index) in list" :key="index">
+							<view class="coupon-card-header" :class="getHeaderClass(coupon.status)">
+								<text class="coupon-card-title">{{ coupon.coupon_name || 'Coupon' }}</text>
+								<text class="coupon-more" @click="openDetailModal(coupon)">Details ›</text>
+							</view>
+							<view class="coupon-card-body">
+								<view class="coupon-thumbnail" v-if="coupon.p_img_mb && !coupon._imageError">
+									<image :src="coupon.p_img_mb" mode="aspectFill" class="thumbnail-image" lazy-load
+										@error="handleImageError(coupon)"></image>
+								</view>
+								<view class="coupon-info-left">
+									<view class="info-line">
+										<text class="info-label">Min Bet</text>
+										<text class="info-val">{{ coupon.min_bet_required || 0 }}</text>
+									</view>
+									<view class="info-line">
+										<text class="info-label">Used</text>
+										<text
+											class="info-val">{{ `${coupon.used_count || 0}${coupon.usage_limit ? '/' + coupon.usage_limit : ''}` }}</text>
+									</view>
+								</view>
+								<view class="coupon-bonus">
+									<text class="bonus-label">Bonus</text>
+									<text class="bonus-value">{{ $toolbox.num_format(coupon.bonus_amount) }}</text>
+								</view>
+							</view>
+							<view class="coupon-card-footer">
+								<text class="expire-time" v-if="coupon.expire_time">Expires:
+									{{ formatDateTime(coupon.expire_time) }}</text>
+								<text class="expire-time" v-else>-</text>
+								<view class="claim-action-btn" v-if="coupon.status === 'Unused'"
+									@click="claimCoupon(coupon)">
+									{{ $t('Claim') }}
+								</view>
+								<text class="status-text" v-else>{{ $t(coupon.status) }}</text>
+							</view>
+						</view>
+
+						<!-- 空状态 -->
+						<view class="empty-state" v-if="list.length === 0 && !loading">
+							<theme-icon name="deals" class="empty-icon"
+								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+							<text class="empty-text">No coupons available</text>
 						</view>
 					</view>
 
-					<!-- 优惠券卡片列表 -->
-					<view class="coupon-card" v-for="(coupon, index) in list" :key="index">
-						<view class="coupon-card-header" :class="getHeaderClass(coupon.status)">
-							<text class="coupon-card-title">{{ coupon.coupon_name || 'Coupon' }}</text>
-							<text class="coupon-more" @click="openDetailModal(coupon)">Details ›</text>
-						</view>
-						<view class="coupon-card-body">
-							<view class="coupon-thumbnail" v-if="coupon.p_img_mb && !coupon._imageError">
-								<image :src="coupon.p_img_mb" mode="aspectFill" class="thumbnail-image" lazy-load
-									@error="handleImageError(coupon)"></image>
+					<!-- ============ Promotion 区域 ============ -->
+					<view class="list-container promotion-list-container" v-else-if="activity_type === 'promotion'">
+						<view class="promotion-card2" v-for="(promo, index) in promotion_list" :key="index"
+							@click="showPromotionDetail(promo)">
+							<view class="promotion-card2-header" :class="getPromotionHeaderClass(promo.status)">
+								<text class="promotion-card2-title">{{ promo.name }}</text>
 							</view>
-							<view class="coupon-info-left">
-								<view class="info-line">
-									<text class="info-label">Min Bet</text>
-									<text class="info-val">{{ coupon.min_bet_required || 0 }}</text>
+							<view class="promotion-card2-image">
+								<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
+									@error="handlePromotionImageError(promo)"></image>
+							</view>
+							<view class="promotion-card2-body">
+								<view class="promo-info">
+									<text class="promo-label">Promotion Period:</text>
+									<text class="promo-period">{{ promo.period_start }} - {{ promo.period_end }}</text>
+									<view class="promo-countdown"
+										v-if="promo.end_time_full && isWithin48Hours(promo.end_time_full)">
+										<count-down :count_time="promo.end_time_full"></count-down>
+									</view>
+									<text class="promo-label promo-label-mt">Terms & Conditions</text>
+									<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
 								</view>
-								<view class="info-line">
-									<text class="info-label">Used</text>
-									<text
-										class="info-val">{{ `${coupon.used_count || 0}${coupon.usage_limit ? '/' + coupon.usage_limit : ''}` }}</text>
+							</view>
+							<view class="promotion-card2-footer">
+								<text class="promo-amount" v-if="promo.participation_amount_type === 'Fixed'">
+									K {{ $toolbox.num_format(promo.min_amount) }}
+								</text>
+								<text class="promo-amount" v-else>
+									K
+									{{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
+								</text>
+								<view v-if="promo.status === 'Available'" class="promo-status-btn">{{ promo.status }}
 								</view>
-							</view>
-							<view class="coupon-bonus">
-								<text class="bonus-label">Bonus</text>
-								<text class="bonus-value">{{ $toolbox.num_format(coupon.bonus_amount) }}</text>
+								<text v-else class="promo-status-text"
+									:style="{ color: promo.status === 'Completed' ? '#9eacb5' : '' }">{{ promo.status }}</text>
 							</view>
 						</view>
-						<view class="coupon-card-footer">
-							<text class="expire-time" v-if="coupon.expire_time">Expires:
-								{{ formatDateTime(coupon.expire_time) }}</text>
-							<text class="expire-time" v-else>-</text>
-							<view class="claim-action-btn" v-if="coupon.status === 'Unused'"
-								@click="claimCoupon(coupon)">
-								{{ $t('Claim') }}
-							</view>
-							<text class="status-text" v-else>{{ $t(coupon.status) }}</text>
-						</view>
-					</view>
 
-					<!-- 空状态 -->
-					<view class="empty-state" v-if="list.length === 0 && !loading">
-						<theme-icon name="deals" class="empty-icon"
-							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
-						<text class="empty-text">No coupons available</text>
+						<!-- 空状态 -->
+						<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
+							<theme-icon name="deals" class="empty-icon"
+								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+							<text class="empty-text">No promotions available</text>
+						</view>
 					</view>
 				</view>
 
-				<!-- ============ Promotion 区域 ============ -->
-				<view class="list-container promotion-list-container" v-else-if="activity_type === 'promotion'">
-					<view class="promotion-card2" v-for="(promo, index) in promotion_list" :key="index"
-						@click="showPromotionDetail(promo)">
-						<view class="promotion-card2-header" :class="getPromotionHeaderClass(promo.status)">
-							<text class="promotion-card2-title">{{ promo.name }}</text>
-						</view>
-						<view class="promotion-card2-image">
-							<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
-								@error="handlePromotionImageError(promo)"></image>
-						</view>
-						<view class="promotion-card2-body">
-							<view class="promo-info">
-								<text class="promo-label">Promotion Period:</text>
-								<text class="promo-period">{{ promo.period_start }} - {{ promo.period_end }}</text>
-								<view class="promo-countdown"
-									v-if="promo.end_time_full && isWithin48Hours(promo.end_time_full)">
-									<count-down :count_time="promo.end_time_full"></count-down>
-								</view>
-								<text class="promo-label promo-label-mt">Terms & Conditions</text>
-								<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
-							</view>
-						</view>
-						<view class="promotion-card2-footer">
-							<text class="promo-amount" v-if="promo.participation_amount_type === 'Fixed'">
-								K {{ $toolbox.num_format(promo.min_amount) }}
-							</text>
-							<text class="promo-amount" v-else>
-								K
-								{{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
-							</text>
-							<view v-if="promo.status === 'Available'" class="promo-status-btn">{{ promo.status }}</view>
-							<text v-else class="promo-status-text"
-								:style="{ color: promo.status === 'Completed' ? '#9eacb5' : '' }">{{ promo.status }}</text>
+				<!-- 未登录状态 -->
+				<view class="flex-column justify-center margin-top" v-else>
+					<view class="flex-column align-center justify-center">
+						<image class="yellow2dblue" style="height: 60px;margin-bottom: 6px;" mode="heightFix"
+							src="/static/image/deals/deals.png"></image>
+						<view class="myfont-20px mycolor-primary">{{ language.please_sign_in_to_receive_the_coupon }}
 						</view>
 					</view>
-
-					<!-- 空状态 -->
-					<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-						<theme-icon name="deals" class="empty-icon"
-							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
-						<text class="empty-text">No promotions available</text>
-					</view>
 				</view>
-			</view>
 
-			<!-- 未登录状态 -->
-			<view class="flex-column justify-center margin-top" v-else>
-				<view class="flex-column align-center justify-center">
-					<image class="yellow2dblue" style="height: 60px;margin-bottom: 6px;" mode="heightFix"
-						src="/static/image/deals/deals.png"></image>
-					<view class="myfont-20px mycolor-primary">{{ language.please_sign_in_to_receive_the_coupon }}</view>
-				</view>
-			</view>
+				<view style="height: 30px;width: 100%;"></view>
+			</scroll-view>
+		</view>
 
-			<view style="height: 30px;width: 100%;"></view>
-		</scroll-view>
-
-		<!-- ============ 优惠券详情弹窗 ============ -->
-		<view class="detail-modal" v-if="showDetailModal && selectedCoupon" @click="closeDetailModal">
-			<view class="detail-modal-content" @click.stop="">
-				<view class="detail-modal-header">
+		<!-- ============ 优惠券详情页 ============ -->
+		<view class="detail-page" v-if="showDetailModal && selectedCoupon">
+			<view class="detail-page-content">
+				<view class="detail-page-header">
+					<view class="detail-page-header-spacer"></view>
 					<text class="detail-modal-title">Coupon Details</text>
-					<text class="detail-modal-close" @click="closeDetailModal">✕</text>
+					<theme-icon name="ai-close" size="20px" color="var(--theme-icon-on-primary, #fff)"
+						@click="closeDetailModal"></theme-icon>
 				</view>
 
-				<scroll-view scroll-y class="detail-modal-body">
+				<scroll-view scroll-y class="detail-page-body">
 					<!-- Hero image with coupon name overlay -->
 					<view class="coupon-hero" v-if="selectedCoupon.p_img_mb && !selectedCoupon._imageError">
 						<image class="coupon-hero-image" mode="aspectFill" :src="selectedCoupon.p_img_mb" lazy-load
@@ -283,7 +291,7 @@
 					</view>
 				</scroll-view>
 
-				<view class="detail-modal-footer" v-if="selectedCoupon.status === 'Unused'">
+				<view class="detail-page-footer" v-if="selectedCoupon.status === 'Unused'">
 					<view class="detail-claim-btn" @click="claimCoupon(selectedCoupon)">
 						<text class="detail-claim-text">Claim</text>
 					</view>
@@ -291,15 +299,17 @@
 			</view>
 		</view>
 
-		<!-- ============ Promotion 详情弹窗 ============ -->
-		<view class="detail-modal" v-if="showPromotionDetailModal && selectedPromotion" @click="closePromotionDetail">
-			<view class="detail-modal-content" @click.stop="">
-				<view class="detail-modal-header">
+		<!-- ============ Promotion 详情页 ============ -->
+		<view class="detail-page" v-if="showPromotionDetailModal && selectedPromotion">
+			<view class="detail-page-content">
+				<view class="detail-page-header">
+					<view class="detail-page-header-spacer"></view>
 					<text class="detail-modal-title">Promotion Details</text>
-					<text class="detail-modal-close" @click="closePromotionDetail">✕</text>
+					<theme-icon name="ai-close" size="20px" color="var(--theme-icon-on-primary, #fff)"
+						@click="closePromotionDetail"></theme-icon>
 				</view>
 
-				<scroll-view scroll-y class="detail-modal-body">
+				<scroll-view scroll-y class="detail-page-body">
 					<view class="detail-coupon-title">{{ selectedPromotion.name }}</view>
 					<view class="promo-slogan" v-if="selectedPromotion.slogan">{{ selectedPromotion.slogan }}</view>
 
@@ -433,7 +443,7 @@
 					</view>
 				</scroll-view>
 
-				<view class="detail-modal-footer">
+				<view class="detail-page-footer">
 					<view v-if="selectedPromotion.status === 'Available'" class="detail-claim-btn"
 						@click="showJoinPromotionDialog">
 						<text class="detail-claim-text">Join Promotion</text>
@@ -1431,6 +1441,65 @@
 	.main-scroll-view {
 		flex: 1;
 		height: 0;
+		background: #fff;
+	}
+
+	.coupon-list-view {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.detail-page {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		background: #fff;
+		border-radius: 20px 20px 0 0;
+		overflow: hidden;
+	}
+
+	.detail-page-content {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.detail-page-header {
+		display: flex;
+		align-items: center;
+		background: $color-primary;
+		padding: 12px 16px;
+		flex-shrink: 0;
+	}
+
+	.detail-page-header>.theme-icon,
+	.detail-page-header-spacer {
+		width: 20px;
+		height: 20px;
+		flex-shrink: 0;
+	}
+
+	.detail-page-header .detail-modal-title {
+		flex: 1;
+		text-align: center;
+	}
+
+	.detail-page-body {
+		flex: 1;
+		height: 0;
+		padding: 16px;
+		background: #fff;
+	}
+
+	.detail-page-footer {
+		flex-shrink: 0;
+		padding: 12px 16px;
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
 		background: #fff;
 	}
 

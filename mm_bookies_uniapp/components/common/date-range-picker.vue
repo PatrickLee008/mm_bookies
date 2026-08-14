@@ -747,7 +747,7 @@
 	.date-picker-dropdown .date-option-label {
 		color: $color-primary;
 		font-size: 24upx;
-		font-weight: 500;
+		font-weight: bold;
 		line-height: 32upx;
 	}
 

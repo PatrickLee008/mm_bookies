@@ -7,8 +7,8 @@
 		<message-notification></message-notification>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"
-			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }">
+		</view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -52,9 +52,8 @@
 				<!-- 联赛标题栏 -->
 				<view class="new-league-header" @click="league.show_match = !league.show_match">
 					<view class="league-left">
-						<image class="league-icon"
-							src="https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png"
-							mode="aspectFit"></image>
+						<image class="league-icon" :src="league.league_icon || defaultLeagueIcon" mode="aspectFit">
+						</image>
 						<text class="league-name">{{league.name}}</text>
 					</view>
 					<view class="league-right">
@@ -819,6 +818,7 @@
 				confirmIntervalId: '',
 				configs: {},
 				mix_slip: uni.getStorageSync('mix_slip') || [],
+				defaultLeagueIcon: 'https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png',
 				match_ref: {
 					mixed: false,
 					num: 0,
@@ -1509,6 +1509,12 @@
 				if (data.total) {
 					let favor_leagues = data.favor_leagues
 					let server_matches = data.items
+					let league_icons = {}
+					server_matches.forEach(match => {
+						if (match.LEAGUE && !league_icons[match.LEAGUE]) {
+							league_icons[match.LEAGUE] = match.league_logo || ''
+						}
+					})
 					//使用set给leauges去重
 					let server_leagues = [...new Set(server_matches.map(ele => ele.LEAGUE))]
 					// leauges排序
@@ -1516,6 +1522,7 @@
 					let league_list = server_leagues.map(ele => {
 						return {
 							name: ele,
+							league_icon: league_icons[ele] || '',
 							checked: true,
 							show_match: true,
 							include_today: false,
@@ -2440,6 +2447,7 @@
 		overflow: hidden;
 		border: 1px solid $color-border;
 		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
+		padding-bottom: 12px;
 	}
 
 	.match-datetime {
@@ -2591,7 +2599,7 @@
 	.match-expand-btn {
 		background-color: $color-primary;
 		height: 28px;
-		margin: 4px 12px 12px;
+		margin: 4px 12px 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;

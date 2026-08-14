@@ -746,7 +746,7 @@
 	.filter-option-text {
 		color: $color-primary;
 		font-size: 14px;
-		font-weight: 500;
+		font-weight: bold;
 	}
 
 	.filter-radio {

@@ -29,7 +29,7 @@
 			<view class="withdraw-modal-dialog">
 				<!-- 标题栏 -->
 				<view class="withdraw-modal-header">
-					<text class="withdraw-modal-title">{{ $t('Withdraw') }}</text>
+					<text class="withdraw-modal-title">{{ $t('auto_withdraw') }}</text>
 					<text class="withdraw-modal-close" @click="modalName = ''">✕</text>
 				</view>
 
@@ -41,7 +41,8 @@
 					<view class="info-row">
 						<text class="info-label">{{ $t('bank type') }}</text>
 						<view class="bank-type-value">
-							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`"></image>
+							<image class="bank-type-icon" :src="`/static/icon/register/${selectedCard.bank_code}.png`">
+							</image>
 							<text class="bank-type-text">{{selectedCard.bank_code}}</text>
 						</view>
 					</view>
@@ -69,27 +70,35 @@
 						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
 						<text class="wallet-info-value">{{$toolbox.floor_format(userInfo.money)}}Ks</text>
 					</view>
-					<!-- <view class="wallet-info-row">
+					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('amount_unlock') }} :</text>
-						<text class="wallet-info-value">{{configs.amount_unlock || '0.00'}}</text>
+						<text
+							class="wallet-info-value">{{formatTurnoverAmount(turnoverStatus.withdrawable_amount)}}</text>
 					</view>
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('turnover_limit_label') }} :</text>
-						<text class="wallet-info-value">{{configs.turnover_limit || '0.00'}}</text>
-					</view> -->
+						<text
+							class="wallet-info-value">{{formatTurnoverAmount(turnoverStatus.required_turnover)}}</text>
+					</view>
+					<view class="wallet-info-row">
+						<text class="wallet-info-label">{{ $t('turnover_current_label') }} :</text>
+						<text class="wallet-info-value">{{formatTurnoverAmount(turnoverStatus.current_turnover)}}</text>
+					</view>
 				</view>
 
 				<!-- 金额输入 -->
 				<view class="amount-section">
 					<view class="amount-input-box">
-						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount" :placeholder="$t('enter_withdraw_amount')" />
+						<input class="amount-input-field" type="number" @input='inputNum' v-model="amount"
+							:placeholder="$t('enter_withdraw_amount')" />
 					</view>
-					<text class="amount-hint">Current Turnover: {{numberFormat(userInfo.current_turnover_accumulated)}}Ks | Rate Turnover: {{numberFormat(userInfo.required_turnover_accumulated)}}Ks </text>
-					<text class="amount-hint">Minimum {{numberFormat(configs.withdraw_min_limit || 5000)}} Ks, Maximum {{numberFormat(configs.withdraw_max_limit || 5000000)}} Ks</text>
+					<text class="amount-hint">Minimum {{numberFormat(configs.withdraw_min_limit || 5000)}} Ks, Maximum
+						{{numberFormat(configs.withdraw_max_limit || 5000000)}} Ks</text>
 
 					<!-- 快速金额选择 -->
 					<view class="quick-amount-grid">
-						<view class="quick-amount-btn" :class="amount==item?'selected':''" v-for="(item,index) in withdraw_amount_list" :key="index" @click="amount = item">
+						<view class="quick-amount-btn" :class="amount==item?'selected':''"
+							v-for="(item,index) in withdraw_amount_list" :key="index" @click="amount = item">
 							{{numberFormat(item)}}
 						</view>
 					</view>
@@ -118,7 +127,8 @@
 
 				<!-- 银行图标选择 -->
 				<view class="bank-icon-selector">
-					<view class="bank-icon-item" v-for="(bank,index) in bank_add_list" :key="index" @click="select_modal_bank(bank)" :class="card_conf.bank_code==bank.bank_code?'selected':''">
+					<view class="bank-icon-item" v-for="(bank,index) in bank_add_list" :key="index"
+						@click="select_modal_bank(bank)" :class="card_conf.bank_code==bank.bank_code?'selected':''">
 						<image class="bank-icon-img" :src="`/static/icon/register/${bank.bank_code}.png`"></image>
 					</view>
 				</view>
@@ -128,41 +138,32 @@
 					<!-- Account No -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_number') }}</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()" :placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
+						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()"
+							:placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_ame') }}</text>
-						<input class="form-input" type="text" @input="set_add_disable()" :placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
+						<input class="form-input" type="text" @input="set_add_disable()"
+							:placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
 
 				<!-- Confirm 按钮 -->
-				<button class="confirm-btn" :class="add_disable?'disabled':''" @click="add_card()" :disabled="add_disable">
+				<button class="confirm-btn" :class="add_disable?'disabled':''" @click="add_card()"
+					:disabled="add_disable">
 					{{ $t('confirm') }}
 				</button>
 			</view>
 		</view>
 		<!-- delete bank confirm dialog -->
-	<ConfirmDialog
-		:visible="showDeleteConfirm"
-		:title="$t('remove_bank_title') || 'Delete Bank Account'"
-		:message="$t('remove_bank_confirm')"
-		:confirmText="$t('Confirm')"
-		:cancelText="$t('Cancel')"
-		@confirm="confirmDeleteBank"
-		@cancel="showDeleteConfirm = false"
-	/>
-	<!-- 提现结果提示弹窗（单按钮OK模式） -->
-	<ConfirmDialog
-		:visible="showResultDialog"
-		:title="resultDialogTitle"
-		:message="resultDialogMessage"
-		:confirmText="$t('ok')"
-		:showCancel="false"
-		@confirm="showResultDialog = false"
-	/>
+		<ConfirmDialog :visible="showDeleteConfirm" :title="$t('remove_bank_title') || 'Delete Bank Account'"
+			:message="$t('remove_bank_confirm')" :confirmText="$t('Confirm')" :cancelText="$t('Cancel')"
+			@confirm="confirmDeleteBank" @cancel="showDeleteConfirm = false" />
+		<!-- 提现结果提示弹窗（单按钮OK模式） -->
+		<ConfirmDialog :visible="showResultDialog" :title="resultDialogTitle" :message="resultDialogMessage"
+			:confirmText="$t('ok')" :showCancel="false" @confirm="showResultDialog = false" />
 	</view>
 
 </template>
@@ -171,7 +172,7 @@
 	// from tangjq--- Withdraw 组件,从 withdraw.vue 提取并简化
 	import config from '../../utils/config.js';
 	import dateFormatUtils from "../../utils/utils.js"
-import ConfirmDialog from '@/components/common/confirm-dialog.vue'
+	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	export default {
 		name: 'WalletWithdraw',
@@ -186,11 +187,18 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				card_list: [],
 				userInfo: {},
 				configs: {},
+				turnoverStatus: {
+					withdrawable_amount: 0,
+					required_turnover: 0,
+					current_turnover: 0,
+				},
 				// from tangjq--- 添加银行卡相关变量
 				modalName: '',
 				card_conf: {},
 				selectedCard: {}, // from tangjq--- 选中的银行卡
-				withdraw_amount_list: [], // 提现快速金额列表（由系统配置动态生成）
+				withdraw_amount_list: [5000, 10000, 30000, 50000, 100000, 200000, 500000, 1000000,
+					5000000
+				], // 提现快速金额列表（由系统配置动态生成）
 				bank_add_list: [],
 				add_disable: true,
 				showDeleteConfirm: false,
@@ -210,16 +218,25 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			},
 			// 监听系统配置变化，动态更新提现金额选择列表
 			configs: {
+				handler() {
+					this.withdraw_amount_list = this.dynamicWithdrawAmountList;
+				},
+				deep: true,
+				immediate: true
+			},
+			// App.vue 异步加载配置，监听 Vuex 确保刷新或首次进入时同步限额
+			globalConfigs: {
 				handler(val) {
-					if (val && (val.withdraw_min_limit || val.withdraw_max_limit)) {
-						this.withdraw_amount_list = this.dynamicWithdrawAmountList;
-					}
+					this.configs = Object.assign({}, val || {})
 				},
 				deep: true,
 				immediate: true
 			},
 		},
 		computed: {
+			globalConfigs() {
+				return this.$store.state.configs || {}
+			},
 			// 动态生成提现金额选择列表，基于系统配置的 min/max 限额
 			dynamicWithdrawAmountList() {
 				const min = parseInt(this.configs.withdraw_min_limit) || 5000;
@@ -272,6 +289,33 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			numberFormat(number) {
 				return dateFormatUtils.numFormat(number);
 			},
+			formatTurnoverAmount(value) {
+				const amount = Number(value)
+				if (!Number.isFinite(amount)) return '0.00'
+				return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+			},
+			loadTurnoverStatus() {
+				this.$http.post('/charge/check_deposit_stake', {}, (res) => {
+					if (res.statusCode !== 200 || !res.data || Number(res.data.code) !== 20000) {
+						console.error('Failed to load withdrawal turnover status', res)
+						return
+					}
+
+					const data = res.data
+					const toNumber = (value) => {
+						const amount = Number(value)
+						return Number.isFinite(amount) ? amount : 0
+					}
+					this.turnoverStatus = {
+						withdrawable_amount: toNumber(
+							data.withdrawable_amount != null ? data.withdrawable_amount : data
+							.withdrawal_amount
+						),
+						required_turnover: toNumber(data.required_turnover),
+						current_turnover: toNumber(data.current_turnover),
+					}
+				})
+			},
 			get_bank_card_list() {
 				var _this = this;
 				var para = {}
@@ -287,6 +331,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			selectCard(card) {
 				this.selectedCard = card
 				this.amount = ''
+				this.loadTurnoverStatus()
 				this.modalName = 'withdraw_modal'
 			},
 			// from tangjq--- 提现提交
@@ -328,7 +373,8 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 					uni.hideLoading()
 					if (res.statusCode == 200) {
 						_this.resultDialogTitle = _this.$t('Congratulations')
-						_this.resultDialogMessage = `${_this.$t('Amount')}: ${_this.numberFormat(_this.amount)} Ks\n${_this.$t('withdraw_success')}`
+						_this.resultDialogMessage =
+							`${_this.$t('Amount')}: ${_this.numberFormat(_this.amount)} Ks\n${_this.$t('withdraw_success')}`
 						_this.showResultDialog = true
 
 						// Update user balance in store
@@ -341,11 +387,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						_this.amount = '';
 						_this.modalName = ''
 						_this.selectedCard = {}
+						_this.loadTurnoverStatus()
 					} else {
 						_this.modalName = '';
 						var tips = '';
 						if (_this.language[res.data.message]) {
-							tips = res.statusCode == 429 ? _this.language[res.data.message] + "(" + _this.$store.state.configs[res.data.message] + ")" : _this.$t(res.data.message);
+							tips = res.statusCode == 429 ? _this.language[res.data.message] + "(" + _this.$store
+								.state.configs[res.data.message] + ")" : _this.$t(res.data.message);
 						} else {
 							tips = res.data.message;
 						}
@@ -418,7 +466,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 				_this.showDeleteConfirm = false
 				var bank = _this.deleteTargetBank
 				if (!bank) return
-				var para = { id: bank.id }
+				var para = {
+					id: bank.id
+				}
 				_this.$http.post('/bank_card/delete', para, (res) => {
 					if (res.statusCode == 200) {
 						uni.showToast({
@@ -434,7 +484,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			// 通过接口获取 admin 配置的可用银行列表并过滤 bank_add_list
 			loadAvailableBanks() {
 				var _this = this
-				_this.$http.get('/agent_bankcard/available_banks', { data: {} }, (res) => {
+				_this.$http.get('/agent_bankcard/available_banks', {
+					data: {}
+				}, (res) => {
 					if (res.statusCode == 200 && res.data) {
 						const auto = res.data.auto || []
 						const manual = res.data.manual || []
@@ -443,13 +495,32 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 						auto.forEach(b => codes.add(b.bank_code))
 						manual.forEach(b => codes.add(b.bank_code))
 						const availableCodes = Array.from(codes)
-			
-						const allBanks = [
-							{ bank_code: 'KBZ Pay', label: 'KBZPay', checked: true },
-							{ bank_code: 'Wave Money', label: 'WavePAY', checked: false },
-							{ bank_code: 'AYA', label: 'AYA PAY', checked: false },
-							{ bank_code: 'Citizen Pay', label: 'Citizen Pay', checked: false },
-							{ bank_code: 'UAB Pay', label: 'UAB Pay', checked: false },
+
+						const allBanks = [{
+								bank_code: 'KBZ Pay',
+								label: 'KBZPay',
+								checked: true
+							},
+							{
+								bank_code: 'Wave Money',
+								label: 'WavePAY',
+								checked: false
+							},
+							{
+								bank_code: 'AYA',
+								label: 'AYA PAY',
+								checked: false
+							},
+							{
+								bank_code: 'Citizen Pay',
+								label: 'Citizen Pay',
+								checked: false
+							},
+							{
+								bank_code: 'UAB Pay',
+								label: 'UAB Pay',
+								checked: false
+							},
 						]
 						_this.bank_add_list = allBanks.filter(bank => availableCodes.includes(bank.bank_code))
 						if (_this.bank_add_list.length > 0) {
@@ -465,6 +536,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 			this.configs = Object.assign({}, this.$store.state.configs)
 			this.loadAvailableBanks()
+			this.loadTurnoverStatus()
 			console.log(this.$store.state.configs);
 		},
 	}
@@ -715,9 +787,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	.bank-icon-item {
 		width: 40px;
 		height: 40px;
-		border-radius: 8px;
+		border-radius: $radius-small;
 		overflow: hidden;
-		border: 2px solid transparent;
+		border: 3px solid transparent;
 	}
 
 	.bank-icon-item.selected {
@@ -750,8 +822,8 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.form-input {
 		flex: 1;
-		height: 24px;
-		border:  2px solid $color-secondary-light;
+		height: 28px;
+		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		font-size: 12px;
 		color: #000;
@@ -760,13 +832,13 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.confirm-btn {
 		width: 100%;
-		height: 30px;
+		height: 35px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
 		font-weight: 700;
-		color: #fff;
+		color: white;
 		padding: 8px;
 		display: flex;
 		align-items: center;
@@ -775,6 +847,8 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.confirm-btn.disabled {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: white;
 	}
 
 	/* from tangjq--- 提现弹窗样式（仿照deposit-modal-dialog） */
@@ -784,6 +858,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		background-color: #fff;
 		border-radius: 16px;
 		padding: 0;
+		padding-bottom: 20px;
 		position: relative;
 		max-height: 90vh;
 		overflow-y: auto;
@@ -791,7 +866,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.withdraw-modal-header {
 		background-color: $color-primary;
-		padding: 8px;
+		padding: 14px 20px;
 		border-radius: 16px 16px 0 0;
 		display: flex;
 		justify-content: center;
@@ -801,46 +876,48 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.withdraw-modal-title {
 		font-size: 16px;
-		font-weight: 600;
+		font-weight: 700;
 		color: #fff;
 		text-align: center;
 	}
 
 	.withdraw-modal-close {
-		font-size: 20px;
+		font-size: 16px;
 		color: #fff;
-		font-weight: 300;
+		font-weight: bold;
 		line-height: 1;
 		cursor: pointer;
 		position: absolute;
-		right: 8px;
+		right: 20px;
 	}
 
 	.user-account-section {
 		background-color: $bg-color-info;
+		margin: 20px 20px 0;
 		padding: 20px;
+		border-radius: $radius-large;
 	}
 
 	.section-title {
-		font-size: 18px;
-		font-weight: 700;
+		font-size: 14px;
+		font-weight: bold;
 		color: $color-primary;
 		display: block;
 		text-align: center;
-		margin-bottom: 16px;
+		margin-bottom: 22px;
 	}
 
 	.info-row {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		margin-bottom: 12px;
+		margin-bottom: 18px;
 	}
 
 	.info-label {
 		font-size: 12px;
 		font-weight: 600;
-		color: #000;
+		color: $color-primary;
 		width: 120px;
 		flex-shrink: 0;
 	}
@@ -849,26 +926,28 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		justify-content: center;
+		width: calc(100% - 120px);
 		gap: 8px;
 	}
 
 	.bank-type-icon {
-		width: 35px;
-		height: 35px;
+		width: 32px;
+		height: 32px;
 		border-radius: 6px;
 	}
 
 	.bank-type-text {
 		font-size: 12px;
-		font-weight: 600;
+		font-weight: bold;
 		color: $color-primary;
 	}
 
 	.info-value-box {
 		flex: 1;
-		height: 24px;
-		border: $color-secondary-light;
-		border-radius: 12px;
+		height: 28px;
+		border: 2px solid $color-secondary;
+		border-radius: $radius-large;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -884,7 +963,9 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	/* from tangjq--- 钱包信息部分样式 */
 	.wallet-info-section {
 		background-color: $bg-color-info;
-		padding: 0 20px 20px;
+		margin: 15px 20px 0;
+		padding: 20px 40px;
+		border-radius: $radius-large;
 	}
 
 	.wallet-info-row {
@@ -892,19 +973,26 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 12px;
+		margin-bottom: 18px;
+	}
+
+	.wallet-info-row:last-child {
+		margin-bottom: 0;
 	}
 
 	.wallet-info-label {
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 400;
+		width: 120px;
+		text-align: end;
 		color: $color-primary;
 	}
 
 	.wallet-info-value {
-		font-size: 16px;
-		font-weight: 700;
+		font-size: 12px;
+		font-weight: bold;
 		color: $color-primary;
+		font-style: italic;
 	}
 
 	.amount-section {
@@ -916,7 +1004,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		height: 40px;
 		background-color: $bg-color-info;
 		border: 1px solid $color-border-other;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -933,11 +1021,15 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 		width: 100%;
 	}
 
-	.amount-input-field::-webkit-input-placeholder {
+	.amount-input-field::placeholder,
+	.amount-input-field::-webkit-input-placeholder,
+	.amount-input-field::-moz-placeholder,
+	.amount-input-field:-ms-input-placeholder {
 		font-size: 14px;
 		font-weight: 400;
 		font-style: italic;
-		color: #999;
+		color: $color-primary;
+		opacity: 1;
 	}
 
 	.amount-hint {
@@ -977,7 +1069,7 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.continue-btn {
 		width: calc(100% - 40px);
-		height: 30px;
+		height: 40px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
@@ -993,5 +1085,17 @@ import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 
 	.continue-btn[disabled] {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: #fff;
+	}
+</style>
+
+<style lang="scss">
+	.amount-input-box .uni-input-placeholder {
+		font-size: 14px !important;
+		font-weight: 400 !important;
+		font-style: italic !important;
+		color: $color-primary !important;
+		opacity: 1 !important;
 	}
 </style>

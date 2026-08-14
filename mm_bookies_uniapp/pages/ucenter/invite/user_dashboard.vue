@@ -492,7 +492,7 @@
 		overflow: hidden;
 		color: #ffffff;
 		font-size: 11px;
-		font-weight: 600;
+		font-weight: bold;
 		line-height: 16px;
 		text-align: left;
 		text-overflow: ellipsis;
@@ -534,7 +534,7 @@
 		background-color: transparent !important;
 		color: #ffffff !important;
 		font-size: 11px;
-		font-weight: 600;
+		font-weight: bold;
 		line-height: 16px;
 	}
 
@@ -652,7 +652,7 @@
 	}
 
 	.status-active {
-		background: #38c2cf;
+		background: $color-primary;
 		color: #ffffff;
 	}
 
@@ -667,7 +667,7 @@
 	}
 
 	.status-signed {
-		background: #38c2cf;
+		background: $color-secondary;
 		color: #ffffff;
 	}
 

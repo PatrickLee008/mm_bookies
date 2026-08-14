@@ -29,11 +29,11 @@
 						@click="$refs.date_picker.show()">
 						<theme-icon v-if="!date_filtered" name="calendar" class="order-filter-calendar"
 							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
-						<text class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
+						<text
+							class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
 						<text v-if="!date_filtered" class="cuIcon-unfold pill-arrow"></text>
 					</view>
-					<date-range-picker ref="date_picker" :inline="true"
-						@click_option="date_click"></date-range-picker>
+					<date-range-picker ref="date_picker" :inline="true" @click_option="date_click"></date-range-picker>
 				</view>
 				<view class="order-filter-pill">
 					<selector :option_list.sync="type_list" :default_label="$t('type')" @click_option="click_option">
@@ -916,7 +916,7 @@
 		flex: 1;
 		min-width: 0;
 		font-size: 22upx;
-		font-weight: 600;
+		font-weight: bold;
 		color: #FFFFFF;
 		line-height: 32upx;
 		overflow: hidden;
@@ -955,7 +955,7 @@
 		background-color: transparent !important;
 		color: #FFFFFF !important;
 		font-size: 22upx;
-		font-weight: 600;
+		font-weight: bold;
 		gap: 4upx;
 		justify-content: center;
 	}
@@ -1066,7 +1066,7 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 	}
 
 	.team-name {
@@ -1074,7 +1074,11 @@
 		color: #FFFFFF;
 		font-weight: 600;
 		text-align: center;
-		flex-shrink: 1;
+		flex: 1 1 0;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	/* 让球方（odd given team）球队名称显示为红色 */
@@ -1085,7 +1089,6 @@
 	/* from tangjq--- 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
 		color: $color-secondary;
-		min-width: 0;
 	}
 
 	.vs-text {
@@ -1093,7 +1096,8 @@
 		color: #FFFFFF;
 		font-weight: 700;
 		margin: 0 16upx;
-		flex-shrink: 0;
+		flex: 0 0 auto;
+		text-align: center;
 	}
 
 	.score-text {
@@ -1101,7 +1105,8 @@
 		color: #FFFFFF;
 		font-weight: 700;
 		margin: 0 16upx;
-		flex-shrink: 0;
+		flex: 0 0 auto;
+		text-align: center;
 	}
 
 	.match-time {

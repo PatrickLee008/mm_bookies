@@ -5,7 +5,8 @@
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
+		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll"
+			@scrolltoupper="handleHeaderTop">
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -53,7 +54,7 @@
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">{{ $t('my_phone') }} :
+						<text class="profile-info-label">{{ $t('my_id') }} :
 							{{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
@@ -61,7 +62,9 @@
 					<view class="profile-phone-row">
 						<text class="profile-phone-label">{{ $t('phone_no') }}:
 							{{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
-						<!-- <image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image> -->
+						<theme-icon class="profile-phone-copy-icon" name="copy" size="20px"
+							color="var(--theme-icon-primary, var(--theme-primary))" @click="copy"
+							v-if="canInvite"></theme-icon>
 					</view>
 
 					<!-- Change Password 按钮 -->
@@ -373,6 +376,7 @@
 		data() {
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
+				canInvite: true,
 				temp: {},
 				about: '',
 				currentLanguage: config.language,
@@ -776,6 +780,17 @@
 						})
 					}
 				})
+			},
+			copy() {
+				const userInfo = this.$store.state.userInfo || {}
+				if (!userInfo.phone) {
+					uni.showToast({
+						title: this.$t('unable_get_user_info'),
+						icon: 'none'
+					})
+					return
+				}
+				this.copyToClipboard(userInfo.phone)
 			},
 			// 打开客服 modal
 			openCustomerService() {
@@ -1522,7 +1537,7 @@
 
 	.modal-content {
 		background: #fff;
-		border-radius: 16px;
+		border-radius: $radius-large;
 		width: 100%;
 		max-width: 500px;
 		max-height: 90vh;
@@ -1535,7 +1550,6 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-radius: 16px 16px 0 0;
 	}
 
 	.modal-title {
@@ -1597,9 +1611,19 @@
 	}
 
 	.profile-phone-label {
+		flex: 1;
+		min-width: 0;
 		font-size: 15px;
 		font-weight: 600;
 		color: $color-primary;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.profile-phone-copy-icon {
+		flex-shrink: 0;
+		margin-left: 8px;
 	}
 
 	.profile-edit-icon {

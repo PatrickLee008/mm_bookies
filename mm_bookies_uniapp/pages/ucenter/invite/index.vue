@@ -6,7 +6,8 @@
 		<view class="invite-header-placeholder"
 			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
-		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
+		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll"
+			@scrolltoupper="handleHeaderTop">
 			<!-- 两个仪表盘入口 -->
 			<view class="flex-row justify-between text-black invite-dashboards">
 				<view class="dashboard-rec dashboard-bonus" @click="goto('./bonus_dashboard')">
@@ -36,7 +37,7 @@
 						<text class="code-value">{{ userInfo ? userInfo.r_code : '' }}</text>
 					</view>
 					<theme-icon name="copy" class="copy-icon" size="18px"
-						color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+						color="var(--theme-secondary-light, var(--theme-secondary))"></theme-icon>
 				</view>
 				<view class="invite-friends-button" @click="openShare">
 					<text class="cuIcon-share margin-right-xs"></text>
@@ -119,7 +120,8 @@
 							<text class="myfont-12px line-height-13px text-left" style="min-width: 60%;">
 								{{ rule.description || rule.rule_type }}
 							</text>
-							<view class="flex-row1 justify-end align-center" style="max-width: 30%;min-width: 20%  !important;">
+							<view class="flex-row1 justify-end align-center"
+								style="max-width: 30%;min-width: 20%  !important;">
 								<view class="flex-column1 align-center">
 									<text class="myfont-10px line-height-13px mycolor-info">
 										{{ `${rule.current_value}/${rule.threshold}` }}
@@ -829,18 +831,19 @@
 		border-radius: 10px;
 		background: $color-primary;
 		color: #fff;
+		height: 84px;
 	}
 
 	.code-label {
 		display: block;
-		font-size: 9px;
+		font-size: 12px;
 	}
 
 	.code-value {
 		display: block;
 		margin-top: 2px;
 		color: $color-secondary-light;
-		font-size: 22px;
+		font-size: 32px;
 		font-weight: 700;
 		letter-spacing: 1px;
 	}
@@ -1034,7 +1037,7 @@
 
 	.activity-summary-value {
 		margin-top: 2px;
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-size: 13px;
 		font-weight: 700;
 	}
@@ -1271,7 +1274,7 @@
 		font-size: 11px;
 		font-weight: bold;
 		background: transparent;
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.activity-status-badge::before {
@@ -1279,12 +1282,12 @@
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
-		background: $color-secondary-light;
+		background: $color-secondary;
 	}
 
 	.status-active {
 		background: transparent;
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-inactive {

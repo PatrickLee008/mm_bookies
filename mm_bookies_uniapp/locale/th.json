@@ -1848,7 +1848,6 @@
 	  "message_id": "ไอดีข้อความ",
 	  "source_label": "แหล่งที่มา",
 	  "my_id": "ไอดีของฉัน",
-	  "my_phone": "โทรศัพท์",
 	  "phone_no": "หมายเลขโทรศัพท์",
 	  "explore_website": "ดูเว็บไซต์ของเราสำหรับข้อมูลเพิ่มเติมและการอัปเดต",
 	  "rules": "กฎ",
@@ -1963,7 +1962,6 @@
 	  "qr_pay": "สแกนจ่าย QR",
 	  "enter_withdraw_amount": "กรุณากรอกจำนวนเงินที่จะถอน",
 	  "account_phone_number": "หมายเลขโทรศัพท์บัญชี",
-	  "choose_account_type": "เลือกประเภทบัญชี",
 	  "bind_wallet_account": "ผูกบัญชีธนาคาร",
 	  "select_bank_card": "เลือกบัตรธนาคาร",
 	  "deposit_with_kpay": "ฝากอัตโนมัติผ่าน Kpay",
@@ -2030,11 +2028,13 @@
 	"choose_account_type": "เลือกประเภทบัญชี",
 	"bind_wallet_account": "เชื่อมโยงบัญชีกระเป๋าเงิน",
 	"auto_deposit": "ฝากเงินอัตโนมัติ",
+	"auto_withdraw": "ถอนเงินอัตโนมัติ",
 	"user_account": "บัญชีผู้ใช้",
 	"payment_channel": "ช่องทางการชำระเงิน",
 	"qr_pay": "QR Pay",
 	"continue_btn": "ดำเนินการต่อ",
 	"wallet_balance": "ยอดเงินในกระเป๋า",
 	"amount_unlock": "จำนวนเงินที่ถอนได้",
-	"turnover_limit_label": "วงเงินเทิร์นโอเวอร์"
+	"turnover_limit_label": "วงเงินเทิร์นโอเวอร์",
+	"turnover_current_label": "ยอดเทิร์นโอเวอร์ปัจจุบัน"
 }
