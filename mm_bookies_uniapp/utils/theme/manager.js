@@ -296,6 +296,7 @@ function applyCssVariables(theme) {
 		'--theme-primary-alpha-18': withAlpha(tokens.primary, 0.18),
 		'--theme-primary-alpha-20': withAlpha(tokens.primary, 0.2),
 		'--theme-secondary-alpha-20': withAlpha(tokens.secondary, 0.2),
+		'--theme-secondary-alpha-40': withAlpha(tokens.secondary, 0.4),
 		'--theme-background': tokens.background,
 		'--theme-header-background': tokens.headerBackground,
 		'--theme-header-logo-bg': tokens.headerLogoBg,

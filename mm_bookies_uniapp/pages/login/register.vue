@@ -19,7 +19,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="height-8vh" v-if="!advertisements.length"></view>
+		<view class="height-8vh" v-if="registerStep !== 2 && !advertisements.length"></view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
 			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
@@ -27,7 +27,7 @@
 		</view>
 
 		<!-- 广告区域 -->
-		<view class="ad-container" v-if="advertisements.length">
+		<view class="ad-container" v-if="registerStep !== 2 && advertisements.length">
 			<swiper class="ad-swiper" :circular="advertisements.length > 1"
 				:autoplay="advertisements.length > 1" interval="3500" duration="500"
 				:indicator-dots="advertisements.length > 1">
@@ -36,10 +36,10 @@
 				</swiper-item>
 			</swiper>
 		</view>
-		<view class="height-8vh" v-else></view>
+		<view class="height-8vh" v-else-if="registerStep !== 2"></view>
 
-		<!-- Login Form -->
-		<view class="login-form">
+		<!-- Register step 1: account and password -->
+		<view class="login-form register-flow" v-if="registerStep === 1">
 			<!-- Welcome Text -->
 			<view class="welcome-text">
 				<template v-if="currentLang === 'mm'">
@@ -65,7 +65,7 @@
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}" type="text"
+				<input class="input-field" :class="{'input-error': password_error}"
 					:password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password"
 					:placeholder="$t('enter_password')" maxlength="32" @blur="handle_password_blur"
 					@input="handle_password_blur" />
@@ -80,7 +80,7 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text"
+				<input class="input-field" :class="{'input-error': confirm_password_error}"
 					:password="!showConfirmPassword" placeholder-class="input-placeholder"
 					v-model="loginInfo.confirm_password" :placeholder="$t('confirm_password')" maxlength="32"
 					@blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
@@ -94,22 +94,61 @@
 			</view>
 
 			<!-- Referral ID -->
-			<view class="referral-field">
+			<view class="referral-field" v-if="false">
 				<input class="input-field referral-input" :class="{ 'referral-input-disabled': r_code_disabled }"
 					v-model="loginInfo.r_code" :disabled="r_code_disabled" placeholder-class="input-placeholder"
 					:placeholder="$t('enter_referral_id_optional')" maxlength="32" @input="handle_r_code_input" />
 			</view>
 
 			<!-- Sign up Button -->
-			<view class="login-btn" @click="register()">
+			<view class="login-btn" :class="{ 'login-btn-disabled': registerDisabled }"
+				@click="continueToCaptcha">
 				<text :class="loadding"></text>
-				<text>{{ $t('Sign up') }}</text>
+				<text>{{ $t('Continue') }}</text>
 			</view>
 
 			<!-- Login Link -->
 			<view class="register-link">
 				<text class="register-text">{{ $t('Back to ') }}</text>
 				<text class="register-link-text" @click="toLogin()">{{ $t('login') }}</text>
+			</view>
+		</view>
+
+		<!-- Register step 2: slider verification -->
+		<view class="login-form register-flow captcha-step" v-else-if="registerStep === 2">
+			<slider-captcha ref="registerCaptcha" :config="captchaConfig" :trigger-generate="captchaTrigger"
+				:show-close="false" @verify="handleCaptchaVerify" @verify-fail="handleCaptchaVerifyFail"
+				@refresh="handleCaptchaRefresh" @error="handleCaptchaError" />
+
+			<view class="login-btn" :class="{ 'login-btn-disabled': !captchaVerified || loadding }"
+				@click="confirmCaptcha">
+				<text :class="loadding"></text>
+				<text>{{ $t('verify') }}</text>
+			</view>
+			<view class="register-secondary-btn" @click="backToCredentials">{{ $t('Back') }}</view>
+		</view>
+
+		<!-- Register step 3: referral code -->
+		<view class="login-form register-flow referral-step" v-else>
+			<view class="step-heading">{{ $t('referral_id') }}</view>
+			<view class="referral-question">{{ $t('enter_referral_id_optional') }}</view>
+			<view class="referral-field">
+				<input class="input-field referral-input"
+					:class="{ 'referral-input-disabled': r_code_disabled }" v-model="loginInfo.r_code"
+					:disabled="r_code_disabled" placeholder-class="input-placeholder"
+					:placeholder="$t('enter_referral_id_optional')" maxlength="32"
+					@input="handle_r_code_input" />
+			</view>
+
+			<view class="login-btn" :class="{ 'login-btn-disabled': loadding }" @click="register">
+				<text :class="loadding"></text>
+				<text>{{ $t('Confirm') }}</text>
+			</view>
+			<view v-if="!r_code_disabled" class="register-secondary-btn" @click="skipReferralAndRegister">
+				{{ $t('Skip') }}
+			</view>
+			<view class="register-link" @click="backToCaptcha">
+				<text class="register-link-text">{{ $t('Back') }}</text>
 			</view>
 		</view>
 
@@ -141,10 +180,12 @@
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
 	import CryptoJS from 'crypto-js';
+	import SliderCaptcha from '@/components/SliderCaptcha.vue'
 	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
 		components: {
+			SliderCaptcha,
 			CustomerService,
 		},
 		data() {
@@ -191,12 +232,28 @@
 				showPassword: false,
 				showConfirmPassword: false,
 				advertisements: [],
+
+				// 注册步骤与滑动验证码
+				registerStep: 1,
+				captchaTrigger: 0,
+				captchaVerified: false,
 			}
 		},
 		computed: {
 			registerDisabled() {
 				return !this.loginInfo.phone || !this.loginInfo.password || !this.loginInfo.confirm_password ||
 					this.phone_error || this.password_error || this.confirm_password_error
+			},
+			captchaConfig() {
+				return {
+					title: this.$t('security_check'),
+					description: this.$t('human_verification_description'),
+					sliderText: this.$t('slide_to_verify_short'),
+					successText: this.$t('verification_success'),
+					canvasWidth: 300,
+					canvasHeight: 202,
+					sliderSize: 40,
+				}
 			},
 			currentLangLabel() {
 				const map = {
@@ -241,6 +298,87 @@
 			},
 			toggleConfirmPasswordVisibility() {
 				this.showConfirmPassword = !this.showConfirmPassword;
+			},
+			continueToCaptcha() {
+				this.handle_phone_blur();
+				this.handle_password_blur();
+				this.handle_confirm_password_blur();
+				if (this.registerDisabled) return;
+
+				this.captchaVerified = false;
+				this.registerStep = 2;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.captchaTrigger = Date.now();
+						this.$refs.registerCaptcha && this.$refs.registerCaptcha.calculateDimensions();
+					}, 100);
+				});
+			},
+			handleCaptchaVerify() {
+				this.captchaVerified = true;
+			},
+			handleCaptchaVerifyFail() {
+				this.captchaVerified = false;
+			},
+			handleCaptchaError() {
+				this.captchaVerified = false;
+				uni.showToast({
+					title: this.$t('error_title'),
+					icon: 'none',
+				});
+			},
+			handleCaptchaRefresh() {
+				this.captchaVerified = false;
+				this.captchaTrigger = Date.now();
+			},
+			confirmCaptcha() {
+				if (!this.captchaVerified || this.loadding) return;
+
+				this.loadding = 'cuIcon-loading2 cuIconfont-spin';
+				this.$http.post(`/app_user/${this.loginInfo.phone}`, {}, (res) => {
+					this.loadding = '';
+					if (res.statusCode == 200) {
+						if (!res.data.status) {
+							this.registerStep = 3;
+						} else {
+							this.captchaVerified = false;
+							this.$notice.show({
+								title: this.$t('tips'),
+								content: this.$t('account_repeat'),
+								showCancel: false,
+								confirmText: this.$t('ok'),
+							});
+						}
+					} else {
+						this.captchaVerified = false;
+						this.$notice.show({
+							title: this.$t('error_title'),
+							content: res.data.message,
+							showCancel: false,
+							confirmText: this.$t('ok'),
+						});
+					}
+				});
+			},
+			backToCredentials() {
+				this.registerStep = 1;
+				this.captchaVerified = false;
+			},
+			backToCaptcha() {
+				this.registerStep = 2;
+				this.captchaVerified = false;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.captchaTrigger = Date.now();
+						this.$refs.registerCaptcha && this.$refs.registerCaptcha.calculateDimensions();
+					}, 100);
+				});
+			},
+			skipReferralAndRegister() {
+				if (this.r_code_disabled) return;
+				this.loginInfo.r_code = '';
+				uni.removeStorageSync('default_r_code');
+				this.register();
 			},
 			switchChange(e) {
 				this.rememberMe = e.target.value;
@@ -289,43 +427,12 @@
 			register() {
 				if (this.$toolbox.click_too_fast(1)) return
 
-				// 验证所有字段
-				this.handle_phone_blur();
-				this.handle_password_blur();
-				this.handle_confirm_password_blur();
-
-				if (this.registerDisabled) {
-					return;
-				}
+				if (this.registerStep !== 3 || this.registerDisabled) return;
 
 				let _this = this;
 				_this.loadding = 'cuIcon-loading2 cuIconfont-spin';
 
-				// 先检查账号是否重复
-				_this.$http.post(`/app_user/${this.loginInfo.phone}`, {}, (res) => {
-					if (res.statusCode == 200) {
-						if (!res.data.status) {
-							// 账号不重复，进行注册
-							_this.doRegister();
-						} else {
-							_this.loadding = '';
-							this.$notice.show({
-								title: _this.$t('tips'),
-								content: _this.$t('account_repeat'),
-								showCancel: false,
-								confirmText: _this.$t('ok'),
-							});
-						}
-					} else {
-						_this.loadding = '';
-						this.$notice.show({
-							title: _this.$t('error_title'),
-							content: res.data.message,
-							showCancel: false,
-							confirmText: _this.$t('ok'),
-						});
-					}
-				})
+				_this.doRegister();
 			},
 			doRegister() {
 				let _this = this;
@@ -772,6 +879,46 @@
 	.login-btn:active {
 		opacity: 0.9;
 		transform: scale(0.98);
+	}
+
+	.login-btn-disabled {
+		opacity: 0.55;
+	}
+
+	.captcha-step,
+	.referral-step {
+		max-width: 620rpx;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	.step-heading {
+		margin-bottom: 30rpx;
+		color: $theme-background-foreground;
+		font-size: 32rpx;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.register-secondary-btn {
+		height: 70rpx;
+		margin-bottom: 30rpx;
+		margin-top: 30rpx;
+		border: 2rpx solid $theme-background-foreground;
+		border-radius: 25rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $theme-background-foreground;
+		font-size: 30rpx;
+		font-weight: 600;
+	}
+
+	.referral-question {
+		margin-bottom: 24rpx;
+		color: $theme-background-foreground;
+		font-size: 24rpx;
+		text-align: center;
 	}
 
 	.register-link {

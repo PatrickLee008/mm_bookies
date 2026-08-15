@@ -36,6 +36,7 @@
 	--theme-primary-alpha-18: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .18);
 	--theme-primary-alpha-20: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .2);
 	--theme-secondary-alpha-20: rgba(#{red($theme-secondary-value)}, #{green($theme-secondary-value)}, #{blue($theme-secondary-value)}, .2);
+	--theme-secondary-alpha-40: rgba(#{red($theme-secondary-value)}, #{green($theme-secondary-value)}, #{blue($theme-secondary-value)}, .4);
 	--theme-icon-primary: #{$theme-primary-value};
 	--theme-icon-secondary: #{$theme-secondary-value};
 	--theme-icon-on-primary: #{$text-color-inverse};
