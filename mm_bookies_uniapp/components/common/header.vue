@@ -3,10 +3,10 @@
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
 		<view class="zw-header-wrapper"
-			:class="{ 'header-logged-out': !isLogin, 'header-collapsed': collapsed && isLogin }"
+			:class="{ 'header-logged-out': !isLogin, 'header-collapsed': headerCollapsed }"
 			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
-			<view class="header-title-bar" :class="{ 'title-bar-collapsed': collapsed && isLogin }">
+			<view class="header-title-bar" :class="{ 'title-bar-collapsed': headerCollapsed }">
 				<theme-logo variant="header" height="32px" class="header-logo"></theme-logo>
 				<!-- 收起状态：紧凑余额 + 铃铛 + 设置 -->
 				<view class="collapsed-right" v-if="isLogin">
@@ -119,6 +119,10 @@
 			active: {
 				type: String,
 				default: ''
+			},
+			allowCollapse: {
+				type: Boolean,
+				default: true
 			}
 		},
 		data() {
@@ -144,6 +148,12 @@
 			currentRoute() {
 				const pages = getCurrentPages();
 				return pages.length ? pages[pages.length - 1].route : '';
+			},
+			isWalletPage() {
+				return this.currentRoute.indexOf('pages/wallet/') === 0
+			},
+			headerCollapsed() {
+				return this.isLogin && (!this.isWalletPage || (this.allowCollapse && this.collapsed))
 			},
 			pageTitle() {
 				const titles = {
@@ -178,7 +188,7 @@
 				return titles[this.currentRoute] || ''
 			},
 			headerHeightStyle() {
-				const height = this.collapsed && this.isLogin ? 85 : this.expandedHeight
+				const height = this.headerCollapsed ? 85 : this.expandedHeight
 				return height ? {
 					height: `${height}px`
 				} : {}
@@ -207,6 +217,24 @@
 			// from tangjq--- 监听active prop变化
 			active(newVal) {
 				this.activeNav = newVal;
+			},
+			allowCollapse(newVal) {
+				if (!this.isLogin || !this.isWalletPage) return
+
+				const nextCollapsed = newVal ? this.collapsed : false
+				if (this.collapsed !== nextCollapsed) {
+					this.collapsed = nextCollapsed
+				}
+
+				this.$nextTick(() => {
+					if (nextCollapsed) {
+						this.$emit('headerHeightChange', 85)
+					} else if (this.expandedHeight) {
+						this.$emit('headerHeightChange', this.expandedHeight)
+					} else {
+						this.calculateHeaderHeight()
+					}
+				})
 			}
 		},
 		methods: {
@@ -264,7 +292,7 @@
 					if (rect && rect.height) {
 						this.headerHeight = rect.height;
 						// 记录展开状态的高度，用于收起后立即恢复
-						if (!this.collapsed) {
+						if ((this.isWalletPage && (!this.collapsed || !this.allowCollapse)) || !this.isLogin) {
 							this.expandedHeight = rect.height;
 						}
 						this.$emit('headerHeightChange', rect.height);
@@ -275,7 +303,9 @@
 			// 接收页面滚动事件，控制header收起/展开
 			handleSetCollapsed(collapsed) {
 				// 未登录时保持完整 header，避免标题栏与登录卡片因收缩样式重新排版。
-				const nextCollapsed = this.isLogin ? collapsed : false
+				const nextCollapsed = this.isLogin ?
+					(!this.isWalletPage || (this.allowCollapse && collapsed)) :
+					false
 				if (this.collapsed === nextCollapsed) return
 				this.collapsed = nextCollapsed
 

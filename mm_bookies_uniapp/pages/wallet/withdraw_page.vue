@@ -1,6 +1,6 @@
 <template name="withdraw_page">
 	<view class="full-page">
-		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
+		<zw-header :allow-collapse="tab_index === 1" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>

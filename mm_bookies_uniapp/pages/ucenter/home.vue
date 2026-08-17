@@ -518,7 +518,7 @@
 				// from tangjq--- 语言选择器
 				selectedLanguage: uni.getStorageSync('UNI_LOCALE') || 'mm',
 				themeModalVisible: false,
-				selectedTheme: uni.getStorageSync('frontend_theme_preset') || 'shwe-goal',
+				selectedTheme: uni.getStorageSync('frontend_theme_preset') || 'mm-bookies',
 				themeOptions: [{
 					value: 'mm-bookies',
 					label: 'MM Bookies',
