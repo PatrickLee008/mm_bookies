@@ -264,6 +264,7 @@
 
 	.user-details {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
@@ -535,6 +536,12 @@
 	.user-summary .id-value {
 		color: $theme-background-foreground;
 		font-size: 15px;
+		display: block;
+		max-width: 100%;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-summary .header-actions {
