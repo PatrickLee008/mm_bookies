@@ -3,7 +3,7 @@
 		<global-notice ref="globalNotice"></global-notice>
 		<scroll-view scroll-y class="home-scroll">
 			<view class="home-top">
-				<theme-logo variant="page" height="88px" class="home-logo"></theme-logo>
+				<theme-logo variant="page" height="var(--theme-home-logo-height)" class="home-logo"></theme-logo>
 				<view class="home-subtitle"></view>
 
 				<view class="user-summary">
@@ -217,7 +217,7 @@
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		height: 88px;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
 		margin: 3vh 0 5px;
 	}
 
@@ -482,7 +482,7 @@
 	.section-title {
 		display: block;
 		margin-bottom: 14px;
-		color: white;
+		color: $theme-background-foreground;
 		font-size: 21px;
 		font-weight: 700;
 	}
@@ -492,7 +492,7 @@
 		width: 100%;
 		height: 200px;
 		overflow: hidden;
-		border-radius: 15px;
+		border-radius: $radius-large;
 		// background: #e9eeee;
 	}
 

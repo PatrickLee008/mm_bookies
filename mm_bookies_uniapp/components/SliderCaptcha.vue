@@ -78,7 +78,7 @@
 						ownerInstance.callMethod('onCaptchaError')
 					}
 				}
-				sourceImage.src = '/static/icon/login/verify-bg.jpg'
+				sourceImage.src = '/static/icon/login/verify-bg.png'
 			},
 		},
 	}
@@ -512,6 +512,7 @@
 
 	.security-description {
 		margin-top: 8px;
+		margin-bottom: 8px;
 		color: rgba(255, 255, 255, 0.84);
 		font-size: 11px;
 		line-height: 1.4;

@@ -19,10 +19,10 @@
 				</view>
 			</view>
 		</view>
-		<view class="height-8vh" v-if="registerStep !== 2 && !advertisements.length"></view>
+		<view class="height-8vh" v-if="!advertisements.length"></view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
-			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
+			<theme-logo variant="page" height="var(--theme-home-logo-height)" class="login-title-image"></theme-logo>
 			<view class="login-subtitle"></view>
 		</view>
 
@@ -679,7 +679,7 @@
 
 	.login-title-image {
 		width: auto;
-		height: 88px;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
 		max-width: 100%;
 	}
 

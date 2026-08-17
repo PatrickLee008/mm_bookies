@@ -39,11 +39,11 @@
 				</view>
 			</view>
 
-			<view class="height-8vh" v-if="!showCaptchaView && !advertisements.length"></view>
+			<view class="height-8vh" v-if="!advertisements.length"></view>
 
 			<!-- 标题图片 -->
 			<view class="login-title-container">
-				<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
+				<theme-logo variant="page" height="var(--theme-home-logo-height)" class="login-title-image"></theme-logo>
 				<view class="login-subtitle"></view>
 			</view>
 
@@ -683,8 +683,9 @@
 		position: absolute;
 		top: 40rpx;
 		right: 40rpx;
-		width: 180rpx;
+		min-width: 180rpx;
 		height: 60rpx;
+		padding: 0 5px;
 		background-color: $color-primary;
 		border-radius: 30rpx;
 		display: flex;
@@ -880,7 +881,7 @@
 
 	.login-title-image {
 		width: auto;
-		height: 88px;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
 		max-width: 100%;
 	}
 
