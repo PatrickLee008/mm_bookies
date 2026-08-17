@@ -45,6 +45,20 @@ def generate_unique_r_code(max_attempts=100):
     raise Exception("无法生成唯一的r_code，请稍后重试")
 
 
+def generate_member_id():
+    """生成一个六位用户ID：大写字母和数字"""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+
+def generate_unique_member_id(max_attempts=100):
+    """生成唯一的六位用户ID，最多尝试max_attempts次"""
+    for _ in range(max_attempts):
+        member_id = generate_member_id()
+        if not AppMember.query.filter_by(id=member_id).first():
+            return member_id
+    raise Exception("无法生成唯一的用户ID，请稍后重试")
+
+
 def check_referrer_frequency_warning(promoter_id, promoter_username=None):
     """检查推广人最新第1条和第5条推广关系是否在3分钟内生成。"""
     from app_server.model.MAppPromotionRelationModel import MAppPromotionRelation
@@ -464,7 +478,7 @@ def add_app_user():
             if not agent:
                 agent_id = None
         # 创建会员
-        user = AppMember(id=Kits.generate_uuid(), phone=phone, name=bank_user_name, username=phone, currency=currency)
+        user = AppMember(id=generate_unique_member_id(), phone=phone, name=bank_user_name, username=phone, currency=currency)
         # 获取推荐人信息
         referrer_valid = False
         inviter_activity = None
