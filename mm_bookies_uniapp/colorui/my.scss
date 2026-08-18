@@ -346,7 +346,11 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	}
 
 	.theme-logo-header .theme-logo-image {
-		display: none;
+		display: none !important;
+	}
+} @else {
+	.theme-logo-header .theme-logo-title {
+		display: none !important;
 	}
 }
 
@@ -366,8 +370,22 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	display: block !important;
 }
 
+:root[data-theme-logo-type="text"] .theme-logo-header .theme-logo-image {
+	display: none !important;
+}
+
 :root[data-theme-logo-type="image"] .theme-logo-header .theme-logo-title {
 	display: none !important;
+}
+
+:root[data-theme-logo-type="image"] .theme-logo-header .theme-logo-image {
+	display: none !important;
+}
+
+:root[data-theme-logo-type="image"][data-theme-preset="mm-bookies"] .theme-logo-header .theme-logo-image-legacy,
+:root[data-theme-logo-type="image"][data-theme-preset="shwe-goal"] .theme-logo-header .theme-logo-image-shwe-goal,
+:root[data-theme-logo-type="image"][data-theme-preset="phoe-wa-maung"] .theme-logo-header .theme-logo-image-phoe-wa-maung {
+	display: block !important;
 }
 
 @each $preset-name, $preset-config in $theme-presets {
@@ -381,6 +399,10 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
 		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
 			display: block !important;
+		}
+
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-image {
+			display: none !important;
 		}
 	} @else {
 		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
