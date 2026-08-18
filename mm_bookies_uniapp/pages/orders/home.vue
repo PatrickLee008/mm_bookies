@@ -1109,20 +1109,20 @@
 	.match-time {
 		font-size: 20upx;
 		color: rgba(255, 255, 255, 0.8);
-		margin-bottom: 8upx;
+		// margin-bottom: 8upx;
 		text-align: center;
 	}
 
 	/* 卡片内容 */
 	.card-content {
-		padding: 20upx 28upx;
+		padding: 10upx 28upx 0;
 	}
 
 	.info-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 20upx;
+		margin-bottom: 10upx;
 	}
 
 	.info-row:last-child {
@@ -1217,7 +1217,7 @@
 
 	/* from tangjq--- Parlay汇总信息，与上方内容连接 */
 	.parlay-summary {
-		padding: 0 15px 10px;
+		padding: 5px 15px;
 		background: #FFFFFF;
 	}
 
@@ -1225,11 +1225,10 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 5upx;
 		background: $color-secondary-light;
 		cursor: pointer;
 		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
-		border-radius: 0 0 15px 15px;
+		border-radius: 0 0 $radius-large $radius-large;
 	}
 
 	.parlay-label {
@@ -1259,7 +1258,6 @@
 	.divider {
 		height: 2upx;
 		background: #E0E0E0;
-		margin: 24upx 0 0;
 	}
 
 	/* 旧样式保留（以防某些组件仍在使用） */

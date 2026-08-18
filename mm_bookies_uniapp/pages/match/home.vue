@@ -47,7 +47,7 @@
 			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop"
 			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px - ${headerHeight}px)` : `calc(${calc_page_height} - 80px - ${headerHeight}px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
-			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"
+			<view class="flex-column" v-for="(league,index) in league_list" :key="index"
 				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
 				<!-- 联赛标题栏 -->
 				<view class="new-league-header" @click="league.show_match = !league.show_match">
@@ -76,15 +76,21 @@
 							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
 							<view class="match-teams">
 								<view class="team-section">
-									<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
-										@error="error_pic(match,'home')" />
+									<view class="team-logo-frame">
+										<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
+											:class="{ 'team-logo-expanded': match.expanded }"
+											@error="error_pic(match,'home')" />
+									</view>
 									<text class="team-name"
 										:class="{'text-red':match.LOSE_TEAM ==='1',}">{{match.HOST_TEAM}}</text>
 								</view>
 								<text class="vs-text">vs</text>
 								<view class="team-section">
-									<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
-										@error="error_pic(match,'away')" />
+									<view class="team-logo-frame">
+										<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
+											:class="{ 'team-logo-expanded': match.expanded }"
+											@error="error_pic(match,'away')" />
+									</view>
 									<text class="team-name"
 										:class="{'text-red':match.LOSE_TEAM ==='2',}">{{match.GUEST_TEAM}}</text>
 								</view>
@@ -2292,7 +2298,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		padding: 10px 10px 0;
+		padding: 10px 10px 5px;
 		gap: 10px;
 		background-color: #ffffff;
 		border-radius: 20px 20px 0 0;
@@ -2476,9 +2482,25 @@
 		flex: 1;
 	}
 
-	.team-logo {
-		width: 42px;
-		height: 42px;
+	.new-match-card .team-logo-frame {
+		width: 35px;
+		height: 35px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.new-match-card .team-logo {
+		width: 20px;
+		height: 20px;
+		transform: scale(1);
+		transform-origin: center;
+		transition: transform 180ms ease-out;
+	}
+
+	.new-match-card .team-logo.team-logo-expanded {
+		transform: scale(1.75);
 	}
 
 	.team-name {
