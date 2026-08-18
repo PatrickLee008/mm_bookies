@@ -375,7 +375,7 @@
 	.filter-bar {
 		background: $color-primary;
 		border-radius: $radius-large;
-		padding: 10px 14px;
+		padding: 8px 14px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
