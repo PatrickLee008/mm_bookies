@@ -64,6 +64,7 @@ const mmBookies = {
 	preset: 'mm-bookies',
 	tokens: {
 		title: 'MM Bookies',
+		headerLogoType: 'text',
 		subtitle: 'ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်',
 		primary: '#1C667C',
 		border: '#2A626833',
@@ -114,6 +115,7 @@ const shweGoal = {
 	preset: 'shwe-goal',
 	tokens: {
 		title: 'Shwe Goal',
+		headerLogoType: 'image',
 		subtitle: 'အနိုင်ရဖို့ ရွှေဂိုးတစ်ဂိုးသာလိုပါတယ်',
 		primary: '#136201',
 		border: '#136201',
@@ -164,6 +166,7 @@ const phoeWaMaung = {
 	preset: 'phoe-wa-maung',
 	tokens: {
 		title: 'Phoe Wa Maung',
+		headerLogoType: 'image',
 		subtitle: 'ငွေကြေးခိုင်မာ ယုံကြည်စိတ်ချ ညီကိုတိုအားလုံးအတွက် ဖိုးဝ',
 		primary: '#005E12',
 		border: '#136201',

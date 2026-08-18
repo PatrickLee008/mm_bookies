@@ -1,5 +1,6 @@
 <template>
 	<view class="theme-logo" :class="`theme-logo-${variant}`" :style="{ height: cssHeight }">
+		<text class="theme-logo-title"></text>
 		<image class="theme-logo-image theme-logo-image-legacy"
 			src="/static/theme/legacy/mm_bookies_logo.png" mode="heightFix"
 			:style="{ height: cssHeight }"></image>
@@ -58,5 +59,18 @@
 	.theme-logo-image {
 		width: auto;
 		max-width: 100%;
+	}
+
+	.theme-logo-title {
+		display: none;
+		color: var(--theme-header-background-foreground, #ffffff);
+		font-size: 16px;
+		font-weight: bold;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.theme-logo-title::after {
+		content: var(--theme-title, "#{$theme-title-value}");
 	}
 </style>

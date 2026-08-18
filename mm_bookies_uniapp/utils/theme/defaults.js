@@ -4,6 +4,7 @@ const testTheme = {
 	version: 'test',
 	tokens: {
 		title: 'MM Bookies',
+		headerLogoType: 'text',
 		primary: '#6D28D9',
 		border: '#6D28D9',
 		borderOther: '#A5B4FC',

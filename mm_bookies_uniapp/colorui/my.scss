@@ -26,6 +26,7 @@
 	--theme-radius-medium: #{$theme-radius-medium-value};
 	--theme-radius-small: #{$theme-radius-small-value};
 	--theme-logo-image: #{$theme-logo-image};
+	--theme-header-logo-type: #{$theme-header-logo-type-value};
 	--theme-home-logo-height: #{$theme-home-logo-height-value};
 	--theme-title: "#{$theme-title-value}";
 	--theme-header-logo-padding: #{$theme-header-logo-padding-value};
@@ -339,6 +340,16 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	}
 }
 
+@if "#{$theme-header-logo-type-value}" == "text" {
+	.theme-logo-header .theme-logo-title {
+		display: block !important;
+	}
+
+	.theme-logo-header .theme-logo-image {
+		display: none;
+	}
+}
+
 :root[data-theme-preset="mm-bookies"] .theme-logo-image,
 :root[data-theme-preset="shwe-goal"] .theme-logo-image,
 :root[data-theme-preset="phoe-wa-maung"] .theme-logo-image {
@@ -351,9 +362,30 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	display: block;
 }
 
+:root[data-theme-logo-type="text"] .theme-logo-header .theme-logo-title {
+	display: block !important;
+}
+
+:root[data-theme-logo-type="image"] .theme-logo-header .theme-logo-title {
+	display: none !important;
+}
+
 @each $preset-name, $preset-config in $theme-presets {
+	$preset-header-logo-type: map-get($preset-config, header-logo-type);
+
 	:root[data-theme-preset="#{$preset-name}"] {
 		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
+		--theme-header-logo-type: #{$preset-header-logo-type};
+	}
+
+	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
+			display: block !important;
+		}
+	} @else {
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
+			display: none !important;
+		}
 	}
 }
 

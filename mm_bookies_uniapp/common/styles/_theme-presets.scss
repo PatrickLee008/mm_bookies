@@ -44,8 +44,10 @@ $theme-presets: (
 		glow: #36BCCB,
 		// 品牌 logo：首页、登录注册和 Header 的默认 logo。
 		logo-image: "/static/theme/mm-bookies/mm-bookies_logo.png",
+		// Header logo 类型：文字或图片。
+		header-logo-type: text,
 		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
-		home-logo-height: 62px,
+		home-logo-height: 52px,
 		// 注册页欢迎标题。
 		title: "MM Bookies",
 		// 首页、登录和注册页副标题。
@@ -112,6 +114,8 @@ $theme-presets: (
 		header-background-image: "/static/theme/bg-green.png",
 		// 品牌 logo：首页、登录注册和 Header 使用绿色 ShweGoal logo。
 		logo-image: "/static/theme/test/shwegoal_logo.png",
+		// Header logo 类型：文字或图片。
+		header-logo-type: image,
 		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
 		home-logo-height: 88px,
 		// 注册页欢迎标题。
@@ -176,6 +180,8 @@ $theme-presets: (
 		header-background-image: "/static/theme/header-bg-white.png",
 		// 品牌 logo：首页、登录注册和 Header 使用 Phoewaa Maung logo。
 		logo-image: "/static/theme/test-old/phoewaa_maung_logo.png",
+		// Header logo 类型：文字或图片。
+		header-logo-type: image,
 		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
 		home-logo-height: 88px,
 		// 注册页欢迎标题。

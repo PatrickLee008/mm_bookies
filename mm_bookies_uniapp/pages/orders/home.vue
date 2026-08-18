@@ -915,7 +915,7 @@
 
 	/* from tangjq--- 日历胶囊内的日期/预设文本，宽度不够时省略号 */
 	.calendar-text {
-		flex: 1;
+		// flex: 1;
 		min-width: 0;
 		font-size: 22upx;
 		font-weight: bold;

@@ -34,6 +34,10 @@ function safeText(value, fallback) {
 		fallback;
 }
 
+function safeHeaderLogoType(value, fallback = 'image') {
+	return value === 'text' || value === 'image' ? value : fallback;
+}
+
 function safeUrl(value) {
 	if (typeof value !== 'string' || value.trim().length > 2048 || !URL_PATTERN.test(value.trim())) {
 		return '';
@@ -203,6 +207,7 @@ function normalizeTheme(theme) {
 		sharedGradient,
 		tokens: {
 			title: safeText(tokens.title, defaults.title || 'MM Bookies'),
+			headerLogoType: safeHeaderLogoType(tokens.headerLogoType, defaults.headerLogoType || 'image'),
 			subtitle: safeText(tokens.subtitle, defaults.subtitle || ''),
 			primary,
 			border: safeColor(tokens.border, primary),
@@ -273,6 +278,7 @@ function applyCssVariables(theme) {
 	const variables = {
 		'--theme-primary': tokens.primary,
 		'--theme-title': quoteCssText(tokens.title),
+		'--theme-header-logo-type': tokens.headerLogoType,
 		'--theme-subtitle': quoteCssText(tokens.subtitle),
 		'--theme-border': tokens.border,
 		'--theme-border-other': tokens.borderOther,
@@ -347,6 +353,7 @@ function applyCssVariables(theme) {
 	const root = getRootElement();
 	if (root) {
 		root.setAttribute('data-theme-preset', theme.preset || '');
+		root.setAttribute('data-theme-logo-type', tokens.headerLogoType);
 	}
 }
 
@@ -426,7 +433,7 @@ function coerceTheme(value) {
 
 	const tokens = parseObject(source.tokens) || {};
 	const backgrounds = parseObject(source.backgrounds) || {};
-	const hasToken = ['title', 'themeTitle', 'theme_title', 'primary', 'secondary', 'border', 'borderOther', 'borderOtherColor', 'bgLoginInput',
+	const hasToken = ['title', 'themeTitle', 'theme_title', 'headerLogoType', 'header_logo_type', 'header-logo-type', 'primary', 'secondary', 'border', 'borderOther', 'borderOtherColor', 'bgLoginInput',
 		'backgroundLoginInput', 'colorLoginInput', 'loginInputColor', 'primaryColor', 'secondaryColor',
 		'borderColor', 'border_other', 'border_other_color', 'bg_login_input', 'background_login_input',
 		'color_login_input', 'login_input_color', 'primary_color', 'secondary_color', 'border_color'].some((name) =>
@@ -442,6 +449,7 @@ function coerceTheme(value) {
 
 	const tokenAliases = {
 		title: ['title', 'themeTitle', 'theme_title'],
+		headerLogoType: ['headerLogoType', 'header_logo_type', 'header-logo-type'],
 		primary: ['primary', 'primaryColor', 'primary_color'],
 		border: ['border', 'borderColor', 'border_color'],
 		borderOther: ['borderOther', 'border_other', 'borderOtherColor', 'border_other_color'],

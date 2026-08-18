@@ -33,6 +33,10 @@ $theme-radius-large-value: theme-color(radius-large);
 $theme-radius-medium-value: theme-color(radius-medium);
 $theme-radius-small-value: theme-color(radius-small);
 $theme-logo-image-value: theme-color(logo-image);
+$theme-header-logo-type-value: theme-color(header-logo-type);
+@if $theme-header-logo-type-value == null {
+	$theme-header-logo-type-value: image;
+}
 $theme-home-logo-height-value: theme-color(home-logo-height);
 @if $theme-home-logo-height-value == null {
 	$theme-home-logo-height-value: 88px;

@@ -487,7 +487,7 @@
 	}
 
 	.calendar-text {
-		flex: 1;
+		// flex: 1;
 		min-width: 0;
 		overflow: hidden;
 		color: #ffffff;
