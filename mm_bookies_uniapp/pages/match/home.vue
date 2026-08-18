@@ -43,9 +43,9 @@
 		</view>
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold"
-			:class="{ 'page-mixed': match_ref.mixed }" style="line-height: 1.5;"
-			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop">
+		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
+			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop"
+			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px - ${headerHeight}px)` : `calc(${calc_page_height} - 80px - ${headerHeight}px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
 			<view class="flex-column" v-for="(league,index) in league_list" :key="index"
 				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
@@ -90,10 +90,12 @@
 
 									<view class="match-name-row">
 										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='1',}">
-											{{match.HOST_TEAM}}</view>
+											{{match.HOST_TEAM}}
+										</view>
 										<text class="vs-text">vs</text>
 										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='2',}">
-											{{match.GUEST_TEAM}}</view>
+											{{match.GUEST_TEAM}}
+										</view>
 									</view>
 								</view>
 							</view>
@@ -1015,9 +1017,9 @@
 			calc_slip_height() {
 				let info = uni.getDeviceInfo()
 				if (info.platform == 'ios') {
-					return `calc(var(--app-viewport-height, 100vh) - 85px)`
+					return `calc(100vh - 85px)`
 				}
-				return 'var(--app-viewport-height, 100vh)'
+				return '100vh'
 			},
 			// 动态生成金额选择列表，基于系统配置的 min/max 限额
 			dynamicAmountList() {
@@ -2088,7 +2090,7 @@
 
 	.single-mask {
 		background: none;
-		height: var(--app-viewport-height, 100vh);
+		height: 100vh;
 		opacity: .5;
 		background-color: black;
 	}
@@ -2123,26 +2125,17 @@
 
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
-		height: var(--app-viewport-height, 100vh);
-		min-height: var(--app-viewport-height, 100vh);
+		height: 100vh;
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
 	}
 
 	.page {
+		/* height: calc(100vh - env(safe-area-inset-bottom)); */
 		flex: 1;
-		height: 0;
 		min-height: 0;
 		background: #ffffff;
-		box-sizing: border-box;
-		padding-bottom: 24px !important;
-		padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
-	}
-
-	.page.page-mixed {
-		padding-bottom: 70px !important;
-		padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
 	}
 
 	.dialog-wrapper {
@@ -2466,7 +2459,7 @@
 		border: 1px solid $color-border;
 		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
 		padding-bottom: 12px;
-		--match-center-column-width: 128px;
+		--match-center-column-width: 112px;
 	}
 
 	.match-summary {
@@ -2502,10 +2495,10 @@
 
 	.match-datetime {
 		width: 100%;
-		min-width: 0;
+		min-width: 115px;
 		max-width: 100%;
 		box-sizing: border-box;
-		overflow: visible;
+		overflow: hidden;
 		background-color: transparent;
 		text-align: center;
 		font-size: 11px;
@@ -2577,7 +2570,7 @@
 
 	/* from tangjq--- 新的投注选项样式 */
 	.new-bet-options {
-		padding: 0 12px 0;
+		padding: 0 20px 0;
 	}
 
 	.bet-row {
@@ -2627,7 +2620,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		// min-height: 46px;
+		min-height: 46px;
 	}
 
 	.bet-btn-selected {
@@ -2679,7 +2672,7 @@
 	.match-expand-btn {
 		background-color: $color-primary;
 		height: 28px;
-		margin: 4px 12px 0;
+		margin: 4px 20px 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
