@@ -2580,7 +2580,7 @@
 		display: block;
 		width: 100%;
 		font-size: 14px;
-		color: #666;
+		color: $color-primary;
 		font-weight: bold;
 		line-height: 1;
 		text-align: center;

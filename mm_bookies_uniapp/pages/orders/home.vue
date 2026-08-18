@@ -141,75 +141,26 @@
 							<text class="user-label-text">{{getWalletBadgeLabel(item.pay_wallet)}}</text>
 						</view>
 
-						<!-- 单个比赛项 - 折叠时只显示一个 -->
-						<view v-if="!item.show_detail">
-							<view class="card-header">
-								<view class="match-time">{{item.order_time}}</view>
-								<view class="header-match">
-									<text class="team-name"
-										:class="{ 'team-give': give_team_side(item) === 'H' }">{{item.HOME}}</text>
-									<text class="vs-text"
-										v-if="current_page==='pending' && give_team_side(item)">VS</text>
-									<text class="score-text" v-else>{{item.SCORE}}</text>
-									<text class="team-name"
-										:class="{ 'team-give': give_team_side(item) === 'A' }">{{item.AWAY}}</text>
-								</view>
-							</view>
-							<view class="card-content">
-								<!-- <view class="info-row">
-									<text class="label">{{$t('Bet Time')}}<</text>
-									<text class="value">{{item.order_time}}</text>
-								</view> -->
-								<view class="info-row">
-									<text class="label">{{$t('Type')}}</text>
-									<text class="value">MixParlay</text>
-								</view>
-								<!-- <view class="info-row">
-									<text class="label">{{$t('Bet')}}</text>
-									<text class="value">{{item.ORDER_COUNT}}X1</text>
-								</view> -->
-								<view class="info-row">
-									<text class="label">{{$t('Odds')}}</text>
-									<text class="value">{{item.real_odds}}</text>
-								</view>
+						<!-- Parlay 摘要，点击底部入口后在弹窗中查看全部比赛 -->
+						<view class="card-header">
+							<view class="match-time">{{item.order_time}}</view>
+							<view class="header-match">
+								<text class="team-name"
+									:class="{ 'team-give': give_team_side(item) === 'H' }">{{item.HOME}}</text>
+								<text class="vs-text" v-if="current_page==='pending' && give_team_side(item)">VS</text>
+								<text class="score-text" v-else>{{item.SCORE}}</text>
+								<text class="team-name"
+									:class="{ 'team-give': give_team_side(item) === 'A' }">{{item.AWAY}}</text>
 							</view>
 						</view>
-
-						<!-- 展开时显示所有比赛 -->
-						<view v-else>
-							<view v-for="(detail,_index) in item.detail" :key="_index">
-								<view class="card-header">
-									<!-- 混合投注展开后，仅第一场显示下注日期 -->
-									<view class="match-time" v-if="_index === 0">{{detail.order_time}}</view>
-									<view class="header-match">
-										<text class="team-name"
-											:class="{ 'team-give': give_team_side(detail) === 'H' }">{{detail.HOME}}</text>
-										<text class="vs-text" v-if="current_page==='pending'">VS</text>
-										<text class="score-text" v-else>{{detail.SCORE}}</text>
-										<text class="team-name"
-											:class="{ 'team-give': give_team_side(detail) === 'A' }">{{detail.AWAY}}</text>
-									</view>
-								</view>
-								<view class="card-content">
-									<!-- <view class="info-row">
-										<text class="label">{{$t('Bet Time')}}<</text>
-										<text class="value">{{detail.order_time}}</text>
-									</view> -->
-									<view class="info-row">
-										<text class="label">{{$t('Type')}}</text>
-										<text class="value">{{detail.show_order_type}}</text>
-									</view>
-									<view class="info-row">
-										<text class="label">{{$t('Bet')}}</text>
-										<text class="value">{{detail.team_name}}</text>
-									</view>
-									<view class="info-row">
-										<text class="label">{{$t('Odds')}}</text>
-										<text class="value">{{detail.real_odds}}</text>
-									</view>
-								</view>
-								<view class="divider"></view>
-								<!-- <view class="divider" v-if="_index < item.detail.length - 1"></view> -->
+						<view class="card-content">
+							<view class="info-row">
+								<text class="label">{{$t('Type')}}</text>
+								<text class="value">MixParlay</text>
+							</view>
+							<view class="info-row">
+								<text class="label">{{$t('Odds')}}</text>
+								<text class="value">{{item.real_odds}}</text>
 							</view>
 						</view>
 
@@ -243,13 +194,13 @@
 						<!-- Parlay 折叠/展开按钮：文字左右两侧均显示细双箭头图标 -->
 						<view class="parlay-toggle" @click="show_detail(item)">
 							<view class="toggle-icon">
-								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
-								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+								<text class="arrow cuIcon-unfold"></text>
+								<text class="arrow cuIcon-unfold"></text>
 							</view>
 							<text class="parlay-label">{{$t('mixparlay')}} {{item.ORDER_COUNT}} x 1</text>
 							<view class="toggle-icon">
-								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
-								<text class="arrow" :class="item.show_detail ? 'cuIcon-fold' : 'cuIcon-unfold'"></text>
+								<text class="arrow cuIcon-unfold"></text>
+								<text class="arrow cuIcon-unfold"></text>
 							</view>
 						</view>
 					</view>
@@ -270,6 +221,102 @@
 				</view>
 			</view>
 		</scroll-view>
+
+		<!-- Parlay 详情弹窗 -->
+		<view class="parlay-detail-modal" v-if="show_parlay_modal">
+			<view class="parlay-detail-mask" @click="close_parlay_detail"></view>
+			<view class="parlay-detail-dialog" @click.stop="">
+				<text class="parlay-detail-title"></text>
+
+				<scroll-view scroll-y class="parlay-detail-scroll" v-if="parlay_modal_order">
+					<view class="parlay-match-detail-card"
+						v-for="(detail, detailIndex) in get_parlay_details(parlay_modal_order)" :key="detailIndex">
+						<text class="parlay-match-date">{{format_parlay_match_time(detail)}}</text>
+						<view class="parlay-match-score-row">
+							<text class="parlay-match-team parlay-match-team-home"
+								:class="{ 'team-give': give_team_side(detail) === 'H' }">
+								{{detail.HOME}}
+							</text>
+							<text class="parlay-match-score" v-if="current_page === 'pending'">VS</text>
+							<text class="parlay-match-score" v-else>{{detail.SCORE}}</text>
+							<text class="parlay-match-team parlay-match-team-away"
+								:class="{ 'team-give': give_team_side(detail) === 'A' }">
+								{{detail.AWAY}}
+							</text>
+						</view>
+
+						<view class="parlay-detail-info">
+							<view class="parlay-detail-info-row">
+								<text class="parlay-detail-label">{{$t('Bet Time')}}</text>
+								<text class="parlay-detail-value">{{detail.order_time}}</text>
+							</view>
+							<view class="parlay-detail-info-row">
+								<text class="parlay-detail-label">{{$t('Type')}}</text>
+								<text class="parlay-detail-value">{{detail.show_order_type}}</text>
+							</view>
+							<view class="parlay-detail-info-row">
+								<text class="parlay-detail-label">{{$t('Bet')}}</text>
+								<text class="parlay-detail-value">{{detail.team_name}}</text>
+							</view>
+							<view class="parlay-detail-info-row">
+								<text class="parlay-detail-label">{{$t('Odds')}}</text>
+								<text class="parlay-detail-value">{{detail.real_odds}}</text>
+							</view>
+						</view>
+					</view>
+					<view class="padding-bottom-1px"></view>
+				</scroll-view>
+
+				<view class="parlay-detail-summary" v-if="parlay_modal_order">
+					<view class="parlay-summary-row">
+						<text class="parlay-summary-label">{{$t('total bet amount')}}
+							<text v-if="parlay_modal_order.pay_wallet">
+								({{getWalletBadgeLabel(parlay_modal_order.pay_wallet)}})</text>
+						</text>
+						<text class="parlay-summary-value">
+							{{$toolbox.num_format(parlay_modal_order.BET_MONEY,0)}} MMK
+						</text>
+					</view>
+					<view class="parlay-summary-row">
+						<text class="parlay-summary-label">{{$t('Total Match')}}</text>
+						<text class="parlay-summary-value">{{parlay_modal_order.ORDER_COUNT}}</text>
+					</view>
+					<view class="parlay-summary-row" v-if="current_page === 'pending'">
+						<text class="parlay-summary-label">{{$t('Potential Win Amount')}}</text>
+						<text class="parlay-summary-value">
+							{{parlay_modal_order.benefit}} MMK
+						</text>
+					</view>
+					<view class="result-bar" v-if="current_page === 'Finished'"
+						:class="{'result-win':parlay_modal_order.benefit.indexOf('-') === -1 && parlay_modal_order.benefit !== '\\', 'result-lose':parlay_modal_order.benefit.indexOf('-') > -1 || parlay_modal_order.benefit === '\\'}">
+						<text class="result-text"
+							v-if="parlay_modal_order.benefit.indexOf('-') === -1 && parlay_modal_order.benefit !== '\\'">
+							WIN +{{parlay_modal_order.benefit}} MMK
+						</text>
+						<text class="result-text" v-else-if="parlay_modal_order.benefit === '\\'">CANCEL</text>
+						<text class="result-text" v-else>LOSE {{parlay_modal_order.benefit}} MMK</text>
+					</view>
+				</view>
+
+				<view class="parlay-detail-actions">
+					<view class="parlay-confirm-button" @click="close_parlay_detail">
+						<text>{{$t('Confirm')}}</text>
+					</view>
+					<view class="parlay-download-button" :class="{ 'is-downloading': downloading_slip }"
+						@click="download_parlay_slip">
+						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
+						</image>
+						<text>{{$t('Download Slip')}}</text>
+					</view>
+				</view>
+			</view>
+			<view class="parlay-export-mask" v-if="downloading_slip" data-html2canvas-ignore="true">
+				<view class="parlay-export-status">
+					<view class="parlay-export-spinner"></view>
+					<text class="parlay-export-text">Generating...</text>
+				</view>
+			</view>
+		</view>
 
 	</view>
 </template>
@@ -314,7 +361,10 @@
 					all_stake: 0,
 					win: 0,
 					loss: 0,
-				}
+				},
+				show_parlay_modal: false,
+				parlay_modal_order: null,
+				downloading_slip: false,
 			};
 		},
 		methods: {
@@ -498,7 +548,8 @@
 			show_detail(row, type) {
 				if (row.IS_MIX != '1') return;
 				if (row.has_detail) {
-					row.show_detail = !row.show_detail
+					this.parlay_modal_order = row
+					this.show_parlay_modal = true
 					return
 				}
 				let _this = this;
@@ -515,13 +566,166 @@
 				}, (res) => {
 					if (res.statusCode == 200) {
 						row.has_detail = true
-						let items = res.data.items
+						let items = res.data.items || []
 						items.forEach(ele => {
 							row.detail.push(_this.parse_order(ele))
 						})
-						row.show_detail = true
+						_this.parlay_modal_order = row
+						_this.show_parlay_modal = true
 					}
 				})
+			},
+			close_parlay_detail() {
+				this.show_parlay_modal = false
+				this.parlay_modal_order = null
+			},
+			load_html2canvas() {
+				if (typeof window === 'undefined' || typeof document === 'undefined') {
+					return Promise.reject(new Error('Image export requires a browser environment'))
+				}
+				if (window.html2canvas) {
+					return Promise.resolve(window.html2canvas)
+				}
+				if (this._html2canvas_promise) {
+					return this._html2canvas_promise
+				}
+
+				this._html2canvas_promise = new Promise((resolve, reject) => {
+					const script = document.createElement('script')
+					script.src = '/static/vendor/html2canvas.min.js'
+					script.async = true
+					script.onload = () => {
+						if (window.html2canvas) {
+							resolve(window.html2canvas)
+						} else {
+							reject(new Error('Image export library is unavailable'))
+						}
+					}
+					script.onerror = () => reject(new Error('Image export library failed to load'))
+					document.head.appendChild(script)
+				})
+				return this._html2canvas_promise
+			},
+			wait_for_slip_render() {
+				return new Promise((resolve) => {
+					const requestFrame = window.requestAnimationFrame || ((callback) => setTimeout(callback, 0))
+					requestFrame(() => requestFrame(resolve))
+				})
+			},
+			download_parlay_slip() {
+				if (this.downloading_slip || !this.parlay_modal_order) return
+				if (typeof window === 'undefined' || typeof document === 'undefined') {
+					uni.showToast({
+						title: 'Download is not supported',
+						icon: 'none'
+					})
+					return
+				}
+
+				this.downloading_slip = true
+				uni.showLoading({
+					title: 'Generating...',
+					mask: true
+				})
+
+				let styleSnapshots = []
+				let scrollTop = 0
+				this.load_html2canvas()
+					.then((html2canvas) => {
+						return this.$nextTick().then(() => {
+							const dialog = document.querySelector('.parlay-detail-dialog')
+							const scrollElement = dialog && dialog.querySelector('.parlay-detail-scroll')
+							if (!dialog || !scrollElement) {
+								throw new Error('Parlay slip element is unavailable')
+							}
+
+							const scrollElements = [
+								scrollElement,
+								...Array.from(scrollElement.querySelectorAll(
+									'.uni-scroll-view, .uni-scroll-view-content'))
+							]
+							const elementsToResize = [dialog, ...scrollElements]
+							styleSnapshots = elementsToResize.map((element) => ({
+								element,
+								cssText: element.style.cssText
+							}))
+							scrollTop = scrollElement.scrollTop
+
+							dialog.style.height = 'auto'
+							dialog.style.maxHeight = 'none'
+							dialog.style.overflow = 'visible'
+							scrollElements.forEach((element) => {
+								element.style.flex = 'none'
+								element.style.height = 'auto'
+								element.style.minHeight = '0'
+								element.style.maxHeight = 'none'
+								element.style.overflow = 'visible'
+								element.style.overflowY = 'visible'
+							})
+							scrollElement.scrollTop = 0
+
+							return this.wait_for_slip_render().then(() => html2canvas(dialog, {
+								backgroundColor: '#ffffff',
+								allowTaint: false,
+								logging: false,
+								scale: Math.max(1, Math.min(2, window.devicePixelRatio || 1)),
+								useCORS: true,
+								scrollX: 0,
+								scrollY: 0
+							}))
+						})
+					})
+					.then((canvas) => {
+						const orderId = String(
+							this.parlay_modal_order.ORDER_ID || this.parlay_modal_order.ID || 'slip'
+						).replace(/[^\w-]+/g, '_')
+						const link = document.createElement('a')
+						link.href = canvas.toDataURL('image/png')
+						link.download = `bet-slip-${orderId}.png`
+						document.body.appendChild(link)
+						link.click()
+						document.body.removeChild(link)
+						uni.showToast({
+							title: 'Download started',
+							icon: 'success'
+						})
+					})
+					.catch((error) => {
+						console.error('Download slip failed:', error)
+						uni.showToast({
+							title: 'Download failed',
+							icon: 'none'
+						})
+					})
+					.then(() => {
+						styleSnapshots.reverse().forEach((snapshot) => {
+							snapshot.element.style.cssText = snapshot.cssText
+						})
+						const scrollElement = document.querySelector('.parlay-detail-scroll')
+						if (scrollElement) {
+							scrollElement.scrollTop = scrollTop
+						}
+						uni.hideLoading()
+						this.downloading_slip = false
+					})
+			},
+			get_parlay_details(order) {
+				if (!order) return []
+				return Array.isArray(order.detail) && order.detail.length ? order.detail : [order]
+			},
+			format_parlay_match_time(detail) {
+				const value = detail && (detail.MATCH_TIME || detail.match_time)
+				if (!value) return detail && detail.order_time ? detail.order_time : ''
+
+				const match = String(value).replace('T', ' ').match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/
+				)
+				if (!match) return value
+
+				const hour = parseInt(match[4], 10)
+				const ampm = hour >= 12 ? 'PM' : 'AM'
+				const displayHour = hour % 12 || 12
+				return `${match[3]}.${match[2]}.${match[1]} ${String(displayHour).padStart(2, '0')}:${match[5]} ${ampm}`
 			},
 			parse_order(ele) {
 				ele = this.order_mapping(ele)
@@ -1237,6 +1441,267 @@
 		font-weight: bold;
 		/* from tangjq--- 文字左右两侧留出箭头间距 */
 		margin: 0 16upx;
+	}
+
+	/* Parlay 详情弹窗 */
+	.parlay-detail-modal {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: var(--app-viewport-height, 100vh);
+		z-index: 2000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 16px 10px;
+		box-sizing: border-box;
+	}
+
+	.parlay-detail-mask {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.45);
+	}
+
+	.parlay-detail-dialog {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: 400px;
+		height: 86%;
+		max-height: calc(var(--app-viewport-height, 100vh) - 32px);
+		min-height: 0;
+		background: #ffffff;
+		border: 8px solid $color-primary;
+		border-radius: 22px;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
+
+	.parlay-detail-title {
+		display: block;
+		flex-shrink: 0;
+		padding: 11px 10px 9px;
+		color: $color-primary;
+		font-size: 18px;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.parlay-detail-title::after {
+		content: var(--theme-title, "#{$theme-title-value}");
+	}
+
+	.parlay-detail-scroll {
+		flex: 1 1 0%;
+		height: 0;
+		min-height: 0;
+		padding: 0 12px;
+		box-sizing: border-box;
+		overflow-y: auto;
+	}
+
+	.parlay-match-detail-card {
+		padding: 10px 10px 12px;
+		margin-bottom: 12px;
+		border: 1px solid $color-primary;
+		border-radius: 8px;
+		box-sizing: border-box;
+	}
+
+	.parlay-match-date {
+		display: block;
+		margin-bottom: 5px;
+		color: $color-primary;
+		font-size: 10px;
+		line-height: 1.2;
+		text-align: center;
+	}
+
+	.parlay-match-score-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: 8px;
+		padding: 5px 8px;
+		background: $bg-color-info;
+		border-radius: 14px;
+	}
+
+	.parlay-match-team {
+		min-width: 0;
+		color: #263238;
+		font-size: 13px;
+		font-weight: 700;
+		line-height: 1.2;
+		white-space: normal;
+		word-break: break-word;
+	}
+
+	.parlay-match-team-home {
+		color: $color-secondary;
+		text-align: center;
+	}
+
+	.parlay-match-team-away {
+		text-align: center;
+	}
+
+	.parlay-match-score {
+		color: $color-primary;
+		font-size: 13px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.parlay-detail-info {
+		padding: 10px 26px 0;
+	}
+
+	.parlay-detail-info-row,
+	.parlay-summary-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.parlay-detail-info-row {
+		margin-bottom: 7px;
+	}
+
+	.parlay-detail-info-row:last-child {
+		margin-bottom: 0;
+	}
+
+	.parlay-detail-label,
+	.parlay-summary-label {
+		min-width: 0;
+		color: $color-primary;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 1.25;
+	}
+
+	.parlay-detail-value,
+	.parlay-summary-value {
+		min-width: 0;
+		color: $color-primary;
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 1.25;
+		text-align: right;
+		word-break: break-word;
+	}
+
+	.parlay-detail-summary {
+		flex-shrink: 0;
+		padding: 10px 12px 0;
+		border-top: 1px solid $color-border;
+	}
+
+	.parlay-summary-row {
+		margin-bottom: 9px;
+	}
+
+	.parlay-summary-row:last-of-type {
+		margin-bottom: 0;
+	}
+
+	.parlay-summary-value {
+		font-style: italic;
+	}
+
+	.parlay-detail-actions {
+		flex-shrink: 0;
+		padding: 12px 10px 8px;
+		text-align: center;
+	}
+
+	.parlay-confirm-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 162px;
+		height: 42px;
+		margin: 0 auto;
+		background: $color-primary;
+		border-radius: 12px;
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.parlay-download-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-top: 9px;
+		color: $color-primary;
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.parlay-download-icon {
+		width: 15px;
+		height: 14px;
+		flex-shrink: 0;
+	}
+
+	.parlay-download-button.is-downloading {
+		opacity: 0.55;
+	}
+
+	.parlay-export-mask {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 3;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(11, 47, 57, 0.3);
+	}
+
+	.parlay-export-status {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 12px 16px;
+		border-radius: 14px;
+		background: rgba(255, 255, 255, 0.96);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+	}
+
+	.parlay-export-spinner {
+		width: 18px;
+		height: 18px;
+		border: 2px solid rgba(28, 102, 124, 0.24);
+		border-top-color: $color-primary;
+		border-radius: 50%;
+		animation: parlay-export-spin 0.8s linear infinite;
+	}
+
+	.parlay-export-text {
+		color: $color-primary;
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	@keyframes parlay-export-spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.toggle-icon {
