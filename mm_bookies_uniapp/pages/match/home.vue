@@ -76,7 +76,8 @@
 							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
 							<view class="match-teams">
 								<view class="team-section">
-									<view class="team-logo-frame">
+									<view class="team-logo-frame"
+										:class="{ 'team-logo-frame-expanded': match.expanded }">
 										<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
 											:class="{ 'team-logo-expanded': match.expanded }"
 											@error="error_pic(match,'home')" />
@@ -86,7 +87,8 @@
 								</view>
 								<text class="vs-text">vs</text>
 								<view class="team-section">
-									<view class="team-logo-frame">
+									<view class="team-logo-frame"
+										:class="{ 'team-logo-frame-expanded': match.expanded }">
 										<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
 											:class="{ 'team-logo-expanded': match.expanded }"
 											@error="error_pic(match,'away')" />
@@ -2471,7 +2473,7 @@
 		flex-direction: row;
 		justify-content: space-around;
 		align-items: center;
-		padding: 7px 14px 10px;
+		padding: 0 14px 10px;
 	}
 
 	.team-section {
@@ -2483,12 +2485,18 @@
 	}
 
 	.new-match-card .team-logo-frame {
-		width: 35px;
-		height: 35px;
+		width: 20px;
+		height: 20px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+		transition: width 180ms ease-out, height 180ms ease-out;
+	}
+
+	.new-match-card .team-logo-frame.team-logo-frame-expanded {
+		width: 35px;
+		height: 35px;
 	}
 
 	.new-match-card .team-logo {
@@ -3008,7 +3016,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 8px;
+		gap: 5px;
 		flex: 1;
 	}
 
