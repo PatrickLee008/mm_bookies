@@ -345,7 +345,7 @@
 <style lang="scss" scoped>
 	/* from tangjq--- 页面级样式 */
 	.promotion-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		min-height: 0;
 		display: flex;
 		flex-direction: column;
@@ -626,7 +626,7 @@
 
 <style lang="scss">
 	page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 	}
 </style>

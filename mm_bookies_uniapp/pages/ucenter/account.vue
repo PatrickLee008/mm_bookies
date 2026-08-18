@@ -2,7 +2,7 @@
 	<view class="full-page">
 		<zw-header></zw-header>
 
-		<scroll-view scroll-y style="height: calc(100vh - 110px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 110px);">
 			<view class="title-bar" style="box-shadow: none;">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">

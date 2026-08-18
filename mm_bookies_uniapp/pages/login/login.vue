@@ -670,7 +670,7 @@
 		top: 0;
 		left: 0;
 		width: 100vw;
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
@@ -861,7 +861,7 @@
 	/* 原有登录页面样式 */
 	.login-container {
 		position: relative;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		align-items: center;

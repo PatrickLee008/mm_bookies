@@ -769,12 +769,12 @@
 
 	page {
 		background: $color-primary;
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 	}
 
 	.full-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		background: $color-primary;
 		overflow: hidden;
 		display: flex;

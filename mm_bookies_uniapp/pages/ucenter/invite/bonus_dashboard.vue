@@ -406,7 +406,7 @@
 
 <style lang="scss">
 	.invite-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;

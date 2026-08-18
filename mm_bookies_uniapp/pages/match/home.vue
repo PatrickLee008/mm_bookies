@@ -68,33 +68,33 @@
 						<!-- 比赛卡片 -->
 						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index"
 							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
-							<!-- 日期时间行 -->
-							<view class="match-datetime">
-								{{match.MD_DATE_TIME}}
-							</view>
+							<view class="match-summary">
+								<view class="match-teams">
+									<view class="match-logo-row">
+										<view class="team-logo-frame"
+											:class="{ 'team-logo-frame-expanded': match.expanded }">
+											<image :src="match.show_image?match.home_logo:''" lazy-load
+												class="team-logo" :class="{ 'team-logo-expanded': match.expanded }"
+												@error="error_pic(match,'home')" />
+										</view>
+										<view class="match-datetime">
+											{{match.MD_DATE_TIME}}
+										</view>
+										<view class="team-logo-frame"
+											:class="{ 'team-logo-frame-expanded': match.expanded }">
+											<image :src="match.show_image?match.away_logo:''" lazy-load
+												class="team-logo" :class="{ 'team-logo-expanded': match.expanded }"
+												@error="error_pic(match,'away')" />
+										</view>
+									</view>
 
-							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
-							<view class="match-teams">
-								<view class="team-section">
-									<view class="team-logo-frame"
-										:class="{ 'team-logo-frame-expanded': match.expanded }">
-										<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
-											:class="{ 'team-logo-expanded': match.expanded }"
-											@error="error_pic(match,'home')" />
+									<view class="match-name-row">
+										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='1',}">
+											{{match.HOST_TEAM}}</view>
+										<text class="vs-text">vs</text>
+										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='2',}">
+											{{match.GUEST_TEAM}}</view>
 									</view>
-									<text class="team-name"
-										:class="{'text-red':match.LOSE_TEAM ==='1',}">{{match.HOST_TEAM}}</text>
-								</view>
-								<text class="vs-text">vs</text>
-								<view class="team-section">
-									<view class="team-logo-frame"
-										:class="{ 'team-logo-frame-expanded': match.expanded }">
-										<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
-											:class="{ 'team-logo-expanded': match.expanded }"
-											@error="error_pic(match,'away')" />
-									</view>
-									<text class="team-name"
-										:class="{'text-red':match.LOSE_TEAM ==='2',}">{{match.GUEST_TEAM}}</text>
 								</view>
 							</view>
 
@@ -200,8 +200,8 @@
 							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2"
 								@click.stop="toggle_match_expand(match)">
 								<image class="match-toggle-icon"
-									:src="match.expanded ? '/static/image/single/fold.svg' : '/static/image/single/unfold.svg'"
-									mode="aspectFit"></image>
+									:class="{ 'match-toggle-icon-expanded': match.expanded }"
+									src="/static/image/single/unfold.svg" mode="aspectFit"></image>
 							</view>
 						</view>
 					</view>
@@ -2452,36 +2452,59 @@
 	.new-match-card {
 		background-color: white;
 		border-radius: $radius-large;
-		margin-bottom: 12px;
+		margin-bottom: 10px;
 		overflow: hidden;
 		border: 1px solid $color-border;
 		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
 		padding-bottom: 12px;
+		--match-center-column-width: 112px;
 	}
 
-	.match-datetime {
-		background-color: transparent;
-		text-align: center;
-		font-size: 12px;
-		color: $color-primary;
-		font-weight: 500;
-		padding: 10px 14px 2px;
+	.match-summary {
+		padding: 8px 14px 10px;
+		min-width: 0;
 	}
 
 	.match-teams {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		align-items: center;
-		padding: 0 14px 10px;
+		min-width: 0;
 	}
 
-	.team-section {
-		display: flex;
-		flex-direction: column;
+	.match-logo-row,
+	.match-name-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) var(--match-center-column-width) minmax(0, 1fr);
+		min-width: 0;
+	}
+
+	.match-logo-row {
 		align-items: center;
-		gap: 5px;
-		flex: 1;
+		min-height: 0;
+		padding: 5px 0;
+	}
+
+	.match-logo-row .team-logo-frame {
+		justify-self: center;
+	}
+
+	.match-name-row {
+		align-items: stretch;
+		margin-top: 3px;
+	}
+
+	.match-datetime {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow: hidden;
+		background-color: transparent;
+		text-align: center;
+		font-size: 11px;
+		color: $color-primary;
+		font-weight: 500;
+		line-height: 1.25;
+		white-space: nowrap;
+		padding-top: 8px;
 	}
 
 	.new-match-card .team-logo-frame {
@@ -2511,19 +2534,36 @@
 		transform: scale(1.75);
 	}
 
-	.team-name {
+	.new-match-card .team-name {
+		display: flex;
+		align-self: stretch;
+		align-items: center;
+		justify-content: center;
 		font-size: 12px;
 		color: $color-primary;
 		font-weight: 600;
 		text-align: center;
-		max-width: 100px;
+		min-width: 0;
+		max-width: 100%;
+		min-height: 30px;
+		padding: 0 2px;
+		box-sizing: border-box;
+		line-height: 1.25;
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
 
-	.vs-text {
+	.new-match-card .vs-text {
+		display: block;
+		width: 100%;
 		font-size: 14px;
 		color: #666;
 		font-weight: bold;
-		margin: 0 10px;
+		line-height: 1;
+		text-align: center;
+		padding-top: 1px;
+		margin: 0;
 	}
 
 	/* from tangjq--- 新的投注选项样式 */
@@ -2578,7 +2618,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-height: 46px;
+		// min-height: 46px;
 	}
 
 	.bet-btn-selected {
@@ -2642,6 +2682,13 @@
 	.match-toggle-icon {
 		width: 13px;
 		height: 14px;
+		display: block;
+		transform: rotate(0deg);
+		transition: transform 180ms ease-out;
+	}
+
+	.match-toggle-icon.match-toggle-icon-expanded {
+		transform: rotate(180deg);
 	}
 
 	/* from tangjq--- 确保展开按钮可点击 */

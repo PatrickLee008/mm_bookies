@@ -27,7 +27,7 @@
 			</view>
 			<view class="padding-sm"></view>
 		</view>
-		<scroll-view scroll-y style="height: calc(100vh - 120px - 118px); background: #fff;">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 120px - 118px); background: #fff;">
 			<view v-if="current_progress==0">
 				<!-- 银行选择 -->
 				<view class="flex-column justify-center padding-top-sm mycolor-primary">

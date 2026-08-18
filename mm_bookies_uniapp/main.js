@@ -2,6 +2,28 @@ import Vue from 'vue'
 import App from './App'
 import i18n from './locale/i18n.js'
 
+// Use the visible H5 viewport so fixed-height page shells do not extend
+// behind the browser toolbar.
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+	const updateAppViewportHeight = () => {
+		const visualViewport = window.visualViewport
+		const height = visualViewport && visualViewport.height
+			? visualViewport.height
+			: window.innerHeight
+
+		if (height > 0) {
+			document.documentElement.style.setProperty('--app-viewport-height', `${height}px`)
+		}
+	}
+
+	updateAppViewportHeight()
+	window.addEventListener('resize', updateAppViewportHeight)
+	window.addEventListener('orientationchange', updateAppViewportHeight)
+	if (window.visualViewport) {
+		window.visualViewport.addEventListener('resize', updateAppViewportHeight)
+	}
+}
+
 
 import toolbox from './utils/toolbox.js';
 Vue.prototype.$toolbox = toolbox;

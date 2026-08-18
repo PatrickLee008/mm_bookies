@@ -18,7 +18,7 @@
 		</view>
 
 		<!-- 记录列表 -->
-		<scroll-view scroll-y style="height: calc(100vh - 190px);padding-top: 2px;" @scrolltolower="loadMore" :refresher-enabled="true" 
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 190px);padding-top: 2px;" @scrolltolower="loadMore" :refresher-enabled="true"
 			@refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 			
 			<!-- 空状态 -->
@@ -297,7 +297,7 @@ export default {
 <style lang="scss" scoped>
 	.dark-teal-bg {
 
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 .record-item {

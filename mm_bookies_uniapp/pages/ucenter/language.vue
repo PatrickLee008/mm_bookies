@@ -7,7 +7,7 @@
 			<text class="header-placeholder"></text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="language-content">
 				<!-- 语言选项列表 -->
 				<view class="language-item" @click="pickerChange('mm')">
@@ -89,7 +89,7 @@
 
 <style lang="scss" scoped>
 	.language-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */

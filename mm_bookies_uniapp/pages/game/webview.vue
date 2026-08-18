@@ -121,7 +121,7 @@ export default {
 <style scoped>
 .webview-container {
 	width: 100%;
-	height: 100vh;
+	height: var(--app-viewport-height, 100vh);
 	background-color: #000;
 }
 

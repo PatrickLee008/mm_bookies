@@ -1,7 +1,7 @@
 <template>
 	<view class="dark-teal-bg">
 		<zw-header></zw-header>
-		<scroll-view scroll-y style="height: calc(100vh - 120px); background: #fff;">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 120px); background: #fff;">
 			<view class="title-bar" style="height: auto;">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -355,7 +355,7 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	.amount-input {

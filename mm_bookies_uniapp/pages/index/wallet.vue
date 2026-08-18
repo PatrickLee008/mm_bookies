@@ -112,7 +112,7 @@
 				</view>
 			</view>
 		</view> -->
-		<scroll-view scroll-y class="" style="height:calc(100vh - 110px - 187px - 73px)" @scrolltolower="clickLoadMore">
+		<scroll-view scroll-y class="" style="height:calc(var(--app-viewport-height, 100vh) - 110px - 187px - 73px)" @scrolltolower="clickLoadMore">
 			<!-- 列表 -->
 			<view class="flex-column1 justify-around" v-for="(element,index) in list" :key='index'
 				style="min-height: 140px;font-weight: 400;line-height: 1.5;font-size: 10px;border-radius: 10px;background-color: #fff;padding: 5px 30px;margin: 5px 11px;box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;">
@@ -354,7 +354,7 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	.info-rec {

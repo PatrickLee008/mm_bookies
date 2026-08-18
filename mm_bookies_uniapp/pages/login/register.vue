@@ -564,7 +564,7 @@
 <style lang="scss">
 	.login-container {
 		position: relative;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		align-items: center;

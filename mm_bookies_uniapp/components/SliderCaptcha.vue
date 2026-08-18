@@ -503,7 +503,7 @@
 
 	.security-title {
 		margin-top: 17px;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		font-size: 15px;
 		font-weight: 700;
 		line-height: 1.3;
@@ -513,7 +513,8 @@
 	.security-description {
 		margin-top: 8px;
 		margin-bottom: 8px;
-		color: rgba(255, 255, 255, 0.84);
+		color: $theme-background-foreground;
+		opacity: 0.84;
 		font-size: 11px;
 		line-height: 1.4;
 		text-align: center;

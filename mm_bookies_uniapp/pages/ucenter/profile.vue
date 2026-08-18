@@ -8,7 +8,7 @@
 			<text class="header-placeholder"></text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="profile-content">
 				<!-- 用户头像 -->
 				<view class="avatar-section">
@@ -209,7 +209,7 @@
 
 <style lang="scss" scoped>
 	.profile-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */

@@ -1702,12 +1702,12 @@
 	}
 
 	page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 	}
 
 	.full-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;

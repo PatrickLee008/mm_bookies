@@ -27,7 +27,7 @@
 		<view class="cu-modal drawer-modal justify-start" :class="modalName=='Modal'?'show':''" @tap="hideModal">
 			<view class="cu-dialog basis-lg">
 				<scroll-view scroll-y @tap.stop="" style="margin-top: 50px;"
-					:style="[{top:CustomBar+'px',height:'calc(100vh - 50px - ' + CustomBar + 'px)'}]">
+					:style="[{top:CustomBar+'px',height:'calc(var(--app-viewport-height, 100vh) - 50px - ' + CustomBar + 'px)'}]">
 					<view class="cu-list menu text-left">
 						<view class="league-row">
 							<image style="height: 16px;width: 16px;" v-show="allStatus"
@@ -70,7 +70,7 @@
 				</view>
 			</view>
 		</view>
-		<scroll-view class="flex-column" scroll-y style="height: calc(100vh - 45px - 66px);"
+		<scroll-view class="flex-column" scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 45px - 66px);"
 			@scrolltolower="clickLoadMore">
 			<view v-for="league in filterList" v-if="live ? league.live : true">
 				<view class="flex-row padding">

@@ -344,7 +344,7 @@
 		// left: 0;
 		// bottom: 0;
 		z-index: 15 !important;
-		height: 100vh !important;
+		height: var(--app-viewport-height, 100vh) !important;
 	}
 
 	.box-shadow {
@@ -370,7 +370,7 @@
 
 	.single-mask {
 		background: none;
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		// filter: ;
 		opacity: .5;
 		background-color: black;

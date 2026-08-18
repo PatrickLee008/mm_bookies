@@ -226,7 +226,7 @@
 }
 
 .full-page {
-	height: 100vh;
+	height: var(--app-viewport-height, 100vh);
 }
 
 .league-image {
@@ -452,7 +452,7 @@
 	justify-content: center;
 	padding: 8px 24px;
 	align-items: center;
-	height: calc(100vh - 120px);
+	height: calc(var(--app-viewport-height, 100vh) - 120px);
 	width: 100%;
 	background-color: white;
 }

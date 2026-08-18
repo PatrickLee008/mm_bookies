@@ -462,12 +462,16 @@
 		font-family: 'regular';
 	}
 
+	:root {
+		--app-viewport-height: 100vh;
+	}
+
 	// Keep H5 page overscroll inside the page scroll-view instead of moving
 	// the document behind the fixed header.
 	html,
 	body {
 		width: 100%;
-		height: 100%;
+		height: var(--app-viewport-height);
 		margin: 0;
 		overflow: hidden;
 		overscroll-behavior: none;
@@ -480,8 +484,8 @@
 	uni-page-body,
 	page {
 		width: 100%;
-		height: 100%;
-		min-height: 100%;
+		height: var(--app-viewport-height);
+		min-height: var(--app-viewport-height);
 		overflow: hidden;
 	}
 
