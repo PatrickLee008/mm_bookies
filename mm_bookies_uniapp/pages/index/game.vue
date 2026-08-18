@@ -790,7 +790,7 @@
 	}
 
 	.filter-confirm-btn:active {
-		background-color: #2d5d5d;
+		background-color: $color-secondary;
 	}
 
 	.filter-confirm-text {

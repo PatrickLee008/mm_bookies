@@ -43,6 +43,18 @@ const defaultColors = {
 // These definitions use the original SVG dimensions and path data. Only the
 // original single-color fill/stroke values are replaced with currentColor.
 const inlineIcons = {
+	'ai-close': {
+		width: 24,
+		height: 24,
+		viewBox: '0 0 24 24',
+		elements: [{
+			type: 'path',
+			attrs: {
+				d: 'M2.86912 0L12 9.13088L21.1309 0L24 2.86912L14.8691 12L24 21.1309L21.1309 24L12 14.8691L2.86912 24L0 21.1309L9.13088 12L0 2.86912L2.86912 0Z',
+				fill: 'currentColor',
+			},
+		}],
+	},
 	deposit: {
 		width: 20,
 		height: 20,

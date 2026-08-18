@@ -133,48 +133,131 @@
 
 					<!-- ============ Promotion 区域 ============ -->
 					<view class="list-container promotion-list-container" v-else-if="activity_type === 'promotion'">
-						<view class="promotion-card2" v-for="(promo, index) in promotion_list" :key="index"
-							@click="showPromotionDetail(promo)">
-							<view class="promotion-card2-header" :class="getPromotionHeaderClass(promo.status)">
-								<text class="promotion-card2-title">{{ promo.name }}</text>
-							</view>
-							<view class="promotion-card2-image">
-								<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
-									@error="handlePromotionImageError(promo)"></image>
-							</view>
-							<view class="promotion-card2-body">
-								<view class="promo-info">
-									<text class="promo-label">Promotion Period:</text>
-									<text class="promo-period">{{ promo.period_start }} - {{ promo.period_end }}</text>
-									<view class="promo-countdown"
-										v-if="promo.end_time_full && isWithin48Hours(promo.end_time_full)">
-										<count-down :count_time="promo.end_time_full"></count-down>
-									</view>
-									<text class="promo-label promo-label-mt">Terms & Conditions</text>
-									<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
+						<!-- Promotion 列表 / Claim History -->
+						<view class="promotion-tab-selector">
+							<view class="promotion-tab-container">
+								<view v-for="(item, index) in promotionTabs" :key="index" class="promotion-tab-item"
+									:class="{ 'active': promotion_tab_index === index }"
+									@click="handlePromotionTabClick(index)">
+									<text class="promotion-tab-text">{{ $t(item) }}</text>
 								</view>
-							</view>
-							<view class="promotion-card2-footer">
-								<text class="promo-amount" v-if="promo.participation_amount_type === 'Fixed'">
-									K {{ $toolbox.num_format(promo.min_amount) }}
-								</text>
-								<text class="promo-amount" v-else>
-									K
-									{{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
-								</text>
-								<view v-if="promo.status === 'Available'" class="promo-status-btn">{{ promo.status }}
-								</view>
-								<text v-else class="promo-status-text"
-									:style="{ color: promo.status === 'Completed' ? '#9eacb5' : '' }">{{ promo.status }}</text>
+								<view class="promotion-slide-indicator" :style="{
+									width: promotion_indicator_width + 'px',
+									transform: `translateX(${promotion_indicator_offset}px)`
+								}"></view>
 							</view>
 						</view>
 
-						<!-- 空状态 -->
-						<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-							<theme-icon name="deals" class="empty-icon"
-								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
-							<text class="empty-text">No promotions available</text>
-						</view>
+						<template v-if="promotion_tab_index === 0">
+							<view class="promotion-card2" v-for="(promo, index) in promotion_list" :key="index"
+								@click="showPromotionDetail(promo)">
+								<view class="promotion-card2-header" :class="getPromotionHeaderClass(promo.status)">
+									<text class="promotion-card2-title">{{ promo.name }}</text>
+								</view>
+								<view class="promotion-card2-image">
+									<image class="promo-thumb" :src="promo.image" mode="aspectFill" lazy-load
+										@error="handlePromotionImageError(promo)"></image>
+								</view>
+								<view class="promotion-card2-body">
+									<view class="promo-info">
+										<text class="promo-label">Promotion Period:</text>
+										<text class="promo-period">{{ promo.period_start }} -
+											{{ promo.period_end }}</text>
+										<view class="promo-countdown"
+											v-if="promo.end_time_full && isWithin48Hours(promo.end_time_full)">
+											<count-down :count_time="promo.end_time_full"></count-down>
+										</view>
+										<text class="promo-label promo-label-mt">Terms & Conditions</text>
+										<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
+									</view>
+								</view>
+								<view class="promotion-card2-footer">
+									<text class="promo-amount" v-if="promo.participation_amount_type === 'Fixed'">
+										K {{ $toolbox.num_format(promo.min_amount) }}
+									</text>
+									<text class="promo-amount" v-else>
+										K
+										{{ promo.min_amount == promo.max_amount ? $toolbox.num_format(promo.min_amount) : `${$toolbox.num_format(promo.min_amount)} - ${$toolbox.num_format(promo.max_amount)}` }}
+									</text>
+									<view v-if="promo.status === 'Available'" class="promo-status-btn">
+										{{ promo.status }}
+									</view>
+									<text v-else class="promo-status-text"
+										:style="{ color: promo.status === 'Completed' ? '#9eacb5' : '' }">{{ promo.status }}</text>
+								</view>
+							</view>
+
+							<!-- 空状态 -->
+							<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
+								<theme-icon name="deals" class="empty-icon"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								<text class="empty-text">{{ $t('No promotions available') }}</text>
+							</view>
+						</template>
+
+						<template v-else>
+							<view class="claim-stats-card">
+								<text class="claim-stats-title">{{ $t('My Claim Stats') }}</text>
+								<view class="claim-stats-row">
+									<view class="claim-stat-item">
+										<text class="claim-stat-label">{{ $t('Total Promotions') }}</text>
+										<text class="claim-stat-value">
+											{{ $toolbox.num_format(promotion_history_summary.total_promotions || 0) }}
+										</text>
+									</view>
+									<view class="claim-stat-item">
+										<text class="claim-stat-label">{{ $t('Active Promotions') }}</text>
+										<text class="claim-stat-value">
+											{{ $toolbox.num_format(promotion_history_summary.active_promotions || 0) }}
+										</text>
+									</view>
+								</view>
+								<view class="claim-stat-item claim-stat-total">
+									<text class="claim-stat-label">{{ $t('Total Bonus') }}</text>
+									<text class="claim-stat-value">
+										{{ $toolbox.num_format(promotion_history_summary.total_bonus || 0) }}
+									</text>
+								</view>
+							</view>
+
+							<view class="claim-history-card" v-for="claim in promotion_history" :key="claim.id">
+								<view class="claim-history-header">
+									<text class="claim-history-title">{{ claim.promotion_title }}</text>
+								</view>
+								<view class="claim-history-body">
+									<view class="claim-history-row">
+										<text class="claim-history-label">{{ $t('Participation Time') }}</text>
+										<text class="claim-history-value">
+											{{ formatClaimHistoryTime(claim.participation_time) }}
+										</text>
+									</view>
+									<view class="claim-history-row">
+										<text class="claim-history-label">{{ $t('Completion Time') }}</text>
+										<text class="claim-history-value">
+											{{ formatClaimHistoryTime(claim.completion_time) || '-' }}
+										</text>
+									</view>
+									<view class="claim-history-row claim-history-bonus-row">
+										<text class="claim-history-label">{{ $t('Total Bonus') }}</text>
+										<text class="claim-history-value claim-history-bonus">
+											{{ $toolbox.num_format(claim.total_bonus || 0) }}
+										</text>
+									</view>
+								</view>
+								<view class="claim-history-status"
+									:class="'claim-history-status-' + (claim.status || '').toLowerCase()">
+									{{ claim.status ? $t(claim.status) : '-' }}
+								</view>
+							</view>
+
+							<!-- 空状态 -->
+							<view class="empty-state"
+								v-if="promotion_history.length === 0 && !promotion_history_loading">
+								<theme-icon name="deals" class="empty-icon"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								<text class="empty-text">{{ $t('No claim history') }}</text>
+							</view>
+						</template>
 					</view>
 				</view>
 
@@ -198,7 +281,7 @@
 				<view class="detail-page-header">
 					<view class="detail-page-header-spacer"></view>
 					<text class="detail-modal-title">Coupon Details</text>
-					<theme-icon name="ai-close" size="20px" color="var(--theme-icon-on-primary, #fff)"
+					<theme-icon name="ai-close" size="16px" color="var(--theme-icon-on-primary, #fff)"
 						@click="closeDetailModal"></theme-icon>
 				</view>
 
@@ -300,155 +383,162 @@
 		</view>
 
 		<!-- ============ Promotion 详情页 ============ -->
-		<view class="detail-page" v-if="showPromotionDetailModal && selectedPromotion">
+		<view class="detail-page promotion-detail-page" v-if="showPromotionDetailModal && selectedPromotion">
 			<view class="detail-page-content">
-				<view class="detail-page-header">
-					<view class="detail-page-header-spacer"></view>
-					<text class="detail-modal-title">Promotion Details</text>
-					<theme-icon name="ai-close" size="20px" color="var(--theme-icon-on-primary, #fff)"
-						@click="closePromotionDetail"></theme-icon>
+				<view class="promotion-detail-close" @click="closePromotionDetail">
+					<theme-icon name="ai-close" size="16px" color="var(--theme-primary, #1C667C)"></theme-icon>
 				</view>
 
-				<scroll-view scroll-y class="detail-page-body">
-					<view class="detail-coupon-title">{{ selectedPromotion.name }}</view>
-					<view class="promo-slogan" v-if="selectedPromotion.slogan">{{ selectedPromotion.slogan }}</view>
+				<scroll-view scroll-y class="detail-page-body promotion-detail-body">
+					<view class="promotion-detail-hero-card">
+						<view class="promotion-detail-title-wrap">
+							<text class="promotion-detail-title">{{ selectedPromotion.name }}</text>
+							<text class="promotion-detail-slogan"
+								v-if="selectedPromotion.slogan">{{ selectedPromotion.slogan }}</text>
+						</view>
 
-					<view class="detail-image-wrapper">
-						<image class="detail-image" mode="widthFix" :src="selectedPromotion.image" lazy-load
-							@error="handlePromotionImageError(selectedPromotion)"></image>
+						<view class="promotion-detail-image-wrapper">
+							<image class="promotion-detail-image" mode="aspectFill" :src="selectedPromotion.image"
+								lazy-load @error="handlePromotionImageError(selectedPromotion)"></image>
+						</view>
+
+						<view class="promotion-detail-summary">
+							<view class="promotion-detail-field">
+								<text class="promotion-detail-label">
+									{{ selectedPromotion.participation_amount_type === 'Fixed' ? 'Participation Amount:' : 'Participation Amount Range:' }}
+								</text>
+								<text
+									class="promotion-detail-value">{{ formatParticipationAmount(selectedPromotion) }}</text>
+							</view>
+							<view class="promotion-detail-field">
+								<text class="promotion-detail-label">Reward Amount:</text>
+								<text class="promotion-detail-value">
+									{{ formatRewardAmount(selectedPromotion.reward_amount, selectedPromotion.reward_amount_type) }}
+								</text>
+							</view>
+						</view>
 					</view>
 
 					<!-- 活动周期 -->
-					<view class="detail-info-card full-card">
-						<view class="promo-countdown-block"
+					<view class="promotion-detail-info-card promotion-period-card">
+						<view class="promotion-countdown-block"
 							v-if="selectedPromotion.end_time_full && isWithin48Hours(selectedPromotion.end_time_full)">
-							<text class="detail-info-label">Ends In</text>
-							<view class="ends-in"><count-down
+							<text class="promotion-detail-label">Ends In:</text>
+							<view class="promotion-countdown"><count-down
 									:count_time="selectedPromotion.end_time_full"></count-down></view>
 						</view>
-						<text class="detail-info-label">Promotion Period</text>
-						<text class="detail-info-value">{{ selectedPromotion.period_start_time }} -
+						<text class="promotion-detail-label">Promotion Period:</text>
+						<text class="promotion-detail-info-value">{{ selectedPromotion.period_start_time }} -
 							{{ selectedPromotion.period_end_time }}</text>
 					</view>
 
 					<!-- 条款 -->
-					<view class="detail-description-section" v-if="selectedPromotion.terms">
-						<text class="detail-section-title">Terms & Conditions</text>
-						<text class="detail-description-text">
+					<view class="promotion-detail-info-card promotion-terms-card" v-if="selectedPromotion.terms">
+						<text class="promotion-detail-label">Terms & Conditions:</text>
+						<text class="promotion-detail-terms">
 							{{ isTermsExpanded ? selectedPromotion.terms : getTruncatedTerms(selectedPromotion.terms, 150) }}
 						</text>
-						<text v-if="selectedPromotion.terms.length > 150" class="read-more" @click.stop="toggleTerms">
+						<text v-if="selectedPromotion.terms.length > 150" class="promotion-detail-read-more"
+							@click.stop="toggleTerms">
 							{{ isTermsExpanded ? 'Show less' : 'Read more' }}
 						</text>
 					</view>
 
 					<!-- 已参与：进度 -->
-					<view v-if="selectedPromotion.status === 'Joined'">
-						<view class="detail-description-section" v-if="selectedPromotion.required_turnover > 0">
-							<text class="detail-section-title">Turnover Progress</text>
-							<view class="progress-row">
-								<text class="progress-label">Required</text>
-								<text
-									class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_turnover || 0) }}
-									/ {{ $toolbox.num_format(selectedPromotion.required_turnover || 0) }}</text>
+					<view class="promotion-detail-info-card promotion-progress-card"
+						v-if="selectedPromotion.status === 'Joined'">
+						<view class="promotion-progress-section" v-if="selectedPromotion.required_turnover > 0">
+							<text class="promotion-progress-title">Turnover Progress</text>
+							<view class="promotion-progress-row">
+								<text class="promotion-progress-label">Required</text>
+								<text class="promotion-progress-value">
+									{{ $toolbox.num_format(selectedPromotion.achieved_turnover || 0) }} /
+									{{ $toolbox.num_format(selectedPromotion.required_turnover || 0) }}
+								</text>
 							</view>
-							<view class="progress-bar-container">
-								<view class="progress-bar-fill"
+							<view class="promotion-progress-bar">
+								<view class="promotion-progress-fill"
 									:style="{ width: (selectedPromotion.turnover_progress || 0) + '%' }"></view>
 							</view>
 						</view>
-						<view class="detail-description-section" v-if="selectedPromotion.required_netwin > 0">
-							<text class="detail-section-title">Net Win Progress</text>
-							<view class="progress-row">
-								<text class="progress-label">Required</text>
-								<text
-									class="progress-value">{{ $toolbox.num_format(selectedPromotion.achieved_netwin || 0) }}
-									/ {{ $toolbox.num_format(selectedPromotion.required_netwin || 0) }}</text>
+						<view class="promotion-progress-section" v-if="selectedPromotion.required_netwin > 0">
+							<text class="promotion-progress-title">Net Win Progress</text>
+							<view class="promotion-progress-row">
+								<text class="promotion-progress-label">Required</text>
+								<text class="promotion-progress-value">
+									{{ $toolbox.num_format(selectedPromotion.achieved_netwin || 0) }} /
+									{{ $toolbox.num_format(selectedPromotion.required_netwin || 0) }}
+								</text>
 							</view>
 						</view>
-						<view class="detail-bonus-box">
-							<view class="progress-row">
-								<text class="detail-bonus-desc">Max Withdrawal</text>
-								<text
-									class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.max_withdrawal || 0) }}</text>
+						<view class="promotion-progress-wallet">
+							<view class="promotion-progress-row">
+								<text class="promotion-progress-label">Max Withdrawal</text>
+								<text class="promotion-progress-value">
+									{{ $toolbox.num_format(selectedPromotion.max_withdrawal || 0) }}
+								</text>
 							</view>
-							<view class="progress-row">
-								<text class="detail-bonus-title">Promo Wallet</text>
-								<text
-									class="detail-bonus-title">{{ $toolbox.num_format(selectedPromotion.promo_wallet_balance || 0) }}</text>
+							<view class="promotion-progress-row">
+								<text class="promotion-progress-label promotion-progress-wallet-label">Promo
+									Wallet</text>
+								<text class="promotion-progress-value promotion-progress-wallet-value">
+									{{ $toolbox.num_format(selectedPromotion.promo_wallet_balance || 0) }}
+								</text>
 							</view>
-						</view>
-					</view>
-
-					<!-- 未参与：要求 -->
-					<view class="detail-bonus-box" v-else>
-						<view class="progress-row" v-if="selectedPromotion.participation_amount_type === 'Fixed'">
-							<text class="detail-bonus-desc">Participation Amount</text>
-							<text
-								class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }}</text>
-						</view>
-						<view class="progress-row" v-else>
-							<text class="detail-bonus-desc">Participation Range</text>
-							<text class="detail-bonus-desc">{{ $toolbox.num_format(selectedPromotion.min_amount) }} ~
-								{{ $toolbox.num_format(selectedPromotion.max_amount) }}</text>
-						</view>
-						<view class="progress-row">
-							<text class="detail-bonus-title">Reward</text>
-							<text
-								class="detail-bonus-title">{{ formatRewardAmount(selectedPromotion.reward_amount, selectedPromotion.reward_amount_type) }}</text>
 						</view>
 					</view>
 
 					<!-- 不可参与原因 -->
-					<view class="ineligibility"
+					<view class="promotion-detail-ineligibility"
 						v-if="selectedPromotion.status === 'Available' && selectedPromotion.ineligibility_reason">
 						<text>{{ selectedPromotion.ineligibility_reason }}</text>
 					</view>
 
 					<!-- Applicable Scenarios -->
-					<view class="coupon-scenarios"
+					<view class="promotion-detail-scenarios"
 						v-if="selectedPromotion.usage_scenario_1x2 || promotionDisplayVendors.length > 0">
-						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
-						<view class="coupon-scenarios-icons">
+						<text class="promotion-detail-label promotion-scenarios-title">Applicable Scenarios:</text>
+						<view class="promotion-scenarios-icons">
 							<!-- 1x2 Sports Betting -->
-							<view class="coupon-scenario-icon-item" v-if="selectedPromotion.usage_scenario_1x2"
+							<view class="promotion-scenario-item" v-if="hasPromotionBetType('Single')"
 								@click="openPromotionSport">
-								<view class="coupon-scenario-icon-circle">
-									<theme-icon name="single" class="coupon-scenario-img"
+								<view class="promotion-scenario-icon">
+									<theme-icon name="single" class="promotion-scenario-image"
 										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 								</view>
-								<text class="coupon-scenario-label">Single</text>
+								<text class="promotion-scenario-label">Single</text>
 							</view>
 							<!-- Mix Parlay -->
-							<view class="coupon-scenario-icon-item" v-if="promotionDisplayVendors.length > 0"
-								@click="openPromotionVendorGames(promotionDisplayVendors[0])">
-								<view class="coupon-scenario-icon-diamond">
-									<theme-icon name="mixparlay" class="coupon-scenario-img"
+							<view class="promotion-scenario-item" v-if="hasPromotionBetType('Mix')"
+								@click="openPromotionSport">
+								<view class="promotion-scenario-icon">
+									<theme-icon name="mixparlay" class="promotion-scenario-image"
 										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 								</view>
-								<text class="coupon-scenario-label">Mix</text>
+								<text class="promotion-scenario-label">MPL</text>
 							</view>
 						</view>
 						<!-- Vendor list (collapsible below icons) -->
-						<view class="coupon-vendors-grid" v-if="promotionDisplayVendors.length > 0">
-							<view class="coupon-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
+						<view class="promotion-vendors-grid" v-if="promotionDisplayVendors.length > 0">
+							<view class="promotion-vendor-card" v-for="(vendor, index) in promotionDisplayVendors"
 								:key="index" @click="openPromotionVendorGames(vendor)">
-								<view class="coupon-vendor-info">
+								<view class="promotion-vendor-info">
 									<image :src="siteinfo.awcImgUrl + vendor.platform_image" style="height: 40px;"
 										mode="heightFix"></image>
-									<text class="coupon-vendor-name">{{ vendor.platform }}</text>
+									<text class="promotion-vendor-name">{{ vendor.platform }}</text>
 								</view>
 							</view>
 						</view>
 					</view>
 				</scroll-view>
 
-				<view class="detail-page-footer">
-					<view v-if="selectedPromotion.status === 'Available'" class="detail-claim-btn"
-						@click="showJoinPromotionDialog">
-						<text class="detail-claim-text">Join Promotion</text>
+				<view class="detail-page-footer promotion-detail-footer">
+					<view v-if="selectedPromotion.status === 'Available'"
+						class="detail-claim-btn promotion-detail-claim-btn" @click="showJoinPromotionDialog">
+						<text class="detail-claim-text">Join Now</text>
 					</view>
-					<view v-else-if="selectedPromotion.status === 'Joined'" class="detail-claim-btn"
+					<view v-else-if="selectedPromotion.status === 'Joined'"
+						class="detail-claim-btn promotion-detail-claim-btn"
 						:class="{ 'claimed': !selectedPromotion.can_end }"
 						@click="selectedPromotion.can_end && showEndPromotionDialog()">
 						<text class="detail-claim-text">{{ $t('End Promotion') }}</text>
@@ -557,6 +647,21 @@
 				promotion_page_size: 20,
 				promotion_list_end: false,
 				promotionCount: 0,
+				promotionTabs: ['Promotions', 'Claim History'],
+				promotion_tab_index: 0,
+				promotion_indicator_width: 0,
+				promotion_indicator_offset: 0,
+				promotion_history: [],
+				promotion_history_page: 1,
+				promotion_history_page_size: 20,
+				promotion_history_list_end: false,
+				promotion_history_loading: false,
+				promotion_history_loaded: false,
+				promotion_history_summary: {
+					total_promotions: 0,
+					active_promotions: 0,
+					total_bonus: 0
+				},
 
 				// Promotion 详情弹窗
 				showPromotionDetailModal: false,
@@ -594,6 +699,7 @@
 		mounted() {
 			this.$nextTick(() => {
 				this.initIndicator()
+				this.initPromotionIndicator()
 			})
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 		},
@@ -620,6 +726,33 @@
 				let date = `${d[0]}${sep}${d[1]}${sep}${d[2]}`
 				let time = t.length >= 2 ? ` ${t[0]}:${t[1]}` : ''
 				return date + time
+			},
+			formatPromotionDateTime(timeStr) {
+				if (!timeStr) return ''
+				const str = this.toMyanmarTime(timeStr)
+				const parts = str.split(' ')
+				const date = parts[0] ? parts[0].split('-') : []
+				const time = parts[1] ? parts[1].split(':') : []
+				if (date.length < 3) return str
+
+				const rawHour = Number(time[0] || 0)
+				const hour = rawHour % 12 || 12
+				const period = rawHour >= 12 ? 'PM' : 'AM'
+				const minute = time.length >= 2 ? time[1] : '00'
+				return `${date[2]}/${date[1]}/${date[0]} ${String(hour).padStart(2, '0')}:${minute} ${period}`
+			},
+			formatClaimHistoryTime(timeStr) {
+				if (!timeStr) return ''
+				const normalized = this.toMyanmarTime(timeStr)
+				const match = normalized.match(
+					/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/
+				)
+				if (!match) return normalized
+
+				const hour = Number(match[4])
+				const displayHour = hour % 12 || 12
+				const period = hour >= 12 ? 'PM' : 'AM'
+				return `${match[3]}.${match[2]}.${match[1]} ${displayHour}:${match[5]}${period}`
 			},
 			dateOnly(timeStr, sep = '.') {
 				if (!timeStr) return ''
@@ -663,6 +796,16 @@
 				if (text.length <= limit) return text
 				return text.substring(0, limit) + '...'
 			},
+			formatParticipationAmount(promotion) {
+				if (!promotion) return 'K 0'
+				const min = this.$toolbox.num_format(promotion.min_amount || 0)
+				const max = this.$toolbox.num_format(promotion.max_amount || 0)
+				if (promotion.participation_amount_type === 'Fixed' ||
+					Number(promotion.min_amount) === Number(promotion.max_amount)) {
+					return `K ${min}`
+				}
+				return `K ${min} - ${max}`
+			},
 			formatRewardAmount(amount, type) {
 				if (!amount || amount <= 0) return '0'
 				const v = this.$toolbox.num_format(amount)
@@ -690,8 +833,15 @@
 			change_type(type) {
 				if (this.activity_type === type) return
 				this.activity_type = type
-				if (type === 'promotion' && this.promotion_list.length === 0) {
-					this.loadPromotionList()
+				if (type === 'promotion') {
+					this.$nextTick(() => {
+						this.initPromotionIndicator()
+					})
+					if (this.promotion_tab_index === 1 && !this.promotion_history_loaded) {
+						this.loadPromotionHistory()
+					} else if (this.promotion_tab_index === 0 && this.promotion_list.length === 0) {
+						this.loadPromotionList()
+					}
 				} else if (type === 'coupon' && this.list.length === 0) {
 					this.getCouponList()
 				}
@@ -699,6 +849,18 @@
 			handleTabClick(index) {
 				if (this.tab_index !== index) {
 					this.tab_index = index
+				}
+			},
+			handlePromotionTabClick(index) {
+				if (this.promotion_tab_index === index) return
+				this.promotion_tab_index = index
+				this.$nextTick(() => {
+					this.updatePromotionIndicator()
+				})
+				if (index === 1 && !this.promotion_history_loaded) {
+					this.loadPromotionHistory()
+				} else if (index === 0 && this.promotion_list.length === 0) {
+					this.loadPromotionList()
 				}
 			},
 			initIndicator() {
@@ -721,9 +883,31 @@
 					}
 				}).exec()
 			},
+			initPromotionIndicator() {
+				const query = uni.createSelectorQuery().in(this)
+				query.selectAll('.promotion-tab-item').boundingClientRect((res) => {
+					if (res && res.length > 0) {
+						this.promotion_indicator_width = res[0].width
+						this.updatePromotionIndicator()
+					}
+				}).exec()
+			},
+			updatePromotionIndicator() {
+				const query = uni.createSelectorQuery().in(this)
+				query.selectAll('.promotion-tab-item').boundingClientRect((res) => {
+					if (res && res.length > this.promotion_tab_index) {
+						const current = res[this.promotion_tab_index]
+						const first = res[0]
+						this.promotion_indicator_offset = current.left - first.left
+						this.promotion_indicator_width = current.width
+					}
+				}).exec()
+			},
 			loadMore() {
 				if (this.activity_type === 'coupon') {
 					if (!this.list_end) this.getCouponList(true)
+				} else if (this.promotion_tab_index === 1) {
+					if (!this.promotion_history_list_end) this.loadMorePromotionHistory()
 				} else {
 					if (!this.promotion_list_end) this.loadMorePromotions()
 				}
@@ -1018,8 +1202,8 @@
 					period_start: this.dateOnly(promo.start_date, '/'),
 					period_end: this.dateOnly(promo.end_date, '/'),
 					end_time_full: this.parseServerTime(promo.end_date),
-					period_start_time: this.formatDateTime(promo.start_date),
-					period_end_time: this.formatDateTime(promo.end_date),
+					period_start_time: this.formatPromotionDateTime(promo.start_date),
+					period_end_time: this.formatPromotionDateTime(promo.end_date),
 					terms: promo.description || '',
 					min_amount: promo.min_amount || 0,
 					max_amount: promo.max_amount || 0,
@@ -1122,6 +1306,97 @@
 					}
 				}, () => {})
 			},
+			loadPromotionHistory(silent = false) {
+				let _this = this
+				_this.promotion_history_page = 1
+				_this.promotion_history_list_end = false
+				_this.promotion_history_loading = true
+
+				if (!silent) {
+					uni.showLoading({
+						title: 'Loading...',
+						mask: true
+					})
+				}
+
+				_this.$http.get('/promotion/my_promotions', {
+					data: {
+						page: _this.promotion_history_page,
+						page_size: _this.promotion_history_page_size
+					}
+				}, (res) => {
+					if (!silent) uni.hideLoading()
+					_this.promotion_history_loading = false
+
+					if (res.statusCode === 200 && res.data.code === 200) {
+						const data = res.data.data || {}
+						const pagination = data.pagination || {}
+						_this.promotion_history_summary = Object.assign({
+							total_promotions: 0,
+							active_promotions: 0,
+							total_bonus: 0
+						}, data.summary || {})
+						_this.promotion_history = data.participations || []
+						_this.promotion_history_loaded = true
+
+						if (pagination.current_page >= pagination.total_pages ||
+							_this.promotion_history.length === 0) {
+							_this.promotion_history_list_end = true
+						} else {
+							_this.promotion_history_page++
+						}
+					} else {
+						_this.promotion_history_loaded = false
+						_this.promotion_history = []
+						if (!silent) {
+							uni.showToast({
+								icon: 'none',
+								title: res.data.message || 'Failed to load claim history',
+								duration: 2000
+							})
+						}
+					}
+				}, () => {
+					if (!silent) {
+						uni.hideLoading()
+						uni.showToast({
+							icon: 'none',
+							title: 'Network error',
+							duration: 2000
+						})
+					}
+					_this.promotion_history_loading = false
+					_this.promotion_history_loaded = false
+				})
+			},
+			loadMorePromotionHistory() {
+				let _this = this
+				if (_this.promotion_history_list_end || _this.promotion_history_loading) return
+				_this.promotion_history_loading = true
+
+				_this.$http.get('/promotion/my_promotions', {
+					data: {
+						page: _this.promotion_history_page,
+						page_size: _this.promotion_history_page_size
+					}
+				}, (res) => {
+					_this.promotion_history_loading = false
+					if (res.statusCode === 200 && res.data.code === 200) {
+						const data = res.data.data || {}
+						const pagination = data.pagination || {}
+						const claims = data.participations || []
+						_this.promotion_history = _this.promotion_history.concat(claims)
+
+						if (pagination.current_page >= pagination.total_pages || claims.length === 0) {
+							_this.promotion_history_list_end = true
+						} else {
+							_this.promotion_history_page++
+						}
+					}
+				}, () => {
+					_this.promotion_history_loading = false
+				})
+			},
 			getPromotionHeaderClass(status) {
 				if (status === 'Completed') return 'header-expired'
 				return 'header-unused'
@@ -1211,6 +1486,12 @@
 				} catch (error) {
 					console.error('Failed to parse usage_scenario_config:', error)
 				}
+			},
+			hasPromotionBetType(type) {
+				const scenario = this.selectedPromotion && this.selectedPromotion.usage_scenario_1x2
+				if (!scenario) return false
+				const betTypes = scenario.bet_types || []
+				return betTypes.length === 0 ? type === 'Single' : betTypes.includes(type)
 			},
 			// Promotion - 跳转到 1x2 体育投注
 			openPromotionSport() {
@@ -1334,6 +1615,7 @@
 							duration: 2000
 						})
 						_this.loadPromotionList()
+						_this.loadPromotionHistory(true)
 						_this.refreshUserInfo()
 					} else {
 						this.$notice.show({
@@ -1379,6 +1661,7 @@
 					if (res.statusCode === 200 && res.data.code === 200) {
 						_this.closePromotionDetail()
 						_this.loadPromotionList()
+						_this.loadPromotionHistory(true)
 						_this.refreshUserInfo()
 						this.$notice.show({
 							title: 'Success',
@@ -1660,6 +1943,175 @@
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	}
 
+	.promotion-tab-selector {
+		width: 100%;
+		background: #fff;
+		margin-bottom: 8px;
+	}
+
+	.promotion-tab-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		border-bottom: 1px solid #d9d9d9;
+	}
+
+	.promotion-tab-item {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 38px;
+	}
+
+	.promotion-tab-text {
+		font-size: 15px;
+		color: $color-primary;
+		transition: color 0.25s ease;
+	}
+
+	.promotion-tab-item.active .promotion-tab-text {
+		color: $color-secondary;
+		font-weight: 600;
+	}
+
+	.promotion-slide-indicator {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		height: 2px;
+		background: $color-secondary;
+		border-radius: 2px;
+		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+	}
+
+	.claim-stats-card {
+		background: $bg-color-info;
+		border-radius: $radius-large;
+		padding: 16px 20px;
+		margin: 12px 0 20px;
+		color: $color-primary;
+	}
+
+	.claim-stats-title {
+		display: block;
+		margin-bottom: 18px;
+		text-align: center;
+		font-size: 16px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.claim-stats-row {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.claim-stat-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-width: 0;
+		flex: 1;
+		gap: 3px;
+	}
+
+	.claim-stat-total {
+		margin-top: 12px;
+	}
+
+	.claim-stat-label {
+		font-size: 13px;
+		color: $color-primary;
+		white-space: nowrap;
+	}
+
+	.claim-stat-value {
+		font-size: 16px;
+		font-weight: 700;
+		color: $color-primary;
+		white-space: nowrap;
+	}
+
+	.claim-history-card {
+		background: #fff;
+		border: 1px solid $color-border;
+		border-radius: $radius-large;
+		margin: 12px 0 20px;
+		padding: 16px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+	}
+
+	.claim-history-header {
+		display: flex;
+		align-items: center;
+		min-height: 24px;
+		margin: 0 4px 12px;
+	}
+
+	.claim-history-title {
+		color: $color-primary;
+		font-size: 16px;
+		font-weight: 700;
+	}
+
+	.claim-history-body {
+		background: $bg-color-info;
+		border-radius: $radius-large;
+		padding: 14px 16px;
+	}
+
+	.claim-history-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		min-height: 28px;
+	}
+
+	.claim-history-label,
+	.claim-history-value {
+		color: $color-primary;
+		font-size: 14px;
+	}
+
+	.claim-history-value {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	.claim-history-bonus-row {
+		margin-top: 2px;
+	}
+
+	.claim-history-bonus,
+	.claim-history-bonus-row .claim-history-label {
+		font-weight: 700;
+	}
+
+	.claim-history-status {
+		height: 20px;
+		margin-top: 10px;
+		border-radius: 10px;
+		background: $color-primary;
+		color: #fff;
+		font-size: 12px;
+		font-style: italic;
+		font-weight: 700;
+		line-height: 20px;
+		text-align: center;
+	}
+
+	.claim-history-status-active {
+		background: #2ba84a;
+	}
+
+	.claim-history-status-cancelled,
+	.claim-history-status-expired {
+		background: #9eacb5;
+	}
+
 	/* 列表容器 */
 	.list-container {
 		padding: 0 15px 12px;
@@ -1896,7 +2348,7 @@
 
 	/* Promotion 卡片 */
 	.promotion-list-container {
-		padding: 8px 20px 20px;
+		padding: 0 20px 20px;
 	}
 
 	.promotion-card2 {
@@ -1909,8 +2361,7 @@
 	}
 
 	.promotion-card2-header {
-		min-height: 52px;
-		padding: 0 16px;
+		padding: 12px;
 		color: #fff;
 		text-align: center;
 		display: flex;
@@ -1919,13 +2370,13 @@
 	}
 
 	.promotion-card2-title {
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 700;
 	}
 
 	.promotion-card2-image {
 		width: 100%;
-		height: 128px;
+		height: calc((100vw - 40px) * 0.4);
 		background: $bg-color-info;
 		overflow: hidden;
 	}
@@ -1959,7 +2410,7 @@
 
 	.promo-period {
 		margin-top: 1px;
-		font-size: 16px;
+		font-size: 15px;
 		line-height: 24px;
 		color: $color-primary;
 		font-weight: 700;
@@ -1976,7 +2427,7 @@
 	}
 
 	.promo-terms {
-		font-size: 16px;
+		font-size: 15px;
 		color: $color-primary;
 		font-weight: 700;
 		line-height: 1.35;
@@ -1985,8 +2436,7 @@
 	}
 
 	.promotion-card2-footer {
-		min-height: 68px;
-		padding: 14px 16px 15px;
+		padding: 10px 16px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -1995,7 +2445,7 @@
 	}
 
 	.promo-amount {
-		font-size: 20px;
+		font-size: 18px;
 		line-height: 26px;
 		font-weight: 700;
 		color: $color-primary;
@@ -2005,9 +2455,8 @@
 	.promo-status-btn {
 		background: $color-primary;
 		color: #fff;
-		width: 117px;
-		height: 36px;
-		border-radius: $radius-medium;
+		padding: 8px 12px;
+		border-radius: $radius-small;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2083,7 +2532,7 @@
 	}
 
 	.detail-modal-title {
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: 600;
 		color: #fff;
 	}
@@ -2178,7 +2627,7 @@
 
 	.detail-info-label {
 		font-size: 12px;
-		color: #8B8891;
+		color: $color-primary;
 	}
 
 	.detail-info-value {
@@ -2313,6 +2762,319 @@
 		color: #fff;
 	}
 
+	/* ============ Promotion Detail ============ */
+	.promotion-detail-page {
+		position: relative;
+	}
+
+	.promotion-detail-close {
+		position: absolute;
+		top: 3px;
+		right: 5px;
+		z-index: 10;
+		width: 32px;
+		height: 32px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.promotion-detail-body {
+		padding: 30px 20px 0;
+		background: #fff;
+		box-sizing: border-box;
+	}
+
+	.promotion-detail-hero-card {
+		background: #fff;
+		border: 1px solid rgba(42, 98, 104, 0.24);
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(20, 55, 60, 0.08);
+		margin-bottom: 15px;
+	}
+
+	.promotion-detail-title-wrap {
+		min-height: 52px;
+		padding: 8px 16px;
+		background: $color-primary;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
+	.promotion-detail-title {
+		font-size: 16px;
+		line-height: 20px;
+		font-weight: 700;
+		color: #fff;
+		text-align: center;
+	}
+
+	.promotion-detail-slogan {
+		margin-top: 2px;
+		font-size: 11px;
+		line-height: 15px;
+		color: rgba(255, 255, 255, 0.88);
+		text-align: center;
+	}
+
+	.promotion-detail-image-wrapper {
+		width: 100%;
+		height: calc((100vw - 40px) * 0.4);
+		background: $bg-color-info;
+		overflow: hidden;
+	}
+
+	.promotion-detail-image {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.promotion-detail-summary {
+		padding: 18px 16px 16px;
+	}
+
+	.promotion-detail-field+.promotion-detail-field {
+		margin-top: 14px;
+	}
+
+	.promotion-detail-label {
+		display: block;
+		font-size: 12px;
+		line-height: 18px;
+		font-weight: 500;
+		color: $color-primary;
+	}
+
+	.promotion-detail-value {
+		display: block;
+		margin-top: 2px;
+		font-size: 19px;
+		line-height: 25px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-detail-info-card {
+		padding: 18px 19px;
+		margin-bottom: 15px;
+		background: #fff;
+		border: 1px solid rgba(42, 98, 104, 0.24);
+		border-radius: 16px;
+		box-shadow: 0 4px 12px rgba(20, 55, 60, 0.08);
+		box-sizing: border-box;
+	}
+
+	.promotion-countdown-block {
+		margin-bottom: 10px;
+	}
+
+	.promotion-countdown {
+		margin-top: 2px;
+		font-size: 15px;
+		line-height: 20px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-detail-info-value {
+		display: block;
+		margin-top: 3px;
+		font-size: 15px;
+		line-height: 22px;
+		font-weight: 700;
+		color: $color-primary;
+		word-break: break-word;
+	}
+
+	.promotion-detail-terms {
+		display: block;
+		margin-top: 4px;
+		font-size: 15px;
+		line-height: 20px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-detail-read-more {
+		display: block;
+		margin-top: 6px;
+		font-size: 12px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-progress-section+.promotion-progress-section {
+		margin-top: 18px;
+	}
+
+	.promotion-progress-title {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 14px;
+		line-height: 18px;
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-progress-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		margin-bottom: 6px;
+	}
+
+	.promotion-progress-label {
+		font-size: 12px;
+		line-height: 18px;
+		color: #5a7a8f;
+	}
+
+	.promotion-progress-value {
+		font-size: 13px;
+		line-height: 18px;
+		font-weight: 700;
+		color: $color-primary;
+		text-align: right;
+	}
+
+	.promotion-progress-bar {
+		width: 100%;
+		height: 8px;
+		background: #e0e8ec;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.promotion-progress-fill {
+		height: 100%;
+		background: $color-primary;
+		border-radius: 4px;
+	}
+
+	.promotion-progress-wallet {
+		margin-top: 18px;
+		padding-top: 12px;
+		border-top: 1px solid rgba(42, 98, 104, 0.14);
+	}
+
+	.promotion-progress-wallet-label,
+	.promotion-progress-wallet-value {
+		font-weight: 700;
+		color: $color-primary;
+	}
+
+	.promotion-detail-ineligibility {
+		margin-bottom: 20px;
+		padding: 12px 14px;
+		background: #fff4f4;
+		border: 1px solid rgba(231, 76, 60, 0.18);
+		border-radius: 12px;
+		font-size: 12px;
+		line-height: 18px;
+		color: #e74c3c;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.promotion-detail-scenarios {
+		padding: 18px 19px;
+		margin-bottom: 4px;
+		background: $bg-color-info;
+		border: 1px solid rgba(42, 98, 104, 0.24);
+		border-radius: 16px;
+		box-sizing: border-box;
+	}
+
+	.promotion-scenarios-title {
+		margin-bottom: 14px;
+	}
+
+	.promotion-scenarios-icons {
+		display: flex;
+		align-items: flex-start;
+		gap: 20px;
+	}
+
+	.promotion-scenario-item {
+		width: 40px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.promotion-scenario-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.promotion-scenario-image {
+		width: 40px;
+		height: 40px;
+	}
+
+	.promotion-scenario-label {
+		margin-top: 5px;
+		font-size: 12px;
+		line-height: 16px;
+		color: $color-primary;
+		text-align: center;
+	}
+
+	.promotion-vendors-grid {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 14px;
+	}
+
+	.promotion-vendor-card {
+		width: calc(33.33% - 6px);
+		padding: 8px 4px;
+		background: #fff;
+		border-radius: 8px;
+		box-sizing: border-box;
+	}
+
+	.promotion-vendor-info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.promotion-vendor-name {
+		font-size: 11px;
+		font-weight: 600;
+		color: #333;
+		text-align: center;
+	}
+
+	.promotion-detail-footer {
+		padding: 8px 20px;
+		border-top: 0;
+		background: #fff;
+	}
+
+	.promotion-detail-claim-btn {
+		min-height: 40px;
+		padding: 0;
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
 	/* ============ Coupon Detail Modal (coupon-specific) ============ */
 
 	/* Hero image with title overlay */
@@ -2344,6 +3106,9 @@
 		font-weight: bold;
 		color: #fff;
 		text-align: center;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
 	}
 
 	.coupon-hero-fallback {
@@ -2351,6 +3116,7 @@
 		border-radius: 12px;
 		padding: 14px 16px;
 		margin-bottom: 20px;
+		text-align: center;
 	}
 
 	/* Description section */
@@ -2371,6 +3137,9 @@
 		font-size: 14px;
 		color: $color-secondary;
 		text-align: center;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
 		line-height: 1.6;
 	}
 
@@ -2387,7 +3156,7 @@
 	}
 
 	.coupon-code-text {
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: bold;
 		color: $color-primary;
 	}

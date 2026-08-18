@@ -206,7 +206,7 @@
 
 	/* from tangjq--- 标题栏 */
 	.filter-header {
-		background-color: $color-secondary;
+		background-color: $color-primary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
@@ -298,7 +298,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: $color-secondary;
+		background-color: $color-primary;
 		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
@@ -307,7 +307,7 @@
 	}
 
 	.filter-confirm-btn:active {
-		background-color: #2d5d5d;
+		background-color: $color-secondary;
 	}
 
 	.filter-confirm-text {

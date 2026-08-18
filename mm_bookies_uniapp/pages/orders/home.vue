@@ -51,18 +51,20 @@
 		</view>
 
 		<view class="bg-white">
-			<view class="tab-selector">
-				<view class="tab-container">
-					<view class="tab-item" :class="{'active':current_page==='pending'}" @click="page_change('pending')">
-						<text class="tab-text">{{$t('pending')}}</text>
+			<view class="promotion-tab-selector">
+				<view class="promotion-tab-container">
+					<view class="promotion-tab-item" :class="{'active':current_page==='pending'}"
+						@click="page_change('pending')">
+						<text class="promotion-tab-text">{{$t('pending')}}</text>
 					</view>
-					<view class="tab-item" :class="{'active':current_page==='Finished'}"
+					<view class="promotion-tab-item" :class="{'active':current_page==='Finished'}"
 						@click="page_change('Finished')">
-						<text class="tab-text">{{$t('Finished')}}</text>
+						<text class="promotion-tab-text">{{$t('Finished')}}</text>
 					</view>
 
 					<!-- from tangjq--- 底部滑动指示器 -->
-					<view class="slide-indicator" :class="{'indicator-finished': current_page==='Finished'}"></view>
+					<view class="promotion-slide-indicator" :class="{'indicator-finished': current_page==='Finished'}">
+					</view>
 				</view>
 			</view>
 		</view>
@@ -134,13 +136,14 @@
 
 					<!-- 混合投注 Parlay -->
 					<view class="bet-card parlay-card" v-else>
+						<view class="user-label-badge" :class="getWalletBadgeClass(item.pay_wallet)"
+							v-if="item.pay_wallet">
+							<text class="user-label-text">{{getWalletBadgeLabel(item.pay_wallet)}}</text>
+						</view>
+
 						<!-- 单个比赛项 - 折叠时只显示一个 -->
 						<view v-if="!item.show_detail">
 							<view class="card-header">
-								<view class="user-label-badge" :class="getWalletBadgeClass(item.pay_wallet)"
-									v-if="item.pay_wallet">
-									<text class="user-label-text">{{getWalletBadgeLabel(item.pay_wallet)}}</text>
-								</view>
 								<view class="match-time">{{item.order_time}}</view>
 								<view class="header-match">
 									<text class="team-name"
@@ -176,12 +179,6 @@
 						<view v-else>
 							<view v-for="(detail,_index) in item.detail" :key="_index">
 								<view class="card-header">
-									<view class="user-label-badge"
-										:class="getWalletBadgeClass(detail.pay_wallet || item.pay_wallet)"
-										v-if="detail.pay_wallet || item.pay_wallet">
-										<text
-											class="user-label-text">{{getWalletBadgeLabel(detail.pay_wallet || item.pay_wallet)}}</text>
-									</view>
 									<!-- 混合投注展开后，仅第一场显示下注日期 -->
 									<view class="match-time" v-if="_index === 0">{{detail.order_time}}</view>
 									<view class="header-match">
@@ -219,8 +216,8 @@
 						<!-- Parlay 底部汇总信息 -->
 						<view class="parlay-summary">
 							<view class="info-row">
-								<text class="label">{{$t('total bet amount')}}<text v-if="item.pay_wallet">
-										({{getWalletBadgeLabel(item.pay_wallet)}})</text></text>
+								<text class="label">{{$t('total bet amount')}}
+								</text>
 								<text class="value value-amount">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
 							</view>
 							<view class="info-row">
@@ -976,54 +973,52 @@
 	}
 
 	/* Tab 样式 */
-	.tab-selector {
+	.promotion-tab-selector {
 		width: 100%;
 		background: #fff;
-		border-radius: 20px 20px 0 0;
+		margin-bottom: 8px;
 		padding: 0 15px;
 	}
 
-	.tab-container {
+	.promotion-tab-container {
 		position: relative;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		border-bottom: 2px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		border-bottom: 1px solid #d9d9d9;
 	}
 
-	.tab-item {
+	.promotion-tab-item {
+		flex: 1;
 		display: flex;
 		align-items: center;
-		cursor: pointer;
-		height: 30px;
-		// padding: 0 10px;
+		justify-content: center;
+		height: 38px;
 	}
 
-	.tab-text {
-		font-size: 16px;
-		color: #5a7a8f;
-		transition: color 0.25s ease;
-		font-weight: 400;
-	}
-
-	.tab-item.active .tab-text {
+	.promotion-tab-text {
+		font-size: 15px;
 		color: $color-primary;
+		transition: color 0.25s ease;
 	}
 
-	.slide-indicator {
+	.promotion-tab-item.active .promotion-tab-text {
+		color: $color-secondary;
+		font-weight: 600;
+	}
+
+	.promotion-slide-indicator {
 		position: absolute;
 		bottom: 0;
 		left: 0;
 		height: 2px;
-		background: $color-primary;
+		width: 50%;
+		background: $color-secondary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-		width: 60px;
 	}
 
-	.slide-indicator.indicator-finished {
-		left: auto;
-		right: 0;
+	.promotion-slide-indicator.indicator-finished {
+		transform: translateX(100%);
 	}
 
 	.main-scroll-view {
@@ -1217,12 +1212,12 @@
 
 	/* Parlay 特殊样式 */
 	.parlay-card {
-		/* Parlay卡片的额外样式 */
+		position: relative;
 	}
 
 	/* from tangjq--- Parlay汇总信息，与上方内容连接 */
 	.parlay-summary {
-		padding: 10px 15px;
+		padding: 0 15px 10px;
 		background: #FFFFFF;
 	}
 
