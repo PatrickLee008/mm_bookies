@@ -462,6 +462,36 @@
 		font-family: 'regular';
 	}
 
+	// Keep H5 page overscroll inside the page scroll-view instead of moving
+	// the document behind the fixed header.
+	html,
+	body {
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		overflow: hidden;
+		overscroll-behavior: none;
+	}
+
+	#app,
+	uni-app,
+	uni-page,
+	uni-page-wrapper,
+	uni-page-body,
+	page {
+		width: 100%;
+		height: 100%;
+		min-height: 100%;
+		overflow: hidden;
+	}
+
+	scroll-view,
+	uni-scroll-view,
+	.uni-scroll-view {
+		overscroll-behavior-y: contain;
+		-webkit-overflow-scrolling: touch;
+	}
+
 	// Keep the app shell background behind transparent page containers and
 	// rounded header edges. Individual no-header pages opt into their own theme.
 	page,
