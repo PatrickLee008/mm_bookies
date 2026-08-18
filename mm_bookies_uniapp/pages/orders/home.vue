@@ -302,7 +302,8 @@
 					<view class="parlay-confirm-button" @click="close_parlay_detail">
 						<text>{{$t('Confirm')}}</text>
 					</view>
-					<view class="parlay-download-button" :class="{ 'is-downloading': downloading_slip }"
+					<view class="parlay-download-button" data-html2canvas-ignore="true"
+						:class="{ 'is-downloading': downloading_slip }"
 						@click="download_parlay_slip">
 						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
 						</image>
