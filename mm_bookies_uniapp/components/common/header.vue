@@ -119,10 +119,6 @@
 			active: {
 				type: String,
 				default: ''
-			},
-			allowCollapse: {
-				type: Boolean,
-				default: true
 			}
 		},
 		data() {
@@ -153,7 +149,7 @@
 				return this.currentRoute.indexOf('pages/wallet/') === 0
 			},
 			headerCollapsed() {
-				return this.isLogin && (!this.isWalletPage || (this.allowCollapse && this.collapsed))
+				return this.isLogin && !this.isWalletPage
 			},
 			pageTitle() {
 				const titles = {
@@ -217,24 +213,6 @@
 			// from tangjq--- 监听active prop变化
 			active(newVal) {
 				this.activeNav = newVal;
-			},
-			allowCollapse(newVal) {
-				if (!this.isLogin || !this.isWalletPage) return
-
-				const nextCollapsed = newVal ? this.collapsed : false
-				if (this.collapsed !== nextCollapsed) {
-					this.collapsed = nextCollapsed
-				}
-
-				this.$nextTick(() => {
-					if (nextCollapsed) {
-						this.$emit('headerHeightChange', 85)
-					} else if (this.expandedHeight) {
-						this.$emit('headerHeightChange', this.expandedHeight)
-					} else {
-						this.calculateHeaderHeight()
-					}
-				})
 			}
 		},
 		methods: {
@@ -292,7 +270,7 @@
 					if (rect && rect.height) {
 						this.headerHeight = rect.height;
 						// 记录展开状态的高度，用于收起后立即恢复
-						if ((this.isWalletPage && (!this.collapsed || !this.allowCollapse)) || !this.isLogin) {
+						if (this.isWalletPage || !this.isLogin) {
 							this.expandedHeight = rect.height;
 						}
 						this.$emit('headerHeightChange', rect.height);
@@ -304,7 +282,7 @@
 			handleSetCollapsed(collapsed) {
 				// 未登录时保持完整 header，避免标题栏与登录卡片因收缩样式重新排版。
 				const nextCollapsed = this.isLogin ?
-					(!this.isWalletPage || (this.allowCollapse && collapsed)) :
+					(!this.isWalletPage && collapsed) :
 					false
 				if (this.collapsed === nextCollapsed) return
 				this.collapsed = nextCollapsed
