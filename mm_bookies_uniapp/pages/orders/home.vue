@@ -303,8 +303,7 @@
 						<text>{{$t('Confirm')}}</text>
 					</view>
 					<view class="parlay-download-button" data-html2canvas-ignore="true"
-						:class="{ 'is-downloading': downloading_slip }"
-						@click="download_parlay_slip">
+						:class="{ 'is-downloading': downloading_slip }" @click="download_parlay_slip">
 						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
 						</image>
 						<text>{{$t('Download Slip')}}</text>
@@ -1604,7 +1603,7 @@
 
 	.parlay-detail-summary {
 		flex-shrink: 0;
-		padding: 10px 12px 0;
+		padding: 10px 15px 0;
 		border-top: 1px solid $color-border;
 	}
 
