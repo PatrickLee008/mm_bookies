@@ -1,0 +1,1 @@
+const o={activated(){const{params:t,query:e}=this.$route,{path:r}=t;this.$router.replace({path:"/"+r,query:e})},render:function(t){return t()}},a=Object.freeze(Object.defineProperty({__proto__:null,default:o},Symbol.toStringTag,{value:"Module"}));export{a as _};

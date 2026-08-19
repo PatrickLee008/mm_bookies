@@ -1,0 +1,17 @@
+# 缩小构建上下文，避免把前端源码/依赖/本地产物打入镜像
+**/.git
+**/.idea
+**/__pycache__
+**/*.pyc
+**/node_modules
+mm_bookies_uniapp/unpackage/cache
+mm_bookies_uniapp/node_modules
+**/logs/*.log
+**/*.zip
+jx-push/jx-push.zip
+web_manager/
+**/.env.local
+**/.env.develop
+**/.env.test
+**/.env.test.bak
+deploy/**/*.md

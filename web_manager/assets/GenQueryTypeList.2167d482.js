@@ -1,0 +1,1 @@
+import{_ as t,a as o,u as _,A as n}from"./index.80da1cb2.js";const r={};function c(a,l){const e=o("gen-query-type-list",!0);return _(),n(e)}const s=t(r,[["render",c]]),u=Object.freeze(Object.defineProperty({__proto__:null,default:s},Symbol.toStringTag,{value:"Module"}));export{u as _};

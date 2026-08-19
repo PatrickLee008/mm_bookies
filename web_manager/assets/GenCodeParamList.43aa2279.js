@@ -1,0 +1,1 @@
+import{_ as o,a as t,u as _,A as n}from"./index.80da1cb2.js";const r={};function c(s,l){const e=t("gen-code-param-list",!0);return _(),n(e)}const a=o(r,[["render",c]]),i=Object.freeze(Object.defineProperty({__proto__:null,default:a},Symbol.toStringTag,{value:"Module"}));export{i as _};

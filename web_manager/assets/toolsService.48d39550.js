@@ -1,0 +1,1 @@
+import{s as e}from"./httpRequest.3b80f148.js";const n={sendEmail:function(o){return e({url:"/tools/email/send",method:"post",data:o})},createTwoDimensionCode:function(o){return e({url:"/tools/TwoDimensionCodeController/createTwoDimensionCode",method:"get",params:o})}};export{n as t};

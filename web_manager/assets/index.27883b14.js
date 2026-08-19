@@ -1,0 +1,1 @@
+import{_ as o,a as t,u as _,A as s,z as a,C as c}from"./index.80da1cb2.js";const r={};function n(f,l){const e=t("el-footer");return _(),s(e,{class:"footer"},{default:a(()=>[c("Copyright \xA9 2025 JXBoot All Rights Reserved")]),_:1})}const p=o(r,[["render",n],["__scopeId","data-v-aaf826e2"]]);export{p as F};

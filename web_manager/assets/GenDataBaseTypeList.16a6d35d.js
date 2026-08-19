@@ -1,0 +1,1 @@
+import{_ as t,a as _,u as o,A as a}from"./index.80da1cb2.js";const n={};function s(c,l){const e=_("gen-data-base-type-list",!0);return o(),a(e)}const r=t(n,[["render",s]]),i=Object.freeze(Object.defineProperty({__proto__:null,default:r},Symbol.toStringTag,{value:"Module"}));export{i as _};

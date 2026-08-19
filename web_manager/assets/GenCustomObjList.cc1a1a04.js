@@ -1,0 +1,1 @@
+import{_ as o,a as t,u as _,A as n}from"./index.80da1cb2.js";const c={};function s(a,l){const e=t("gen-custom-obj-list",!0);return _(),n(e)}const r=o(c,[["render",s]]),i=Object.freeze(Object.defineProperty({__proto__:null,default:r},Symbol.toStringTag,{value:"Module"}));export{i as _};

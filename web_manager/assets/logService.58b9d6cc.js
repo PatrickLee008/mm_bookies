@@ -1,0 +1,1 @@
+import{s as t}from"./httpRequest.3b80f148.js";const s={list:function(e){return t({url:"/sys/log/list",method:"get",params:e})},mine:function(e){return t({url:"/sys/log/data/mine",method:"get",params:e})},delete:function(e){return t({url:"/sys/log/delete",method:"delete",params:{ids:e}})},empty:function(){return t({url:"/sys/log/empty",method:"delete"})}};export{s as l};
