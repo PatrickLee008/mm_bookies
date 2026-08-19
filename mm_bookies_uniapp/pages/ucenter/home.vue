@@ -431,14 +431,14 @@
 						img: '../../static/icon/ucenter/language.png',
 						para: {},
 					},
-					{
-						title: "theme_test",
-						content: '',
-						method: 'showThemeModal',
-						args: [],
-						img: '../../static/icon/ucenter/about.png',
-						para: {},
-					},
+					// {
+					// 	title: "theme_test",
+					// 	content: '',
+					// 	method: 'showThemeModal',
+					// 	args: [],
+					// 	img: '../../static/icon/ucenter/about.png',
+					// 	para: {},
+					// },
 					{
 						title: "logout", // from tangjq--- 使用语言文件中的键名
 						content: '',
@@ -518,7 +518,7 @@
 				// from tangjq--- 语言选择器
 				selectedLanguage: uni.getStorageSync('UNI_LOCALE') || 'mm',
 				themeModalVisible: false,
-				selectedTheme: uni.getStorageSync('frontend_theme_preset') || 'mm-bookies',
+				selectedTheme: uni.getStorageSync('frontend_theme_preset'),
 				themeOptions: [{
 					value: 'mm-bookies',
 					label: 'MM Bookies',
