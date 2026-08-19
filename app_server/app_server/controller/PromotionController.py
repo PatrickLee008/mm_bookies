@@ -1282,12 +1282,37 @@ def get_my_promotions():
         page_size = min(int(request.args.get('page_size', 20)), 100)
         status = request.args.get('status')  # 'Active', 'Completed', 'Expired', 'Cancelled'
 
-        # 构建查询（使用AppPlayerActivityRecord表）
-        query = AppPlayerActivityRecord.query.filter(
+        base_filters = [
             AppPlayerActivityRecord.mb_id == user_id,
             AppPlayerActivityRecord.activity_type == 'PROMOTION',
-            AppPlayerActivityRecord.del_flag == 0
-        )
+            AppPlayerActivityRecord.del_flag == 0,
+            AppPlayerActivityRecord.tenant_id == '10000'
+        ]
+
+        # 统计数据不受 status 分页筛选影响，用于 Claim History 顶部汇总卡片。
+        summary_query = AppPlayerActivityRecord.query.filter(*base_filters)
+        total_promotions = summary_query.count()
+        active_promotions = summary_query.filter(
+            AppPlayerActivityRecord.status == 'Active'
+        ).count()
+        total_bonus = summary_query.filter(
+            AppPlayerActivityRecord.status != 'Cancelled'
+        ).with_entities(
+            func.coalesce(func.sum(AppPlayerActivityRecord.bonus_amount), 0)
+        ).scalar() or 0
+
+        # 一次性关联促销配置，避免逐条查询 promotion 信息。
+        query = db.session.query(
+            AppPlayerActivityRecord,
+            MAppPromotion
+        ).outerjoin(
+            MAppPromotion,
+            and_(
+                MAppPromotion.id == AppPlayerActivityRecord.activity_id,
+                MAppPromotion.del_flag == 0,
+                MAppPromotion.tenant_id == '10000'
+            )
+        ).filter(*base_filters)
 
         if status:
             query = query.filter(AppPlayerActivityRecord.status == status)
@@ -1297,18 +1322,26 @@ def get_my_promotions():
 
         # 分页
         offset = (page - 1) * page_size
-        activities = query.order_by(AppPlayerActivityRecord.start_time.desc()).offset(offset).limit(page_size).all()
+        activities = query.order_by(
+            AppPlayerActivityRecord.start_time.desc()
+        ).offset(offset).limit(page_size).all()
 
         # 格式化返回数据
         participation_list = []
-        for activity in activities:
-            # 获取促销活动信息
-            promotion_obj = MAppPromotion.query.filter_by(id=activity.activity_id, del_flag=0).first()
-
+        for activity, promotion_obj in activities:
             # 计算进度
             turnover_percentage = 0
             if activity.req_turnover and activity.req_turnover > 0:
                 turnover_percentage = min(100, float((activity.cur_turnover / activity.req_turnover) * 100))
+
+            actual_bonus = float(activity.bonus_amount) if activity.bonus_amount else 0
+            completion_time = activity.end_time.strftime(
+                '%Y-%m-%d %H:%M:%S'
+            ) if activity.end_time else None
+            expire_time = completion_time or (
+                promotion_obj.end_date.strftime('%Y-%m-%d %H:%M:%S')
+                if promotion_obj and promotion_obj.end_date else None
+            )
 
             part_info = {
                 'id': activity.id,
@@ -1316,8 +1349,8 @@ def get_my_promotions():
                 'promotion_title': activity.activity_name if activity.activity_name else (
                     promotion_obj.title if promotion_obj else 'Unknown'),
                 'promotion_image': promotion_obj.image_url if promotion_obj else None,
-                'reward_amount': float(
-                    promotion_obj.reward_amount) if promotion_obj and promotion_obj.reward_amount else 0,
+                'reward_amount': actual_bonus,
+                'total_bonus': actual_bonus,
                 'target_wallet': 'Promotion',
                 'status': activity.status,
                 'turnover_requirement': float(activity.req_turnover) if activity.req_turnover else 0,
@@ -1325,14 +1358,19 @@ def get_my_promotions():
                 'turnover_percentage': turnover_percentage,
                 'participation_time': activity.start_time.strftime(
                     '%Y-%m-%d %H:%M:%S') if activity.start_time else None,
-                'completion_time': activity.end_time.strftime('%Y-%m-%d %H:%M:%S') if activity.end_time else None,
-                'expire_time': activity.end_time.strftime('%Y-%m-%d %H:%M:%S') if activity.end_time else None
+                'completion_time': completion_time,
+                'expire_time': expire_time
             }
             participation_list.append(part_info)
 
         return jsonify({
             'code': SUCCESS_CODE,
             'data': {
+                'summary': {
+                    'total_promotions': total_promotions,
+                    'active_promotions': active_promotions,
+                    'total_bonus': float(total_bonus)
+                },
                 'participations': participation_list,
                 'pagination': {
                     'current_page': page,

@@ -340,7 +340,7 @@
 			Vue.prototype.ColorList = [{
 					title: '嫣红',
 					name: 'red',
-					color: '#e54d42'
+					color: '#D0342C'
 				},
 				{
 					title: '桔橙',
@@ -462,16 +462,50 @@
 		font-family: 'regular';
 	}
 
+	:root {
+		--app-viewport-height: 100vh;
+	}
+
+	// Keep H5 page overscroll inside the page scroll-view instead of moving
+	// the document behind the fixed header.
+	html,
+	body {
+		width: 100%;
+		height: var(--app-viewport-height);
+		margin: 0;
+		overflow: hidden;
+		overscroll-behavior: none;
+	}
+
+	#app,
+	uni-app,
+	uni-page,
+	uni-page-wrapper,
+	uni-page-body,
+	page {
+		width: 100%;
+		height: var(--app-viewport-height);
+		min-height: var(--app-viewport-height);
+		overflow: hidden;
+	}
+
+	scroll-view,
+	uni-scroll-view,
+	.uni-scroll-view {
+		overscroll-behavior-y: contain;
+		-webkit-overflow-scrolling: touch;
+	}
+
 	// Keep the app shell background behind transparent page containers and
 	// rounded header edges. Individual no-header pages opt into their own theme.
 	page,
 	body,
 	#app {
-		background-color: var(--theme-with-header-background-color, #{$theme-header-start});
-		background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
-		background-position: var(--theme-with-header-background-position, center);
-		background-size: var(--theme-with-header-background-size, cover);
-		background-repeat: var(--theme-with-header-background-repeat, no-repeat);
+		background-color: var(--theme-app-background-color, #{$theme-app-background-color});
+		background-image: var(--theme-app-background-image, #{$theme-app-background});
+		background-position: var(--theme-app-background-position, center);
+		background-size: var(--theme-app-background-size, cover);
+		background-repeat: var(--theme-app-background-repeat, no-repeat);
 	}
 
 	.nav-list {

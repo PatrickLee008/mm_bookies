@@ -18,7 +18,7 @@
 		</view>
 
 		<!-- 记录列表 -->
-		<scroll-view scroll-y style="height: calc(100vh - 190px);padding-top: 2px;" @scrolltolower="loadMore" :refresher-enabled="true" 
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 190px);padding-top: 2px;" @scrolltolower="loadMore" :refresher-enabled="true"
 			@refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 			
 			<!-- 空状态 -->
@@ -297,7 +297,7 @@ export default {
 <style lang="scss" scoped>
 	.dark-teal-bg {
 
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 .record-item {
@@ -359,7 +359,7 @@ export default {
 
 .status-success {
 	background-color: #f6ffed;
-	color: #52c41a;
+	color: $color-secondary;
 }
 
 .status-failed {
@@ -446,8 +446,8 @@ export default {
 }
 
 .empty-icon {
-	width: 120px;
-	height: 120px;
+	width: 60px;
+	height: 60px;
 	opacity: 0.6;
 }
 
@@ -455,6 +455,7 @@ export default {
 	font-size: 16px;
 	color: #999999;
 	margin-top: 20px;
+	text-align: center;
 }
 
 .loading-more {

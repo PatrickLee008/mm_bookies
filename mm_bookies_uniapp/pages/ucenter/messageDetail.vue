@@ -1,7 +1,7 @@
 <template>
 	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
-		<scroll-view class="padding" scroll-y style="height: calc(100vh - 120px);">
+		<scroll-view class="padding" scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 120px);">
 			<!-- 返回头部 -->
 			<view class="flex-row justify-start align-center margin-bottom-sm">
 				<text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text>
@@ -322,7 +322,7 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	.message-detail-card {

@@ -2,7 +2,7 @@
 	<view class="full-page">
 		<zw-header></zw-header>
 
-		<scroll-view scroll-y style="height: calc(100vh - 110px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 110px);">
 			<view class="title-bar" style="box-shadow: none;">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -23,7 +23,8 @@
 					</view>
 					<view class="flex-row1 justify-between align-center">
 						<text>{{userInfo.id}}</text>
-						<text class="cuIcon-copy myfont-18px" @click="copy"></text>
+						<theme-icon name="copy" size="18px"
+							color="var(--theme-icon-on-primary, #fff)" @click="copy"></theme-icon>
 					</view>
 				</view>
 				<view class="bank-rec" v-if="card_list[0]">
@@ -379,7 +380,7 @@
 	}
 
 	.input-error {
-		border-color: #e54d42;
+		border-color: #D0342C;
 	}
 
 	.input-focused .label-focused {
@@ -387,7 +388,7 @@
 	}
 
 	.input-error .label-focused {
-		color: #e54d42;
+		color: #D0342C;
 	}
 
 

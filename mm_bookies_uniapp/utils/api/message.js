@@ -146,7 +146,7 @@ export function deleteMessage(ids) {
 		// 转换为字符串格式
 		const idStr = Array.isArray(ids) ? ids.join(',') : ids;
 
-		// mm_bookies 的 http 工具未提供 delete 快捷方法，使用 request 指定 method
+		// mm-bookies 的 http 工具未提供 delete 快捷方法，使用 request 指定 method
 		http.request({
 			url: '/message/delete',
 			method: 'DELETE',

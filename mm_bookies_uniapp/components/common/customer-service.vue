@@ -502,13 +502,14 @@
 		align-items: center;
 		justify-content: center;
 		background: $color-primary;
-		border: 0;
+		border: 1px solid $color-border-other;
 		border-radius: 50%;
+		box-sizing: border-box;
 	}
 
 	.customer-btn-icon {
-		width: 24px;
-		height: 24px;
+		width: 20px;
+		height: 20px;
 		display: block;
 	}
 

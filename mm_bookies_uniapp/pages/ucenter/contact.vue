@@ -7,7 +7,7 @@
 			<text class="header-close-icon" @click="goBack">✕</text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="contact-content">
 				<!-- 标题部分 -->
 				<text class="contact-section-title">{{ $t('Contact') }}</text>
@@ -142,7 +142,7 @@
 						name: 'a',
 						attrs: {
 							href: href,
-							style: 'color: #4fb3bf; text-decoration: underline;'
+							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 						},
 						children: [{
 							type: 'text',
@@ -237,7 +237,7 @@
 <style lang="scss" scoped>
 	.contact-page {
 		background: #f5f5f5;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */
@@ -317,7 +317,7 @@
 	}
 
 	.copy-btn {
-		background: #4fb3bf;
+		background: $color-primary;
 		border-radius: 8px;
 		padding: 8px 16px;
 		display: flex;

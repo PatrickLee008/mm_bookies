@@ -244,9 +244,9 @@ export default {
 		calc_page_height() {
 			let info = uni.getDeviceInfo()
 			if (info.platform == 'ios') {
-				return `calc(100vh - 85px)`
+				return `calc(var(--app-viewport-height, 100vh) - 85px)`
 			}
-			return '100vh'
+			return 'var(--app-viewport-height, 100vh)'
 		},
 
 	},

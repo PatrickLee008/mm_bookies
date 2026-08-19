@@ -773,7 +773,7 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	.default-bank {
@@ -805,7 +805,7 @@
 		width: 25px;
 		height: 25px;
 		border-radius: 50%;
-		filter: drop-shadow(var(--theme-header-background-color, #{$theme-header-start}) 0px 0px 2px);
+		filter: drop-shadow(var(--theme-header-background-color, #{$theme-page-start}) 0px 0px 2px);
 	}
 
 	// 登录样式
@@ -826,7 +826,7 @@
 	}
 
 	.input-error {
-		border-color: #e54d42;
+		border-color: #D0342C;
 	}
 
 	.input-focused .label-focused {
@@ -834,6 +834,6 @@
 	}
 
 	.input-error .label-focused {
-		color: #e54d42;
+		color: #D0342C;
 	}
 </style>

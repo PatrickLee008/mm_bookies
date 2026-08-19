@@ -265,8 +265,8 @@ radio.radio .uni-radio-input-checked::after {
 
 .switch-sex .wx-switch-input,
 .switch-sex .uni-switch-input {
-	background: #e54d42 !important;
-	border-color: #e54d42 !important;
+	background: #D0342C !important;
+	border-color: #D0342C !important;
 }
 
 .switch-sex[checked] .wx-switch-input,
@@ -281,8 +281,8 @@ radio.red[checked] .wx-radio-input,
 switch.red.checked .uni-switch-input.uni-switch-input-checked,
 checkbox.red.checked .uni-checkbox-input,
 radio.red.checked .uni-radio-input {
-	background-color: #e54d42 !important;
-	border-color: #e54d42 !important;
+	background-color: #D0342C !important;
+	border-color: #D0342C !important;
 	color: #ffffff !important;
 }
 
@@ -3334,7 +3334,7 @@ scroll-view.cu-steps .cu-item {
 
 .line-red::after,
 .lines-red::after {
-	border-color: #e54d42;
+	border-color: #D0342C;
 }
 
 .line-orange::after,
@@ -3493,7 +3493,7 @@ scroll-view.cu-steps .cu-item {
 }
 
 .bg-red.light {
-	color: #e54d42;
+	color: #D0342C;
 	background-color: #fadbd9;
 }
 
@@ -3828,7 +3828,7 @@ scroll-view.cu-steps .cu-item {
 .text-red,
 .line-red,
 .lines-red {
-	color: #e54d42 !important;
+	color: #D0342C !important;
 }
 
 .text-orange,

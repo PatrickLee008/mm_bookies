@@ -1,7 +1,7 @@
 <template>
 	<view class="deposit-component">
 		<global-notice ref="globalNotice"></global-notice>
-		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit">
+		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit">
 			<!-- from tangjq--- 银行卡列表界面（默认显示） -->
 			<view class="bank-list-container" v-if="current_progress==0">
 				<!-- 银行卡列表 -->
@@ -173,9 +173,10 @@
 						<view class="flex-column1 justify-center align-start width-45 margin-left-lg" @click="">
 							<view class="bank-title">{{agent_bankcard.rc_bank_username}}</view>
 							<view>{{ $t('account_ame') }}</view>
-							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<text
-									class="cuIcon-copy mycolor-info text-light margin-left"
-									@click="copy(agent_bankcard.rc_bank_account)"></text>
+							<view class="bank-title">{{agent_bankcard.rc_bank_account}}<theme-icon name="copy"
+									size="16px" color="rgb(161, 160, 161)" class="margin-left"
+									style="display: inline-block; vertical-align: middle;"
+									@click="copy(agent_bankcard.rc_bank_account)"></theme-icon>
 							</view>
 							<view>{{ $t('account_number') }}</view>
 						</view>
@@ -442,7 +443,8 @@
 							<view class="confirm-copy-btn"
 								@click="copyPayeeInfo(agent_bankcard.rc_bank_account, 'Account')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
-								<text class="cuIcon-copy"></text>
+								<theme-icon name="copy" size="14px"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 						</view>
 					</view>
@@ -454,7 +456,8 @@
 							<view class="confirm-copy-btn"
 								@click="copyPayeeInfo(agent_bankcard.rc_bank_username, 'Name')">
 								<text class="copy-btn-text">{{ $t('copy') }}</text>
-								<text class="cuIcon-copy"></text>
+								<theme-icon name="copy" size="14px"
+									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 							</view>
 						</view>
 					</view>
@@ -673,8 +676,19 @@
 				deep: true,
 				immediate: true
 			},
+			// App.vue 异步加载配置，监听 Vuex 确保动态金额限额及时同步
+			globalConfigs: {
+				handler(val) {
+					this.configs = Object.assign({}, val || {})
+				},
+				deep: true,
+				immediate: true
+			},
 		},
 		computed: {
+			globalConfigs() {
+				return this.$store.state.configs || {}
+			},
 			confirmDisabled() {
 				if (this.current_progress == 0 && this.amount_error) return true
 				else if (this.current_progress == 1 && this.chargeForm.charge_way == 1 && (!this.picture || !this
@@ -729,6 +743,10 @@
 			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
+			},
+			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			onScrollTopEmit() {
+				this.$emit('contentScrollTop')
 			},
 			select_option(selected, list, allow_false) {
 				if (selected.checked && !allow_false) return
@@ -1700,9 +1718,9 @@
 	.bank-icon-item {
 		width: 40px;
 		height: 40px;
-		border-radius: 8px;
+		border-radius: $radius-small;
 		overflow: hidden;
-		border: 2px solid transparent;
+		border: 3px solid transparent;
 	}
 
 	.bank-icon-item.selected {
@@ -1735,7 +1753,7 @@
 
 	.form-input {
 		flex: 1;
-		height: 24px;
+		height: 28px;
 		border: 2px solid $color-secondary;
 		border-radius: 12px;
 		font-size: 12px;
@@ -1745,13 +1763,13 @@
 
 	.confirm-btn {
 		width: 100%;
-		height: 30px;
+		height: 35px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
 		font-size: 15px;
 		font-weight: 700;
-		color: #fff;
+		color: white;
 		padding: 8px;
 		display: flex;
 		align-items: center;
@@ -1760,6 +1778,8 @@
 
 	.confirm-btn.disabled {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: white;
 	}
 
 	/* from tangjq--- 充值弹窗样式 */
@@ -1804,12 +1824,13 @@
 	.user-account-section {
 		background-color: $bg-color-info;
 		padding: 20px;
-		margin: 0 10px;
+		margin: 20px 20px 0;
+		border-radius: $radius-medium;
 	}
 
 	.section-title {
-		font-size: 18px;
-		font-weight: 700;
+		font-size: 14px;
+		font-weight: bold;
 		color: $color-primary;
 		display: block;
 		text-align: center;
@@ -1826,7 +1847,7 @@
 	.info-label {
 		font-size: 12px;
 		font-weight: 600;
-		color: #000;
+		color: $color-primary;
 		width: 120px;
 		flex-shrink: 0;
 	}
@@ -1834,7 +1855,9 @@
 	.bank-type-value {
 		display: flex;
 		flex-direction: row;
+		justify-content: center;
 		align-items: center;
+		width: calc(100% - 120px);
 		gap: 8px;
 	}
 
@@ -1853,7 +1876,7 @@
 	.info-value-box {
 		flex: 1;
 		height: 24px;
-		border: 2px solid $color-secondary;
+		border: 1px solid $color-secondary;
 		border-radius: 12px;
 		display: flex;
 		align-items: center;
@@ -1875,7 +1898,8 @@
 		width: 100%;
 		height: 40px;
 		background-color: $bg-color-info;
-		border-radius: 12px;
+		border: 1px solid $color-border-other;
+		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1979,7 +2003,7 @@
 
 	.continue-btn {
 		width: calc(100% - 40px);
-		height: 30px;
+		height: 40px;
 		background-color: $color-primary;
 		border-radius: 12px;
 		border: none;
@@ -1990,10 +2014,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		padding: 8px;
 	}
 
-	.continue-btn:disabled {
+	.continue-btn[disabled] {
 		opacity: 0.5;
+		background-color: $color-primary;
+		color: #fff;
 	}
 
 	/* from tangjq--- Transfer Tips弹窗样式 */
@@ -2464,5 +2491,15 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+</style>
+
+<style lang="scss">
+	.amount-input-box .uni-input-placeholder {
+		font-size: 14px !important;
+		font-weight: 400 !important;
+		font-style: italic !important;
+		color: $color-primary !important;
+		opacity: 1 !important;
 	}
 </style>

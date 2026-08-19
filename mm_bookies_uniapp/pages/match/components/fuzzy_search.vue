@@ -196,7 +196,7 @@
 		left: 0;
 		bottom: 0;
 		// height: calc(100vh - 55px);
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		width: 100vw;
 	}
 

@@ -7,7 +7,7 @@
 			<text class="header-close-icon" @click="goBack">✕</text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="about-content">
 				<!-- Rules 部分 -->
 				<view class="about-section">
@@ -74,7 +74,7 @@
 <style lang="scss" scoped>
 	.about-page {
 		background: #f5f5f5;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */

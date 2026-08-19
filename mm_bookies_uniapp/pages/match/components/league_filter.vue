@@ -206,10 +206,11 @@
 
 	/* from tangjq--- 标题栏 */
 	.filter-header {
-		background-color: $color-secondary;
+		background-color: $color-primary;
 		padding: 15px 20px;
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 		border-radius: 10px 0 0 0;
 	}
@@ -232,6 +233,7 @@
 	.filter-list {
 		padding: 0;
 		background-color: $bg-color-info;
+		border: 1px solid $color-border-other;
 		border-radius: $radius-medium;
 		overflow: hidden;
 	}
@@ -247,7 +249,7 @@
 		align-items: center;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		border-bottom: 1px solid var(--theme-primary-alpha-20, rgba(28, 102, 124, .2));
+		border-bottom: 1px solid $color-border-other;
 	}
 
 	.filter-item:active {
@@ -296,7 +298,7 @@
 	}
 
 	.filter-confirm-btn {
-		background-color: $color-secondary;
+		background-color: $color-primary;
 		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
@@ -305,7 +307,7 @@
 	}
 
 	.filter-confirm-btn:active {
-		background-color: #2d5d5d;
+		background-color: $color-secondary;
 	}
 
 	.filter-confirm-text {

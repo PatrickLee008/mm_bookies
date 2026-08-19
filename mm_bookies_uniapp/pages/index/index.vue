@@ -3,8 +3,8 @@
 		<global-notice ref="globalNotice"></global-notice>
 		<scroll-view scroll-y class="home-scroll">
 			<view class="home-top">
-				<theme-logo variant="page" height="88px" class="home-logo"></theme-logo>
-				<text class="home-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
+				<theme-logo variant="page" height="var(--theme-home-logo-height)" class="home-logo"></theme-logo>
+				<view class="home-subtitle"></view>
 
 				<view class="user-summary">
 					<view class="user-avatar">
@@ -12,7 +12,7 @@
 					</view>
 					<view class="user-details">
 						<text class="greeting">{{ $t(greetingKey) }}</text>
-						<text class="id-value">My ID : {{ userInfo.phone || userInfo.nick_name || '' }}</text>
+						<text class="id-value">My ID : {{ userInfo.id || '' }}</text>
 					</view>
 					<view class="header-actions">
 						<view class="bell-btn" @click="goMessage">
@@ -60,7 +60,8 @@
 						<theme-icon name="single" class="nav-theme-icon"></theme-icon><text>{{$t('single')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/match/home?mix=1')">
-						<theme-icon name="mixparlay" class="nav-theme-icon"></theme-icon><text>{{$t('mixparlay')}}</text>
+						<theme-icon name="mixparlay"
+							class="nav-theme-icon"></theme-icon><text>{{$t('mixparlay')}}</text>
 					</view>
 					<view class="nav-item" @click="goto('/pages/ucenter/invite/index')">
 						<theme-icon name="referral" class="referral-icon"></theme-icon>
@@ -123,9 +124,8 @@
 		},
 		methods: {
 			displayBalance(value) {
-				if (this.balanceVisible) return this.$toolbox.floor_format(value || 0)
-				const digits = String(this.$toolbox.floor_format(value || 0)).replace(/,/g, '')
-				return digits.replace(/\d/g, '*').replace(/(\*{3})(?=\*)/g, '$1,')
+				const formattedBalance = this.$toolbox.floor_format(value || 0)
+				return this.balanceVisible ? formattedBalance : formattedBalance.replace(/\d/g, '*')
 			},
 			goto(url) {
 				uni.navigateTo({
@@ -197,7 +197,7 @@
 
 <style lang="scss">
 	.home-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
@@ -205,7 +205,7 @@
 
 	.home-top {
 		padding: 18px 20px 16px;
-		border-bottom: 2px solid #A0FF82;
+		border-bottom: 2px solid $color-home-top-border;
 		box-shadow: 0px 4px 4px 0px #A0FF82;
 		box-shadow: 0px 4px 20px 0px #FFFFFF00 inset;
 		border-bottom-left-radius: 12px;
@@ -213,19 +213,24 @@
 	}
 
 	.home-logo {
-		display: inline-flex;
-		width: auto;
-		height: 88px;
-		max-width: 90%;
-		margin: 3vh auto 5px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
+		margin: 3vh 0 5px;
 	}
 
 	.home-subtitle {
 		display: block;
 		margin: 3px auto 3vh;
-		color: #fff;
+		color: $theme-background-foreground;
 		font-size: 12px;
 		text-align: center;
+	}
+
+	.home-subtitle::after {
+		content: var(--theme-subtitle, "#{$theme-subtitle-value}");
 	}
 
 	.user-info-card {
@@ -259,6 +264,7 @@
 
 	.user-details {
 		flex: 1;
+		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 4px;
@@ -320,7 +326,7 @@
 	.settings-icon {
 		width: 22px;
 		height: 22px;
-		filter: brightness(0) invert(1);
+		filter: $theme-background-foreground-filter;
 	}
 
 	.bell-icon.bell-ring {
@@ -330,23 +336,24 @@
 
 	.bell-badge {
 		position: absolute;
-		top: -2px;
+		top: -5px;
 		right: -2px;
-		min-width: 16px;
-		height: 16px;
-		padding: 0 4px;
-		border-radius: 8px;
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		padding: 0;
+		border-radius: 50%;
 		background-color: #FF4444;
 		color: #ffffff;
-		font-size: 10px;
+		font-size: 8px;
 		font-weight: bold;
-		line-height: normal;
+		line-height: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		text-align: center;
-		border: 1px solid #ffffff;
 		box-sizing: border-box;
+		white-space: nowrap;
 	}
 
 	.user-balance-row {
@@ -384,6 +391,7 @@
 	.cashout-label,
 	.cashout-value {
 		font-size: 12px;
+		font-weight: bold;
 	}
 
 	.cashout-label {
@@ -435,7 +443,8 @@
 		align-items: center;
 		justify-content: center;
 		height: 86px;
-		border-radius: 16px;
+		border: 1px solid $color-border;
+		border-radius: $radius-large;
 		background: #fff;
 		color: $color-primary;
 		font-size: 12px;
@@ -474,7 +483,7 @@
 	.section-title {
 		display: block;
 		margin-bottom: 14px;
-		color: white;
+		color: $theme-background-foreground;
 		font-size: 21px;
 		font-weight: 700;
 	}
@@ -484,7 +493,7 @@
 		width: 100%;
 		height: 200px;
 		overflow: hidden;
-		border-radius: 15px;
+		border-radius: $radius-large;
 		// background: #e9eeee;
 	}
 
@@ -504,7 +513,7 @@
 		display: flex;
 		align-items: center;
 		padding: 8px 4px 14px;
-		color: #fff;
+		color: $theme-background-foreground;
 	}
 
 	.user-summary .user-avatar {
@@ -521,12 +530,18 @@
 
 	.greeting {
 		font-size: 12px;
-		color: #fff;
+		color: $theme-background-foreground;
 	}
 
 	.user-summary .id-value {
-		color: #fff;
+		color: $theme-background-foreground;
 		font-size: 15px;
+		display: block;
+		max-width: 100%;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.user-summary .header-actions {
@@ -535,11 +550,13 @@
 
 	.user-summary .avatar-img {
 		background: transparent;
+		filter: $theme-background-foreground-filter;
 	}
 
 	.balance-card {
 		background: #fff;
-		border-radius: 20px;
+		border: 1px solid $color-border;
+		border-radius: 16px;
 		padding: 14px 20px 16px;
 		color: $color-primary;
 	}
@@ -608,8 +625,9 @@
 
 	.customer-service-wrapper :deep(.customer-btn) {
 		background: $color-primary;
-		border: 0;
+		border: 1px solid $color-border-other;
 		border-radius: 50%;
+		box-sizing: border-box;
 	}
 
 	.customer-service-wrapper :deep(.customer-btn-icon) {

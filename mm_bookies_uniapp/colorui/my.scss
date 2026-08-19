@@ -5,23 +5,40 @@
 	--theme-secondary: #{$theme-secondary-value};
 	--theme-secondary-light: #{$theme-secondary-light-value};
 	--theme-active: #{$theme-active-value};
+	--theme-background: #{$theme-background-value};
+	--theme-header-background: #{$theme-header-background-value};
+	--theme-header-logo-bg: #{$theme-header-logo-bg-value};
+	--theme-background-foreground: #{$theme-background-foreground-value};
+	--theme-background-foreground-filter: #{$theme-background-foreground-filter-value};
+	--theme-header-background-foreground: #{$theme-header-background-foreground-value};
+	--theme-header-background-foreground-filter: #{$theme-header-background-foreground-filter-value};
+	--theme-auth-button-background: #{$theme-auth-button-background-value};
+	--theme-auth-button-foreground: #{$theme-auth-button-foreground-value};
+	--theme-border-other: #{$theme-border-other-value};
 	--theme-text-primary: #{$theme-text-value};
 	--theme-text-secondary: #{$theme-text-secondary-value};
 	--theme-bg-light: #{$theme-bg-light-value};
 	--theme-bg-info: #{$theme-bg-info-value};
+	--theme-bg-login-input: #{$theme-bg-login-input-value};
+	--theme-color-login-input: #{$theme-color-login-input-value};
+	--theme-border: #{$theme-border-value};
 	--theme-radius-large: #{$theme-radius-large-value};
 	--theme-radius-medium: #{$theme-radius-medium-value};
 	--theme-radius-small: #{$theme-radius-small-value};
 	--theme-logo-image: #{$theme-logo-image};
+	--theme-header-logo-type: #{$theme-header-logo-type-value};
+	--theme-home-logo-height: #{$theme-home-logo-height-value};
+	--theme-title: "#{$theme-title-value}";
+	--theme-header-logo-padding: #{$theme-header-logo-padding-value};
+	--theme-header-logo-radius: #{$theme-header-logo-radius-value};
 	--theme-page-start: #{$theme-page-start};
 	--theme-page-end: #{$theme-page-end};
 	--theme-glow: #{$theme-glow};
-	--theme-header-start: #{$theme-header-start};
-	--theme-header-end: #{$theme-header-end};
 	--theme-primary-alpha-06: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .06);
 	--theme-primary-alpha-18: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .18);
 	--theme-primary-alpha-20: rgba(#{red($theme-primary-value)}, #{green($theme-primary-value)}, #{blue($theme-primary-value)}, .2);
 	--theme-secondary-alpha-20: rgba(#{red($theme-secondary-value)}, #{green($theme-secondary-value)}, #{blue($theme-secondary-value)}, .2);
+	--theme-secondary-alpha-40: rgba(#{red($theme-secondary-value)}, #{green($theme-secondary-value)}, #{blue($theme-secondary-value)}, .4);
 	--theme-icon-primary: #{$theme-primary-value};
 	--theme-icon-secondary: #{$theme-secondary-value};
 	--theme-icon-on-primary: #{$text-color-inverse};
@@ -46,13 +63,13 @@
 	--theme-register-background-size: cover;
 	--theme-register-background-repeat: no-repeat;
 	--theme-header-background-image: #{$theme-header-background};
-	--theme-header-background-color: #{$theme-header-start};
+	--theme-header-background-color: #{$theme-header-background-color};
 	--theme-header-background-position: center top;
 	--theme-header-background-size: 100% 552px;
 	--theme-header-background-repeat: no-repeat;
 	--theme-header-placeholder-position: center -255px;
 	--theme-page-background-image: #{$theme-page-background};
-	--theme-page-background-color: #{$theme-header-start};
+	--theme-page-background-color: #{$theme-page-background-color};
 	--theme-page-background-position: center;
 	--theme-page-background-size: cover;
 	--theme-page-background-repeat: no-repeat;
@@ -62,10 +79,15 @@
 	--theme-no-header-background-size: cover;
 	--theme-no-header-background-repeat: no-repeat;
 	--theme-with-header-background-image: #{$theme-with-header-background};
-	--theme-with-header-background-color: #{$theme-header-start};
+	--theme-with-header-background-color: #{$theme-with-header-background-color};
 	--theme-with-header-background-position: center;
 	--theme-with-header-background-size: cover;
 	--theme-with-header-background-repeat: no-repeat;
+	--theme-app-background-image: #{$theme-app-background};
+	--theme-app-background-color: #{$theme-app-background-color};
+	--theme-app-background-position: center;
+	--theme-app-background-size: cover;
+	--theme-app-background-repeat: no-repeat;
 }
 
 
@@ -269,7 +291,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-bg-header {
-	background-color: var(--theme-header-background-color, $theme-header-start);
+	background-color: var(--theme-header-background-color, $theme-page-start);
 	background-image: var(--theme-header-background-image, #{$theme-header-background});
 	background-position: var(--theme-header-background-position, center top);
 	background-size: var(--theme-header-background-size, 100% 552px);
@@ -277,7 +299,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-page-background {
-	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-color: var(--theme-with-header-background-color, $theme-page-start);
 	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
 	background-position: var(--theme-with-header-background-position, center);
 	background-size: var(--theme-with-header-background-size, cover);
@@ -293,7 +315,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 }
 
 .theme-bg-with-header {
-	background-color: var(--theme-with-header-background-color, $theme-header-start);
+	background-color: var(--theme-with-header-background-color, $theme-page-start);
 	background-image: var(--theme-with-header-background-image, #{$theme-with-header-background});
 	background-position: var(--theme-with-header-background-position, center);
 	background-size: var(--theme-with-header-background-size, cover);
@@ -304,17 +326,88 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	display: none;
 }
 
-@if "#{$theme-preset}" == "test" {
-	.theme-logo-image-test {
+@if "#{$theme-preset}" == "shwe-goal" {
+	.theme-logo-image-shwe-goal {
 		display: block;
 	}
-} @else if "#{$theme-preset}" == "test-old" {
-	.theme-logo-image-test-old {
+} @else if "#{$theme-preset}" == "phoe-wa-maung" {
+	.theme-logo-image-phoe-wa-maung {
 		display: block;
 	}
 } @else {
 	.theme-logo-image-legacy {
 		display: block;
+	}
+}
+
+@if "#{$theme-header-logo-type-value}" == "text" {
+	.theme-logo-header .theme-logo-title {
+		display: block !important;
+	}
+
+	.theme-logo-header .theme-logo-image {
+		display: none !important;
+	}
+} @else {
+	.theme-logo-header .theme-logo-title {
+		display: none !important;
+	}
+}
+
+:root[data-theme-preset="mm-bookies"] .theme-logo-image,
+:root[data-theme-preset="shwe-goal"] .theme-logo-image,
+:root[data-theme-preset="phoe-wa-maung"] .theme-logo-image {
+	display: none;
+}
+
+:root[data-theme-preset="mm-bookies"] .theme-logo-image-legacy,
+:root[data-theme-preset="shwe-goal"] .theme-logo-image-shwe-goal,
+:root[data-theme-preset="phoe-wa-maung"] .theme-logo-image-phoe-wa-maung {
+	display: block;
+}
+
+:root[data-theme-logo-type="text"] .theme-logo-header .theme-logo-title {
+	display: block !important;
+}
+
+:root[data-theme-logo-type="text"] .theme-logo-header .theme-logo-image {
+	display: none !important;
+}
+
+:root[data-theme-logo-type="image"] .theme-logo-header .theme-logo-title {
+	display: none !important;
+}
+
+:root[data-theme-logo-type="image"] .theme-logo-header .theme-logo-image {
+	display: none !important;
+}
+
+:root[data-theme-logo-type="image"][data-theme-preset="mm-bookies"] .theme-logo-header .theme-logo-image-legacy,
+:root[data-theme-logo-type="image"][data-theme-preset="shwe-goal"] .theme-logo-header .theme-logo-image-shwe-goal,
+:root[data-theme-logo-type="image"][data-theme-preset="phoe-wa-maung"] .theme-logo-header .theme-logo-image-phoe-wa-maung {
+	display: block !important;
+}
+
+@each $preset-name, $preset-config in $theme-presets {
+	$preset-header-logo-type: map-get($preset-config, header-logo-type);
+
+	:root[data-theme-preset="#{$preset-name}"] {
+		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
+		--theme-header-logo-type: #{$preset-header-logo-type};
+	}
+
+	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
+			display: block !important;
+		}
+
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-image {
+			display: none !important;
+		}
+	} @else {
+		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
+			display: none !important;
+		}
 	}
 }
 

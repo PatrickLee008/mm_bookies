@@ -140,7 +140,7 @@
 		position: fixed;
 		left: 0;
 		bottom: 0;
-		height: calc(100vh - 55px);
+		height: calc(var(--app-viewport-height, 100vh) - 55px);
 		width: 100vw;
 	}
 

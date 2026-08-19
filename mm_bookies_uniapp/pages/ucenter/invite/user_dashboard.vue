@@ -2,7 +2,7 @@
 	<view class="invite-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
-		<scroll-view class="user-scroll invite-scroll" scroll-y @scroll="handleHeaderScroll">
+		<scroll-view class="user-scroll invite-scroll" scroll-y @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<view class="dashboard-content">
 				<view class="dashboard-card revenue-card">
 					<text class="card-label">{{ $t('Total Revenue from Invitees') }}</text>
@@ -46,13 +46,18 @@
 					</view>
 				</view>
 
-				<date-range-picker ref="date_picker" @click_option="date_click"></date-range-picker>
 				<view class="dashboard-filters">
-					<view class="user-filter-pill date-filter" @click="$refs.date_picker.show()">
-						<theme-icon name="calendar" class="user-filter-calendar"
-							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
-						<text class="calendar-text">{{ dateDisplay }}</text>
-						<text class="cuIcon-unfold filter-arrow"></text>
+					<view class="date-filter-container">
+						<view class="user-filter-pill date-filter"
+							:class="{ 'date-filter-selected': date_filtered }"
+							@click="$refs.date_picker.show()">
+							<theme-icon v-if="!date_filtered" name="calendar" class="user-filter-calendar"
+								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+							<text class="calendar-text">{{ dateDisplay }}</text>
+							<text v-if="!date_filtered" class="cuIcon-unfold filter-arrow"></text>
+						</view>
+						<date-range-picker ref="date_picker" :inline="true"
+							@click_option="date_click"></date-range-picker>
 					</view>
 					<view class="user-filter-pill status-filter">
 						<selector :option_list.sync="status_list" :default_label="$t('status')"
@@ -143,6 +148,7 @@
 				userList: [],
 				filteredUserList: [],
 				date_preset: '',
+				date_filtered: false,
 				date_range: [{
 					show: "00/00/0000",
 					value: "0000-00-00",
@@ -266,6 +272,7 @@
 			date_click(range, presetLabel) {
 				this.date_preset = presetLabel || '';
 				this.date_range = range;
+				this.date_filtered = true;
 				if (this.date_range[0].value === '0000-00-00' || this.date_range[1].value === '0000-00-00') {
 					this.date_preset = '';
 					this.date_range = [{
@@ -306,7 +313,7 @@
 
 <style lang="scss">
 	.invite-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
@@ -444,6 +451,12 @@
 		margin-top: 18px;
 	}
 
+	.date-filter-container {
+		position: relative;
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
 	.user-filter-pill,
 	.search-box {
 		height: 56upx;
@@ -461,10 +474,10 @@
 	}
 
 	.date-filter {
-		flex: 0 0 79px;
+		width: 100%;
 		gap: 6px;
 		padding: 0 8px;
-		overflow: hidden;
+		overflow: visible;
 	}
 
 	.user-filter-calendar {
@@ -474,16 +487,21 @@
 	}
 
 	.calendar-text {
-		flex: 1;
+		// flex: 1;
 		min-width: 0;
 		overflow: hidden;
 		color: #ffffff;
 		font-size: 11px;
-		font-weight: 600;
+		font-weight: bold;
 		line-height: 16px;
 		text-align: left;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.date-filter-selected .calendar-text {
+		flex: 0 1 auto;
+		text-align: center;
 	}
 
 	.filter-arrow {
@@ -516,7 +534,7 @@
 		background-color: transparent !important;
 		color: #ffffff !important;
 		font-size: 11px;
-		font-weight: 600;
+		font-weight: bold;
 		line-height: 16px;
 	}
 
@@ -634,7 +652,7 @@
 	}
 
 	.status-active {
-		background: #38c2cf;
+		background: $color-primary;
 		color: #ffffff;
 	}
 
@@ -649,7 +667,7 @@
 	}
 
 	.status-signed {
-		background: #38c2cf;
+		background: $color-secondary;
 		color: #ffffff;
 	}
 

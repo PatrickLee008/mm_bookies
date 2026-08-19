@@ -1,7 +1,7 @@
 <template>
 	<view class="full-page dark-teal-bg">
 		<zw-header></zw-header>
-		<scroll-view scroll-y :style="{ height: isLogin ? 'calc(100vh - 110px)' : 'calc(100vh - 170px)', background: '#fff' }">
+		<scroll-view scroll-y :style="{ height: isLogin ? 'calc(var(--app-viewport-height, 100vh) - 110px)' : 'calc(var(--app-viewport-height, 100vh) - 170px)', background: '#fff' }">
 
 			<view class="flex-column justify-center align-center text-center text-black"
 				style="position: fixed;top: 30vh;">
@@ -72,7 +72,7 @@
 
 <style lang="scss">
 	.dark-teal-bg {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	.logout-btn {

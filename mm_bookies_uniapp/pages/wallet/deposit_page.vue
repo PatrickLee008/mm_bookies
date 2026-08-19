@@ -7,17 +7,17 @@
 
 		<!-- from tangjq--- 顶部 tab：Deposit（充值表单）/ Deposit History（充值记录） -->
 		<view class="title-bar">
-			<view class="tab-selector">
-				<view class="tab-container">
-					<view class="tab-item" :class="{'active': tab_index === 0}" @click="handleTabClick(0)">
-						<text class="tab-text">{{ $t('deposit') }}</text>
+			<view class="promotion-tab-selector">
+				<view class="promotion-tab-container">
+					<view class="promotion-tab-item" :class="{'active': tab_index === 0}" @click="handleTabClick(0)">
+						<text class="promotion-tab-text">{{ $t('deposit') }}</text>
 					</view>
-					<view class="tab-item" :class="{'active': tab_index === 1}" @click="handleTabClick(1)">
-						<text class="tab-text">{{ $t('deposit_history') }}</text>
+					<view class="promotion-tab-item" :class="{'active': tab_index === 1}" @click="handleTabClick(1)">
+						<text class="promotion-tab-text">{{ $t('deposit_history') }}</text>
 					</view>
 
 					<!-- from tangjq--- 底部滑动指示器 -->
-					<view class="slide-indicator" :style="{
+					<view class="promotion-slide-indicator" :style="{
 						width: indicator_width + 'px',
 						transform: `translateX(${indicator_offset}px)`
 					}"></view>
@@ -28,10 +28,11 @@
 		<!-- from tangjq--- Tab 内容区域 -->
 		<view class="tab-content">
 			<!-- Deposit 表单（现有 deposit.vue 子组件） -->
-			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll"></wallet-deposit>
+			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-deposit>
 
 			<!-- Deposit History 列表（现有 history.vue 子组件） -->
-			<wallet-history v-if="tab_index === 1" ref="depositHistory" @contentScroll="handleHeaderScroll"></wallet-history>
+			<wallet-history v-if="tab_index === 1" ref="depositHistory"
+				@contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-history>
 		</view>
 
 		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在 Deposit History tab 显示 -->
@@ -83,7 +84,7 @@
 
 			initIndicator() {
 				const query = uni.createSelectorQuery().in(this)
-				query.selectAll('.tab-item').boundingClientRect().exec((res) => {
+				query.selectAll('.promotion-tab-item').boundingClientRect().exec((res) => {
 					if (res[0] && res[0].length > 0) {
 						this.indicator_width = res[0][0].width
 						this.updateIndicator()
@@ -93,7 +94,7 @@
 
 			updateIndicator() {
 				const query = uni.createSelectorQuery().in(this)
-				query.selectAll('.tab-item').boundingClientRect().exec((res) => {
+				query.selectAll('.promotion-tab-item').boundingClientRect().exec((res) => {
 					if (res[0] && res[0].length > this.tab_index) {
 						const currentTab = res[0][this.tab_index]
 						const container = res[0][0]
@@ -133,7 +134,7 @@
 	}
 
 	.full-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 	}
@@ -145,44 +146,44 @@
 		padding: 10px 20px;
 	}
 
-	.tab-selector {
+	.promotion-tab-selector {
 		width: 100%;
 		background: #fff;
+		margin-bottom: 8px;
 	}
 
-	.tab-container {
+	.promotion-tab-container {
 		position: relative;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
 		border-bottom: 1px solid #d9d9d9;
 	}
 
-	.tab-item {
+	.promotion-tab-item {
+		flex: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		cursor: pointer;
-		height: 30px;
+		height: 38px;
 	}
 
-	.tab-text {
-		font-size: 13px;
-		color: #5a7a8f;
+	.promotion-tab-text {
+		font-size: 15px;
+		color: $color-primary;
 		transition: color 0.25s ease;
-		font-weight: 400;
 	}
 
-	.tab-item.active .tab-text {
-		color: #4fb3bf;
+	.promotion-tab-item.active .promotion-tab-text {
+		color: $color-secondary;
 		font-weight: 600;
 	}
 
-	.slide-indicator {
+	.promotion-slide-indicator {
 		position: absolute;
 		bottom: 0;
+		left: 0;
 		height: 2px;
-		background: #4fb3bf;
+		background: $color-secondary;
 		border-radius: 2px;
 		transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 	}
@@ -205,7 +206,8 @@
 		height: 50px;
 		border-radius: 30px;
 		background: $color-primary;
-		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		// box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		border: 1px solid $color-border-other;
 		display: flex;
 		flex-direction: column;
 		align-items: center;

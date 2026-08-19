@@ -8,7 +8,7 @@
 			<text class="header-placeholder"></text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="profile-content">
 				<!-- 用户头像 -->
 				<view class="avatar-section">
@@ -209,12 +209,12 @@
 
 <style lang="scss" scoped>
 	.profile-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */
 	.profile-header {
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-color: var(--theme-header-background-color, #{$theme-page-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);

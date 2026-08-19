@@ -721,7 +721,8 @@ def check_deposit_stake():
             'turnover_rate': 1.5,               // 周转率倍数
             'remaining': 500.00,                // 剩余需要的流水
             'is_satisfied': false,              // 是否满足提现条件
-            'withdrawal_amount': 0.00,          // 可提现金额
+            'withdrawable_amount': 0.00,        // 可提现金额
+            'withdrawal_amount': 0.00,          // 兼容旧字段
             'current_balance': 1000.00,         // 当前余额
             'message': 'Success'
         }
@@ -770,6 +771,7 @@ def check_deposit_stake():
             'turnover_rate': turnover_rate,
             'remaining': round(remaining, 2),
             'is_satisfied': is_satisfied,
+            'withdrawable_amount': round(withdrawable_amount, 2),
             'withdrawal_amount': round(withdrawable_amount, 2),
             'current_balance': round(current_balance, 2),
             'message': 'Success'

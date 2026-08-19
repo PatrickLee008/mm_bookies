@@ -3,7 +3,7 @@
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 		<!-- 滚动内容区域 -->
-		<scroll-view scroll-y class="payment-content" @scroll="handleHeaderScroll">
+		<scroll-view scroll-y class="payment-content" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 			<block>
 				<!-- <block v-if="isload && payInfo"> -->
 				<!-- 隐藏的二维码生成组件 -->

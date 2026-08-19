@@ -24,7 +24,7 @@
 				</view>
 			</view>
 
-			<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltolower="loadMore"
+			<scroll-view scroll-y class="history-scroll" @scroll="onScroll" @scrolltoupper="handleHeaderTop" @scrolltolower="loadMore"
 				:refresher-enabled="true" @refresherrefresh="onRefresh" @refresherrestore="onRefresherRestore"
 				@refresherabort="onRefresherAbort" :refresher-triggered="refresherTriggered">
 
@@ -345,7 +345,7 @@
 <style lang="scss" scoped>
 	/* from tangjq--- 页面级样式 */
 	.promotion-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		min-height: 0;
 		display: flex;
 		flex-direction: column;
@@ -374,8 +374,8 @@
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
-		padding: 10px 14px;
+		border-radius: $radius-large;
+		padding: 8px 14px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -413,7 +413,7 @@
 
 	.option-text {
 		font-size: 13px;
-		font-weight: 500;
+		font-weight: bold;
 		color: $color-primary;
 	}
 
@@ -450,7 +450,8 @@
 	.record-card {
 		margin: 10px 0;
 		background-color: $bg-color-info;
-		border-radius: 14px;
+		border: 1px solid $color-border;
+		border-radius: $radius-medium;
 		overflow: hidden;
 	}
 
@@ -528,7 +529,7 @@
 	.amount-value {
 		font-size: 17px;
 		font-weight: 700;
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-style: italic;
 	}
 
@@ -546,7 +547,7 @@
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {
@@ -575,8 +576,8 @@
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 
@@ -625,7 +626,7 @@
 
 <style lang="scss">
 	page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 	}
 </style>

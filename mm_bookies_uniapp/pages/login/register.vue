@@ -19,22 +19,38 @@
 				</view>
 			</view>
 		</view>
+		<view class="height-8vh" v-if="!advertisements.length"></view>
 		<!-- 标题图片 -->
 		<view class="login-title-container">
-			<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
-			<!-- TODO: 替换为正确的缅甸文翻译 -->
-			<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
+			<theme-logo variant="page" height="var(--theme-home-logo-height)" class="login-title-image"></theme-logo>
+			<view class="login-subtitle"></view>
 		</view>
 
 		<!-- 广告区域 -->
-		<view class="ad-container">
-			<image class="ad-image" src="../../figma/login/login_ad.png" mode="widthFix"></image>
+		<view class="ad-container" v-if="registerStep !== 2 && advertisements.length">
+			<swiper class="ad-swiper" :circular="advertisements.length > 1"
+				:autoplay="advertisements.length > 1" interval="3500" duration="500"
+				:indicator-dots="advertisements.length > 1">
+				<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+					<image class="ad-image" :src="getAdvertisementImage(ad)" mode="aspectFill"></image>
+				</swiper-item>
+			</swiper>
 		</view>
+		<view class="height-8vh" v-else-if="registerStep !== 2"></view>
 
-		<!-- Login Form -->
-		<view class="login-form">
+		<!-- Register step 1: account and password -->
+		<view class="login-form register-flow" v-if="registerStep === 1">
 			<!-- Welcome Text -->
-			<view class="welcome-text">{{ $t('Welcome to MM Bookies') }}</view>
+			<view class="welcome-text">
+				<template v-if="currentLang === 'mm'">
+					<text class="welcome-title"></text>
+					<text>{{ $t('welcome_to') }}</text>
+				</template>
+				<template v-else>
+					<text>{{ $t('welcome_to') }}</text>
+					<text class="welcome-title"></text>
+				</template>
+			</view>
 
 			<!-- Phone Input Field -->
 			<view class="input-wrapper">
@@ -49,7 +65,7 @@
 
 			<!-- Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': password_error}" type="text"
+				<input class="input-field" :class="{'input-error': password_error}"
 					:password="!showPassword" placeholder-class="input-placeholder" v-model="loginInfo.password"
 					:placeholder="$t('enter_password')" maxlength="32" @blur="handle_password_blur"
 					@input="handle_password_blur" />
@@ -64,7 +80,7 @@
 
 			<!-- Confirm Password Input Field -->
 			<view class="input-wrapper">
-				<input class="input-field" :class="{'input-error': confirm_password_error}" type="text"
+				<input class="input-field" :class="{'input-error': confirm_password_error}"
 					:password="!showConfirmPassword" placeholder-class="input-placeholder"
 					v-model="loginInfo.confirm_password" :placeholder="$t('confirm_password')" maxlength="32"
 					@blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
@@ -77,16 +93,62 @@
 				</view>
 			</view>
 
+			<!-- Referral ID -->
+			<view class="referral-field" v-if="false">
+				<input class="input-field referral-input" :class="{ 'referral-input-disabled': r_code_disabled }"
+					v-model="loginInfo.r_code" :disabled="r_code_disabled" placeholder-class="input-placeholder"
+					:placeholder="$t('enter_referral_id_optional')" maxlength="32" @input="handle_r_code_input" />
+			</view>
+
 			<!-- Sign up Button -->
-			<view class="login-btn" @click="register()">
+			<view class="login-btn" :class="{ 'login-btn-disabled': registerDisabled }"
+				@click="continueToCaptcha">
 				<text :class="loadding"></text>
-				<text>{{ $t('Sign up') }}</text>
+				<text>{{ $t('Continue') }}</text>
 			</view>
 
 			<!-- Login Link -->
 			<view class="register-link">
 				<text class="register-text">{{ $t('Back to ') }}</text>
 				<text class="register-link-text" @click="toLogin()">{{ $t('login') }}</text>
+			</view>
+		</view>
+
+		<!-- Register step 2: slider verification -->
+		<view class="login-form register-flow captcha-step" v-else-if="registerStep === 2">
+			<slider-captcha ref="registerCaptcha" :config="captchaConfig" :trigger-generate="captchaTrigger"
+				:show-close="false" @verify="handleCaptchaVerify" @verify-fail="handleCaptchaVerifyFail"
+				@refresh="handleCaptchaRefresh" @error="handleCaptchaError" />
+
+			<view class="login-btn" :class="{ 'login-btn-disabled': !captchaVerified || loadding }"
+				@click="confirmCaptcha">
+				<text :class="loadding"></text>
+				<text>{{ $t('verify') }}</text>
+			</view>
+			<view class="register-secondary-btn" @click="backToCredentials">{{ $t('Back') }}</view>
+		</view>
+
+		<!-- Register step 3: referral code -->
+		<view class="login-form register-flow referral-step" v-else>
+			<view class="step-heading">{{ $t('referral_id') }}</view>
+			<view class="referral-question">{{ $t('enter_referral_id_optional') }}</view>
+			<view class="referral-field">
+				<input class="input-field referral-input"
+					:class="{ 'referral-input-disabled': r_code_disabled }" v-model="loginInfo.r_code"
+					:disabled="r_code_disabled" placeholder-class="input-placeholder"
+					:placeholder="$t('enter_referral_id_optional')" maxlength="32"
+					@input="handle_r_code_input" />
+			</view>
+
+			<view class="login-btn" :class="{ 'login-btn-disabled': loadding }" @click="register">
+				<text :class="loadding"></text>
+				<text>{{ $t('Confirm') }}</text>
+			</view>
+			<view v-if="!r_code_disabled" class="register-secondary-btn" @click="skipReferralAndRegister">
+				{{ $t('Skip') }}
+			</view>
+			<view class="register-link" @click="backToCaptcha">
+				<text class="register-link-text">{{ $t('Back') }}</text>
 			</view>
 		</view>
 
@@ -118,10 +180,12 @@
 	import config from '../../utils/config.js'
 	import language from '../../utils/language.js'
 	import CryptoJS from 'crypto-js';
+	import SliderCaptcha from '@/components/SliderCaptcha.vue'
 	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
 		components: {
+			SliderCaptcha,
 			CustomerService,
 		},
 		data() {
@@ -162,16 +226,34 @@
 				phone_error: false,
 				password_error: false,
 				confirm_password_error: false,
+				r_code_disabled: false,
 
 				// 密码显隐状态
 				showPassword: false,
 				showConfirmPassword: false,
+				advertisements: [],
+
+				// 注册步骤与滑动验证码
+				registerStep: 1,
+				captchaTrigger: 0,
+				captchaVerified: false,
 			}
 		},
 		computed: {
 			registerDisabled() {
 				return !this.loginInfo.phone || !this.loginInfo.password || !this.loginInfo.confirm_password ||
 					this.phone_error || this.password_error || this.confirm_password_error
+			},
+			captchaConfig() {
+				return {
+					title: this.$t('security_check'),
+					description: this.$t('human_verification_description'),
+					sliderText: this.$t('slide_to_verify_short'),
+					successText: this.$t('verification_success'),
+					canvasWidth: 300,
+					canvasHeight: 202,
+					sliderSize: 40,
+				}
 			},
 			currentLangLabel() {
 				const map = {
@@ -202,11 +284,101 @@
 			handle_confirm_password_blur() {
 				this.confirm_password_error = this.loginInfo.password !== this.loginInfo.confirm_password;
 			},
+			handle_r_code_input() {
+				this.loginInfo.r_code = String(this.loginInfo.r_code || '')
+					.replace(/[^a-zA-Z0-9]/g, '')
+					.slice(0, 32)
+					.toUpperCase();
+				if (!this.loginInfo.r_code && !this.r_code_disabled) {
+					uni.removeStorageSync('default_r_code');
+				}
+			},
 			togglePasswordVisibility() {
 				this.showPassword = !this.showPassword;
 			},
 			toggleConfirmPasswordVisibility() {
 				this.showConfirmPassword = !this.showConfirmPassword;
+			},
+			continueToCaptcha() {
+				this.handle_phone_blur();
+				this.handle_password_blur();
+				this.handle_confirm_password_blur();
+				if (this.registerDisabled) return;
+
+				this.captchaVerified = false;
+				this.registerStep = 2;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.captchaTrigger = Date.now();
+						this.$refs.registerCaptcha && this.$refs.registerCaptcha.calculateDimensions();
+					}, 100);
+				});
+			},
+			handleCaptchaVerify() {
+				this.captchaVerified = true;
+			},
+			handleCaptchaVerifyFail() {
+				this.captchaVerified = false;
+			},
+			handleCaptchaError() {
+				this.captchaVerified = false;
+				uni.showToast({
+					title: this.$t('error_title'),
+					icon: 'none',
+				});
+			},
+			handleCaptchaRefresh() {
+				this.captchaVerified = false;
+				this.captchaTrigger = Date.now();
+			},
+			confirmCaptcha() {
+				if (!this.captchaVerified || this.loadding) return;
+
+				this.loadding = 'cuIcon-loading2 cuIconfont-spin';
+				this.$http.post(`/app_user/${this.loginInfo.phone}`, {}, (res) => {
+					this.loadding = '';
+					if (res.statusCode == 200) {
+						if (!res.data.status) {
+							this.registerStep = 3;
+						} else {
+							this.captchaVerified = false;
+							this.$notice.show({
+								title: this.$t('tips'),
+								content: this.$t('account_repeat'),
+								showCancel: false,
+								confirmText: this.$t('ok'),
+							});
+						}
+					} else {
+						this.captchaVerified = false;
+						this.$notice.show({
+							title: this.$t('error_title'),
+							content: res.data.message,
+							showCancel: false,
+							confirmText: this.$t('ok'),
+						});
+					}
+				});
+			},
+			backToCredentials() {
+				this.registerStep = 1;
+				this.captchaVerified = false;
+			},
+			backToCaptcha() {
+				this.registerStep = 2;
+				this.captchaVerified = false;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.captchaTrigger = Date.now();
+						this.$refs.registerCaptcha && this.$refs.registerCaptcha.calculateDimensions();
+					}, 100);
+				});
+			},
+			skipReferralAndRegister() {
+				if (this.r_code_disabled) return;
+				this.loginInfo.r_code = '';
+				uni.removeStorageSync('default_r_code');
+				this.register();
 			},
 			switchChange(e) {
 				this.rememberMe = e.target.value;
@@ -231,46 +403,36 @@
 				this.$i18n.locale = value
 				this.showLangModal = false
 			},
+			getAdvertisements() {
+				this.advertisements = []
+				this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'register',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						const items = res.data.data && res.data.data.items ? res.data.data.items : []
+						this.advertisements = items.filter((ad) => this.getAdvertisementImage(ad))
+					}
+				})
+			},
+			getAdvertisementImage(ad) {
+				if (!ad) return ''
+				return ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url || ''
+			},
+			handleAdClick(ad) {
+				if (!ad || !ad.link_url) return
+				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
+			},
 			register() {
 				if (this.$toolbox.click_too_fast(1)) return
 
-				// 验证所有字段
-				this.handle_phone_blur();
-				this.handle_password_blur();
-				this.handle_confirm_password_blur();
-
-				if (this.registerDisabled) {
-					return;
-				}
+				if (this.registerStep !== 3 || this.registerDisabled) return;
 
 				let _this = this;
 				_this.loadding = 'cuIcon-loading2 cuIconfont-spin';
 
-				// 先检查账号是否重复
-				_this.$http.post(`/app_user/${this.loginInfo.phone}`, {}, (res) => {
-					if (res.statusCode == 200) {
-						if (!res.data.status) {
-							// 账号不重复，进行注册
-							_this.doRegister();
-						} else {
-							_this.loadding = '';
-							this.$notice.show({
-								title: _this.$t('tips'),
-								content: _this.$t('account_repeat'),
-								showCancel: false,
-								confirmText: _this.$t('ok'),
-							});
-						}
-					} else {
-						_this.loadding = '';
-						this.$notice.show({
-							title: _this.$t('error_title'),
-							content: res.data.message,
-							showCancel: false,
-							confirmText: _this.$t('ok'),
-						});
-					}
-				})
+				_this.doRegister();
 			},
 			doRegister() {
 				let _this = this;
@@ -344,7 +506,7 @@
 						}
 
 						uni.redirectTo({
-							url: '../match/home'
+							url: '../index/index'
 						});
 						uni.setStorageSync('login_success', true);
 						uni.setStorageSync('rigister_success', true);
@@ -382,11 +544,18 @@
 		},
 		onLoad(option) {
 			uni.removeStorageSync('login_success');
+			this.getAdvertisements()
 			// 捕获邀请码（推荐链接 ?iv=xxx），用于注册时绑定推荐人
-			const iv = option && (option.iv || option.r_code)
-			if (iv) {
-				this.loginInfo.r_code = iv
-				uni.setStorageSync('default_r_code', iv)
+			const inviteCode = option && (option.iv || option.r_code)
+			const cachedCode = uni.getStorageSync('default_r_code')
+			const rCode = inviteCode || cachedCode
+			this.r_code_disabled = Boolean(inviteCode)
+			if (rCode) {
+				this.loginInfo.r_code = String(rCode).trim()
+				this.handle_r_code_input()
+				if (inviteCode) {
+					uni.setStorageSync('default_r_code', this.loginInfo.r_code)
+				}
 			}
 		},
 	}
@@ -395,7 +564,7 @@
 <style lang="scss">
 	.login-container {
 		position: relative;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -455,7 +624,7 @@
 	.lang-modal-title {
 		font-size: 32rpx;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 20rpx;
 	}
@@ -474,28 +643,28 @@
 	.lang-option-label {
 		font-size: 30rpx;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.lang-radio {
 		width: 40rpx;
 		height: 40rpx;
 		border-radius: 50%;
-		border: 3rpx solid #ccc;
+		border: 3rpx solid $color-secondary;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
 	.lang-radio.lang-radio-on {
-		border-color: $color-primary;
+		border-color: $color-secondary;
 	}
 
 	.lang-radio-dot {
 		width: 22rpx;
 		height: 22rpx;
 		border-radius: 50%;
-		background: $color-primary;
+		background: $color-secondary;
 	}
 
 	/* 标题区域 */
@@ -510,15 +679,40 @@
 
 	.login-title-image {
 		width: auto;
-		height: 88px;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
 		max-width: 100%;
 	}
 
 	.login-subtitle {
 		margin-top: 10rpx;
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 		font-size: 24rpx;
 		letter-spacing: 2rpx;
+	}
+
+	.login-subtitle::after {
+		content: var(--theme-subtitle, "#{$theme-subtitle-value}");
+	}
+
+	.referral-field {
+		width: 100%;
+		margin-bottom: 30rpx;
+	}
+
+	.referral-label {
+		display: block;
+		margin: 0 0 10rpx 10rpx;
+		color: rgba(255, 255, 255, 0.9);
+		font-size: 24rpx;
+	}
+
+	.referral-input {
+		width: 100%;
+		text-align: left;
+	}
+
+	.referral-input-disabled {
+		opacity: 0.8;
 	}
 
 	/* 广告区域 */
@@ -529,10 +723,19 @@
 		margin-top: 30rpx;
 	}
 
+	.ad-swiper {
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 32rpx;
+	}
+
 	.ad-image {
 		width: 100%;
-		height: auto;
+		height: 100%;
 		border-radius: 32rpx;
+		border: 1px solid $color-border-other;
+		box-sizing: border-box;
 	}
 
 	/* 表单区域 */
@@ -544,9 +747,18 @@
 	.welcome-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		text-align: center;
 		margin-bottom: 30rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8rpx;
+		flex-wrap: wrap;
+	}
+
+	.welcome-title::after {
+		content: var(--theme-title, "#{$theme-title-value}");
 	}
 
 	.input-wrapper {
@@ -556,26 +768,26 @@
 
 	.input-field {
 		height: 85rpx;
-		background-color: rgba(105, 145, 149, 0.6);
-		border: none;
+		background-color: $bg-login-input;
+		border: 2rpx solid $color-border-other;
 		border-radius: 20rpx;
 		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
-		color: #ffffff;
+		color: $color-login-input;
 		box-sizing: border-box;
 		text-align: center;
 		font-style: italic;
 	}
 
 	.input-placeholder {
-		color: #103C42;
+		color: $color-login-input;
 		text-align: center;
 		font-style: italic;
 		font-size: 24rpx;
 	}
 
 	.input-error {
-		border: 2rpx solid #e54d42;
+		border: 2rpx solid #D0342C;
 	}
 
 	.password-toggle {
@@ -615,7 +827,7 @@
 	.remember-text {
 		font-size: 24rpx;
 		font-weight: 400;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		font-style: italic;
 		margin-right: auto;
 	}
@@ -624,7 +836,7 @@
 	.custom-switch {
 		width: 40rpx;
 		height: 40rpx;
-		border: 3rpx solid rgba(255, 255, 255, 0.6);
+		border: 3rpx solid $theme-background-foreground;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -640,7 +852,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $color-secondary-light;
+		background-color: $theme-background-foreground;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -652,14 +864,14 @@
 
 	.login-btn {
 		height: 70rpx;
-		background-color: #ffffff;
+		background-color: $theme-auth-button-background;
 		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #2A5F63;
+		color: $theme-auth-button-foreground;
 		margin-bottom: 30rpx;
 		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	}
@@ -667,6 +879,46 @@
 	.login-btn:active {
 		opacity: 0.9;
 		transform: scale(0.98);
+	}
+
+	.login-btn-disabled {
+		opacity: 0.55;
+	}
+
+	.captcha-step,
+	.referral-step {
+		max-width: 620rpx;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
+	.step-heading {
+		margin-bottom: 30rpx;
+		color: $theme-background-foreground;
+		font-size: 32rpx;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.register-secondary-btn {
+		height: 70rpx;
+		margin-bottom: 30rpx;
+		margin-top: 30rpx;
+		border: 2rpx solid $theme-background-foreground;
+		border-radius: 25rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $theme-background-foreground;
+		font-size: 30rpx;
+		font-weight: 600;
+	}
+
+	.referral-question {
+		margin-bottom: 24rpx;
+		color: $theme-background-foreground;
+		font-size: 24rpx;
+		text-align: center;
 	}
 
 	.register-link {
@@ -677,11 +929,11 @@
 	}
 
 	.register-text {
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 	}
 
 	.register-link-text {
-		color: $color-secondary-light;
+		color: $color-secondary;
 		text-decoration: underline;
 	}
 

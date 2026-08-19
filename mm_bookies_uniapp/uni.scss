@@ -1,11 +1,16 @@
 /* 颜色变量 */
-// Frontend debug mode: edit the "test" palette in common/styles/_theme-presets.scss.
-$theme-preset: test !default;
+// Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
+// 默认主题 mm-bookies shwe-goal phoe-wa-maung
+$theme-preset: mm-bookies !default;
+// $theme-preset: shwe-goal !default;
+// $theme-preset: phoe-wa-maung !default;
 @import "./common/styles/theme-presets";
 
 $theme-config: map-get($theme-presets, $theme-preset);
 @if $theme-config == null {
-	$theme-config: map-get($theme-presets, legacy);
+	// $theme-config: map-get($theme-presets, mm-bookies);
+	// $theme-config: map-get($theme-presets, shwe-goal);
+	// $theme-config: map-get($theme-presets, phoe-wa-maung);
 }
 
 @function theme-color($name) {
@@ -22,8 +27,8 @@ $theme-config: map-get($theme-presets, $theme-preset);
 $theme-page-start: theme-color(page-start);
 $theme-page-end: theme-color(page-end);
 $theme-glow: theme-color(glow);
-$theme-header-start: theme-color(header-start);
-$theme-header-end: theme-color(header-end);
+$theme-background-value: theme-color(background);
+$theme-header-background-value: theme-color(header-background);
 $theme-text-value: theme-color(text);
 $theme-text-secondary-value: theme-color(text-secondary);
 $theme-bg-light-value: theme-color(bg-light);
@@ -32,6 +37,22 @@ $theme-radius-large-value: theme-color(radius-large);
 $theme-radius-medium-value: theme-color(radius-medium);
 $theme-radius-small-value: theme-color(radius-small);
 $theme-logo-image-value: theme-color(logo-image);
+$theme-header-logo-type-value: theme-color(header-logo-type);
+@if $theme-header-logo-type-value == null {
+	$theme-header-logo-type-value: image;
+}
+$theme-home-logo-height-value: theme-color(home-logo-height);
+@if $theme-home-logo-height-value == null {
+	$theme-home-logo-height-value: 88px;
+}
+$theme-title-value: theme-color(title);
+$theme-subtitle-value: theme-color(subtitle);
+$theme-header-logo-bg-value: theme-color(header-logo-bg);
+$theme-header-logo-radius-value: theme-color(header-logo-radius);
+@if $theme-header-logo-radius-value == null {
+	$theme-header-logo-radius-value: if($theme-header-logo-bg-value != none, $theme-radius-large-value, 0);
+}
+$theme-header-logo-padding-value: if($theme-header-logo-bg-value != none, 0 12px, 0);
 
 // Keep the compile-time values available for Sass color functions while the
 // public color variables resolve through runtime CSS custom properties.
@@ -40,12 +61,50 @@ $theme-secondary-value: theme-color(secondary);
 $theme-secondary-light-value: theme-color(secondary-light);
 $theme-active-value: theme-color(active);
 
+$theme-background-foreground-value: #FFFFFF;
+$theme-background-foreground-filter-value: brightness(0) invert(1);
+$theme-header-background-foreground-value: #FFFFFF;
+$theme-header-background-foreground-filter-value: brightness(0) invert(1);
+$theme-auth-button-background-value: #FFFFFF;
+$theme-auth-button-foreground-value: $theme-primary-value;
+
+@if $theme-background-value == light {
+	$theme-background-foreground-value: $theme-primary-value;
+	// Recolor the existing white/dark raster summary icons to the primary color.
+	$theme-background-foreground-filter-value: brightness(0) saturate(100%) invert(71%) sepia(95%) saturate(250%) hue-rotate(77deg) brightness(42%) contrast(169%);
+	$theme-auth-button-background-value: $theme-primary-value;
+	$theme-auth-button-foreground-value: #FFFFFF;
+}
+
+@if $theme-header-background-value == light {
+	$theme-header-background-foreground-value: $theme-primary-value;
+	$theme-header-background-foreground-filter-value: brightness(0) saturate(100%) invert(71%) sepia(95%) saturate(250%) hue-rotate(77deg) brightness(42%) contrast(169%);
+}
+
 // 主要颜色
 // Sass variable names follow the corresponding keys in _theme-presets.scss.
 $color-primary: var(--theme-primary, #{$theme-primary-value});
 $color-secondary: var(--theme-secondary, #{$theme-secondary-value});
 $color-secondary-light: var(--theme-secondary-light, #{$theme-secondary-light-value});
 $color-active: var(--theme-active, #{$theme-active-value});
+$theme-border-value: theme-color(border);
+$border-color: var(--theme-border, #{$theme-border-value});
+$color-border: $border-color;
+$theme-border-other-value: theme-color(border-other);
+$color-border-other: var(--theme-border-other, #{$theme-border-other-value});
+$theme-bg-login-input-value: theme-color(bg-login-input);
+$bg-login-input: var(--theme-bg-login-input, #{$theme-bg-login-input-value});
+$theme-color-login-input-value: theme-color(color-login-input);
+$color-login-input: var(--theme-color-login-input, #{$theme-color-login-input-value});
+$theme-home-top-border-value: theme-color(home-top-border);
+$color-home-top-border: var(--theme-home-top-border, #{$theme-home-top-border-value});
+$theme-header-logo-bg: var(--theme-header-logo-bg, #{$theme-header-logo-bg-value});
+$theme-background-foreground: var(--theme-background-foreground, #{$theme-background-foreground-value});
+$theme-background-foreground-filter: var(--theme-background-foreground-filter, #{$theme-background-foreground-filter-value});
+$theme-header-background-foreground: var(--theme-header-background-foreground, #{$theme-header-background-foreground-value});
+$theme-header-background-foreground-filter: var(--theme-header-background-foreground-filter, #{$theme-header-background-foreground-filter-value});
+$theme-auth-button-background: var(--theme-auth-button-background, #{$theme-auth-button-background-value});
+$theme-auth-button-foreground: var(--theme-auth-button-foreground, #{$theme-auth-button-foreground-value});
 
 /* 文字基本颜色 */
 $text-color: var(--theme-text-primary, #{$theme-text-value});//基本色
@@ -68,18 +127,36 @@ $theme-home-background-fallback:
 	linear-gradient(135deg, $theme-page-start 0%, $theme-page-start 56%, $theme-page-end 100%);
 $theme-home-background: theme-background-image(theme-color(no-header-background-image), $theme-home-background-fallback);
 $theme-auth-background: $theme-home-background;
-$theme-header-background-fallback:
-	radial-gradient(circle at 100% 0%, $theme-glow 0%, $theme-header-end 34%, rgba(255, 255, 255, 0) 68%),
-	linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-header-background-fallback: $theme-home-background-fallback;
 $theme-header-background: theme-background-image(theme-color(header-background-image), $theme-header-background-fallback);
-$theme-page-background-fallback: linear-gradient(135deg, $theme-header-start 0%, $theme-header-start 56%, $theme-header-end 100%);
+$theme-page-background-fallback: $theme-home-background-fallback;
 $theme-page-background: theme-background-image(theme-color(with-header-background-image), $theme-page-background-fallback);
 
-// The app shell uses two backgrounds: pages without the shared header use the
-// home/auth background, while all header pages expose the app shell background
-// behind transparent page containers and header placeholders.
 $theme-no-header-background: $theme-home-background;
 $theme-with-header-background: $theme-page-background;
+$theme-header-background-color: $theme-page-start;
+$theme-page-background-color: $theme-page-start;
+$theme-with-header-background-color: $theme-page-start;
+$theme-app-background: $theme-with-header-background;
+$theme-app-background-color: $theme-with-header-background-color;
+
+$theme-is-gradient-background:
+	(theme-color(no-header-background-image) == null or theme-color(no-header-background-image) == "") and
+	(theme-color(with-header-background-image) == null or theme-color(with-header-background-image) == "") and
+	(theme-color(header-background-image) == null or theme-color(header-background-image) == "");
+
+@if $theme-is-gradient-background {
+	// Gradient themes use the home background once at the app root so the
+	// fixed header and page content share the same coordinate system.
+	$theme-header-background: none;
+	$theme-header-background-color: transparent;
+	$theme-page-background: none;
+	$theme-with-header-background: none;
+	$theme-with-header-background-color: transparent;
+	$theme-app-background: $theme-home-background;
+	$theme-app-background-color: $theme-page-start;
+}
+
 $theme-logo-image: theme-background-image($theme-logo-image-value, none);
 
 
@@ -104,8 +181,6 @@ $text-color-inverse:#fff;//反色
 $text-color-grey:#999;//辅助灰色，如加载更多的提示信息
 $text-color-placeholder: #808080;
 $text-color-disable:#c0c0c0;
-/* 边框颜色 */
-$border-color:#e0e0e0;
 /* 页面宽度 */
 $page-width: 1226px;
 // flex布局且垂直居中

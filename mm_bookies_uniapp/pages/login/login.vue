@@ -39,20 +39,27 @@
 				</view>
 			</view>
 
+			<view class="height-8vh" v-if="!advertisements.length"></view>
+
 			<!-- 标题图片 -->
 			<view class="login-title-container">
-				<theme-logo variant="page" height="88px" class="login-title-image"></theme-logo>
-				<!-- TODO: 替换为正确的缅甸文翻译 -->
-				<text class="login-subtitle">ရွှေမြန်မာတို့ အကြိုက် မြန်မာဘောဒိုင်</text>
+				<theme-logo variant="page" height="var(--theme-home-logo-height)" class="login-title-image"></theme-logo>
+				<view class="login-subtitle"></view>
 			</view>
 
 			<!-- 广告区域 -->
-			<view class="ad-container">
-				<image class="ad-image" src="../../figma/login/login_ad.png" mode="widthFix"></image>
+			<view class="ad-container" v-if="!showCaptchaView && advertisements.length">
+				<swiper class="ad-swiper" :circular="advertisements.length > 1" :autoplay="advertisements.length > 1"
+					interval="3500" duration="500" :indicator-dots="advertisements.length > 1">
+					<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
+						<image class="ad-image" :src="getAdvertisementImage(ad)" mode="aspectFill"></image>
+					</swiper-item>
+				</swiper>
 			</view>
+			<view class="height-8vh" v-else-if="!showCaptchaView"></view>
 
 			<!-- Login Form -->
-			<view class="login-form">
+			<view class="login-form" v-if="!showCaptchaView">
 				<!-- Welcome Text -->
 				<view class="welcome-text">{{ $t('Welcome Back') }}</view>
 
@@ -91,7 +98,7 @@
 				</view>
 
 				<!-- Login Button -->
-				<view class="login-btn" @click="login()">
+				<view class="login-btn" :class="{ 'login-btn-disabled': loginDisabled }" @click="handleLogin">
 					<text :class="loadding"></text>
 					<text>{{ $t('login') }}</text>
 				</view>
@@ -101,6 +108,19 @@
 					<text class="register-text">{{ $t("Don't have an account? ") }}</text>
 					<text class="register-link-text" @click="toRegister()">{{ $t('register_button') }}</text>
 					<!-- <text class="register-text">{{ $t('now for free') }}</text> -->
+				</view>
+			</view>
+
+			<!-- Slider verification -->
+			<view class="login-form captcha-step" v-else>
+				<slider-captcha ref="loginCaptcha" :config="captchaConfig" :trigger-generate="captchaTrigger"
+					:show-close="false" @verify="handleCaptchaVerify" @verify-fail="handleCaptchaVerifyFail"
+					@refresh="handleCaptchaRefresh" @error="handleCaptchaError" />
+
+				<view class="register-secondary-btn" @click="handleCaptchaBack">{{ $t('Back') }}</view>
+				<view class="register-link">
+					<text class="register-text">{{ $t("Don't have an account? ") }}</text>
+					<text class="register-link-text" @click="toRegister">{{ $t('register_button') }}</text>
 				</view>
 			</view>
 
@@ -134,6 +154,7 @@
 	import language from '../../utils/language.js'
 	import siteinfo from '../../siteinfo.js'
 	import CryptoJS from 'crypto-js';
+	import SliderCaptcha from '@/components/SliderCaptcha.vue'
 	import CustomerService from '@/components/common/customer-service.vue'
 
 	// 验证码相关导入 - Commented out as requested
@@ -156,6 +177,7 @@
 
 	export default {
 		components: {
+			SliderCaptcha,
 			CustomerService,
 		},
 		data() {
@@ -184,6 +206,10 @@
 
 				showPassword: false,
 				show_x: false,
+				advertisements: [],
+				captchaTrigger: 0,
+				captchaVerified: false,
+				showCaptchaView: false,
 				// from tangjq--- 开屏广告相关数据（由后端配置驱动）
 				showSplash: false,
 				splashCountdown: 5,
@@ -232,6 +258,17 @@
 					return true
 				}
 				return false
+			},
+			captchaConfig() {
+				return {
+					title: this.$t('security_check'),
+					description: this.$t('human_verification_description'),
+					sliderText: this.$t('slide_to_verify_short'),
+					successText: this.$t('verification_success'),
+					canvasWidth: 300,
+					canvasHeight: 202,
+					sliderSize: 40,
+				}
 			}
 		},
 		watch: {
@@ -246,6 +283,7 @@
 		mounted() {
 			this.reloadUser()
 			uni.removeStorageSync('login_success')
+			this.getAdvertisements()
 			// from tangjq--- 启动启动界面倒计时
 			this.checkShouldShowSplash()
 		},
@@ -290,6 +328,53 @@
 			// },
 			togglePasswordVisibility() {
 				this.showPassword = !this.showPassword;
+			},
+			handleLogin() {
+				this.handlePhoneBlur();
+				this.handlePasswordBlur();
+				if (this.loginDisabled) return;
+
+				this.captchaVerified = false;
+				this.showCaptchaView = true;
+				this.$nextTick(() => {
+					setTimeout(() => {
+						this.captchaTrigger = Date.now();
+						this.$refs.loginCaptcha && this.$refs.loginCaptcha.calculateDimensions();
+					}, 100);
+				});
+			},
+			handleCaptchaVerify() {
+				this.captchaVerified = true;
+				setTimeout(() => {
+					if (this.showCaptchaView && this.captchaVerified) {
+						this.login();
+					}
+				}, 400);
+			},
+			handleCaptchaVerifyFail() {
+				this.captchaVerified = false;
+				uni.showToast({
+					title: this.$t('verify_fail'),
+					icon: 'none',
+				});
+			},
+			handleCaptchaError() {
+				this.captchaVerified = false;
+				uni.showToast({
+					title: this.$t('error_title'),
+					icon: 'none',
+				});
+			},
+			handleCaptchaRefresh() {
+				this.captchaVerified = false;
+				this.captchaTrigger = Date.now();
+			},
+			handleCaptchaBack() {
+				this.showCaptchaView = false;
+				this.captchaVerified = false;
+				setTimeout(() => {
+					this.captchaTrigger = Date.now();
+				}, 300);
 			},
 
 			toAI() {
@@ -423,9 +508,11 @@
 						});
 						// _this.loginDisabled = false;
 					}
-					// 验证码刷新 - Commented out as requested
-					// this.Captcha = ''
-					// this.updateImageCode()
+					_this.showCaptchaView = false;
+					_this.captchaVerified = false;
+					setTimeout(() => {
+						_this.captchaTrigger = Date.now();
+					}, 300);
 				})
 			},
 
@@ -527,6 +614,27 @@
 					this.$toolbox.navigateToPage(route)
 				}
 			},
+			getAdvertisements() {
+				this.advertisements = []
+				this.$http.post('/advertisement/get_by_page', {
+					platform: 'mobile',
+					page: 'register',
+					position: 'banner'
+				}, (res) => {
+					if (res.statusCode == 200 && res.data.code == 200) {
+						const items = res.data.data && res.data.data.items ? res.data.data.items : []
+						this.advertisements = items.filter((ad) => this.getAdvertisementImage(ad))
+					}
+				})
+			},
+			getAdvertisementImage(ad) {
+				if (!ad) return ''
+				return ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url || ''
+			},
+			handleAdClick(ad) {
+				if (!ad || !ad.link_url) return
+				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
+			},
 			toggleRememberMe() {
 				this.loginInfo.rememberMe = !this.loginInfo.rememberMe
 			},
@@ -562,7 +670,7 @@
 		top: 0;
 		left: 0;
 		width: 100vw;
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		z-index: 9999;
 		display: flex;
 		flex-direction: column;
@@ -575,8 +683,9 @@
 		position: absolute;
 		top: 40rpx;
 		right: 40rpx;
-		width: 180rpx;
+		min-width: 180rpx;
 		height: 60rpx;
+		padding: 0 5px;
 		background-color: $color-primary;
 		border-radius: 30rpx;
 		display: flex;
@@ -706,7 +815,7 @@
 	.lang-modal-title {
 		font-size: 32rpx;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 		text-align: center;
 		margin-bottom: 20rpx;
 	}
@@ -725,7 +834,7 @@
 	.lang-option-label {
 		font-size: 30rpx;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.lang-radio {
@@ -752,7 +861,7 @@
 	/* 原有登录页面样式 */
 	.login-container {
 		position: relative;
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -772,15 +881,19 @@
 
 	.login-title-image {
 		width: auto;
-		height: 88px;
+		height: var(--theme-home-logo-height, #{$theme-home-logo-height-value});
 		max-width: 100%;
 	}
 
 	.login-subtitle {
 		margin-top: 10rpx;
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 		font-size: 24rpx;
 		letter-spacing: 2rpx;
+	}
+
+	.login-subtitle::after {
+		content: var(--theme-subtitle, "#{$theme-subtitle-value}");
 	}
 
 	/* 广告区域 */
@@ -791,10 +904,19 @@
 		margin-top: 30rpx;
 	}
 
+	.ad-swiper {
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
+		border-radius: 32rpx;
+	}
+
 	.ad-image {
 		width: 100%;
-		height: auto;
+		height: 100%;
 		border-radius: 32rpx;
+		border: 1px solid $color-border-other;
+		box-sizing: border-box;
 	}
 
 	/* 表单区域 */
@@ -806,7 +928,7 @@
 	.welcome-text {
 		font-size: 28rpx;
 		font-weight: 600;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		text-align: center;
 		margin-bottom: 30rpx;
 	}
@@ -818,26 +940,26 @@
 
 	.input-field {
 		height: 85rpx;
-		background-color: rgba(105, 145, 149, 0.6);
-		border: none;
+		background-color: $bg-login-input;
+		border: 2rpx solid $color-border-other;
 		border-radius: 20rpx;
 		padding: 0 100rpx 0 40rpx;
 		font-size: 28rpx;
-		color: #ffffff;
+		color: $color-login-input;
 		box-sizing: border-box;
 		text-align: center;
 		font-style: italic;
 	}
 
 	.input-placeholder {
-		color: #103C42;
+		color: $color-login-input;
 		text-align: center;
 		font-style: italic;
 		font-size: 24rpx;
 	}
 
 	.input-error {
-		border: 2rpx solid #e54d42;
+		border: 2rpx solid #D0342C;
 	}
 
 	.password-toggle {
@@ -877,7 +999,7 @@
 	.remember-text {
 		font-size: 24rpx;
 		font-weight: 400;
-		color: #ffffff;
+		color: $theme-background-foreground;
 		font-style: italic;
 		margin-right: auto;
 	}
@@ -886,7 +1008,7 @@
 	.custom-switch {
 		width: 32rpx;
 		height: 32rpx;
-		border: 4rpx solid $color-secondary-light;
+		border: 4rpx solid $theme-background-foreground;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -903,7 +1025,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $color-secondary-light;
+		background-color: $theme-background-foreground;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -915,14 +1037,14 @@
 
 	.login-btn {
 		height: 70rpx;
-		background-color: #ffffff;
+		background-color: $theme-auth-button-background;
 		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		font-size: 32rpx;
 		font-weight: 600;
-		color: #2A5F63;
+		color: $theme-auth-button-foreground;
 		margin-bottom: 30rpx;
 		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	}
@@ -930,6 +1052,39 @@
 	.login-btn:active {
 		opacity: 0.9;
 		transform: scale(0.98);
+	}
+
+	.login-btn-disabled {
+		opacity: 0.55;
+	}
+
+	.captcha-step {
+		max-width: 620rpx;
+		margin-right: auto;
+		margin-left: auto;
+		margin-top: 15px;
+	}
+
+	.step-heading {
+		margin-bottom: 30rpx;
+		color: $theme-background-foreground;
+		font-size: 32rpx;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.register-secondary-btn {
+		height: 70rpx;
+		margin-bottom: 30rpx;
+		margin-top: 30rpx;
+		border: 2rpx solid $theme-background-foreground;
+		border-radius: 25rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $theme-background-foreground;
+		font-size: 30rpx;
+		font-weight: 600;
 	}
 
 	.register-link {
@@ -940,11 +1095,11 @@
 	}
 
 	.register-text {
-		color: rgba(255, 255, 255, 0.9);
+		color: $theme-background-foreground;
 	}
 
 	.register-link-text {
-		color: $color-secondary-light;
+		color: $color-secondary;
 		text-decoration: underline;
 	}
 

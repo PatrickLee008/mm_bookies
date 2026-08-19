@@ -1,20 +1,20 @@
 <template>
 	<view class="selector-wrapper">
 		<view class="cu-tag round sm selector-tag" :style="tag_style" @click="set_dialog_status(!hidden)">
-			<text>{{language[current_tag.label]?language[current_tag.label]:current_tag.label}}</text>
-			<text class="" :class="hidden?'cuIcon-unfold':'cuIcon-fold'"></text>
+			<text class="text-bold">{{translateLabel(current_tag.label)}}</text>
+			<text v-if="show_selector_arrow" :class="hidden?'cuIcon-unfold':'cuIcon-fold'"></text>
 		</view>
 		<view class="selector-bg" v-if="!hidden" :style="{'top':top,'left':left}">
 			<!-- 顶部青绿标题栏：当前选中项 + 收起箭头 -->
-			<view class="selector-header" @click="set_dialog_status(true)">
-				<text class="selector-header-text">{{language[current_tag.label]?language[current_tag.label]:current_tag.label}}</text>
+			<!-- <view class="selector-header" @click="set_dialog_status(true)">
+				<text class="selector-header-text">{{translateLabel(current_tag.label)}}</text>
 				<text class="cuIcon-fold selector-header-arrow"></text>
-			</view>
+			</view> -->
 			<!-- 选项列表 -->
 			<view class="selector-options">
 				<view class="option-bg" v-for="(i,_index) in option_list" :key="_index"
 					:class="{'option-active':i.checked}" @click="clickOption(_index)">
-					<text class="option-text">{{language[i.label]?language[i.label]:i.label}}</text>
+					<text class="option-text">{{translateLabel(i.label)}}</text>
 					<view class="option-radio" :class="{'radio-checked':i.checked}"></view>
 				</view>
 			</view>
@@ -79,12 +79,23 @@
 				}
 				// from tangjq--- 当选中项是 'All'（默认初始值）时，用 default_label 替代显示
 				if (res && typeof res.value === 'string' && res.value.toLowerCase() === 'all' && this.default_label) {
-					res = Object.assign({}, res, { label: this.default_label })
+					res = Object.assign({}, res, {
+						label: this.default_label
+					})
 				}
 				return res
+			},
+			show_selector_arrow() {
+				const selected_index = this.option_list.findIndex(option => option.checked)
+				return selected_index <= 0
 			}
 		},
 		methods: {
+			translateLabel(label) {
+				if (!label) return ''
+				const translated = this.$t(label)
+				return translated !== label ? translated : (this.language[label] || label)
+			},
 			set_dialog_status(e) {
 				// this.$emit('update:hidden', e)
 				this.hidden = e
@@ -111,12 +122,15 @@
 <style lang="scss">
 	.selector-wrapper {
 		position: relative;
+		width: 100%;
 		margin: 0;
 		padding: 0;
 	}
 
 	/* 触发器（tag）：统一使用订单筛选栏的青绿色样式，页面可按容器覆盖 */
 	.selector-tag {
+		width: 100%;
+		box-sizing: border-box;
 		background-color: $color-primary;
 		color: white;
 		gap: 6upx;
@@ -130,8 +144,9 @@
 		top: calc(100% + 8upx);
 		left: 0;
 		z-index: 15;
-		min-width: 220upx;
-		background-color: #F0F9FB;
+		width: 100%;
+		min-width: 0;
+		background-color: $bg-color-info;
 		border-radius: 16upx;
 		box-shadow: 0 6upx 20upx var(--theme-primary-alpha-18, rgba(28, 102, 124, 0.18));
 		overflow: hidden;
@@ -173,8 +188,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		gap: 16upx;
-		padding: 18upx 24upx;
+		gap: 10upx;
+		padding: 15upx 10upx 15upx 15upx;
 		background: transparent;
 		white-space: nowrap;
 		cursor: pointer;
@@ -188,7 +203,7 @@
 	.option-text {
 		color: $color-primary;
 		font-size: 24upx;
-		font-weight: 500;
+		font-weight: bold;
 		line-height: 32upx;
 		flex: 1;
 	}
@@ -197,7 +212,7 @@
 	.option-radio {
 		width: 28upx;
 		height: 28upx;
-		border: 2upx solid #4fb3bf;
+		border: 2upx solid $color-primary;
 		border-radius: 50%;
 		background: transparent;
 		flex-shrink: 0;
@@ -214,7 +229,7 @@
 		width: 14upx;
 		height: 14upx;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	/* 旧 option-active 不再使用浅色背景，由 radio-checked 表达选中态 */

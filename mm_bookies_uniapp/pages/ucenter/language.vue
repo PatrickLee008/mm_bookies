@@ -7,7 +7,7 @@
 			<text class="header-placeholder"></text>
 		</view>
 
-		<scroll-view scroll-y style="height: calc(100vh - 88px);">
+		<scroll-view scroll-y style="height: calc(var(--app-viewport-height, 100vh) - 88px);">
 			<view class="language-content">
 				<!-- 语言选项列表 -->
 				<view class="language-item" @click="pickerChange('mm')">
@@ -89,12 +89,12 @@
 
 <style lang="scss" scoped>
 	.language-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 	}
 
 	/* 顶部栏 */
 	.language-header {
-		background-color: var(--theme-header-background-color, #{$theme-header-start});
+		background-color: var(--theme-header-background-color, #{$theme-page-start});
 		background-image: var(--theme-header-background-image, #{$theme-header-background});
 		background-position: var(--theme-header-background-position, center top);
 		background-size: var(--theme-header-background-size, 100% 552px);
@@ -154,14 +154,14 @@
 	}
 
 	.radio-circle.radio-selected {
-		border-color: #4fb3bf;
+		border-color: $color-primary;
 	}
 
 	.radio-dot {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.confirm-btn {

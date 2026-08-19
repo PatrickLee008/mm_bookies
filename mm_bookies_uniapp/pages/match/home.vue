@@ -7,8 +7,8 @@
 		<message-notification></message-notification>
 
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
-		<view class="header-placeholder"
-			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+		<view class="header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }">
+		</view>
 
 		<!-- <view class="flex-row mybg-lprimary justify-around padding-tb-sm ">
 			<button class="cu-btn sm width-40 myfont-10px" :class="{'mybg-active':!tomorrow,}" @click="select_date(false)">{{$t('today')}}</button>
@@ -26,8 +26,7 @@
 					color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 				<input class="search-input" placeholder-style="font-style:italic;color:var(--theme-primary)" type="text"
 					:placeholder="$t('search_by_team')" v-model="searchKeyword" @input="handleSearchInput" />
-				<theme-icon name="close" class="clear-icon"
-					color="var(--theme-icon-secondary, var(--theme-secondary))"
+				<theme-icon name="close" class="clear-icon" color="var(--theme-icon-secondary, var(--theme-secondary))"
 					v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
@@ -37,23 +36,24 @@
 					<view class="filter-line"></view>
 					<view class="filter-line"></view>
 				</view>
-				<view class='filter-badge' v-if="league_checked_count > 0">{{league_checked_count}}</view>
+				<view class='filter-badge' v-if="league_checked_count > 0">
+					{{ league_checked_count > 99 ? '99+' : league_checked_count }}
+				</view>
 			</view>
 		</view>
 
 		<!-- from tangjq--- 调整scroll-view高度，移除today/tomorrow tab高度，为mix模式底部栏预留空间 -->
-		<scroll-view scroll-y class="page padding-lr-sm padding-bottom-1px text-bold" style="line-height: 1.5;"
-			@scroll="onScrollHandler"
-			:style="{height: match_ref.mixed ? `calc(${calc_page_height} - 80px - 70px - ${headerHeight}px)` : `calc(${calc_page_height} - 80px - ${headerHeight}px)`,'padding-bottom':match_ref.mixed?'50px!important':''}">
+		<scroll-view scroll-y class="page padding-lr padding-bottom-1px text-bold"
+			:class="{ 'page-mixed': match_ref.mixed }" style="line-height: 1.5;"
+			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
-			<view class="flex-column padding-tb-sm" v-for="(league,index) in league_list" :key="index"
+			<view class="flex-column" v-for="(league,index) in league_list" :key="index"
 				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
 				<!-- 联赛标题栏 -->
 				<view class="new-league-header" @click="league.show_match = !league.show_match">
 					<view class="league-left">
-						<image class="league-icon"
-							src="https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png"
-							mode="aspectFit"></image>
+						<image class="league-icon" :src="league.league_icon || defaultLeagueIcon" mode="aspectFit">
+						</image>
 						<text class="league-name">{{league.name}}</text>
 					</view>
 					<view class="league-right">
@@ -68,25 +68,35 @@
 						<!-- 比赛卡片 -->
 						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index"
 							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
-							<!-- 日期时间行 -->
-							<view class="match-datetime">
-								{{match.MD_DATE_TIME}}
-							</view>
+							<view class="match-summary">
+								<view class="match-teams">
+									<view class="match-logo-row">
+										<view class="team-logo-frame"
+											:class="{ 'team-logo-frame-expanded': match.expanded }">
+											<image :src="match.show_image?match.home_logo:''" lazy-load
+												class="team-logo" :class="{ 'team-logo-expanded': match.expanded }"
+												@error="error_pic(match,'home')" />
+										</view>
+										<view class="match-datetime">
+											{{match.MD_DATE_TIME}}
+										</view>
+										<view class="team-logo-frame"
+											:class="{ 'team-logo-frame-expanded': match.expanded }">
+											<image :src="match.show_image?match.away_logo:''" lazy-load
+												class="team-logo" :class="{ 'team-logo-expanded': match.expanded }"
+												@error="error_pic(match,'away')" />
+										</view>
+									</view>
 
-							<!-- from tangjq--- 队伍信息行，移除show_match_detail调用 -->
-							<view class="match-teams">
-								<view class="team-section">
-									<image :src="match.show_image?match.home_logo:''" lazy-load class="team-logo"
-										@error="error_pic(match,'home')" />
-									<text class="team-name"
-										:class="{'text-red':match.LOSE_TEAM ==='1',}">{{match.HOST_TEAM}}</text>
-								</view>
-								<text class="vs-text">vs</text>
-								<view class="team-section">
-									<image :src="match.show_image?match.away_logo:''" lazy-load class="team-logo"
-										@error="error_pic(match,'away')" />
-									<text class="team-name"
-										:class="{'text-red':match.LOSE_TEAM ==='2',}">{{match.GUEST_TEAM}}</text>
+									<view class="match-name-row">
+										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='1',}">
+											{{match.HOST_TEAM}}
+										</view>
+										<text class="vs-text">vs</text>
+										<view class="team-name" :class="{'text-red':match.LOSE_TEAM ==='2',}">
+											{{match.GUEST_TEAM}}
+										</view>
+									</view>
 								</view>
 							</view>
 
@@ -192,8 +202,8 @@
 							<view class="match-expand-btn" v-if="get_available_bet_count(match) > 2"
 								@click.stop="toggle_match_expand(match)">
 								<image class="match-toggle-icon"
-									:src="match.expanded ? '/static/image/single/fold.svg' : '/static/image/single/unfold.svg'"
-									mode="aspectFit"></image>
+									:class="{ 'match-toggle-icon-expanded': match.expanded }"
+									src="/static/image/single/unfold.svg" mode="aspectFit"></image>
 							</view>
 						</view>
 					</view>
@@ -209,6 +219,8 @@
 					</view>
 				</template>
 			</view>
+			<view class="match-list-bottom-spacer"
+				:class="{ 'match-list-bottom-spacer-mixed': match_ref.mixed }"></view>
 		</scroll-view>
 
 		<!-- from tangjq--- 混合投注模式的底部栏 -->
@@ -355,8 +367,9 @@
 
 					<!-- from tangjq--- 投注选项 -->
 					<view class="bet-choice-row">
+						<text class="mix-row-label">Bet :</text>
 						<text class="choice-team">{{bet_content(match_ref.bet_match)}}</text>
-						<text class="choice-type"></text>
+						<!-- <text class="choice-type"></text> -->
 					</view>
 				</view>
 
@@ -818,6 +831,7 @@
 				confirmIntervalId: '',
 				configs: {},
 				mix_slip: uni.getStorageSync('mix_slip') || [],
+				defaultLeagueIcon: 'https://ssl.gstatic.com/onebox/media/sports/logos/udQ6ns69PctCvXqqCPnItA_48x48.png',
 				match_ref: {
 					mixed: false,
 					num: 0,
@@ -1005,9 +1019,9 @@
 			calc_slip_height() {
 				let info = uni.getDeviceInfo()
 				if (info.platform == 'ios') {
-					return `calc(100vh - 85px)`
+					return `calc(var(--app-viewport-height, 100vh) - 85px)`
 				}
-				return '100vh'
+				return 'var(--app-viewport-height, 100vh)'
 			},
 			// 动态生成金额选择列表，基于系统配置的 min/max 限额
 			dynamicAmountList() {
@@ -1508,6 +1522,12 @@
 				if (data.total) {
 					let favor_leagues = data.favor_leagues
 					let server_matches = data.items
+					let league_icons = {}
+					server_matches.forEach(match => {
+						if (match.LEAGUE && !league_icons[match.LEAGUE]) {
+							league_icons[match.LEAGUE] = match.league_logo || ''
+						}
+					})
 					//使用set给leauges去重
 					let server_leagues = [...new Set(server_matches.map(ele => ele.LEAGUE))]
 					// leauges排序
@@ -1515,6 +1535,7 @@
 					let league_list = server_leagues.map(ele => {
 						return {
 							name: ele,
+							league_icon: league_icons[ele] || '',
 							checked: true,
 							show_match: true,
 							include_today: false,
@@ -2071,7 +2092,7 @@
 
 	.single-mask {
 		background: none;
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		opacity: .5;
 		background-color: black;
 	}
@@ -2106,17 +2127,35 @@
 
 	/* from tangjq--- 新的页面容器样式，修复滚动问题 */
 	.match-page-container {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
+		min-height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
 	}
 
 	.page {
-		/* height: calc(100vh - env(safe-area-inset-bottom)); */
 		flex: 1;
+		height: 0;
 		min-height: 0;
 		background: #ffffff;
+		box-sizing: border-box;
+		// padding-bottom: 24px !important;
+		// padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+	}
+
+	.page.page-mixed {
+		// padding-bottom: 70px !important;
+		// padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+	}
+
+	.match-list-bottom-spacer {
+		height: 48px;
+		flex-shrink: 0;
+	}
+
+	.match-list-bottom-spacer-mixed {
+		height: 90px;
 	}
 
 	.dialog-wrapper {
@@ -2283,7 +2322,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		padding: 10px 10px 0;
+		padding: 10px 15px 5px;
 		gap: 10px;
 		background-color: #ffffff;
 		border-radius: 20px 20px 0 0;
@@ -2368,14 +2407,18 @@
 		right: -5px;
 		background-color: #ff4444;
 		color: white;
-		border-radius: 10px;
-		min-width: 16px;
-		height: 16px;
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 9px;
-		padding: 0 4px;
+		font-size: 8px;
+		line-height: 1;
+		padding: 0;
+		white-space: nowrap;
+		box-sizing: border-box;
 	}
 
 	/* from tangjq--- 新的联赛标题栏样式 */
@@ -2431,60 +2474,123 @@
 	.new-match-card {
 		background-color: white;
 		border-radius: $radius-large;
-		margin-bottom: 12px;
+		margin-bottom: 10px;
 		overflow: hidden;
-		border: 1px solid #d7e2e3;
+		border: 1px solid $color-border;
 		box-shadow: 0 1px 3px rgba(47, 93, 98, 0.16);
+		padding-bottom: 12px;
+		--match-center-column-width: 128px;
 	}
 
-	.match-datetime {
-		background-color: transparent;
-		text-align: center;
-		font-size: 12px;
-		color: $color-primary;
-		font-weight: 500;
-		padding: 10px 14px 2px;
+	.match-summary {
+		padding: 8px 14px 10px;
+		min-width: 0;
 	}
 
 	.match-teams {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
+		min-width: 0;
+	}
+
+	.match-logo-row,
+	.match-name-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) var(--match-center-column-width) minmax(0, 1fr);
+		min-width: 0;
+	}
+
+	.match-logo-row {
 		align-items: center;
-		padding: 7px 14px 10px;
+		min-height: 0;
+		padding: 5px 0;
 	}
 
-	.team-section {
+	.match-logo-row .team-logo-frame {
+		justify-self: center;
+	}
+
+	.match-name-row {
+		align-items: stretch;
+		margin-top: 3px;
+	}
+
+	.match-datetime {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow: visible;
+		background-color: transparent;
+		text-align: center;
+		font-size: 11px;
+		color: $color-primary;
+		font-weight: 500;
+		line-height: 1.25;
+		white-space: nowrap;
+		padding-top: 8px;
+	}
+
+	.new-match-card .team-logo-frame {
+		width: 20px;
+		height: 20px;
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		gap: 5px;
-		flex: 1;
+		justify-content: center;
+		flex-shrink: 0;
+		transition: width 180ms ease-out, height 180ms ease-out;
 	}
 
-	.team-logo {
-		width: 42px;
-		height: 42px;
+	.new-match-card .team-logo-frame.team-logo-frame-expanded {
+		width: 35px;
+		height: 35px;
 	}
 
-	.team-name {
+	.new-match-card .team-logo {
+		width: 20px;
+		height: 20px;
+		transform: scale(1);
+		transform-origin: center;
+		transition: transform 180ms ease-out;
+	}
+
+	.new-match-card .team-logo.team-logo-expanded {
+		transform: scale(1.75);
+	}
+
+	.new-match-card .team-name {
+		display: flex;
+		align-self: stretch;
+		align-items: center;
+		justify-content: center;
 		font-size: 12px;
 		color: $color-primary;
 		font-weight: 600;
 		text-align: center;
-		max-width: 100px;
+		min-width: 0;
+		max-width: 100%;
+		min-height: 30px;
+		padding: 0 2px;
+		box-sizing: border-box;
+		line-height: 1.25;
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
 
-	.vs-text {
+	.new-match-card .vs-text {
+		display: block;
+		width: 100%;
 		font-size: 14px;
-		color: #666;
+		color: $color-primary;
 		font-weight: bold;
-		margin: 0 10px;
+		line-height: 1;
+		text-align: center;
+		padding-top: 1px;
+		margin: 0;
 	}
 
 	/* from tangjq--- 新的投注选项样式 */
 	.new-bet-options {
-		padding: 0 12px 0;
+		padding: 0 20px 0;
 	}
 
 	.bet-row {
@@ -2586,7 +2692,7 @@
 	.match-expand-btn {
 		background-color: $color-primary;
 		height: 28px;
-		margin: 4px 12px 12px;
+		margin: 4px 20px 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -2598,6 +2704,13 @@
 	.match-toggle-icon {
 		width: 13px;
 		height: 14px;
+		display: block;
+		transform: rotate(0deg);
+		transition: transform 180ms ease-out;
+	}
+
+	.match-toggle-icon.match-toggle-icon-expanded {
+		transform: rotate(180deg);
 	}
 
 	/* from tangjq--- 确保展开按钮可点击 */
@@ -2641,7 +2754,7 @@
 	}
 
 	.total-count {
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-size: 18px;
 		font-weight: bold;
 	}
@@ -2845,7 +2958,8 @@
 	/* from tangjq--- 混合投注列表项，与左右边框有距离 */
 	.mix-match-item {
 		background-color: $bg-color-info;
-		border-radius: 12px;
+		border: 1px solid $color-border-other;
+		border-radius: $radius-small;
 		padding: 12px 15px;
 		margin: 0 15px 12px 15px;
 	}
@@ -2876,7 +2990,7 @@
 	/* from tangjq--- 队伍对阵行特殊样式 */
 	.mix-teams-row {
 		padding-bottom: 10px;
-		border-bottom: 1px solid #D0E8EA;
+		border-bottom: 1px solid $color-border-other;
 		margin-bottom: 2px;
 		align-items: flex-start;
 		/* from tangjq--- 改为顶部对齐，支持换行后的布局 */
@@ -2938,7 +3052,7 @@
 	/* from tangjq--- 单注比赛信息样式 */
 	.single-match-info {
 		background-color: $bg-color-info;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		padding: 10px;
 		margin: 15px;
 		margin-bottom: 15px;
@@ -2964,14 +3078,14 @@
 		align-items: center;
 		margin-bottom: 10px;
 		padding-bottom: 10px;
-		border-bottom: 1px solid #D0E8EA;
+		border-bottom: 1px solid $color-border-other;
 	}
 
 	.team-section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 8px;
+		gap: 5px;
 		flex: 1;
 	}
 
@@ -3046,7 +3160,7 @@
 
 	.bet-info-rows {
 		background-color: $bg-color-info;
-		border-radius: 10px;
+		border-radius: $radius-small;
 		padding: 12px 15px;
 		margin-bottom: 15px;
 	}
@@ -3090,7 +3204,7 @@
 		justify-content: center;
 		gap: 2px;
 		padding: 4px;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		border: 1.5px solid $color-primary;
 		background: $bg-color-info;
 		cursor: pointer;
@@ -3143,7 +3257,7 @@
 
 	.bet-amount-input {
 		background-color: #BDD4D6;
-		border-radius: 10px;
+		border-radius: $radius-small;
 		padding: 8px;
 		margin-bottom: 5px;
 	}
@@ -3191,8 +3305,8 @@
 	.cancel-btn {
 		flex: 1;
 		background-color: white;
-		border: 2px solid #C8434C;
-		border-radius: 12px;
+		border: 2px solid $color-primary;
+		border-radius: $radius-medium;
 		padding: 5px;
 		display: flex;
 		align-items: center;
@@ -3208,7 +3322,7 @@
 	.confirm-btn-action {
 		flex: 1;
 		background-color: #BDD4D6;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 5px;
 		display: flex;
 		align-items: center;

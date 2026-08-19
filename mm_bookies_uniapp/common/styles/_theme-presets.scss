@@ -1,12 +1,27 @@
 // Sass-only theme presets used during the frontend migration.
 $theme-presets: (
-	legacy: (
+	mm-bookies: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #1C667C,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #37BDCC,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
 		secondary-light: #F1FAFB,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: dark,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色；none 表示不显示额外背景。
+		header-logo-bg: none,
+		// Header logo 背景圆角。
+		header-logo-radius: 0,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #2A626833,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: none,
+		// 首页顶部区域底部边框色。
+		home-top-border: #44696E,
+		
 		// 行为强调色：激活标签、选中项和需要突出显示的状态。
 		active: #FFC857,
 		// 主要文字：页面标题、重要数据和主要内容文字。
@@ -17,28 +32,50 @@ $theme-presets: (
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
 		bg-info: #E8F4F5,
+		// 登录注册输入框背景色。
+		bg-login-input: rgba(105, 145, 149, 0.6),
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #FFFFFF,
 		// 无 header 页面背景渐变起始色：首页、登录和注册的主要底色。
 		page-start: #103D43,
 		// 无 header 页面背景渐变结束色：页面背景渐变的收束色。
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #36BCCB,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #02455F,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #1F879B,
 		// 品牌 logo：首页、登录注册和 Header 的默认 logo。
-		logo-image: "/static/theme/legacy/mm_bookies_logo.png",
+		logo-image: "/static/theme/mm-bookies/mm-bookies_logo.png",
+		// Header logo 类型：文字或图片。
+		header-logo-type: text,
+		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
+		home-logo-height: 52px,
+		// 注册页欢迎标题。
+		title: "MM Bookies",
+		// 首页、登录和注册页副标题。
+		subtitle: "အနိုင်ရဖို့ ရွှေဂိုးတစ်ဂိုးသာလိုပါတယ်",
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
-		radius-large: 12px,
+		radius-large: 16px,
 		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
-		radius-medium: 8px,
+		radius-medium: 12px,
 		// 小圆角：投注按钮。
-		radius-small: 4px
+		radius-small: 8px
 	),
-	test: (
+	shwe-goal: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #136201,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: dark,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色；none 表示不显示额外背景。
+		header-logo-bg: none,
+		// Header logo 背景圆角。
+		header-logo-radius: 0,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #136201,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: #A0FF82,
+		// 首页顶部区域底部边框色。
+		home-top-border: #A0FF82,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -52,33 +89,57 @@ $theme-presets: (
 		// 通用浅背景：浅色提示区和非主内容背景。
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
-		bg-info: #F2F2F2,
+		bg-info: #EDEDED,
+		// 登录注册输入框背景色。
+		bg-login-input: rgba(0, 0, 0, 0.3),
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #FFFFFF,
+
+		// 大圆角：搜索框、比赛卡片和筛选按钮。
+		radius-large: 8px,
+		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
+		radius-medium: 8px,
+		// 小圆角：投注按钮。
+		radius-small: 4px,
+
 		// 无 header 页面背景渐变起始色：首页、登录和注册的主要底色。
 		page-start: #136201,
 		// 无 header 页面背景渐变结束色：页面背景渐变的收束色。
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #136201,
 		// 无 header 页面、header 页面和顶部 header 统一使用测试背景图片。
 		no-header-background-image: "/static/theme/bg-green.png",
 		with-header-background-image: "/static/theme/bg-green.png",
 		header-background-image: "/static/theme/bg-green.png",
 		// 品牌 logo：首页、登录注册和 Header 使用绿色 ShweGoal logo。
 		logo-image: "/static/theme/test/shwegoal_logo.png",
-		// 大圆角：搜索框、比赛卡片和筛选按钮。
-		radius-large: 12px,
-		// 中圆角：筛选列表、联赛标题、确认按钮和投注行。
-		radius-medium: 8px,
-		// 小圆角：投注按钮。
-		radius-small: 4px
+		// Header logo 类型：文字或图片。
+		header-logo-type: image,
+		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
+		home-logo-height: 88px,
+		// 注册页欢迎标题。
+		title: "Shwe Goal",
+		// 首页、登录和注册页副标题。
+		subtitle: "အနိုင်ရဖို့ ရွှေဂိုးတစ်ဂိုးသာလိုပါတယ်",
 	),
-	test-old: (
+	phoe-wa-maung: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
-		primary: #136201,
+		primary: #005E12,
+		// 背景明暗模式：控制无 header 页面上的前景色。
+		background: light,
+		// Header、登录和注册页面的背景明暗模式。
+		header-background: dark,
+		// Header logo 背景色。
+		header-logo-bg: white,
+		// Header logo 背景圆角。
+		header-logo-radius: 20px,
+		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
+		border: #136201,
+		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
+		border-other: #99BA4A,
+		// 首页顶部区域底部边框色。
+		home-top-border: #028206,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
@@ -93,6 +154,10 @@ $theme-presets: (
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
 		bg-info: #F2F2F2,
+		// 登录注册输入框背景色。
+		bg-login-input: white,
+		// 登录注册输入框文字和 placeholder 颜色。
+		color-login-input: #005E12,
 
 		// 大圆角：搜索框、比赛卡片和筛选按钮。
 		radius-large: 12px,
@@ -107,10 +172,6 @@ $theme-presets: (
 		page-end: #103D43,
 		// 无 header 页面背景光晕：背景角落的高亮扩散色。
 		glow: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变起始色。
-		header-start: #81BB1D,
-		// 有 header 页面 App 背景和顶部导航的渐变结束色。
-		header-end: #136201,
 		// 无 header 页面背景图片：首页、登录和注册使用。
 		no-header-background-image: "/static/theme/bg-white.png",
 		// 有 header 页面 App 根背景图片。
@@ -119,5 +180,13 @@ $theme-presets: (
 		header-background-image: "/static/theme/header-bg-white.png",
 		// 品牌 logo：首页、登录注册和 Header 使用 Phoewaa Maung logo。
 		logo-image: "/static/theme/test-old/phoewaa_maung_logo.png",
+		// Header logo 类型：文字或图片。
+		header-logo-type: image,
+		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
+		home-logo-height: 88px,
+		// 注册页欢迎标题。
+		title: "Phoe Wa Maung",
+		// 首页、登录和注册页副标题။
+		subtitle: "ငွေကြေးခိုင်မာ ယုံကြည်စိတ်ချ ညီကိုတို့အားလုံးအတွက် ဖိုးဝ",
 	)
 );

@@ -48,7 +48,7 @@
 				</view>
 			</view>
 
-			<scroll-view scroll-y class="history-scroll" @scroll="handleHeaderScroll" @scrolltolower="loadMore"
+			<scroll-view scroll-y class="history-scroll" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop" @scrolltolower="loadMore"
 				:refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 				<!-- 空状态 -->
@@ -341,7 +341,7 @@
 	}
 
 	.full-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 	}
@@ -368,7 +368,7 @@
 		cursor: pointer;
 		padding: 16px 6px 10px;
 		border: 1.5px solid $color-primary;
-		border-radius: 14px;
+		border-radius: $radius-medium;
 		background: #FFFFFF;
 		transition: background 0.2s ease;
 		min-width: 0;
@@ -408,8 +408,8 @@
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
-		padding: 10px 14px;
+		border-radius: $radius-large;
+		padding: 8px 14px;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -440,13 +440,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 12px 16px;
+		padding: 8px 16px;
 		cursor: pointer;
 	}
 
 	.option-text {
 		font-size: 13px;
-		font-weight: 500;
+		font-weight: bold;
 		color: $color-primary;
 	}
 
@@ -482,7 +482,8 @@
 	.record-card {
 		margin: 10px 0;
 		background-color: $bg-color-info;
-		border-radius: 14px;
+		border: 1px solid $color-border;
+		border-radius: $radius-medium;
 		overflow: hidden;
 	}
 
@@ -572,7 +573,7 @@
 	}
 
 	.amount-deposit-color {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.amount-withdraw-color {
@@ -593,7 +594,7 @@
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {
@@ -622,8 +623,8 @@
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 
@@ -631,6 +632,7 @@
 		font-size: 14px;
 		color: #999999;
 		margin-top: 20px;
+		text-align: center;
 	}
 
 	/* 加载更多 */
@@ -677,7 +679,8 @@
 		height: 50px;
 		border-radius: 30px;
 		background: $color-primary;
-		box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		// box-shadow: 0 4px 12px rgba(47, 93, 98, 0.4);
+		border: 1px solid $color-border-other;
 		display: flex;
 		flex-direction: column;
 		align-items: center;

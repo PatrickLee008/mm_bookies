@@ -1,17 +1,20 @@
 <template>
 	<view class="invite-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
-		
-		<!-- header 占位元素，防止内容被固定顶栏遮挡 -->
-		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
 
-		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll">
+		<!-- header 占位元素，防止内容被固定顶栏遮挡 -->
+		<view class="invite-header-placeholder"
+			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+
+		<scroll-view class="padding invite-scroll" scroll-y @scroll="handleHeaderScroll"
+			@scrolltoupper="handleHeaderTop">
 			<!-- 两个仪表盘入口 -->
 			<view class="flex-row justify-between text-black invite-dashboards">
 				<view class="dashboard-rec dashboard-bonus" @click="goto('./bonus_dashboard')">
 					<text class="text-bold myfont-12px">{{ $t('Bonus Dashboard') }}</text>
 					<view class="flex-row justify-between align-center height-22px">
-						<text class="text-bold myfont-16px">{{ $toolbox.num_format(summary.referrer_total_rewards || 0) }}</text>
+						<text
+							class="text-bold myfont-16px">{{ $toolbox.num_format(summary.referrer_total_rewards || 0) }}</text>
 						<text class="myfont-10px">Ks</text>
 					</view>
 				</view>
@@ -33,13 +36,13 @@
 						<text class="code-label">YOUR CODE</text>
 						<text class="code-value">{{ userInfo ? userInfo.r_code : '' }}</text>
 					</view>
-					<text class="cuIcon-copy copy-icon"></text>
+					<theme-icon name="copy" class="copy-icon" size="18px"
+						color="var(--theme-secondary-light, var(--theme-secondary))"></theme-icon>
 				</view>
-				<view class="invite-friends-button"
-					@click="goto(`./share?r_code=${userInfo ? userInfo.r_code : ''}`)">
+				<view class="invite-friends-button" @click="openShare">
 					<text class="cuIcon-share margin-right-xs"></text>
 					<text>{{ $t('Invite Friends') }}</text>
-					</view>
+				</view>
 			</view>
 
 			<!-- 活动列表 -->
@@ -60,7 +63,8 @@
 							<text class="myfont-10px mycolor-info">
 								{{ $t('Expires') }}: {{ formatDate(activity.end_date) }}
 							</text>
-							<view class="activity-status-badge" :class="activity.is_valid ? 'status-active' : 'status-inactive'">
+							<view class="activity-status-badge"
+								:class="activity.is_valid ? 'status-active' : 'status-inactive'">
 								<text class="myfont-10px">{{ activity.is_valid ? $t('Active') : $t('Ended') }}</text>
 							</view>
 						</view>
@@ -99,7 +103,9 @@
 				</text>
 
 				<!-- Method 1.1: 成就规则奖励 -->
-				<view v-if="activity.method1 && activity.method1.achievement_rules && activity.method1.achievement_rules.length > 0" class="activity-achievement">
+				<view
+					v-if="activity.method1 && activity.method1.achievement_rules && activity.method1.achievement_rules.length > 0"
+					class="activity-achievement">
 					<view class="white-rec method-card flex-column1" style="padding: 8px;align-items: start;">
 						<view class="method-title">
 							<text class="cuIcon-friend margin-right-xs"></text>
@@ -109,11 +115,13 @@
 							</view>
 						</view>
 						<view class="inner-rec flex-row justify-between text-bold text-center"
-							v-for="(rule, ruleIndex) in activity.method1.achievement_rules" :key="rule.rule_id">
-							<text class="myfont-12px line-height-13px text-left" style="max-width: 50%;">
+							style="padding-left: 10px;" v-for="(rule, ruleIndex) in activity.method1.achievement_rules"
+							:key="rule.rule_id">
+							<text class="myfont-12px line-height-13px text-left" style="min-width: 60%;">
 								{{ rule.description || rule.rule_type }}
 							</text>
-							<view class="flex-row1 justify-between align-center" style="min-width: 50%;">
+							<view class="flex-row1 justify-end align-center"
+								style="max-width: 30%;min-width: 20%  !important;">
 								<view class="flex-column1 align-center">
 									<text class="myfont-10px line-height-13px mycolor-info">
 										{{ `${rule.current_value}/${rule.threshold}` }}
@@ -126,7 +134,8 @@
 									</text>
 								</view>
 								<view class="flex-row1 justify-around margin-left-sm">
-									<view class="rec-btn-sm" :class="rule.can_claim ? 'claim-enabled text-white' : 'claim-disabled'"
+									<view class="rec-btn-sm"
+										:class="rule.can_claim ? 'claim-enabled text-white' : 'claim-disabled'"
 										@click="rule.can_claim ? claimAchievementReward(activity, rule) : ''">
 										<text>{{ $t('Claim') }}</text>
 									</view>
@@ -151,7 +160,8 @@
 								<text class="myfont-12px line-height-13px">{{ $t('One-time Invitation Reward') }}</text>
 								<view class="flex-row1 align-center margin-top-xs" style="font-size: 11px;">
 									<text class="mycolor-info">{{ $t('Qualified Invitees') }}: </text>
-									<text :class="activity.method1.invitation_share.qualified_invitees > 0 ? 'mycolor-success' : 'mycolor-info'">
+									<text
+										:class="activity.method1.invitation_share.qualified_invitees > 0 ? 'mycolor-success' : 'mycolor-info'">
 										{{ activity.method1.invitation_share.qualified_invitees || 0 }}
 									</text>
 									<text class="margin-left-xs mycolor-info"
@@ -160,15 +170,15 @@
 									</text>
 								</view>
 							</view>
-								<view class="flex-row1 justify-end align-center" style="min-width: 40%;">
-									<view class="flex-column1 align-center">
-										<text class="myfont-17px line-height-17px mycolor-primary">
-											{{ $toolbox.num_format(activity.method1.invitation_share.potential_rewards || 0) }}
-										</text>
-										<text class="myfont-9px mycolor-info" style="margin-top: 2px;">Ks</text>
-									</view>
+							<view class="flex-row1 justify-end align-center" style="min-width: 40%;">
+								<view class="flex-column1 align-center">
+									<text class="myfont-17px line-height-17px mycolor-primary">
+										{{ $toolbox.num_format(activity.method1.invitation_share.potential_rewards || 0) }}
+									</text>
+									<text class="myfont-9px mycolor-info" style="margin-top: 2px;">Ks</text>
 								</view>
 							</view>
+						</view>
 						<view class="requirement-hint">
 							<text class="myfont-9px">
 								{{ $t('Requirements') }}: {{ $t('Deposit') }}
@@ -186,7 +196,9 @@
 				</view>
 
 				<!-- Method 2: 存款分享 -->
-				<view v-if="activity.method2 && activity.method2.deposit_share_tiers && activity.method2.deposit_share_tiers.length > 0" class="activity-deposit-share">
+				<view
+					v-if="activity.method2 && activity.method2.deposit_share_tiers && activity.method2.deposit_share_tiers.length > 0"
+					class="activity-deposit-share">
 					<view class="white-rec method-card flex-column1" style="padding: 8px;align-items: start;">
 						<view class="method-title">
 							<text class="cuIcon-moneybag myfont-16px margin-right-xs"></text>
@@ -210,7 +222,8 @@
 							</view>
 							<view class="flex-row1 justify-end align-center" style="min-width: 40%;">
 								<view class="flex-column1 align-center">
-									<text class="myfont-10px line-height-13px mycolor-info">{{ tier.bonus_rate }}%</text>
+									<text
+										class="myfont-10px line-height-13px mycolor-info">{{ tier.bonus_rate }}%</text>
 									<text class="myfont-17px line-height-17px margin-tb-xs mycolor-primary">
 										{{ $toolbox.num_format(tier.claimable_amount || 0) }}
 									</text>
@@ -226,7 +239,8 @@
 				</view>
 
 				<!-- Method 3: 邀请人佣金 -->
-				<view v-if="activity.method3 && activity.method3.commission_stats" class="method-block activity-inviter-commission">
+				<view v-if="activity.method3 && activity.method3.commission_stats"
+					class="method-block activity-inviter-commission">
 					<view class="method-title">
 						<text class="cuIcon-fork myfont-16px margin-right-xs"></text>
 						<text>{{ $t('Inviter Commission') }}</text>
@@ -244,11 +258,15 @@
 						<view class="flex-row justify-between margin-top-sm" style="width: 100%; font-size: 11px;">
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Pending') }}</text>
-								<text class="mycolor-warning text-bold">{{ $toolbox.num_format(activity.method3.commission_stats.pending) }} Ks</text>
+								<text
+									class="mycolor-warning text-bold">{{ $toolbox.num_format(activity.method3.commission_stats.pending) }}
+									Ks</text>
 							</view>
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Paid') }}</text>
-								<text class="mycolor-success text-bold">{{ $toolbox.num_format(activity.method3.commission_stats.paid) }} Ks</text>
+								<text
+									class="mycolor-success text-bold">{{ $toolbox.num_format(activity.method3.commission_stats.paid) }}
+									Ks</text>
 							</view>
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Rate') }}</text>
@@ -259,7 +277,8 @@
 				</view>
 
 				<!-- Method 4: 被邀请人投注佣金 -->
-				<view v-if="activity.method4 && activity.method4.commission_stats" class="method-block activity-invitee-commission">
+				<view v-if="activity.method4 && activity.method4.commission_stats"
+					class="method-block activity-invitee-commission">
 					<view class="method-title">
 						<text class="cuIcon-redpacket myfont-16px margin-right-xs"></text>
 						<text>{{ $t('Invitee Bet Commission') }}</text>
@@ -277,11 +296,15 @@
 						<view class="flex-row justify-between margin-top-sm" style="width: 100%; font-size: 11px;">
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Pending') }}</text>
-								<text class="mycolor-warning text-bold">{{ $toolbox.num_format(activity.method4.commission_stats.pending) }} Ks</text>
+								<text
+									class="mycolor-warning text-bold">{{ $toolbox.num_format(activity.method4.commission_stats.pending) }}
+									Ks</text>
 							</view>
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Paid') }}</text>
-								<text class="mycolor-success text-bold">{{ $toolbox.num_format(activity.method4.commission_stats.paid) }} Ks</text>
+								<text
+									class="mycolor-success text-bold">{{ $toolbox.num_format(activity.method4.commission_stats.paid) }}
+									Ks</text>
 							</view>
 							<view class="flex-column1 align-center">
 								<text class="mycolor-info">{{ $t('Rate') }}</text>
@@ -297,11 +320,12 @@
 
 		<!-- 规则弹窗 -->
 		<view class="cu-modal rules-modal" :class="{ 'show': !modal_hidden }" @click="modal_hidden = true">
-			<view class="cu-dialog padding-lr-sm width-100" style="vertical-align: top;background: none;margin-top: 10vh;"
-				@click.stop="">
+			<view class="cu-dialog padding-lr-sm width-100"
+				style="vertical-align: top;background: none;margin-top: 10vh;" @click.stop="">
 				<scroll-view scroll-y
 					class="height-75vh bg-white radius-10px padding flex-column1 justify-start align-start text-black">
-					<view v-if="loadingRules" class="flex-column justify-center align-center" style="width:100%;margin-top: 50px;">
+					<view v-if="loadingRules" class="flex-column justify-center align-center"
+						style="width:100%;margin-top: 50px;">
 						<text class="cuIcon-loading2 cuIconfont-spin mycolor-primary" style="font-size: 40px;"></text>
 						<text class="myfont-14px mycolor-info margin-top-sm">{{ $t('Loading') }}...</text>
 					</view>
@@ -313,7 +337,8 @@
 						<view class="info-section margin-bottom">
 							<text class="myfont-12px mycolor-info">{{ rulesData.activity_description }}</text>
 							<view class="flex-row justify-between margin-top-xs myfont-10px mycolor-info">
-								<text>{{ formatDate(rulesData.start_date) }} - {{ formatDate(rulesData.end_date) }}</text>
+								<text>{{ formatDate(rulesData.start_date) }} -
+									{{ formatDate(rulesData.end_date) }}</text>
 							</view>
 						</view>
 
@@ -325,7 +350,8 @@
 							<view class="dashed-rec">
 								<view class="margin-bottom-sm">
 									<text class="text-bold">{{ $t('One-Time Bonus') }}:</text>
-									<text class="mycolor-warning"> {{ $toolbox.num_format(rulesData.method1.one_time_bonus) }} Ks</text>
+									<text class="mycolor-warning">
+										{{ $toolbox.num_format(rulesData.method1.one_time_bonus) }} Ks</text>
 								</view>
 								<view class="margin-bottom-xs myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
@@ -333,9 +359,11 @@
 								</view>
 								<view class="margin-bottom-xs myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
-									{{ $t('Min Turnover') }}: {{ $toolbox.num_format(rulesData.method1.min_turnover) }} Ks
+									{{ $t('Min Turnover') }}: {{ $toolbox.num_format(rulesData.method1.min_turnover) }}
+									Ks
 								</view>
-								<view v-if="rulesData.method1.achievement_rules && rulesData.method1.achievement_rules.length > 0"
+								<view
+									v-if="rulesData.method1.achievement_rules && rulesData.method1.achievement_rules.length > 0"
 									class="margin-top-sm">
 									<text class="text-bold">{{ $t('Achievement Rewards') }}:</text>
 									<view v-for="(rule, index) in rulesData.method1.achievement_rules" :key="index"
@@ -343,7 +371,8 @@
 										<text class="cuIcon-rankfill margin-right-xs mycolor-warning"></text>
 										{{ $t('Invite') }} {{ rule.threshold_value }} {{ $t('people') }} →
 										{{ $toolbox.num_format(rule.reward_amount) }} Ks
-										<text v-if="rule.max_claim_count > 0" class="mycolor-info"> ({{ $t('Max') }} {{ rule.max_claim_count }}x)</text>
+										<text v-if="rule.max_claim_count > 0" class="mycolor-info"> ({{ $t('Max') }}
+											{{ rule.max_claim_count }}x)</text>
 									</view>
 								</view>
 							</view>
@@ -358,12 +387,14 @@
 								<view class="margin-bottom-xs myfont-12px">
 									{{ $t('Earn a percentage of your invitees deposits based on tier ranges') }}
 								</view>
-								<view v-for="(tier, index) in rulesData.method2.deposit_tiers" :key="index" class="margin-tb-xs myfont-12px">
+								<view v-for="(tier, index) in rulesData.method2.deposit_tiers" :key="index"
+									class="margin-tb-xs myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
 									{{ $toolbox.num_format(tier.min_deposit) }} -
 									{{ tier.max_deposit ? $toolbox.num_format(tier.max_deposit) : '∞' }} Ks
 									→ <text class="text-bold mycolor-success">{{ tier.bonus_rate }}%</text>
-									<text v-if="tier.max_claims > 0" class="mycolor-info"> ({{ $t('Max') }} {{ tier.max_claims }}x)</text>
+									<text v-if="tier.max_claims > 0" class="mycolor-info"> ({{ $t('Max') }}
+										{{ tier.max_claims }}x)</text>
 								</view>
 							</view>
 						</view>
@@ -381,11 +412,13 @@
 								</view>
 								<view class="margin-bottom-xs myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
-									{{ $t('Rate') }}: <text class="text-bold mycolor-warning">{{ rulesData.method3.commission_rate }}%</text>
+									{{ $t('Rate') }}: <text
+										class="text-bold mycolor-warning">{{ rulesData.method3.commission_rate }}%</text>
 								</view>
 								<view class="myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
-									{{ $t('Settlement') }}: {{ formatFrequency(rulesData.method3.settlement_frequency) }}
+									{{ $t('Settlement') }}:
+									{{ formatFrequency(rulesData.method3.settlement_frequency) }}
 								</view>
 							</view>
 						</view>
@@ -401,7 +434,8 @@
 								</view>
 								<view class="myfont-12px">
 									<text class="cuIcon-title margin-right-xs"></text>
-									{{ $t('Commission Rate') }}: <text class="text-bold mycolor-warning">{{ rulesData.method4.rebate_rate }}%</text>
+									{{ $t('Commission Rate') }}: <text
+										class="text-bold mycolor-warning">{{ rulesData.method4.rebate_rate }}%</text>
 								</view>
 							</view>
 						</view>
@@ -446,10 +480,25 @@
 		},
 		methods: {
 			back_to() {
-				uni.navigateBack({ delta: 1 })
+				uni.navigateBack({
+					delta: 1
+				})
 			},
 			goto(url) {
-				uni.navigateTo({ url })
+				uni.navigateTo({
+					url
+				})
+			},
+			openShare() {
+				const rCode = this.userInfo && this.userInfo.r_code
+				if (!rCode) {
+					uni.showToast({
+						title: this.$t('something_went_wrong_please_try_again_later'),
+						icon: 'none'
+					})
+					return
+				}
+				this.goto(`./share?r_code=${encodeURIComponent(rCode)}`)
 			},
 			// 本地日期格式化（本项目 $toolbox 无 formatDateTime）
 			formatDate(dateStr, sep = '/') {
@@ -498,7 +547,10 @@
 				if (!code) return
 				uni.setClipboardData({
 					data: code,
-					success: () => uni.showToast({ title: _this.$t('copied_to_clipboard'), icon: 'success' })
+					success: () => uni.showToast({
+						title: _this.$t('copied_to_clipboard'),
+						icon: 'success'
+					})
 				})
 			},
 			openRulesModal(activityId) {
@@ -516,7 +568,10 @@
 						_this.rulesData = res.data.data
 					} else {
 						_this.rulesData = null
-						uni.showToast({ title: res.data.message || _this.$t('Failed to load rules'), icon: 'none' })
+						uni.showToast({
+							title: res.data.message || _this.$t('Failed to load rules'),
+							icon: 'none'
+						})
 					}
 				}, () => {
 					_this.loadingRules = false
@@ -527,11 +582,17 @@
 			joinActivity(activity) {
 				let _this = this
 				if (!activity.is_valid) {
-					uni.showToast({ title: _this.$t('Activity has ended'), icon: 'none' })
+					uni.showToast({
+						title: _this.$t('Activity has ended'),
+						icon: 'none'
+					})
 					return
 				}
 				if (activity.has_joined) {
-					uni.showToast({ title: _this.$t('Already participated'), icon: 'none' })
+					uni.showToast({
+						title: _this.$t('Already participated'),
+						icon: 'none'
+					})
 					return
 				}
 				this.$notice.show({
@@ -541,11 +602,14 @@
 					cancelText: _this.$t('Cancel'),
 					success: (r) => {
 						if (!r.confirm) return
-						_this.$http.post('/invitation_v2/join-activity', { activity_id: activity.id }, (res) => {
+						_this.$http.post('/invitation_v2/join-activity', {
+							activity_id: activity.id
+						}, (res) => {
 							if (res.statusCode === 200 && res.data.code === 200) {
 								this.$notice.show({
 									title: _this.$t('Success'),
-									content: _this.$t('Successfully joined the invitation activity!'),
+									content: _this.$t(
+										'Successfully joined the invitation activity!'),
 									showCancel: false,
 									confirmText: _this.$t('ok')
 								})
@@ -650,7 +714,7 @@
 <style lang="scss">
 	/* 页面骨架：固定顶栏占位 + 弹性滚动区（参考 pages/index/coupon.vue） */
 	.invite-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
@@ -709,31 +773,31 @@
 		flex-direction: column;
 	}
 
-	.activity-item > .activity-title-card {
+	.activity-item>.activity-title-card {
 		order: 1;
 	}
 
-	.activity-item > .invite-section-title {
+	.activity-item>.invite-section-title {
 		order: 2;
 	}
 
-	.activity-item > .activity-achievement {
+	.activity-item>.activity-achievement {
 		order: 3;
 	}
 
-	.activity-item > .activity-invitation-share {
+	.activity-item>.activity-invitation-share {
 		order: 4;
 	}
 
-	.activity-item > .activity-deposit-share {
+	.activity-item>.activity-deposit-share {
 		order: 5;
 	}
 
-	.activity-item > .activity-inviter-commission {
+	.activity-item>.activity-inviter-commission {
 		order: 6;
 	}
 
-	.activity-item > .activity-invitee-commission {
+	.activity-item>.activity-invitee-commission {
 		order: 7;
 	}
 
@@ -767,18 +831,19 @@
 		border-radius: 10px;
 		background: $color-primary;
 		color: #fff;
+		height: 84px;
 	}
 
 	.code-label {
 		display: block;
-		font-size: 9px;
+		font-size: 12px;
 	}
 
 	.code-value {
 		display: block;
 		margin-top: 2px;
 		color: $color-secondary-light;
-		font-size: 22px;
+		font-size: 32px;
 		font-weight: 700;
 		letter-spacing: 1px;
 	}
@@ -972,7 +1037,7 @@
 
 	.activity-summary-value {
 		margin-top: 2px;
-		color: $color-secondary-light;
+		color: $color-secondary;
 		font-size: 13px;
 		font-weight: 700;
 	}
@@ -991,26 +1056,26 @@
 		box-shadow: 0 1px 3px rgba(18, 63, 70, 0.14);
 	}
 
-	.method-card > .method-title {
+	.method-card>.method-title {
 		margin: 0;
 		padding: 9px 12px;
 		background: $color-secondary;
 		color: #fff;
 	}
 
-	.method-card > .inner-rec,
-	.method-card > .requirement-hint {
+	.method-card>.inner-rec,
+	.method-card>.requirement-hint {
 		margin-left: 12px;
 		margin-right: 12px;
 		width: auto;
 	}
 
-	.method-card > .inner-rec {
+	.method-card>.inner-rec {
 		border: 0;
 		padding: 10px 0 0;
 	}
 
-	.activity-achievement .method-card > .inner-rec {
+	.activity-achievement .method-card>.inner-rec {
 		min-height: 52px;
 		width: 100%;
 		margin: 7px 0;
@@ -1021,7 +1086,7 @@
 		overflow: hidden;
 	}
 
-	.activity-achievement .method-card > .inner-rec + .inner-rec {
+	.activity-achievement .method-card>.inner-rec+.inner-rec {
 		border-top: 1px solid #d7e5e7;
 	}
 
@@ -1035,7 +1100,7 @@
 		overflow: visible;
 	}
 
-	.activity-achievement .method-card > .inner-rec > text:first-child {
+	.activity-achievement .method-card>.inner-rec>text:first-child {
 		flex: 1;
 		max-width: 47% !important;
 		color: $color-primary;
@@ -1044,12 +1109,12 @@
 		line-height: 14px;
 	}
 
-	.activity-achievement .method-card > .inner-rec > view:last-child {
+	.activity-achievement .method-card>.inner-rec>view:last-child {
 		flex: 1;
 		min-width: 53% !important;
 	}
 
-	.activity-achievement .method-card > .inner-rec > view:last-child > view:first-child {
+	.activity-achievement .method-card>.inner-rec>view:last-child>view:first-child {
 		min-width: 58px;
 	}
 
@@ -1067,24 +1132,24 @@
 		background: $color-primary !important;
 	}
 
-	.activity-achievement .method-card > .inner-rec > view:last-child > view:last-child {
+	.activity-achievement .method-card>.inner-rec>view:last-child>view:last-child {
 		align-self: stretch;
 		margin: -7px 0 -7px 8px;
 	}
 
-	.activity-invitation-share .inner-rec > view:first-child,
-	.activity-deposit-share .inner-rec > view:first-child,
-	.method-block .white-rec > view:first-child > text:first-child {
+	.activity-invitation-share .inner-rec>view:first-child,
+	.activity-deposit-share .inner-rec>view:first-child,
+	.method-block .white-rec>view:first-child>text:first-child {
 		flex: 1;
 		max-width: 68% !important;
 		line-height: 15px;
 	}
 
-	.method-card > .requirement-hint {
+	.method-card>.requirement-hint {
 		margin-bottom: 12px;
 	}
 
-	.method-block > .method-title {
+	.method-block>.method-title {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -1095,14 +1160,14 @@
 		color: #fff;
 	}
 
-	.method-block > .white-rec {
+	.method-block>.white-rec {
 		margin-top: 0;
 		border-top: 0;
 		border-radius: 0 0 12px 12px;
 	}
 
-	.activity-inviter-commission > .method-title,
-	.activity-invitee-commission > .method-title {
+	.activity-inviter-commission>.method-title,
+	.activity-invitee-commission>.method-title {
 		justify-content: flex-start;
 		margin: 16px 0 8px;
 		padding: 0;
@@ -1112,13 +1177,13 @@
 		font-size: 14px;
 	}
 
-	.activity-inviter-commission > .method-title .method-detail-button,
-	.activity-invitee-commission > .method-title .method-detail-button {
+	.activity-inviter-commission>.method-title .method-detail-button,
+	.activity-invitee-commission>.method-title .method-detail-button {
 		display: none;
 	}
 
-	.activity-inviter-commission > .white-rec,
-	.activity-invitee-commission > .white-rec {
+	.activity-inviter-commission>.white-rec,
+	.activity-invitee-commission>.white-rec {
 		border-top: 1px solid #d7e5e7;
 		border-radius: 10px;
 	}
@@ -1209,7 +1274,7 @@
 		font-size: 11px;
 		font-weight: bold;
 		background: transparent;
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.activity-status-badge::before {
@@ -1217,12 +1282,12 @@
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
-		background: $color-secondary-light;
+		background: $color-secondary;
 	}
 
 	.status-active {
 		background: transparent;
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-inactive {

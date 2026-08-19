@@ -16,7 +16,7 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
@@ -105,6 +105,10 @@
 			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
+			},
+			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			onScrollTopEmit() {
+				this.$emit('contentScrollTop')
 			},
 			refreshData() {
 				if (this.refreshing) return;
@@ -295,7 +299,7 @@ async loadRecords() {
 	/* 筛选器 */
 	.filter-bar {
 		background: $color-primary;
-		border-radius: 20px;
+		border-radius: $radius-large;
 		padding: 8px 10px;
 		display: flex;
 		align-items: center;
@@ -331,7 +335,7 @@ async loadRecords() {
 
 	.option-text {
 		font-size: 12px;
-		font-weight: 500;
+		font-weight: bold;
 		color: $color-primary;
 	}
 
@@ -367,7 +371,8 @@ async loadRecords() {
 	.record-card {
 		margin: 10px 0;
 		background-color: $bg-color-info;
-		border-radius: 14px;
+		border: 1px solid $color-border;
+		border-radius: $radius-medium;
 		overflow: hidden;
 	}
 
@@ -452,7 +457,7 @@ async loadRecords() {
 	}
 
 	.amount-deposit-color {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.amount-withdraw-color {
@@ -472,7 +477,7 @@ async loadRecords() {
 	}
 
 	.status-success {
-		color: $color-secondary-light;
+		color: $color-secondary;
 	}
 
 	.status-pending {
@@ -501,8 +506,8 @@ async loadRecords() {
 	}
 
 	.empty-icon {
-		width: 120px;
-		height: 120px;
+		width: 60px;
+		height: 60px;
 		opacity: 0.6;
 	}
 
@@ -510,6 +515,7 @@ async loadRecords() {
 		font-size: 16px;
 		color: #999999;
 		margin-top: 20px;
+		text-align: center;
 	}
 
 	/* 加载更多 */

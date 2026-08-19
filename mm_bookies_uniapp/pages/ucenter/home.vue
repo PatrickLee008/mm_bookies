@@ -5,7 +5,8 @@
 		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll">
+		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll"
+			@scrolltoupper="handleHeaderTop">
 			<!-- <view class="title-bar">
 				<view class="flex-row justify-between" style="">
 					<view class="flex-row align-center" style="">
@@ -46,14 +47,14 @@
 					<!-- 用户头像 -->
 					<view class="profile-avatar-section">
 						<view class="profile-avatar-circle">
-							<image class="profile-avatar-img" src="/static/icon/nav/user_avatar.png" mode="aspectFill">
-							</image>
+							<theme-icon name="user-avatar" color="var(--theme-primary, #1C667C)"
+								class="profile-avatar-img"></theme-icon>
 						</view>
 					</view>
 
 					<!-- My ID -->
 					<view class="profile-info-row">
-						<text class="profile-info-label">{{ $t('my_phone') }} :
+						<text class="profile-info-label">{{ $t('my_id') }} :
 							{{ $store.state.userInfo.id || userInfo.id || '00001' }}</text>
 					</view>
 
@@ -61,7 +62,9 @@
 					<view class="profile-phone-row">
 						<text class="profile-phone-label">{{ $t('phone_no') }}:
 							{{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
-						<!-- <image class="profile-edit-icon" src="/static/icon/ucenter/edit.png" mode="aspectFit"></image> -->
+						<theme-icon class="profile-phone-copy-icon" name="copy" size="20px"
+							color="var(--theme-icon-primary, var(--theme-primary))" @click="copy"
+							v-if="canInvite"></theme-icon>
 					</view>
 
 					<!-- Change Password 按钮 -->
@@ -197,6 +200,25 @@
 					<!-- Confirm 按钮 -->
 					<view class="language-confirm-btn" @click="confirmLanguage()">
 						<text class="language-confirm-text">{{ $t('confirm') }}</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- Theme 测试弹窗 -->
+		<view class="modal-overlay" v-if="themeModalVisible" @click="hideThemeModal">
+			<view class="modal-content theme-modal" @click.stop="">
+				<view class="modal-header">
+					<text class="modal-title">{{ $t('theme_test') }}</text>
+					<text class="modal-close" @click="hideThemeModal">✕</text>
+				</view>
+				<view class="modal-body">
+					<view v-for="theme in themeOptions" :key="theme.value" class="language-item"
+						@click="selectTheme(theme.value)">
+						<text class="language-label">{{ theme.label }}</text>
+						<view class="radio-circle" :class="{ 'radio-selected': selectedTheme === theme.value }">
+							<view class="radio-dot" v-if="selectedTheme === theme.value"></view>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -342,6 +364,7 @@
 	import CustomerService from '@/components/common/customer-service.vue'
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import themeManager from '@/utils/theme/manager.js'
 
 	export default {
 		components: {
@@ -353,13 +376,13 @@
 		data() {
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
+				canInvite: true,
 				temp: {},
 				about: '',
 				currentLanguage: config.language,
 				picker: '',
 				contact2: '',
 				contact: [],
-				headerHeight: uni.getStorageSync('Authorization') ? 270 : 201, // 默认占位高度，等待 header 组件计算后更新
 				bar_list: [
 					// from tangjq--- 按设计稿顺序排列的新列表项
 					{
@@ -408,6 +431,14 @@
 						img: '../../static/icon/ucenter/language.png',
 						para: {},
 					},
+					// {
+					// 	title: "theme_test",
+					// 	content: '',
+					// 	method: 'showThemeModal',
+					// 	args: [],
+					// 	img: '../../static/icon/ucenter/about.png',
+					// 	para: {},
+					// },
 					{
 						title: "logout", // from tangjq--- 使用语言文件中的键名
 						content: '',
@@ -486,6 +517,18 @@
 
 				// from tangjq--- 语言选择器
 				selectedLanguage: uni.getStorageSync('UNI_LOCALE') || 'mm',
+				themeModalVisible: false,
+				selectedTheme: uni.getStorageSync('frontend_theme_preset'),
+				themeOptions: [{
+					value: 'mm-bookies',
+					label: 'MM Bookies',
+				}, {
+					value: 'shwe-goal',
+					label: 'Shwe Goal',
+				}, {
+					value: 'phoe-wa-maung',
+					label: 'Phoe Wa Maung',
+				}],
 
 				// from tangjq--- Change Password 弹窗相关变量
 				passwordChangeModalVisible: false,
@@ -628,7 +671,7 @@
 								name: 'a',
 								attrs: {
 									href: href,
-									style: 'color: #4fb3bf; text-decoration: underline;'
+									style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 								},
 								children: []
 							}
@@ -698,7 +741,7 @@
 						name: 'a',
 						attrs: {
 							href: m[0],
-							style: 'color: #4fb3bf; text-decoration: underline;'
+							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 						},
 						children: [{
 							type: 'text',
@@ -738,6 +781,17 @@
 					}
 				})
 			},
+			copy() {
+				const userInfo = this.$store.state.userInfo || {}
+				if (!userInfo.phone) {
+					uni.showToast({
+						title: this.$t('unable_get_user_info'),
+						icon: 'none'
+					})
+					return
+				}
+				this.copyToClipboard(userInfo.phone)
+			},
 			// 打开客服 modal
 			openCustomerService() {
 				uni.$emit('open-customer-service-fullscreen');
@@ -774,6 +828,17 @@
 						url: '/pages/ucenter/home'
 					})
 				}, 300)
+			},
+			showThemeModal() {
+				this.themeModalVisible = true
+			},
+			hideThemeModal() {
+				this.themeModalVisible = false
+			},
+			selectTheme(theme) {
+				themeManager.applyPreset(theme)
+				this.selectedTheme = theme
+				this.hideThemeModal()
 			},
 
 			// from tangjq--- Customer Support弹窗方法
@@ -1184,7 +1249,7 @@
 	}
 
 	.ucenter-page {
-		min-height: 100vh;
+		min-height: var(--app-viewport-height, 100vh);
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
@@ -1272,7 +1337,7 @@
 	.cashout-value {
 		font-size: 13px;
 		color: #1e3a5f;
-		font-weight: 700;
+		font-weight: bold;
 		margin-right: 12px;
 	}
 
@@ -1324,7 +1389,7 @@
 
 	.icon-label {
 		font-size: 12px;
-		color: #4fb3bf;
+		color: $color-primary;
 		font-weight: 500;
 	}
 
@@ -1339,7 +1404,7 @@
 	.setting-item {
 		background: #fff;
 		border: 2px solid $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-large;
 		padding: 8px;
 		margin-bottom: 20px;
 		text-align: center;
@@ -1472,7 +1537,7 @@
 
 	.modal-content {
 		background: #fff;
-		border-radius: 16px;
+		border-radius: $radius-large;
 		width: 100%;
 		max-width: 500px;
 		max-height: 90vh;
@@ -1485,7 +1550,6 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		border-radius: 16px 16px 0 0;
 	}
 
 	.modal-title {
@@ -1536,7 +1600,7 @@
 	.profile-info-label {
 		font-size: 16px;
 		font-weight: 700;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.profile-phone-row {
@@ -1547,9 +1611,19 @@
 	}
 
 	.profile-phone-label {
+		flex: 1;
+		min-width: 0;
 		font-size: 15px;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.profile-phone-copy-icon {
+		flex-shrink: 0;
+		margin-left: 8px;
 	}
 
 	.profile-edit-icon {
@@ -1560,7 +1634,7 @@
 	.profile-change-pwd-btn {
 		background: #fff;
 		border: 2px solid $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 		margin-bottom: 12px;
@@ -1574,7 +1648,7 @@
 
 	.profile-save-btn {
 		background: $color-primary;
-		border-radius: 12px;
+		border-radius: $radius-medium;
 		padding: 8px;
 		text-align: center;
 	}
@@ -1743,7 +1817,7 @@
 	.language-label {
 		font-size: 16px;
 		font-weight: 600;
-		color: #1e3a5f;
+		color: $color-primary;
 	}
 
 	.radio-circle {
@@ -1758,14 +1832,14 @@
 	}
 
 	.radio-circle.radio-selected {
-		border-color: #4fb3bf;
+		border-color: $color-primary;
 	}
 
 	.radio-dot {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
-		background: #4fb3bf;
+		background: $color-primary;
 	}
 
 	.language-confirm-btn {
@@ -1842,7 +1916,7 @@
 	}
 
 	// .pwd-input-wrapper.input-error {
-	// 	border: 2px solid #e54d42;
+	// 	border: 2px solid #D0342C;
 	// }
 
 	.pwd-input {
@@ -1875,7 +1949,7 @@
 	.pwd-error-message {
 		display: block;
 		font-size: 13px;
-		color: #e54d42;
+		color: #D0342C;
 		margin-top: -10px;
 		margin-bottom: 10px;
 		padding-left: 5px;

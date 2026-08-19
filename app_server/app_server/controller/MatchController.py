@@ -11,11 +11,70 @@ from flask import g, request, jsonify, Blueprint
 from app_server.utils import OrmUttil
 from sqlalchemy import or_, func, and_, not_
 import json
+import re
 from datetime import datetime, timezone, timedelta
 from app_server.model import Redis
 
 match = Blueprint('match', __name__)
 key_prefix = 'live_matches'
+
+
+def normalize_league_name(name):
+    if not isinstance(name, str):
+        return ''
+    return ' '.join(re.sub(r'[^\w]+', ' ', name.casefold()).split())
+
+
+def league_name_match_score(requested_name, candidate_name):
+    if not requested_name or not candidate_name:
+        return -1
+    if requested_name == candidate_name:
+        return 100000 + len(candidate_name)
+
+    return -1
+
+
+def get_league_logo_map(league_names):
+    """Build a league-name-to-logo map for the match list response."""
+    names = {
+        normalize_league_name(name)
+        for name in league_names
+        if normalize_league_name(name)
+    }
+    if not names:
+        return {}
+
+    leagues = MAppLeague.query.filter(
+        MAppLeague.del_flag == 0,
+        or_(
+            MAppLeague.logo.isnot(None),
+            MAppLeague.logo2.isnot(None),
+        ),
+    ).order_by(
+        MAppLeague.status.desc(),
+        MAppLeague.is_scraper.desc(),
+    ).all()
+
+    logo_map = {}
+    for requested_name in names:
+        best_score = -1
+        best_logo = None
+        for league in leagues:
+            logo = (league.logo2 or league.logo or '').strip()
+            if not logo:
+                continue
+
+            for candidate_name in (league.name, league.scraper_name):
+                candidate_name = normalize_league_name(candidate_name)
+                score = league_name_match_score(requested_name, candidate_name)
+                if score > best_score:
+                    best_score = score
+                    best_logo = logo
+
+        if best_logo:
+            logo_map[requested_name] = best_logo
+
+    return logo_map
 
 
 # 获取比赛列表
@@ -112,6 +171,14 @@ def get_match_list():
         valid_items.append(item)
 
     items = valid_items
+
+    league_logo_map = get_league_logo_map(
+        item.get('LEAGUE') for item in items
+    )
+    for item in items:
+        item['league_logo'] = league_logo_map.get(
+            normalize_league_name(item.get('LEAGUE'))
+        )
 
     # 获取联赛排序和过滤
     leagues_sort = MAppLeague.get_scraper_leagues(True)

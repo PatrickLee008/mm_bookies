@@ -42,14 +42,12 @@
 
 		<!-- 下拉刷新容器 -->
 		<scroll-view class="message-scroll" scroll-y="true" refresher-enabled="true" :refresher-triggered="refreshing"
-			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll">
+			@refresherrefresh="onRefresh" @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
 
 			<!-- 消息列表 -->
 			<view class="message-list">
-				<view v-for="(message, index) in messages" :key="message.id || index"
-					class="message-card"
-					:class="{'unread-card': !message.read}"
-					@click="viewMessageDetails(message)">
+				<view v-for="(message, index) in messages" :key="message.id || index" class="message-card"
+					:class="{'unread-card': !message.read}" @click="viewMessageDetails(message)">
 					<!-- 未读指示条 -->
 					<view class="unread-indicator" v-if="!message.read"></view>
 
@@ -68,8 +66,8 @@
 			</view>
 			<!-- 空状态 -->
 			<view class="no-messages" v-if="messages.length === 0 && !loading">
-				<image src="/static/icon/messages.png" style="height: 80px; width: 80px; margin-bottom: 16px; opacity: 0.3;"
-					mode="aspectFit"></image>
+				<image src="/static/icon/messages.png"
+					style="height: 80px; width: 80px; margin-bottom: 16px; opacity: 0.3;" mode="aspectFit"></image>
 				<text class="no-messages-text">{{ $t('no_messages') }}</text>
 				<text class="no-messages-tip">{{ $t('realtime_msg_tip') }}</text>
 			</view>
@@ -119,9 +117,7 @@
 				<!-- 弹窗底部操作 -->
 				<view class="modal-footer">
 					<!-- 跳转按钮 - 根据target_type和target_url显示 -->
-					<view class="modal-btn primary-btn"
-						  @click="handleMessageJump"
-						  v-if="shouldShowJumpButton()">
+					<view class="modal-btn primary-btn" @click="handleMessageJump" v-if="shouldShowJumpButton()">
 						<text class="btn-text">{{ $t('msg_view_details') }}</text>
 					</view>
 
@@ -329,9 +325,9 @@
 
 				// 只有当target_type不是NONE且target_url存在时才显示跳转按钮
 				return message.targetType &&
-					   message.targetType !== 'NONE' &&
-					   message.targetUrl &&
-					   message.targetUrl.trim() !== ''
+					message.targetType !== 'NONE' &&
+					message.targetUrl &&
+					message.targetUrl.trim() !== ''
 			},
 
 			// 处理消息跳转
@@ -367,7 +363,7 @@
 				}
 			},
 
-			// 处理页面内部跳转（mm_bookies 无 $toolbox.navigateToPage，使用 uni 原生跳转 + 回退）
+			// 处理页面内部跳转（mm-bookies 无 $toolbox.navigateToPage，使用 uni 原生跳转 + 回退）
 			handlePageJump(route) {
 				uni.navigateTo({
 					url: route,
@@ -384,9 +380,14 @@
 							fail: () => {
 								uni.redirectTo({
 									url: route,
-									success: () => { this.closeModal() },
+									success: () => {
+										this.closeModal()
+									},
 									fail: () => {
-										uni.showToast({ title: this.$t('msg_nav_failed'), icon: 'none' })
+										uni.showToast({
+											title: this.$t('msg_nav_failed'),
+											icon: 'none'
+										})
 									}
 								})
 							}
@@ -635,9 +636,15 @@
 				const days = Math.floor(diff / 86400000)
 
 				if (minutes < 1) return this.$t('msg_just_now')
-				if (minutes < 60) return this.$t('msg_min_ago', { n: minutes })
-				if (hours < 24) return this.$t('msg_hour_ago', { n: hours })
-				if (days < 7) return this.$t('msg_day_ago', { n: days })
+				if (minutes < 60) return this.$t('msg_min_ago', {
+					n: minutes
+				})
+				if (hours < 24) return this.$t('msg_hour_ago', {
+					n: hours
+				})
+				if (days < 7) return this.$t('msg_day_ago', {
+					n: days
+				})
 
 				const date = new Date(timestamp)
 				return `${date.getMonth() + 1}/${date.getDate()} ${this.padZero(date.getHours())}:${this.padZero(date.getMinutes())}`
@@ -662,7 +669,7 @@
 
 <style lang="scss" scoped>
 	.full-page {
-		height: 100vh;
+		height: var(--app-viewport-height, 100vh);
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
@@ -716,7 +723,7 @@
 		font-size: 13px;
 		color: $color-primary;
 		padding: 6px 12px;
-		background: #E8F0FE;
+		background: $bg-color-info;
 		border-radius: 6px;
 
 		.cuIcon-check {
@@ -790,17 +797,24 @@
 
 	.tab-badge {
 		position: absolute;
-		top: 8px;
-		right: calc(50% - 35px);
+		top: 5px;
+		right: calc(50% - 45px);
 		background: #E52626;
 		color: white;
-		font-size: 10px;
+		width: 18px;
+		height: 18px;
+		min-width: 18px;
+		font-size: 8px;
 		font-weight: 600;
-		padding: 1px 5px;
-		border-radius: 10px;
-		min-width: 16px;
+		padding: 0;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
-		line-height: 1.4;
+		line-height: 1;
+		white-space: nowrap;
+		box-sizing: border-box;
 	}
 
 	.message-scroll {
@@ -865,10 +879,13 @@
 	}
 
 	@keyframes pulse {
-		0%, 100% {
+
+		0%,
+		100% {
 			opacity: 1;
 			width: 6px;
 		}
+
 		50% {
 			opacity: 0.9;
 			width: 8px;
