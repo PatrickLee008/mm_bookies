@@ -214,7 +214,7 @@
 					<view class="ad-banner-wrapper" v-for="(ad, adIndex) in advertisements" :key="`ad-${adIndex}`"
 						@click="handleAdClick(ad)">
 						<image class="ad-banner-image"
-							:src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''" mode="aspectFill">
+							:src="ad.image_urls && ad.image_urls.length > 0 ? ad.image_urls[0] : ''" mode="scaleToFill">
 						</image>
 					</view>
 				</template>
@@ -3342,7 +3342,7 @@
 	/* from tangjq--- 广告图区域样式 */
 	.ad-banner-wrapper {
 		width: 100%;
-		height: 130px;
+		height: 36.8vw;
 		border-radius: 15px;
 		overflow: hidden;
 		/* margin: 15px 0; */

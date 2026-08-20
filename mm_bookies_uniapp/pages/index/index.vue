@@ -86,7 +86,7 @@
 					indicator-dots>
 					<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
 						<image class="promotion-image"
-							:src="ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url" mode="aspectFill">
+							:src="ad.image_urls && ad.image_urls.length ? ad.image_urls[0] : ad.url" mode="scaleToFill">
 						</image>
 					</swiper-item>
 				</swiper>
@@ -491,7 +491,7 @@
 	.promotion-swiper,
 	.empty-promotion {
 		width: 100%;
-		height: 200px;
+		height: 35.73vw;
 		overflow: hidden;
 		border-radius: $radius-large;
 		// background: #e9eeee;

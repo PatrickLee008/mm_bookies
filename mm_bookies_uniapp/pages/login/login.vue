@@ -52,7 +52,7 @@
 				<swiper class="ad-swiper" :circular="advertisements.length > 1" :autoplay="advertisements.length > 1"
 					interval="3500" duration="500" :indicator-dots="advertisements.length > 1">
 					<swiper-item v-for="(ad, index) in advertisements" :key="index" @click="handleAdClick(ad)">
-						<image class="ad-image" :src="getAdvertisementImage(ad)" mode="aspectFill"></image>
+						<image class="ad-image" :src="getAdvertisementImage(ad)" mode="scaleToFill"></image>
 					</swiper-item>
 				</swiper>
 			</view>
@@ -906,7 +906,7 @@
 
 	.ad-swiper {
 		width: 100%;
-		height: 200px;
+		height: 36.8vw;
 		overflow: hidden;
 		border-radius: 32rpx;
 	}
