@@ -303,7 +303,8 @@
 						<text>{{$t('Confirm')}}</text>
 					</view>
 					<view class="parlay-download-button" data-html2canvas-ignore="true"
-						:class="{ 'is-downloading': downloading_slip }" @click="download_parlay_slip">
+						:class="{ 'is-downloading': downloading_slip }"
+						@click="download_parlay_slip">
 						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
 						</image>
 						<text>{{$t('Download Slip')}}</text>
@@ -314,6 +315,21 @@
 				<view class="parlay-export-status">
 					<view class="parlay-export-spinner"></view>
 					<text class="parlay-export-text">Generating...</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- iOS 不支持直接下载时显示图片预览，用户可长按保存 -->
+		<view class="parlay-slip-preview-modal" v-if="slip_preview_src">
+			<view class="parlay-detail-mask" @click="close_slip_preview"></view>
+			<view class="parlay-slip-preview-dialog" @click.stop="">
+				<text class="parlay-slip-preview-title">{{$t('Download Slip')}}</text>
+				<scroll-view class="parlay-slip-preview-scroll" scroll-y>
+					<image class="parlay-slip-preview-image" :src="slip_preview_src" mode="widthFix"></image>
+				</scroll-view>
+				<text class="parlay-slip-preview-tip">{{$t('save_slip_instruction')}}</text>
+				<view class="parlay-confirm-button" @click="close_slip_preview">
+					<text>{{$t('Confirm')}}</text>
 				</view>
 			</view>
 		</view>
@@ -365,6 +381,7 @@
 				show_parlay_modal: false,
 				parlay_modal_order: null,
 				downloading_slip: false,
+				slip_preview_src: '',
 			};
 		},
 		methods: {
@@ -612,6 +629,93 @@
 					requestFrame(() => requestFrame(resolve))
 				})
 			},
+			canvas_to_blob(canvas) {
+				return new Promise((resolve, reject) => {
+					if (!canvas || typeof canvas.toBlob !== 'function') {
+						reject(new Error('Canvas blob export is unavailable'))
+						return
+					}
+					canvas.toBlob((blob) => {
+						if (blob) {
+							resolve(blob)
+							return
+						}
+						reject(new Error('Canvas blob export failed'))
+					}, 'image/png')
+				})
+			},
+			is_ios_browser() {
+				const userAgent = navigator.userAgent || ''
+				return /iPad|iPhone|iPod/.test(userAgent) ||
+					(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+			},
+			get_parlay_slip_filename() {
+				const orderId = String(
+					(this.parlay_modal_order && (
+						this.parlay_modal_order.ORDER_ID || this.parlay_modal_order.ID
+					)) || 'slip'
+				).replace(/[^\w-]+/g, '_')
+				return `bet-slip-${orderId}.png`
+			},
+			open_slip_preview(blob) {
+				this.close_slip_preview()
+				this.slip_preview_src = URL.createObjectURL(blob)
+			},
+			close_slip_preview() {
+				if (this.slip_preview_src && typeof URL !== 'undefined' && URL.revokeObjectURL) {
+					URL.revokeObjectURL(this.slip_preview_src)
+				}
+				this.slip_preview_src = ''
+			},
+			save_parlay_canvas(canvas) {
+				return this.canvas_to_blob(canvas).then(async (blob) => {
+					const filename = this.get_parlay_slip_filename()
+					if (this.is_ios_browser()) {
+						if (typeof File !== 'undefined' &&
+							typeof navigator.share === 'function' &&
+							typeof navigator.canShare === 'function') {
+							try {
+								const file = new File([blob], filename, {
+									type: 'image/png'
+								})
+								if (navigator.canShare({ files: [file] })) {
+									try {
+										await navigator.share({
+											title: filename,
+											files: [file]
+										})
+										uni.showToast({
+											title: 'Share completed',
+											icon: 'success'
+										})
+										return
+									} catch (error) {
+										if (error && error.name === 'AbortError') return
+										console.warn('Share slip failed:', error)
+									}
+								}
+							} catch (error) {
+								console.warn('iOS file share is unavailable:', error)
+							}
+						}
+						this.open_slip_preview(blob)
+						return
+					}
+
+					const objectUrl = URL.createObjectURL(blob)
+					const link = document.createElement('a')
+					link.href = objectUrl
+					link.download = filename
+					document.body.appendChild(link)
+					link.click()
+					document.body.removeChild(link)
+					setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
+					uni.showToast({
+						title: 'Download started',
+						icon: 'success'
+					})
+				})
+			},
 			download_parlay_slip() {
 				if (this.downloading_slip || !this.parlay_modal_order) return
 				if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -675,21 +779,7 @@
 							}))
 						})
 					})
-					.then((canvas) => {
-						const orderId = String(
-							this.parlay_modal_order.ORDER_ID || this.parlay_modal_order.ID || 'slip'
-						).replace(/[^\w-]+/g, '_')
-						const link = document.createElement('a')
-						link.href = canvas.toDataURL('image/png')
-						link.download = `bet-slip-${orderId}.png`
-						document.body.appendChild(link)
-						link.click()
-						document.body.removeChild(link)
-						uni.showToast({
-							title: 'Download started',
-							icon: 'success'
-						})
-					})
+					.then((canvas) => this.save_parlay_canvas(canvas))
 					.catch((error) => {
 						console.error('Download slip failed:', error)
 						uni.showToast({
@@ -1030,6 +1120,9 @@
 			this.date_preset = this.$t('today')
 			this.parse_option_list()
 			this.get_list()
+		},
+		beforeDestroy() {
+			this.close_slip_preview()
 		},
 		created() {}
 	}
@@ -1696,6 +1789,78 @@
 		color: $color-primary;
 		font-size: 13px;
 		font-weight: 600;
+	}
+
+	.parlay-slip-preview-modal {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: var(--app-viewport-height, 100vh);
+		z-index: 2100;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 16px 10px;
+		box-sizing: border-box;
+	}
+
+	.parlay-slip-preview-dialog {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: 400px;
+		height: 86%;
+		max-height: calc(var(--app-viewport-height, 100vh) - 32px);
+		min-height: 0;
+		background: #ffffff;
+		border: 8px solid $color-primary;
+		border-radius: 22px;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
+
+	.parlay-slip-preview-title {
+		display: block;
+		flex-shrink: 0;
+		padding: 11px 10px 9px;
+		color: $color-primary;
+		font-size: 18px;
+		font-weight: 700;
+		text-align: center;
+	}
+
+	.parlay-slip-preview-scroll {
+		flex: 1 1 0%;
+		height: 0;
+		min-height: 0;
+		padding: 0 10px;
+		background: #f7fafb;
+		box-sizing: border-box;
+	}
+
+	.parlay-slip-preview-image {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.parlay-slip-preview-tip {
+		display: block;
+		flex-shrink: 0;
+		padding: 9px 12px 4px;
+		color: $color-primary;
+		font-size: 12px;
+		line-height: 1.35;
+		text-align: center;
+	}
+
+	.parlay-slip-preview-dialog .parlay-confirm-button {
+		flex-shrink: 0;
+		margin-bottom: 12px;
 	}
 
 	@keyframes parlay-export-spin {

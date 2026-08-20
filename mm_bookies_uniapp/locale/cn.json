@@ -1537,6 +1537,7 @@
 	"confirm": "确认",
 	"Confirm": "确认",
 	"Download Slip": "下载投注单",
+	"save_slip_instruction": "长按图片保存。",
 	"deposit_success": "充值成功",
 	"add_bank_tips": "请务必输入正确信息。输入错误信息可能导致存款失败。",
 	"money_not_enough": "提现金额超过余额",

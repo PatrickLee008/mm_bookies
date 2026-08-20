@@ -1535,6 +1535,7 @@
 	"confirm": "Confirm",
 	"Confirm": "Confirm",
 	"Download Slip": "Download Slip",
+	"save_slip_instruction": "Press and hold the image to save it.",
 	"deposit_success": "Deposit Transaction Successful",
 	"add_bank_tips": "Please make sure to input the correct information. Inputting incorrect information may result in deposit failure.",
 	"money_not_enough": "Withdrawal amount exceeds remaining balance",
