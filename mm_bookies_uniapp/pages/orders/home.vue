@@ -325,20 +325,27 @@
 			<view class="parlay-slip-preview-dialog" @click.stop="">
 				<text class="parlay-slip-preview-title">{{$t('Download Slip')}}</text>
 				<scroll-view class="parlay-slip-preview-scroll" scroll-y>
+					<!-- #ifdef H5 -->
+					<img class="parlay-slip-preview-image" :src="slip_preview_src" alt="Bet slip"
+						draggable="true">
+					<!-- #endif -->
+					<!-- #ifndef H5 -->
 					<image class="parlay-slip-preview-image" :src="slip_preview_src" mode="widthFix"></image>
+					<!-- #endif -->
 				</scroll-view>
 				<text class="parlay-slip-preview-tip">{{$t('save_slip_instruction')}}</text>
-				<view class="parlay-slip-preview-download" @click="download_slip_preview">
-					<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
-					</image>
-					<text>{{$t('Download Slip')}}</text>
-				</view>
 				<view class="parlay-slip-preview-share" v-if="can_share_slip"
 					:class="{ 'is-sharing': sharing_slip }" @click="share_slip_preview">
 					<text>{{$t('share')}}</text>
 				</view>
-				<view class="parlay-confirm-button" @click="close_slip_preview">
-					<text>{{$t('Confirm')}}</text>
+				<view class="parlay-slip-preview-actions">
+					<view class="parlay-confirm-button parlay-download-confirm-button"
+						@click="download_slip_preview">
+						<text>{{$t('Download')}}</text>
+					</view>
+					<view class="parlay-confirm-button" @click="close_slip_preview">
+						<text>{{$t('Confirm')}}</text>
+					</view>
 				</view>
 			</view>
 		</view>
@@ -663,6 +670,27 @@
 					}, 'image/png')
 				})
 			},
+			blob_to_data_url(blob) {
+				return new Promise((resolve, reject) => {
+					if (!blob || typeof FileReader === 'undefined') {
+						reject(new Error('Data URL preview is unavailable'))
+						return
+					}
+
+					const reader = new FileReader()
+					reader.onload = () => {
+						if (typeof reader.result === 'string' && reader.result) {
+							resolve(reader.result)
+							return
+						}
+						reject(new Error('Data URL preview generation failed'))
+					}
+					reader.onerror = () => reject(
+						reader.error || new Error('Data URL preview generation failed')
+					)
+					reader.readAsDataURL(blob)
+				})
+			},
 			is_ios_browser() {
 				const userAgent = navigator.userAgent || ''
 				return /iPad|iPhone|iPod/.test(userAgent) ||
@@ -676,16 +704,13 @@
 				).replace(/[^\w-]+/g, '_')
 				return `bet-slip-${orderId}.png`
 			},
-			open_slip_preview(blob, filename) {
+			open_slip_preview(dataUrl, blob, filename) {
 				this.close_slip_preview()
 				this.slip_preview_blob = blob
 				this.slip_preview_filename = filename
-				this.slip_preview_src = URL.createObjectURL(blob)
+				this.slip_preview_src = dataUrl
 			},
 			close_slip_preview() {
-				if (this.slip_preview_src && typeof URL !== 'undefined' && URL.revokeObjectURL) {
-					URL.revokeObjectURL(this.slip_preview_src)
-				}
 				this.slip_preview_src = ''
 				this.slip_preview_blob = null
 				this.slip_preview_filename = ''
@@ -775,8 +800,12 @@
 			save_parlay_canvas(canvas) {
 				return this.canvas_to_blob(canvas).then(async (blob) => {
 					const filename = this.get_parlay_slip_filename()
-					// Keep the preview available as a fallback on every platform.
-					this.open_slip_preview(blob, filename)
+					// Use a data URL for the preview and keep the Blob for download/share.
+					const previewDataUrl = await this.blob_to_data_url(blob)
+					this.close_parlay_detail()
+					this.open_slip_preview(previewDataUrl, blob, filename)
+					await this.$nextTick()
+					await this.wait_for_slip_render()
 					if (this.is_ios_browser()) {
 						// Try both automatic download and system sharing; the preview remains available.
 						this.download_slip_blob(blob, filename, false)
@@ -1905,18 +1934,24 @@
 	}
 
 	.parlay-slip-preview-scroll {
-		flex: 1 1 0%;
-		height: 0;
-		min-height: 0;
+		flex: 1 1 auto;
+		height: auto;
+		min-height: 1px;
 		padding: 0 10px;
 		background: #f7fafb;
 		box-sizing: border-box;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 
 	.parlay-slip-preview-image {
 		display: block;
 		width: 100%;
+		max-width: 100%;
 		height: auto;
+		-webkit-touch-callout: default;
+		-webkit-user-select: auto;
+		user-select: auto;
 	}
 
 	.parlay-slip-preview-tip {
@@ -1929,16 +1964,24 @@
 		text-align: center;
 	}
 
-	.parlay-slip-preview-download {
+	.parlay-slip-preview-actions {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 12px;
 		flex-shrink: 0;
-		margin: 4px auto 0;
-		color: $color-primary;
-		font-size: 12px;
-		font-weight: 600;
+		margin-bottom: 12px;
+	}
+
+	.parlay-slip-preview-actions .parlay-confirm-button {
+		width: auto;
+		flex: 1 1 0;
+		max-width: 162px;
+		margin: 0;
+	}
+
+	.parlay-download-confirm-button {
+		background: $color-secondary;
 	}
 
 	.parlay-slip-preview-share {
@@ -1962,7 +2005,7 @@
 
 	.parlay-slip-preview-dialog .parlay-confirm-button {
 		flex-shrink: 0;
-		margin-bottom: 12px;
+		margin: 0;
 	}
 
 	@keyframes parlay-export-spin {
