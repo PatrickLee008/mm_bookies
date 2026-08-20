@@ -328,6 +328,15 @@
 					<image class="parlay-slip-preview-image" :src="slip_preview_src" mode="widthFix"></image>
 				</scroll-view>
 				<text class="parlay-slip-preview-tip">{{$t('save_slip_instruction')}}</text>
+				<view class="parlay-slip-preview-download" @click="download_slip_preview">
+					<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
+					</image>
+					<text>{{$t('Download Slip')}}</text>
+				</view>
+				<view class="parlay-slip-preview-share" v-if="can_share_slip"
+					:class="{ 'is-sharing': sharing_slip }" @click="share_slip_preview">
+					<text>{{$t('share')}}</text>
+				</view>
 				<view class="parlay-confirm-button" @click="close_slip_preview">
 					<text>{{$t('Confirm')}}</text>
 				</view>
@@ -382,7 +391,17 @@
 				parlay_modal_order: null,
 				downloading_slip: false,
 				slip_preview_src: '',
+				slip_preview_blob: null,
+				slip_preview_filename: '',
+				sharing_slip: false,
 			};
+		},
+		computed: {
+			can_share_slip() {
+				return typeof navigator !== 'undefined' &&
+					typeof File !== 'undefined' &&
+					typeof navigator.share === 'function'
+			},
 		},
 		methods: {
 			copy(order) {
@@ -657,8 +676,10 @@
 				).replace(/[^\w-]+/g, '_')
 				return `bet-slip-${orderId}.png`
 			},
-			open_slip_preview(blob) {
+			open_slip_preview(blob, filename) {
 				this.close_slip_preview()
+				this.slip_preview_blob = blob
+				this.slip_preview_filename = filename
 				this.slip_preview_src = URL.createObjectURL(blob)
 			},
 			close_slip_preview() {
@@ -666,55 +687,104 @@
 					URL.revokeObjectURL(this.slip_preview_src)
 				}
 				this.slip_preview_src = ''
+				this.slip_preview_blob = null
+				this.slip_preview_filename = ''
+			},
+			download_slip_blob(blob, filename, showToast = true) {
+				const objectUrl = URL.createObjectURL(blob)
+				const link = document.createElement('a')
+				link.href = objectUrl
+				link.download = filename
+				document.body.appendChild(link)
+				link.click()
+				document.body.removeChild(link)
+				setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
+				if (showToast) {
+					uni.showToast({
+						title: 'Download started',
+						icon: 'success'
+					})
+				}
+			},
+			download_slip_preview() {
+				if (!this.slip_preview_blob) return
+				this.download_slip_blob(
+					this.slip_preview_blob,
+					this.slip_preview_filename || this.get_parlay_slip_filename()
+				)
+			},
+			share_slip_blob(blob, filename, showToast = true) {
+				if (!blob || !this.can_share_slip) {
+					return Promise.resolve(false)
+				}
+
+				try {
+					const file = new File([blob], filename, {
+						type: 'image/png'
+					})
+					if (typeof navigator.canShare === 'function' &&
+						!navigator.canShare({ files: [file] })) {
+						return Promise.resolve(false)
+					}
+					return navigator.share({
+						title: filename,
+						files: [file]
+					}).then(() => {
+						if (showToast) {
+							uni.showToast({
+								title: 'Share completed',
+								icon: 'success'
+							})
+						}
+						return true
+					}).catch((error) => {
+						if (error && error.name !== 'AbortError') {
+							console.warn('Share slip failed:', error)
+						}
+						return false
+					})
+				} catch (error) {
+					console.warn('File sharing is unavailable:', error)
+					return Promise.resolve(false)
+				}
+			},
+			share_slip_preview() {
+				if (this.sharing_slip || !this.slip_preview_blob) return
+				if (!this.can_share_slip) {
+					uni.showToast({
+						title: this.$t('share_not_supported'),
+						icon: 'none'
+					})
+					return
+				}
+
+				this.sharing_slip = true
+				this.share_slip_blob(
+					this.slip_preview_blob,
+					this.slip_preview_filename || this.get_parlay_slip_filename()
+				).then((shared) => {
+					if (!shared) {
+						uni.showToast({
+							title: this.$t('share_not_supported'),
+							icon: 'none'
+						})
+					}
+					this.sharing_slip = false
+				})
 			},
 			save_parlay_canvas(canvas) {
 				return this.canvas_to_blob(canvas).then(async (blob) => {
 					const filename = this.get_parlay_slip_filename()
 					// Keep the preview available as a fallback on every platform.
-					this.open_slip_preview(blob)
+					this.open_slip_preview(blob, filename)
 					if (this.is_ios_browser()) {
-						if (typeof File !== 'undefined' &&
-							typeof navigator.share === 'function' &&
-							typeof navigator.canShare === 'function') {
-							try {
-								const file = new File([blob], filename, {
-									type: 'image/png'
-								})
-								if (navigator.canShare({ files: [file] })) {
-									try {
-										await navigator.share({
-											title: filename,
-											files: [file]
-										})
-										uni.showToast({
-											title: 'Share completed',
-											icon: 'success'
-										})
-										return
-									} catch (error) {
-										if (error && error.name === 'AbortError') return
-										console.warn('Share slip failed:', error)
-									}
-								}
-							} catch (error) {
-								console.warn('File sharing is unavailable:', error)
-							}
-						}
+						// Try both automatic download and system sharing; the preview remains available.
+						this.download_slip_blob(blob, filename, false)
+						this.share_slip_blob(blob, filename, false)
 						return
 					}
 
-					const objectUrl = URL.createObjectURL(blob)
-					const link = document.createElement('a')
-					link.href = objectUrl
-					link.download = filename
-					document.body.appendChild(link)
-					link.click()
-					document.body.removeChild(link)
-					setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
-					uni.showToast({
-						title: 'Download started',
-						icon: 'success'
-					})
+					this.download_slip_blob(blob, filename)
 				})
 			},
 			download_parlay_slip() {
@@ -1857,6 +1927,37 @@
 		font-size: 12px;
 		line-height: 1.35;
 		text-align: center;
+	}
+
+	.parlay-slip-preview-download {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		flex-shrink: 0;
+		margin: 4px auto 0;
+		color: $color-primary;
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.parlay-slip-preview-share {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 162px;
+		height: 36px;
+		margin: 4px auto 8px;
+		border: 1px solid $color-primary;
+		border-radius: 12px;
+		color: $color-primary;
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.parlay-slip-preview-share.is-sharing {
+		opacity: 0.55;
 	}
 
 	.parlay-slip-preview-dialog .parlay-confirm-button {
