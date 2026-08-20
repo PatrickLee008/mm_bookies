@@ -319,7 +319,7 @@
 			</view>
 		</view>
 
-		<!-- iOS 不支持直接下载时显示图片预览，用户可长按保存 -->
+		<!-- 所有平台都保留图片预览，用户可长按保存 -->
 		<view class="parlay-slip-preview-modal" v-if="slip_preview_src">
 			<view class="parlay-detail-mask" @click="close_slip_preview"></view>
 			<view class="parlay-slip-preview-dialog" @click.stop="">
@@ -670,6 +670,8 @@
 			save_parlay_canvas(canvas) {
 				return this.canvas_to_blob(canvas).then(async (blob) => {
 					const filename = this.get_parlay_slip_filename()
+					// Keep the preview available as a fallback on every platform.
+					this.open_slip_preview(blob)
 					if (this.is_ios_browser()) {
 						if (typeof File !== 'undefined' &&
 							typeof navigator.share === 'function' &&
@@ -695,10 +697,9 @@
 									}
 								}
 							} catch (error) {
-								console.warn('iOS file share is unavailable:', error)
+								console.warn('File sharing is unavailable:', error)
 							}
 						}
-						this.open_slip_preview(blob)
 						return
 					}
 
