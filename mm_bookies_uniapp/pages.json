@@ -145,6 +145,37 @@
 			}
 		},
 		{
+			"path": "pages/customer-service/index",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "Customer Service",
+				"navigationBarBackgroundColor": "#1C667C",
+				"navigationBarTextStyle": "white",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"titleNView": {
+						"backgroundColor": "#1C667C",
+						"titleColor": "#ffffff",
+						"autoBackButton": true,
+						"buttons": [
+							// 关闭
+							{
+								"text": "✕",
+								"fontSize": "16px",
+								"color": "white"
+							},
+							// 刷新
+							{
+								"text": "⟳",
+								"fontSize": "24px",
+								"color": "white"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
 			"path": "pages/game/webview",
 			"style": {
 				"navigationBarTitleText": "Game",
