@@ -1,6 +1,12 @@
 import Vue from 'vue'
 import App from './App'
 import i18n from './locale/i18n.js'
+import MessageNotification from './components/message-notification/message-notification.vue'
+import ZwHeader from './components/common/header.vue'
+import ZwFooter from './components/common/footer.vue'
+import GlobalNotice from './components/common/global-notice.vue'
+import ThemeIcon from './components/common/theme-icon.vue'
+import ThemeLogo from './components/common/theme-logo.vue'
 
 // Use the visible H5 viewport so fixed-height page shells do not extend
 // behind the browser toolbar.
@@ -58,7 +64,7 @@ Vue.prototype.$messageStorage = messageStorage;
 import messageNotificationManager from './utils/message-notification-manager.js'
 uni.$messageNotification = messageNotificationManager;
 Vue.prototype.$messageNotification = messageNotificationManager;
-Vue.component('message-notification', () => import('@/components/message-notification/message-notification.vue'));
+Vue.component('message-notification', MessageNotification)
 import DateRangePicker from './components/common/date-range-picker.vue'
 Vue.component('date-range-picker',DateRangePicker)
 
@@ -69,11 +75,11 @@ import cuCustom from './colorui/components/cu-custom.vue'
 Vue.component('cu-custom',cuCustom)
 
 // 顶栏底栏
-Vue.component('zw-header', () => import('@/components/common/header.vue'));
-Vue.component('zw-footer', () => import('@/components/common/footer.vue'));
-Vue.component('global-notice', () => import('@/components/common/global-notice.vue'));
-Vue.component('theme-icon', () => import('@/components/common/theme-icon.vue'));
-Vue.component('theme-logo', () => import('@/components/common/theme-logo.vue'));
+Vue.component('zw-header', ZwHeader)
+Vue.component('zw-footer', ZwFooter)
+Vue.component('global-notice', GlobalNotice)
+Vue.component('theme-icon', ThemeIcon)
+Vue.component('theme-logo', ThemeLogo)
 
 Vue.config.productionTip = false
 

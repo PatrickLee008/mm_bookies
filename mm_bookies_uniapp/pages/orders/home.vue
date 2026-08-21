@@ -27,8 +27,8 @@
 				<view class="order-filter-pill order-filter-calendar-pill">
 					<view class="date-filter-trigger" :class="{ 'date-filter-selected': date_filtered }"
 						@click="$refs.date_picker.show()">
-						<theme-icon v-if="!date_filtered" name="calendar" class="order-filter-calendar"
-							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+						<image v-if="!date_filtered" class="order-filter-calendar"
+							src="/static/image/order/calender.svg" mode="aspectFit"></image>
 						<text
 							class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
 						<text v-if="!date_filtered" class="cuIcon-unfold pill-arrow"></text>

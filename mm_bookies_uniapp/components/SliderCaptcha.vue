@@ -22,7 +22,8 @@
 			<view class="slider-progress" :class="{ 'progress-animating': isSnapping || isResetting }"
 				:style="{ width: trackProgressWidth + 'px' }"></view>
 			<view class="slider-button" :class="buttonClass" :style="{ left: trackSliderPosition + 'px' }"
-				@touchstart="onTouchStart" @touchmove.stop.prevent="onTouchMove" @touchend="onTouchEnd"
+				@touchstart="onTouchStart" @touchmove.stop="onTouchMove"
+				@touchend="onTouchEnd" @touchcancel="onTouchEnd"
 				@mousedown="onMouseDown">
 				<view v-if="!isSuccess" class="slider-grip">
 					<view class="grip-bar"></view>
@@ -41,6 +42,47 @@
 </template>
 
 <script module="canvasCaptcha" lang="renderjs">
+	function reportImageError(ownerInstance) {
+		if (ownerInstance && typeof ownerInstance.callMethod === 'function') {
+			ownerInstance.callMethod('onCaptchaError')
+		}
+	}
+
+	function loadImageAsDataUrl(path, onLoad, onError) {
+		if (typeof plus !== 'undefined' && plus.io &&
+			typeof plus.io.resolveLocalFileSystemURL === 'function' &&
+			typeof plus.io.convertLocalFileSystemURL === 'function' &&
+			typeof plus.io.FileReader === 'function') {
+			const localUrl = plus.io.convertLocalFileSystemURL(path)
+			plus.io.resolveLocalFileSystemURL(localUrl, (entry) => {
+				entry.file((file) => {
+					const reader = new plus.io.FileReader()
+					reader.onload = (event) => onLoad(event && event.target ? event.target.result : reader.result)
+					reader.onerror = onError
+					reader.readAsDataURL(file)
+				}, onError)
+			}, onError)
+			return
+		}
+
+		if (typeof fetch === 'function' && typeof FileReader !== 'undefined') {
+			fetch(path).then((response) => {
+				if (!response.ok) {
+					throw new Error(`Captcha image request failed: ${response.status}`)
+				}
+				return response.blob()
+			}).then((blob) => {
+				const reader = new FileReader()
+				reader.onload = () => onLoad(reader.result)
+				reader.onerror = onError
+				reader.readAsDataURL(blob)
+			}).catch(onError)
+			return
+		}
+
+		onError(new Error('Captcha image loading is not supported'))
+	}
+
 	export default {
 		methods: {
 			generateCaptcha(newValue, oldValue, ownerInstance) {
@@ -74,11 +116,11 @@
 					}
 				}
 				sourceImage.onerror = function() {
-					if (ownerInstance && typeof ownerInstance.callMethod === 'function') {
-						ownerInstance.callMethod('onCaptchaError')
-					}
+					reportImageError(ownerInstance)
 				}
-				sourceImage.src = '/static/icon/login/verify-bg.png'
+				loadImageAsDataUrl('/static/icon/login/verify-bg.png', (dataUrl) => {
+					sourceImage.src = dataUrl
+				}, () => reportImageError(ownerInstance))
 			},
 		},
 	}

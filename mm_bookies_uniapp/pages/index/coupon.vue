@@ -281,8 +281,7 @@
 				<view class="detail-page-header">
 					<view class="detail-page-header-spacer"></view>
 					<text class="detail-modal-title">Coupon Details</text>
-					<theme-icon name="ai-close" size="16px" color="var(--theme-icon-on-primary, #fff)"
-						@click="closeDetailModal"></theme-icon>
+					<text class="detail-modal-close" @click="closeDetailModal">✕</text>
 				</view>
 
 				<scroll-view scroll-y class="detail-page-body">
@@ -310,7 +309,7 @@
 						<text class="coupon-code-text">{{ selectedCoupon.p_code }}</text>
 						<view class="coupon-copy-btn" @click="copyCode">
 							<text class="coupon-copy-text">Copy code</text>
-							<theme-icon name="copy" class="coupon-copy-icon"
+							<theme-icon name="copy" size="19px" class="coupon-copy-icon"
 								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						</view>
 					</view>
@@ -386,7 +385,7 @@
 		<view class="detail-page promotion-detail-page" v-if="showPromotionDetailModal && selectedPromotion">
 			<view class="detail-page-content">
 				<view class="promotion-detail-close" @click="closePromotionDetail">
-					<theme-icon name="ai-close" size="16px" color="var(--theme-primary, #1C667C)"></theme-icon>
+					<text class="promotion-detail-close-icon">✕</text>
 				</view>
 
 				<scroll-view scroll-y class="detail-page-body promotion-detail-body">
@@ -1761,7 +1760,8 @@
 	}
 
 	.detail-page-header>.theme-icon,
-	.detail-page-header-spacer {
+	.detail-page-header-spacer,
+	.detail-page-header .detail-modal-close {
 		width: 20px;
 		height: 20px;
 		flex-shrink: 0;
@@ -2539,8 +2539,10 @@
 
 	.detail-modal-close {
 		font-size: 18px;
+		font-weight: 300;
 		color: #fff;
-		line-height: 1;
+		line-height: 20px;
+		text-align: center;
 	}
 
 	.detail-modal-body {
@@ -2777,6 +2779,13 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.promotion-detail-close-icon {
+		font-size: 18px;
+		font-weight: 300;
+		color: var(--theme-primary, #1C667C);
+		line-height: 1;
 	}
 
 	.promotion-detail-body {
@@ -3169,8 +3178,8 @@
 	}
 
 	.coupon-copy-icon {
-		width: 16px;
-		height: 16px;
+		width: 17px;
+		height: 19px;
 	}
 
 	.coupon-copy-text {

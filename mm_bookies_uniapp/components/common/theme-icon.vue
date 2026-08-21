@@ -1,13 +1,14 @@
 <template>
-	<svg v-if="inlineIcon" v-on="$listeners" class="theme-icon" :style="iconStyle" :width="inlineIcon.width"
-		:height="inlineIcon.height" :viewBox="inlineIcon.viewBox" fill="none" xmlns="http://www.w3.org/2000/svg"
+	<svg v-if="inlineIcon" v-on="$listeners" class="theme-icon" :style="iconStyle"
+		:width="svgWidth" :height="svgHeight" :viewBox="svgViewBox"
+		preserveAspectRatio="xMidYMid meet" fill="none" xmlns="http://www.w3.org/2000/svg"
 		aria-hidden="true">
 		<template v-for="(element, index) in inlineIcon.elements">
 			<path v-if="element.type === 'path'" :key="index" v-bind="element.attrs"></path>
 			<circle v-else-if="element.type === 'circle'" :key="index" v-bind="element.attrs"></circle>
 		</template>
 	</svg>
-	<image v-else-if="resolvedSrc" v-on="$listeners" class="theme-icon-fallback" :src="resolvedSrc" :style="iconStyle"
+	<image v-else-if="resolvedSrc" v-on="$listeners" class="theme-icon theme-icon-fallback" :src="resolvedSrc" :style="iconStyle"
 		mode="aspectFit"></image>
 </template>
 
@@ -18,6 +19,11 @@ const originalSources = {
 	'ai-close': '/static/icon/ai-close.svg',
 	'ai-chat': '/static/ai-chat.svg',
 	back: '/static/icon/basic/back.svg',
+	// referral/user-avatar use static files instead of inline SVG: the App
+	// webview mis-handles inline SVG viewBox scaling for these icons
+	// (clipped/offset rendering), while <image> renders consistently everywhere.
+	referral: '/static/icon/ucenter/referral.svg',
+	'user-avatar': '/static/icon/ucenter/user_avatar.svg',
 }
 
 const defaultColors = {
@@ -47,13 +53,22 @@ const inlineIcons = {
 		width: 24,
 		height: 24,
 		viewBox: '0 0 24 24',
-		elements: [{
-			type: 'path',
-			attrs: {
-				d: 'M2.86912 0L12 9.13088L21.1309 0L24 2.86912L14.8691 12L24 21.1309L21.1309 24L12 14.8691L2.86912 24L0 21.1309L9.13088 12L0 2.86912L2.86912 0Z',
-				fill: 'currentColor',
+		elements: [
+			{
+				type: 'path',
+				attrs: {
+					d: 'M2.86912 0L24 21.1309L21.1309 24L0 2.86912Z',
+					fill: 'currentColor',
+				},
 			},
-		}],
+			{
+				type: 'path',
+				attrs: {
+					d: 'M21.1309 0L24 2.86912L2.86912 24L0 21.1309Z',
+					fill: 'currentColor',
+				},
+			},
+		],
 	},
 	deposit: {
 		width: 20,
@@ -79,20 +94,7 @@ const inlineIcons = {
 			},
 		}],
 	},
-	'user-avatar': {
-		width: 37,
-		height: 37,
-		viewBox: '0 0 37 37',
-		elements: [{
-			type: 'path',
-			attrs: {
-				'fill-rule': 'evenodd',
-				'clip-rule': 'evenodd',
-				d: 'M18.3333 2.01435e-10C20.7409 -1.12853e-05 23.1249 0.474185 25.3492 1.39551C27.5735 2.31684 29.5946 3.66726 31.297 5.36967C32.9994 7.07208 34.3498 9.09313 35.2711 11.3174C36.1925 13.5417 36.6667 15.9257 36.6667 18.3333C36.6667 28.4585 28.4585 36.6667 18.3333 36.6667C8.20815 36.6667 0 28.4585 0 18.3333C0 8.20815 8.20815 2.01435e-10 18.3333 2.01435e-10ZM20.1667 20.1667H16.5C11.9612 20.1667 8.06455 22.9156 6.38387 26.8396C9.04312 30.5685 13.4043 33 18.3333 33C23.2623 33 27.6235 30.5685 30.2828 26.8393C28.6022 22.9156 24.7055 20.1667 20.1667 20.1667ZM18.3333 5.5C15.2958 5.5 12.8333 7.96245 12.8333 11C12.8333 14.0375 15.2958 16.5 18.3333 16.5C21.3709 16.5 23.8333 14.0375 23.8333 11C23.8333 7.96245 21.3709 5.5 18.3333 5.5Z',
-				fill: 'currentColor',
-			},
-		}],
-	},
+
 	single: {
 		width: 40,
 		height: 40,
@@ -104,6 +106,7 @@ const inlineIcons = {
 					cx: '20',
 					cy: '19.5',
 					r: '13.5',
+					fill: 'none',
 					stroke: 'currentColor',
 				},
 			},
@@ -127,6 +130,7 @@ const inlineIcons = {
 					cx: '20',
 					cy: '19.5',
 					r: '13.5',
+					fill: 'none',
 					stroke: 'currentColor',
 				},
 			},
@@ -150,6 +154,7 @@ const inlineIcons = {
 					cx: '20',
 					cy: '19.5',
 					r: '13.5',
+					fill: 'none',
 					stroke: 'currentColor',
 				},
 			},
@@ -173,6 +178,7 @@ const inlineIcons = {
 					cx: '20',
 					cy: '19.5',
 					r: '13.5',
+					fill: 'none',
 					stroke: 'currentColor',
 				},
 			},
@@ -180,29 +186,6 @@ const inlineIcons = {
 				type: 'path',
 				attrs: {
 					d: 'M23.3333 11.1665L27.5 15.3323V27.0073C27.4996 27.2265 27.4122 27.4366 27.257 27.5914C27.1019 27.7462 26.8917 27.8332 26.6725 27.8332H13.3275C13.1086 27.8316 12.8992 27.7441 12.7443 27.5894C12.5895 27.4347 12.5017 27.2254 12.5 27.0065V11.9932C12.5 11.5365 12.8708 11.1665 13.3275 11.1665H23.3333ZM20.8333 16.9998H19.1667V21.9998H23.3333V20.3332H20.8333V16.9998Z',
-					fill: 'currentColor',
-				},
-			},
-		],
-	},
-	referral: {
-		width: 40,
-		height: 40,
-		viewBox: '0 0 40 40',
-		elements: [
-			{
-				type: 'circle',
-				attrs: {
-					cx: '20',
-					cy: '19.5',
-					r: '13.5',
-					stroke: 'currentColor',
-				},
-			},
-			{
-				type: 'path',
-				attrs: {
-					d: 'M21.6668 21.8768V28.3335H13.3335C13.3332 27.3159 13.5659 26.3118 14.0137 25.398C14.4616 24.4842 15.1126 23.6851 15.917 23.0619C16.7214 22.4386 17.6578 22.0078 18.6545 21.8024C19.6511 21.597 20.6815 21.6224 21.6668 21.8768ZM20.0002 20.8335C17.2377 20.8335 15.0002 18.596 15.0002 15.8335C15.0002 13.071 17.2377 10.8335 20.0002 10.8335C22.7627 10.8335 25.0002 13.071 25.0002 15.8335C25.0002 18.596 22.7627 20.8335 20.0002 20.8335ZM25.0002 24.1668V21.6668H26.6668V24.1668H29.1668V25.8335H26.6668V28.3335H25.0002V25.8335H22.5002V24.1668H25.0002Z',
 					fill: 'currentColor',
 				},
 			},
@@ -219,6 +202,7 @@ const inlineIcons = {
 					cx: '20',
 					cy: '19.5',
 					r: '13.5',
+					fill: 'none',
 					stroke: 'currentColor',
 				},
 			},
@@ -270,8 +254,8 @@ const inlineIcons = {
 		}],
 	},
 	close: {
-		width: '1',
-		height: '1',
+		width: 24,
+		height: 24,
 		viewBox: '0 0 24 24',
 		elements: [{
 			type: 'path',
@@ -296,8 +280,8 @@ const inlineIcons = {
 		}],
 	},
 	share: {
-		width: '1em',
-		height: '1em',
+		width: 24,
+		height: 24,
 		viewBox: '0 0 24 24',
 		elements: [{
 			type: 'path',
@@ -316,6 +300,7 @@ const inlineIcons = {
 				type: 'path',
 				attrs: {
 					d: 'M3.25 8.25C3.25 5.89333 3.25 4.71417 3.9825 3.9825C4.71417 3.25 5.89333 3.25 8.25 3.25H10.75C13.1067 3.25 14.2858 3.25 15.0175 3.9825C15.75 4.71417 15.75 5.89333 15.75 8.25V12.4167C15.75 14.7733 15.75 15.9525 15.0175 16.6842C14.2858 17.4167 13.1067 17.4167 10.75 17.4167H8.25C5.89333 17.4167 4.71417 17.4167 3.9825 16.6842C3.25 15.9525 3.25 14.7733 3.25 12.4167V8.25Z',
+					fill: 'none',
 					stroke: 'currentColor',
 					'stroke-width': '1.5',
 				},
@@ -325,6 +310,7 @@ const inlineIcons = {
 				attrs: {
 					opacity: '0.5',
 					d: 'M3.25 14.9167C2.58696 14.9167 1.95107 14.6533 1.48223 14.1844C1.01339 13.7156 0.75 13.0797 0.75 12.4167V7.41667C0.75 4.27417 0.75 2.7025 1.72667 1.72667C2.70333 0.750833 4.27417 0.75 7.41667 0.75H10.75C11.413 0.75 12.0489 1.01339 12.5178 1.48223C12.9866 1.95107 13.25 2.58696 13.25 3.25',
+					fill: 'none',
 					stroke: 'currentColor',
 					'stroke-width': '1.5',
 				},
@@ -386,6 +372,32 @@ export default {
 				style.height = typeof this.size === 'number' ? `${this.size}px` : this.size
 			}
 			return style
+		},
+		svgWidth() {
+			return this.svgDimension(this.size, this.inlineIcon && this.inlineIcon.width)
+		},
+		svgHeight() {
+			return this.svgDimension(this.size, this.inlineIcon && this.inlineIcon.height)
+		},
+		svgViewBox() {
+			// Always use the icon's native viewBox so its own aspect ratio is
+			// preserved. Sizing to the requested `size` is left entirely to
+			// preserveAspectRatio (below) instead of a manual per-element
+			// transform, which avoids distorting/offsetting non-square icons
+			// and any renderer-specific quirks with scaled child transforms.
+			return this.inlineIcon ? this.inlineIcon.viewBox : ''
+		},
+	},
+	methods: {
+		svgDimension(value, fallback) {
+			if (value === '') {
+				return fallback
+			}
+			if (typeof value === 'number') {
+				return value
+			}
+			const match = String(value).match(/^\s*(-?\d+(?:\.\d+)?)px\s*$/i)
+			return match ? Number(match[1]) : value
 		},
 	},
 }

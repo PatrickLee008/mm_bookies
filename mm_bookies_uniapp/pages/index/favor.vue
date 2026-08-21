@@ -62,7 +62,6 @@
 	import language from '../../utils/language.js'
 	import config from '../../utils/config.js'
 	import match_mixins from '../match/components/mixins.js'
-	import '../match/components/match.css'
 
 	export default {
 		mixins: [match_mixins],
@@ -164,6 +163,8 @@
 </script>
 
 <style lang="scss">
+	@import '../match/components/match.css';
+
 	.dark-teal-bg {
 		min-height: var(--app-viewport-height, 100vh);
 	}

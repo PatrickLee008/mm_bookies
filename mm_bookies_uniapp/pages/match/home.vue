@@ -786,7 +786,6 @@
 <script>
 	import config from '../../utils/config.js'
 	import Vue from "vue";
-	import './components/match.css'
 	import match_mixins from './components/mixins.js'
 	import headerCollapse from '@/mixins/headerCollapse.js'
 	import LeagueFilter from './components/league_filter.vue'
@@ -2068,6 +2067,8 @@
 </script>
 
 <style lang="scss">
+	@import './components/match.css';
+
 	/* from tangjq--- header占位元素样式 */
 	.header-placeholder {
 		width: 100%;

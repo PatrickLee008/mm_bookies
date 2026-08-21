@@ -60,7 +60,6 @@
 </template>
 
 <script>
-	import './match.css'
 	import match_mixins from './mixins.js'
 	export default {
 		mixins: [match_mixins],
@@ -134,6 +133,8 @@
 </script>
 
 <style lang="scss">
+	@import './match.css';
+
 	.dialog-wrapper {
 		z-index: 10000;
 		background-color: white;

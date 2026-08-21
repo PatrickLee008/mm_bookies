@@ -166,7 +166,7 @@
 					'pages/ucenter/language': 'Language',
 					'pages/ucenter/bonus': 'Bonus',
 					'pages/ucenter/download': 'Download',
-					'pages/ucenter/message': 'Messages',
+					'pages/ucenter/message': 'messages_title',
 					'pages/ucenter/invite/bonus_dashboard': 'Bonus Dashboard',
 					'pages/ucenter/invite/user_dashboard': 'User Dashboard',
 					'pages/ucenter/withdraw': 'Withdraw',

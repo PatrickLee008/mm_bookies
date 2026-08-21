@@ -7,7 +7,7 @@
 				<view class="flex-row justify-between" style="">
 					<!-- <text class="cuIcon-back text-bold mycolor-primary margin-right-sm" @click="back_to()"></text> -->
 					<view class="flex-row align-center" style="">
-						<theme-icon name="referral" class="lblue2blue" style="width: 28px; height: 28px;"
+						<theme-icon name="referral" size="28px"
 							color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 						<text class="title-text" style="">{{ language.invite_friend }}</text>
 					</view>
@@ -36,7 +36,7 @@
 					<view class="flex-row justify-around margin-top-sm">
 						<view class="flex-column1 align-center" :class="{ grayscale: !canInvite }" @click="shareSystem()">
 							<view class="mybg-primary flex-column radius-50" style="width: 38px;height: 38px;">
-								<theme-icon name="share" class="width-38upx"
+								<theme-icon name="share" size="24px"
 									color="var(--theme-icon-on-primary, #fff)"></theme-icon>
 							</view>
 							<text class="myfont-12px">{{ language.share }}</text>
