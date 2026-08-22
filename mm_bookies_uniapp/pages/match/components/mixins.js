@@ -33,18 +33,6 @@ export default {
 		error_pic(match, ha) {
 			match[`${ha}_pic`] = `https://storage.googleapis.com/onextwomm/football/shirt/${ha}.png?w=64&q=75`
 		},
-		beforeEnter(el) {
-			el.style.opacity = 0
-		},
-		enter(el, done) {
-			el.offsetWidth
-			el.style.opacity = 1
-			setTimeout(done, 500)
-		},
-		leave(el, done) {
-			el.style.opacity = 0
-			setTimeout(done, 500)
-		},
 		numberFormat(num) {
 			return dateFormatUtils.numFormat(num)
 		},

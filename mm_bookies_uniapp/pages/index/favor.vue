@@ -22,9 +22,7 @@
 					</view>
 				</view>
 
-				<transition name="match-animation" class="width-100" @before-enter="beforeEnter" @enter="enter"
-					@leave="leave">
-					<view v-show="league.show_match" class="width-100">
+				<view v-show="league.show_match" class="width-100">
 						<view class="flex-column radius-10px myfont-12px margin-top-2px padding-tb-sm league-match"
 							v-for="(match,_index) in league.match_list" :key="_index">
 							<view class="flex-row padding-bottom-8px mycolor-primary myfont-10px ">
@@ -51,9 +49,8 @@
 							</view>
 						</view>
 					</view>
-				</transition>
-			</view>
-		</scroll-view>
+				</view>
+			</scroll-view>
 
 	</view>
 </template>

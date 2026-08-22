@@ -62,9 +62,7 @@
 					</view>
 				</view>
 
-				<transition name="match-animation" class="width-100" @before-enter="beforeEnter" @enter="enter"
-					@leave="leave">
-					<view v-show="league.show_match" class="width-100">
+				<view v-show="league.show_match" class="width-100">
 						<!-- 比赛卡片 -->
 						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index"
 							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
@@ -207,7 +205,6 @@
 							</view>
 						</view>
 					</view>
-				</transition>
 
 				<!-- from tangjq--- 广告图显示在第一个可见联赛和第二个联赛之间 -->
 				<template v-if="index === firstVisibleLeagueIndex && advertisements.length > 0">
@@ -507,17 +504,6 @@
 							</view>
 						</view>
 						<!-- 注释掉兑换码tab，只保留bets tab -->
-						<!-- <view
-							class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-2px">
-							<button class="cu-btn mycolor-primary myfont-12px basis-df"
-								:class="!bet_main?'bg-white':'mybg-active'" @click="bet_main = !bet_main">
-								<view>{{$t('bets')}}</view>
-							</button>
-							<button class="cu-btn mycolor-primary myfont-12px basis-df"
-								:class="bet_main?'bg-white':'mybg-active'" @click="bet_main = !bet_main">
-								<view>{{$t('promotion_code')}}</view>
-							</button>
-						</view> -->
 					</view>
 					<view class="flex-column padding-tb-xs dialig-bottom">
 						<view
@@ -532,9 +518,8 @@
 								<view class="">{{Math.pow(2,bet_list.length)}}</view>
 							</view>
 						</view>
-						<view v-show="bet_main">
-							<view
-								class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
+						<view
+							class="flex-row justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm">
 								<view class="flex-row justify-start">
 
 									<view class="mybg-active round width-75upx height-65upx align-center flex-column"
@@ -610,75 +595,6 @@
 									</button>
 								</view>
 
-								<!-- 优惠券下拉选择框 (单笔和混合都显示) -->
-								<view class="flex-column margin-top-sm gap-5px" style="position: relative;">
-									<!-- <view class="text-light myfont-10px">{{$t('Available Coupons')}}</view> -->
-
-									<!-- 下拉选择框主体 -->
-									<view class="coupon-select-wrapper" @click="toggleCouponDropdown">
-										<view class="coupon-select-input padding-sm radius-6px"
-											:class="show_coupon_dropdown ? 'mybg-active text-black' : 'mybg-primary'"
-											style="border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;">
-											<!-- 左侧内容区 -->
-											<view class="flex-row1 align-center" style="flex: 1; min-width: 0;">
-												<view v-if="selected_coupon"
-													style="display: flex; flex-direction: row; align-items: center;">
-													<text class="text-bold myfont-12px"
-														style="white-space: nowrap;">{{selected_coupon.coupon_name}}</text>
-													<text class="myfont-10px text-light margin-left-sm flex-row1"
-														style="white-space: nowrap;">
-														(-{{$toolbox.num_format(selected_coupon.bonus_amount)}} MMK)
-													</text>
-												</view>
-												<view v-else class="text-light myfont-12px flex-row1">
-													<text v-if="loading_coupons">{{$t('Loading Coupons')}}...</text>
-													<text
-														v-else-if="available_coupons.length > 0">{{`${$t('Select Coupon')}(${available_coupons.length})`}}
-													</text>
-													<text v-else>{{$t('No Available Coupons')}}</text>
-												</view>
-											</view>
-											<!-- 右侧图标区 -->
-											<view
-												style="display: flex; flex-direction: row; align-items: center; flex-shrink: 0; margin-left: 10px;">
-												<view v-if="selected_coupon" class="cuIcon-close myfont-12px"
-													@click.stop="clearCouponSelection" style="padding: 2px 5px;"></view>
-												<view class="cuIcon-unfold myfont-12px"
-													:class="show_coupon_dropdown ? 'rotate-180' : ''"
-													style="padding: 2px 5px;"></view>
-											</view>
-										</view>
-									</view>
-
-									<!-- 下拉选项列表 -->
-									<view v-if="show_coupon_dropdown" class="coupon-dropdown-list mybg-grey radius-6px"
-										style="position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
-											   max-height: 150px; overflow-y: auto; margin-top: 5px;
-											   box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
-										<view v-for="(coupon, index) in available_coupons" :key="index"
-											@click="selectCoupon(coupon)"
-											class="coupon-dropdown-item flex-row justify-between padding-sm"
-											:class="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id ? 'mybg-active text-black' : ''"
-											style="border-bottom: 1px solid rgba(255,255,255,0.1);">
-											<view class="flex-column align-start gap-2px" style="flex: 1;">
-												<text class="text-bold myfont-12px">{{coupon.coupon_name}}</text>
-												<text class="myfont-10px text-light">
-													{{$t('bonus')}}: {{$toolbox.num_format(coupon.bonus_amount)}} MMK
-												</text>
-												<text v-if="coupon.min_bet_required > 0"
-													class="myfont-9px text-light">{{`${$t('Min Bet')}: ${$toolbox.num_format(coupon.min_bet_required)}MMK`}}
-												</text>
-												<!-- <text v-if="coupon.min_bet_required > 0" class="myfont-9px text-light">
-													{{$t('min_bet')}}: {{$toolbox.num_format(coupon.min_bet_required)}} MMK
-												</text> -->
-											</view>
-											<view
-												v-if="selected_coupon && selected_coupon.member_coupon_id === coupon.member_coupon_id"
-												class="cuIcon-check mycolor-active myfont-14px"></view>
-										</view>
-									</view>
-								</view>
-
 								<view class="flex-row justify-start text-light text-black text-left" style="">
 									<view>
 										<text>{{$t('minimum_bet')}}</text>
@@ -720,24 +636,6 @@
 										v-for="(i,index) in amount_list" :key='index'>{{i}}</button>
 								</view>
 							</view>
-						</view>
-						<!-- 注释掉兑换码内容部分 -->
-						<!-- <view class="width-100" v-show='!bet_main'>
-							<view
-								class="flex-column justify-between detail-box-shadow radius-6px margin-bottom-xs myfont-12px gap-5px padding-sm mycolor-primary"
-								style="align-items: start;">
-								<view>{{$t('promo_code')}}</view>
-								<view
-									class="flex-row justify-between margin-right radius-6px padding-tb-xs padding-lr-sm"
-									style="border: 1px grey solid;">
-									<input class="width-100 text-left padding-right-sm" v-model="promotion_code" />
-									<view class="cuIcon-close round width-20px height-18px line-height-16px myfont-10px"
-										style="border: 4upx #0c356a solid;" @click="promotion_code = ''"></view>
-								</view>
-								<button class="cu-btn mybg-active mycolor-primary myfont-12px width-100"
-									@click="submitWithPromotion()">{{$t('redeem')}}</button>
-							</view>
-						</view> -->
 					</view>
 				</view>
 			</view>
@@ -809,7 +707,6 @@
 				amount_list: [1000, 5000, 10000],
 				isLogin: uni.getStorageSync('Authorization') || false,
 				animation: '',
-				promotion_code: '',
 				amount: 0,
 				hide_league_filter: true,
 				hide_match_detail: true,
@@ -819,7 +716,6 @@
 				hide_success_popup: true, // from tangjq--- 控制投注成功提示弹窗显示
 				hide_fail_popup: true, // from tangjq--- 控制投注失败提示弹窗显示
 				fail_message: '', // from tangjq--- 存储失败提示的错误信息
-				bet_main: true,
 				tomorrow: false,
 				orders: [],
 				num: 0,
@@ -841,11 +737,6 @@
 					league_list: [],
 				},
 				login_success: uni.getStorageSync('login_success') || false,
-				// 优惠券相关
-				available_coupons: [],
-				selected_coupon: null,
-				loading_coupons: false,
-				show_coupon_dropdown: false, // 控制下拉框显示
 				use_promotion_wallet: false, // 是否优先使用Promotion Wallet
 				searchKeyword: '', // from tangjq--- 搜索关键字
 				advertisements: [], // from tangjq--- 广告列表
@@ -880,19 +771,6 @@
 					});
 				}
 			},
-			// 监听优惠券变化，也检查优惠钱包状态
-			'selected_coupon': function(newCoupon, oldCoupon) {
-				// 如果已勾选优惠钱包，检查优惠券变化后是否仍然符合条件
-				if (this.use_promotion_wallet && !this.canUsePromotionWallet) {
-					this.use_promotion_wallet = false;
-
-					uni.showToast({
-						title: 'Promotion wallet balance is insufficient after applying coupon',
-						icon: 'none',
-						// duration: 2000
-					});
-				}
-			},
 			// 监听系统配置变化，动态更新金额选择列表
 			configs: {
 				handler(val) {
@@ -905,22 +783,9 @@
 			},
 		},
 		computed: {
-			// 计算实际支付金额（考虑优惠券折扣）
+			// 计算实际支付金额
 			actualPaymentAmount() {
-				let paymentAmount = this.amount;
-
-				// 如果选择了优惠券，减去优惠金额
-				if (this.selected_coupon && this.selected_coupon.bonus_amount) {
-					const couponAmount = parseFloat(this.$toolbox.num_format(
-						this.selected_coupon.bonus_amount, 0, true));
-					paymentAmount = this.amount - couponAmount;
-					// 确保不会是负数
-					if (paymentAmount < 0) {
-						paymentAmount = 0;
-					}
-				}
-
-				return paymentAmount;
+				return this.amount;
 			},
 			// 判断是否可以使用优惠钱包
 			canUsePromotionWallet() {
@@ -938,17 +803,8 @@
 					return false;
 				}
 
-				// 条件3: 优惠钱包余额必须大于等于当前下单金额（考虑优惠券折扣后的金额）
+				// 条件3: 优惠钱包余额必须大于等于当前下单金额
 				let requiredAmount = this.amount;
-				if (this.selected_coupon && this.selected_coupon.bonus_amount) {
-					// 如果有优惠券，计算优惠后的金额
-					const couponAmount = parseFloat(this.$toolbox.num_format(
-						this.selected_coupon.bonus_amount, 0, true));
-					requiredAmount = this.amount - couponAmount;
-					if (requiredAmount < 0) {
-						requiredAmount = 0;
-					}
-				}
 
 				if (promotionBalance < requiredAmount) {
 					return false;
@@ -1057,7 +913,6 @@
 		},
 		methods: {
 			onScrollHandler(e) {
-				this.handle_scroll(e)
 				this.handleHeaderScroll(e)
 			},
 			// 格式化赔率，保留两位小数
@@ -1066,102 +921,9 @@
 				const num = parseFloat(odds);
 				return num.toFixed(2);
 			},
-			// 获取可用优惠券
-			fetchAvailableCoupons() {
-				// 检查用户登录状态
-				if (!this.isLogin) {
-					this.available_coupons = []
-					this.selected_coupon = null
-					return
-				}
-
-				// 确定最小金额（根据是否mix）
-				const minAmount = this.match_ref.mixed ? this.mix_min : this.single_min
-
-				// 只有当金额大于等于最小投注额时才获取优惠券
-				if (this.amount < minAmount) {
-					console.log('Amount is less than minimum bet, clearing coupons')
-					this.available_coupons = []
-					this.selected_coupon = null
-					this.loading_coupons = false
-					return
-				}
-
-				this.loading_coupons = true
-				this.$http.post('/coupon/available_for_bet', {
-					bet_amount: this.amount
-				}, (res) => {
-					this.loading_coupons = false
-					// 如果金额已被清零，忽略此响应（防止竞态条件）
-					if (this.amount === 0) {
-						console.log('Amount is 0, ignoring coupon response')
-						return
-					}
-					if (res.statusCode == 200) {
-						// 修正数据路径: res.data 是后端返回的完整响应对象
-						// 后端返回: {code: 200, data: {coupons: [...], total_count: 3}, message: "success"}
-						// 所以需要访问 res.data.data.coupons
-						const responseData = res.data && res.data.data ? res.data.data : res.data
-						this.available_coupons = responseData.coupons || []
-						console.log('Available coupons loaded:', this.available_coupons.length)
-						// 如果之前选择的优惠券不在新列表中，清除选择
-						if (this.selected_coupon) {
-							const stillAvailable = this.available_coupons.find(
-								c => c.member_coupon_id === this.selected_coupon.member_coupon_id
-							)
-							if (!stillAvailable) {
-								this.selected_coupon = null
-							}
-						}
-					} else {
-						this.available_coupons = []
-						this.selected_coupon = null
-					}
-				}, (err) => {
-					this.loading_coupons = false
-					// 如果金额已被清零，忽略此错误响应
-					if (this.amount === 0) {
-						return
-					}
-					this.available_coupons = []
-					this.selected_coupon = null
-					console.error('Failed to load coupons:', err)
-				})
-			},
-
-			// 选择优惠券
-			selectCoupon(coupon) {
-				if (this.selected_coupon && this.selected_coupon.member_coupon_id === coupon.member_coupon_id) {
-					// 取消选择
-					this.selected_coupon = null
-				} else {
-					this.selected_coupon = coupon
-				}
-				// 选择后关闭下拉框
-				this.show_coupon_dropdown = false
-			},
-
-			// 切换下拉框显示状态
-			toggleCouponDropdown() {
-				// 只有在有优惠券时才允许展开下拉框
-				if (this.available_coupons.length > 0 && !this.loading_coupons) {
-					this.show_coupon_dropdown = !this.show_coupon_dropdown
-				}
-			},
-
-			// 清除优惠券选择
-			clearCouponSelection() {
-				this.selected_coupon = null
-				this.show_coupon_dropdown = false
-			},
-
-			// 清零金额并清除优惠券
+			// 清零金额
 			clearAmount() {
 				this.amount = 0
-				// 清零时清除优惠券列表和选择
-				this.available_coupons = []
-				this.selected_coupon = null
-				this.show_coupon_dropdown = false
 			},
 
 			// 切换Promotion Wallet优先使用状态
@@ -1172,12 +934,8 @@
 					const promotionBalance = this.$toolbox.floor_value(
 						this.$store.state.userInfo.money_promotion || 0);
 
-					// 计算所需金额（考虑优惠券）
+					// 计算所需金额
 					let requiredAmount = this.amount;
-					if (this.selected_coupon && this.selected_coupon.bonus_amount) {
-						requiredAmount = this.amount - parseFloat(this.selected_coupon.bonus_amount);
-						if (requiredAmount < 0) requiredAmount = 0;
-					}
 
 					let min_limit = this.match_ref.mixed ? this.mix_min : this.single_min
 					if (promotionBalance < min_limit) {
@@ -1211,10 +969,6 @@
 				// }
 				this.$nextTick(function() {
 					this.$set(this, 'amount', amount)
-					// 当金额改变时，自动获取可用优惠券（支持single和mix）
-					if (this.amount > 0 && this.isLogin) {
-						this.fetchAvailableCoupons()
-					}
 					// if (10000 < parseInt(this.amount) && parseInt(this.amount) < 5000000) {
 					// 	this.amount_error = false
 					// }
@@ -1340,10 +1094,6 @@
 			},
 			set_amount(amount) {
 				this.amount = amount
-				// 快捷金额选择后也需要获取可用优惠券（支持single和mix）
-				if (this.amount > 0 && this.isLogin) {
-					this.fetchAvailableCoupons()
-				}
 			},
 			betClick(type, index, _index, __index, attr) {
 				if (!this.isLogin) {
@@ -1376,7 +1126,6 @@
 
 				if (_this.match_ref.mixed) {
 					// 混合显示
-					match.ATTR[__index] = attr;
 					this.calc_match_num()
 				} else {
 					//single的其他赛事取消高亮
@@ -1392,7 +1141,6 @@
 					// 单笔显示下单界面
 					match.sa = attr
 					_this.match_ref.bet_match = match
-					_this.bet_main = true
 					_this.show_bet_slip()
 				}
 			},
@@ -1426,12 +1174,7 @@
 				let _this = this
 				// 点击赔率时不再自动预填最小投注金额，保持输入框为空，显示占位提示
 				_this.amount = ''
-				_this.promotion_code = ''
 				_this.hide_bets_slip = false
-				// 弹出下单框时也需要获取优惠券,因为有的优惠券可能初始金额就能用（支持single和mix）
-				if (_this.amount > 0 && _this.isLogin) {
-					_this.fetchAvailableCoupons()
-				}
 			},
 			getAdvertisements() {
 				var _this = this;
@@ -1486,32 +1229,23 @@
 					if (res.statusCode == 200) {
 						let odds = res.data.items
 						const odds_map = new Map(odds.map(odd => [odd.MATCH_ATTR_ID, odd]));
-						_this.league_list.forEach((league, index) => {
-							league.match_list.forEach((match, _index) => {
-								match.ATTR.forEach((attr, __index) => {
+						// 赔率无变化的项直接跳过，避免整列表无谓的重渲染
+						_this.league_list.forEach((league) => {
+							league.match_list.forEach((match) => {
+								match.ATTR.forEach((attr) => {
 									let new_odds = odds_map.get(attr.MATCH_ATTR_ID)
-									if (new_odds) {
-										attr.REAL_ODDS = new_odds.REAL_ODDS;
-										attr.ODDS = new_odds.ODDS;
-										attr.ODDS_GUEST = new_odds.ODDS_GUEST;
-										attr.DRAW_ODDS = new_odds.DRAW_ODDS;
-										attr.change = true;
-										Vue.set(_this.league_list[index]
-											.match_list[_index]
-											.ATTR, __index, attr);
-										setTimeout(function() {
-											attr.change = false;
-											Vue.set(_this.league_list[
-													index]
-												.match_list[_index]
-												.ATTR,
-												__index, attr);
-										}, 5000)
-									}
+									if (!new_odds) return
+									if (attr.ODDS == new_odds.ODDS &&
+										attr.ODDS_GUEST == new_odds.ODDS_GUEST &&
+										attr.DRAW_ODDS == new_odds.DRAW_ODDS &&
+										attr.REAL_ODDS == new_odds.REAL_ODDS) return
+									attr.REAL_ODDS = new_odds.REAL_ODDS;
+									attr.ODDS = new_odds.ODDS;
+									attr.ODDS_GUEST = new_odds.ODDS_GUEST;
+									attr.DRAW_ODDS = new_odds.DRAW_ODDS;
 								})
 							})
 						})
-						// })
 					}
 				})
 			},
@@ -1607,10 +1341,6 @@
 								false)
 						})
 					})
-					_this.$nextTick(() => {
-						_this.handle_scroll()
-						// _this.scroll_top = 1
-					})
 					// console.log(league_list)
 				}
 			},
@@ -1640,10 +1370,6 @@
 				_this.hide_bets_slip = true
 				_this.match_ref.num = 0;
 				_this.amount = _this.$store.state.configs[`${_this.match_ref.mixed?'mix':'single'}_min`]
-				// 重置优惠券相关状态
-				_this.available_coupons = []
-				_this.selected_coupon = null
-				_this.show_coupon_dropdown = false
 				// 重置优惠钱包优先使用状态
 				_this.use_promotion_wallet = false
 			},
@@ -1759,11 +1485,6 @@
 								totalAmount: parseInt(_this.amount)
 							};
 
-							// 如果选择了优惠券，添加coupon_id到请求参数
-							if (_this.selected_coupon && _this.selected_coupon.member_coupon_id) {
-								requestParams.coupon_id = _this.selected_coupon.member_coupon_id;
-							}
-
 							// 如果勾选了使用优惠钱包，添加use_promotion_wallet标记
 							if (_this.use_promotion_wallet) {
 								requestParams.use_promotion_wallet = true;
@@ -1774,17 +1495,8 @@
 								if (res.statusCode == 200) {
 									var userInfo = _this.$store.state.userInfo
 
-									// 计算实际扣除金额（考虑优惠券折扣）
+									// 实际扣除金额
 									let actualDeduction = parseInt(_this.amount);
-									if (_this.selected_coupon && _this.selected_coupon.bonus_amount) {
-										// 实际扣除 = 下注金额 - 优惠券金额
-										actualDeduction = parseInt(_this.amount) - parseInt(_this
-											.selected_coupon.bonus_amount);
-										// 确保不会扣除负数
-										if (actualDeduction < 0) {
-											actualDeduction = 0;
-										}
-									}
 
 									// 根据是否使用优惠钱包，从不同的余额扣除
 									if (_this.use_promotion_wallet) {
@@ -1831,105 +1543,6 @@
 				})
 			},
 
-			// 使用优惠券下单
-			submitWithPromotion() {
-				if (this.$toolbox.click_too_fast(2)) return
-				var _this = this;
-
-				// 验证优惠券代码
-				if (!_this.promotion_code || _this.promotion_code.trim() === '') {
-					this.$notice.show({
-						title: 'Tips',
-						content: _this.$t('Please enter promotion code'),
-						showCancel: false,
-						confirmText: 'OK'
-					});
-					return
-				}
-
-				// 只支持单笔下单
-				if (_this.match_ref.mixed) {
-					this.$notice.show({
-						title: 'Tips',
-						content: 'Promotion code can only be used for single bets',
-						showCancel: false,
-						confirmText: 'OK'
-					});
-					return
-				}
-
-				// 校验至少选择一场比赛
-				if (_this.bet_list.length === 0) {
-					this.$notice.show({
-						title: 'Tips',
-						content: _this.$t('Please select at least one match'),
-						showCancel: false,
-						confirmText: 'OK'
-					});
-					return
-				}
-
-				uni.showLoading({
-					title: 'Processing...',
-				})
-
-				clearInterval(this.confirmIntervalId)
-				var paras = [];
-				var checkAttrs = {}
-				_this.bet_list.forEach(element => {
-					var temp = {
-						matchId: element.MATCH_ID,
-						attrType: element.sa.MATCH_ATTR_TYPE,
-						betType: element.sa.draw_selected ? 3 : element.sa.host_selected || element.sa
-							.over_selected ? 1 : 2,
-					}
-					checkAttrs[element.sa.MATCH_ATTR_ID] = element.sa;
-					paras.push(temp);
-				})
-
-				_this.$http.post('/order/promo_bet', {
-					bets: paras,
-					promotion_code: _this.promotion_code.trim()
-				}, (res) => {
-					uni.hideLoading();
-					if (res.statusCode == 200) {
-						var userInfo = _this.$store.state.userInfo
-						// 更新促销余额
-						if (res.data.new_promotion_balance !== undefined) {
-							userInfo.money_promotion = res.data.new_promotion_balance
-						}
-						_this.reset();
-						_this.$store.dispatch('saveUserInfo', userInfo);
-						this.$notice.show({
-							content: _this.$t('bettingSuccess') + '\n' + _this.$t(
-								'Using promotion code: ') + _this.promotion_code,
-							title: 'Success',
-							showCancel: false,
-							confirmText: 'OK',
-							success: function() {
-								_this.hide_bets_slip = true
-							}
-						});
-					} else {
-						var tips = _this.$t(res.data.message);
-						this.$notice.show({
-							title: 'Tips',
-							content: tips,
-							showCancel: false,
-							confirmText: 'OK'
-						});
-					}
-				}, (err) => {
-					uni.hideLoading();
-					this.$notice.show({
-						title: 'Tips',
-						content: _this.$t('Network error, please try again'),
-						showCancel: false,
-						confirmText: 'OK'
-					});
-				})
-			},
-
 			to_deposit() {
 				uni.navigateTo({
 					url: '/pages/ucenter/charge',
@@ -1970,10 +1583,7 @@
 			},
 			// from tangjq--- 切换比赛投注选项的展开/收起状态
 			toggle_match_expand(match) {
-				console.log('toggle_match_expand called, current expanded:', match.expanded)
 				this.$set(match, 'expanded', !match.expanded)
-				console.log('after toggle, expanded:', match.expanded)
-				this.$forceUpdate()
 			},
 			// from tangjq--- 处理搜索输入
 			handleSearchInput() {
@@ -2234,56 +1844,6 @@
 
 	.cu-avatar {
 		background-color: none;
-	}
-
-	/* 优惠券下拉选择框样式 */
-	.coupon-select-wrapper {
-		position: relative;
-		width: 100%;
-	}
-
-	.coupon-select-input {
-		cursor: pointer;
-		transition: all 0.3s;
-		min-height: 40px;
-	}
-
-	.coupon-select-input:active {
-		opacity: 0.8;
-	}
-
-	.coupon-dropdown-list {
-		animation: dropdown-slide 0.2s ease-out;
-	}
-
-	.coupon-dropdown-item {
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.coupon-dropdown-item:hover {
-		opacity: 0.9;
-	}
-
-	.coupon-dropdown-item:last-child {
-		border-bottom: none !important;
-	}
-
-	.rotate-180 {
-		transform: rotate(180deg);
-		transition: transform 0.3s;
-	}
-
-	@keyframes dropdown-slide {
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	/* 自定义Checkbox样式 */
