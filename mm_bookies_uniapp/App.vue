@@ -285,12 +285,14 @@
 			_this.setupLoginListener()
 
 			// 读取用户已存的语种偏好；首次启动无偏好时默认缅甸语（不跟随系统语言）
-			var lang = uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm';
+			var lang = uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm';
 			let langs = ['cn', 'en', 'mm', 'th']
 			lang = langs.includes(lang) ? lang : 'mm'
 			uni.removeStorageSync('noticed');
 			if (lang) {
 				config.language = language[lang]
+				uni.setStorageSync('language', lang)
+				uni.setStorageSync('UNI_LOCALE', lang)
 				uni.setLocale(lang)
 				this.$i18n.locale = lang;
 			}

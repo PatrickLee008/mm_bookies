@@ -212,7 +212,7 @@
 							<view class="flex-column1 text-left" style="max-width: 60%;">
 								<text class="myfont-12px line-height-13px">{{ tier.description }}</text>
 								<text class="myfont-9px mycolor-info">
-									{{ $t('Claimed') }}:
+									{{ $t('claimed') }}:
 									{{ tier.triggered_count }}{{ tier.max_claims > 0 ? ' / ' + tier.max_claims : '' }}
 									{{ $t('times') }}
 								</text>

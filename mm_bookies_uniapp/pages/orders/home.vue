@@ -27,8 +27,8 @@
 				<view class="order-filter-pill order-filter-calendar-pill">
 					<view class="date-filter-trigger" :class="{ 'date-filter-selected': date_filtered }"
 						@click="$refs.date_picker.show()">
-						<theme-icon v-if="!date_filtered" name="calendar" class="order-filter-calendar"
-							color="var(--theme-icon-on-primary, #fff)"></theme-icon>
+						<image v-if="!date_filtered" class="order-filter-calendar"
+							src="/static/image/order/calender.svg" mode="aspectFit"></image>
 						<text
 							class="calendar-text">{{date_preset || (date_range[0].show + ' - ' + date_range[1].show)}}</text>
 						<text v-if="!date_filtered" class="cuIcon-unfold pill-arrow"></text>
@@ -102,7 +102,7 @@
 								<text class="value value-amount">{{item.show_order_type}}</text>
 							</view>
 							<view class="info-row">
-								<text class="label">{{$t('Bet')}}</text>
+								<text class="label">{{'Bet'}}</text>
 								<text class="value value-amount">{{item.team_name}}</text>
 							</view>
 							<view class="info-row">
@@ -255,7 +255,7 @@
 								<text class="parlay-detail-value">{{detail.show_order_type}}</text>
 							</view>
 							<view class="parlay-detail-info-row">
-								<text class="parlay-detail-label">{{$t('Bet')}}</text>
+								<text class="parlay-detail-label">{{'Bet'}}</text>
 								<text class="parlay-detail-value">{{detail.team_name}}</text>
 							</view>
 							<view class="parlay-detail-info-row">
@@ -298,11 +298,11 @@
 					</view>
 				</view>
 
-				<view class="parlay-detail-actions">
+				<view class="parlay-detail-actions" data-html2canvas-ignore="true">
 					<view class="parlay-confirm-button" @click="close_parlay_detail">
 						<text>{{$t('Confirm')}}</text>
 					</view>
-					<view class="parlay-download-button" data-html2canvas-ignore="true"
+					<view class="parlay-download-button"
 						:class="{ 'is-downloading': downloading_slip }"
 						@click="download_parlay_slip">
 						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
@@ -348,8 +348,14 @@
 					</view>
 				</view>
 			</view>
+
 		</view>
 
+		<!-- #ifdef APP-PLUS -->
+		<!-- App端触发器：逻辑层数据变化后由renderjs在视图层执行html2canvas截图 -->
+		<view class="parlay-capture-trigger" :prop="slip_capture_request"
+			:change:prop="slipCanvas.on_capture_request"></view>
+		<!-- #endif -->
 	</view>
 </template>
 
@@ -401,6 +407,7 @@
 				slip_preview_blob: null,
 				slip_preview_filename: '',
 				sharing_slip: false,
+				slip_capture_request: 0, // App端renderjs截图触发器
 			};
 		},
 		computed: {
@@ -418,7 +425,7 @@
 					success: function() {
 						uni.showToast({
 							title: 'Order ID Copied to clipboard',
-							icon: 'success'
+							icon: 'none'
 						});
 					},
 					fail: function() {
@@ -727,16 +734,26 @@
 				if (showToast) {
 					uni.showToast({
 						title: 'Download started',
-						icon: 'success'
+						icon: 'none'
 					})
 				}
 			},
 			download_slip_preview() {
+				// #ifdef APP-PLUS
+				if (!this.slip_preview_src) return
+				this.save_base64_to_album(
+					this.slip_preview_src,
+					this.slip_preview_filename || this.get_parlay_slip_filename()
+				)
+				return
+				// #endif
+				// #ifndef APP-PLUS
 				if (!this.slip_preview_blob) return
 				this.download_slip_blob(
 					this.slip_preview_blob,
 					this.slip_preview_filename || this.get_parlay_slip_filename()
 				)
+				// #endif
 			},
 			share_slip_blob(blob, filename, showToast = true) {
 				if (!blob || !this.can_share_slip) {
@@ -758,7 +775,7 @@
 						if (showToast) {
 							uni.showToast({
 								title: 'Share completed',
-								icon: 'success'
+								icon: 'none'
 							})
 						}
 						return true
@@ -818,6 +835,17 @@
 			},
 			download_parlay_slip() {
 				if (this.downloading_slip || !this.parlay_modal_order) return
+				// #ifdef APP-PLUS
+				// App端逻辑层没有window/document，由renderjs在视图层执行html2canvas，回调后保存到相册
+				this.downloading_slip = true
+				uni.showLoading({
+					title: 'Generating...',
+					mask: true
+				})
+				this.slip_capture_request = Date.now()
+				return
+				// #endif
+				// #ifndef APP-PLUS
 				if (typeof window === 'undefined' || typeof document === 'undefined') {
 					uni.showToast({
 						title: 'Download is not supported',
@@ -898,7 +926,83 @@
 						uni.hideLoading()
 						this.downloading_slip = false
 					})
+				// #endif
 			},
+			// #ifdef APP-PLUS
+			on_slip_canvas_ready(dataUrl) {
+				uni.hideLoading()
+				this.downloading_slip = false
+				if (!dataUrl) {
+					uni.showToast({
+						title: 'Download failed',
+						icon: 'none'
+					})
+					return
+				}
+				const filename = this.get_parlay_slip_filename()
+				this.close_parlay_detail()
+				this.open_slip_preview(dataUrl, null, filename)
+				this.save_base64_to_album(dataUrl, filename)
+			},
+			on_slip_canvas_error(message) {
+				console.error('Download slip failed:', message)
+				uni.hideLoading()
+				this.downloading_slip = false
+				uni.showToast({
+					title: 'Download failed',
+					icon: 'none'
+				})
+			},
+			save_base64_to_album(dataUrl, filename) {
+				try {
+					const bitmap = new plus.nativeObj.Bitmap('slip_' + Date.now())
+					bitmap.loadBase64Data(dataUrl, () => {
+						bitmap.save('_doc/' + filename, {
+							overwrite: true
+						}, (event) => {
+							bitmap.clear()
+							const filePath = plus.io.convertLocalFileSystemURL(event.target)
+							uni.saveImageToPhotosAlbum({
+								filePath: filePath,
+								success: () => {
+									uni.showToast({
+										title: 'Saved successfully',
+										icon: 'none'
+									})
+								},
+								fail: (error) => {
+									console.error('Save slip to album failed:', error)
+									uni.showToast({
+										title: 'Save failed',
+										icon: 'none'
+									})
+								}
+							})
+						}, (error) => {
+							bitmap.clear()
+							console.error('Write slip file failed:', error)
+							uni.showToast({
+								title: 'Save failed',
+								icon: 'none'
+							})
+						})
+					}, (error) => {
+						bitmap.clear()
+						console.error('Decode slip image failed:', error)
+						uni.showToast({
+							title: 'Save failed',
+							icon: 'none'
+						})
+					})
+				} catch (error) {
+					console.error('Save slip failed:', error)
+					uni.showToast({
+						title: 'Save failed',
+						icon: 'none'
+					})
+				}
+			},
+			// #endif
 			get_parlay_details(order) {
 				if (!order) return []
 				return Array.isArray(order.detail) && order.detail.length ? order.detail : [order]
@@ -1225,6 +1329,85 @@
 			this.close_slip_preview()
 		},
 		created() {}
+	}
+</script>
+
+<!-- App端视图层脚本：app-vue页面renderjs运行在视图层，拥有真实DOM，可执行html2canvas -->
+<script module="slipCanvas" lang="renderjs">
+	// #ifdef APP-PLUS
+	// App视图层webview为file://协议，运行时注入/static/绝对路径会解析失败，必须由webpack静态打包进renderjs
+	import html2canvas from '@/static/vendor/html2canvas.min.js'
+	// #endif
+	export default {
+		methods: {
+			on_capture_request(newValue, oldValue, ownerInstance) {
+				if (!newValue || newValue === oldValue) return
+				this.capture_slip(ownerInstance)
+			},
+			wait_for_render(callback) {
+				const requestFrame = window.requestAnimationFrame || ((cb) => setTimeout(cb, 0))
+				requestFrame(() => requestFrame(callback))
+			},
+			capture_slip(ownerInstance) {
+				const dialog = document.querySelector('.parlay-detail-dialog')
+				const scrollElement = dialog && dialog.querySelector('.parlay-detail-scroll')
+				if (!dialog || !scrollElement) {
+					ownerInstance.callMethod('on_slip_canvas_error', 'Parlay slip element is unavailable')
+					return
+				}
+
+				const scrollElements = [
+					scrollElement,
+					...Array.from(scrollElement.querySelectorAll(
+						'.uni-scroll-view, .uni-scroll-view-content'))
+				]
+				const elementsToResize = [dialog, ...scrollElements]
+				const styleSnapshots = elementsToResize.map((element) => ({
+					element,
+					cssText: element.style.cssText
+				}))
+				const scrollTop = scrollElement.scrollTop
+
+				dialog.style.height = 'auto'
+				dialog.style.maxHeight = 'none'
+				dialog.style.overflow = 'visible'
+				scrollElements.forEach((element) => {
+					element.style.flex = 'none'
+					element.style.height = 'auto'
+					element.style.minHeight = '0'
+					element.style.maxHeight = 'none'
+					element.style.overflow = 'visible'
+					element.style.overflowY = 'visible'
+				})
+				scrollElement.scrollTop = 0
+
+				const restore = () => {
+					styleSnapshots.reverse().forEach((snapshot) => {
+						snapshot.element.style.cssText = snapshot.cssText
+					})
+					scrollElement.scrollTop = scrollTop
+				}
+
+				this.wait_for_render(() => {
+					html2canvas(dialog, {
+						backgroundColor: '#ffffff',
+						allowTaint: false,
+						logging: false,
+						scale: Math.max(1, Math.min(2, window.devicePixelRatio || 1)),
+						useCORS: true,
+						scrollX: 0,
+						scrollY: 0
+					}).then((canvas) => {
+						restore()
+						const dataUrl = canvas.toDataURL('image/png')
+						ownerInstance.callMethod('on_slip_canvas_ready', dataUrl)
+					}).catch((error) => {
+						restore()
+						ownerInstance.callMethod('on_slip_canvas_error', error && error.message)
+					})
+				})
+			}
+		}
 	}
 </script>
 

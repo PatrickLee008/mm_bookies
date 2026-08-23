@@ -53,7 +53,7 @@
 	export default {
 		data() {
 			return {
-				picker: uni.getStorageSync('UNI_LOCALE') || 'mm',
+				picker: uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm',
 				language: config.language
 			}
 		},
@@ -76,6 +76,7 @@
 				if (!this.picker) this.picker = 'mm';
 				config.language = language[this.picker];
 				uni.setStorageSync('language', this.picker);
+				uni.setStorageSync('UNI_LOCALE', this.picker);
 
 				uni.setLocale(this.picker)
 				this.$i18n.locale = this.picker;

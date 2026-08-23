@@ -65,7 +65,7 @@
 					</view>
 					<view class="search-box">
 						<text class="cuIcon-search search-icon"></text>
-						<input type="text" v-model="searchKeyword" :placeholder="$t('Search')"
+						<input type="text" v-model="searchKeyword" :placeholder="$t('search')"
 							@input="onSearch" @confirm="onSearch" />
 					</view>
 				</view>

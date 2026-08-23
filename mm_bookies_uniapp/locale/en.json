@@ -1608,6 +1608,7 @@
 	"refund": "Refund",
 	"draw": "Draw",
 	"rejected": "Rejected",
+	"Rejected": "Rejected",
 	"lose": "Lose",
 	"money字段订单页面请求使用不能修改": "",
 	"money": "Main Wallet",

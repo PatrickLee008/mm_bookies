@@ -47,7 +47,7 @@
 					<!-- 用户头像 -->
 					<view class="profile-avatar-section">
 						<view class="profile-avatar-circle">
-							<theme-icon name="user-avatar" color="var(--theme-primary, #1C667C)"
+							<theme-icon name="user-avatar" size="100px" color="var(--theme-primary, #1C667C)"
 								class="profile-avatar-img"></theme-icon>
 						</view>
 					</view>
@@ -89,7 +89,7 @@
 				</view>
 				<view class="modal-body">
 					<!-- Live Chat 按钮 -->
-					<view class="live-chat-btn" @click="openLiveChat">
+					<view class="live-chat-btn" @click="openCustomerService">
 						<text class="live-chat-text">{{ $t('welcome_to_live_chat') }}</text>
 						<text class="live-chat-arrow">➤</text>
 					</view>
@@ -431,14 +431,14 @@
 						img: '../../static/icon/ucenter/language.png',
 						para: {},
 					},
-					// {
-					// 	title: "theme_test",
-					// 	content: '',
-					// 	method: 'showThemeModal',
-					// 	args: [],
-					// 	img: '../../static/icon/ucenter/about.png',
-					// 	para: {},
-					// },
+					{
+						title: "theme_test",
+						content: '',
+						method: 'showThemeModal',
+						args: [],
+						img: '../../static/icon/ucenter/about.png',
+						para: {},
+					},
 					{
 						title: "logout", // from tangjq--- 使用语言文件中的键名
 						content: '',
@@ -516,7 +516,7 @@
 				customerSupportModalVisible: false,
 
 				// from tangjq--- 语言选择器
-				selectedLanguage: uni.getStorageSync('UNI_LOCALE') || 'mm',
+				selectedLanguage: uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm',
 				themeModalVisible: false,
 				selectedTheme: uni.getStorageSync('frontend_theme_preset'),
 				themeOptions: [{
@@ -818,6 +818,7 @@
 				if (!this.selectedLanguage) this.selectedLanguage = 'mm'
 				config.language = language[this.selectedLanguage]
 				uni.setStorageSync('language', this.selectedLanguage)
+				uni.setStorageSync('UNI_LOCALE', this.selectedLanguage)
 				uni.setLocale(this.selectedLanguage)
 				this.$i18n.locale = this.selectedLanguage
 				this.hideLanguageModal()
@@ -1577,6 +1578,9 @@
 	.profile-avatar-section {
 		display: flex;
 		justify-content: center;
+		align-items: center;
+		width: 100%;
+		box-sizing: border-box;
 		margin-bottom: 24px;
 	}
 
@@ -1585,12 +1589,18 @@
 		height: 100px;
 		border-radius: 50%;
 		// background: $color-primary;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		overflow: hidden;
+		margin: 0 auto;
 	}
 
 	.profile-avatar-img {
-		width: 100%;
-		height: 100%;
+		display: block;
+		width: 100px;
+		height: 100px;
+		flex: 0 0 100px;
 	}
 
 	.profile-info-row {

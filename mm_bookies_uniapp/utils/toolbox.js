@@ -148,7 +148,7 @@ export const toolbox = {
 		if (!source && typeof source !== 'object') {
 			throw new Error('error arguments', ` source:`, source)
 		}
-		const targetObj = source.constructor === Array ? [] : {}
+		const targetObj = Array.isArray(source) ? [] : {}
 		Object.keys(source).forEach(keys => {
 			if (source[keys] && typeof source[keys] === 'object') {
 				targetObj[keys] = this.deep_clone(source[keys])

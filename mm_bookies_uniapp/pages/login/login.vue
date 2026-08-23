@@ -222,7 +222,7 @@
 				actionButtonRoute: '',
 				// 语言切换
 				showLangModal: false,
-				currentLang: uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm',
+				currentLang: uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm',
 				langOptions: [{
 						value: 'mm',
 						label: 'မြန်မာ'
@@ -640,7 +640,7 @@
 			},
 			// from tangjq--- 语言切换
 			openLangModal() {
-				this.currentLang = uni.getStorageSync('UNI_LOCALE') || uni.getStorageSync('language') || 'mm'
+				this.currentLang = uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm'
 				this.showLangModal = true
 			},
 			selectLang(value) {
@@ -649,6 +649,7 @@
 				// 与 pages/ucenter/language.vue 保持一致：更新全局语言、缓存与 i18n
 				config.language = language[value]
 				uni.setStorageSync('language', value)
+				uni.setStorageSync('UNI_LOCALE', value)
 				uni.setLocale(value)
 				this.$i18n.locale = value
 				this.showLangModal = false
