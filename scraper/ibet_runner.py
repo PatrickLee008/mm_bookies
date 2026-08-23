@@ -380,7 +380,8 @@ def get_matches(with_mix=False):
                 old_match.MATCH_MD_TIME = match_md_time
                 match_desc = old_match.MATCH_DESC
                 old_match.hide = "0"
-                old_match.UPDATE_TIME  = datetime.now()
+                # UPDATE_TIME 交给模型 onupdate 自动处理：仅当主表字段真实变化时才刷新，
+                # 避免仅赔率变动就刷新 m_app_match 更新时间，利于第三方增量同步
                 # 更新比赛时间
                 # db_session.query(Match).filter(Match.MATCH_ID == match_id).update({"MATCH_TIME": match_time, "MATCH_MD_TIME": match_md_time})
                 # 先删除旧的赔率
