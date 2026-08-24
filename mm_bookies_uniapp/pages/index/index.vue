@@ -212,6 +212,14 @@
 		border-bottom-right-radius: 12px;
 	}
 
+	/* #ifdef APP-PLUS */
+	/* App端显示手机状态栏后，状态栏悬浮在页面顶部，主页内容下移一个状态栏高度 */
+	.home-top {
+		padding-top: calc(var(--status-bar-height) + 18px);
+	}
+
+	/* #endif */
+
 	.home-logo {
 		display: flex;
 		align-items: center;

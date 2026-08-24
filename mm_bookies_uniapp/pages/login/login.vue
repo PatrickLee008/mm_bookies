@@ -779,6 +779,14 @@
 		z-index: 50;
 	}
 
+	/* #ifdef APP-PLUS */
+	/* App端显示手机状态栏后，语言按钮避开状态栏 */
+	.lang-switch {
+		top: calc(var(--status-bar-height) + 24rpx);
+	}
+
+	/* #endif */
+
 	.lang-switch-icon {
 		width: 32rpx;
 		height: 32rpx;

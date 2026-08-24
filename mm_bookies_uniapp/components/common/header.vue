@@ -22,7 +22,7 @@
 								{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
 							</view>
 						</view>
-						<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+						<view class="settings-btn" v-if="!isUcenterHome" @click="goto('/pages/ucenter/home', 1)">
 							<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
 						</view>
 					</view>
@@ -45,7 +45,7 @@
 							{{ unreadMessageCount > 99 ? '99+' : unreadMessageCount }}
 						</view>
 					</view>
-					<view class="settings-btn" @click="goto('/pages/ucenter/home', 1)">
+					<view class="settings-btn" v-if="!isUcenterHome" @click="goto('/pages/ucenter/home', 1)">
 						<image src="/static/icon/nav/settings.png" class="settings-icon" mode="aspectFit"></image>
 					</view>
 				</view>
@@ -122,6 +122,11 @@
 			}
 		},
 		data() {
+			// App端显示手机状态栏后，状态栏会悬浮在webview顶部，header需向下偏移一个状态栏高度
+			let statusBarHeight = 0
+			// #ifdef APP-PLUS
+			statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 0
+			// #endif
 			return {
 				isLogin: uni.getStorageSync('Authorization') || false,
 				userInfo: {},
@@ -132,6 +137,7 @@
 				balanceVisible: true,
 				collapsed: false, // header收起状态
 				expandedHeight: 0, // 展开时的精确高度（用于立即恢复）
+				statusBarHeight, // App状态栏高度（H5为0，不影响布局）
 			}
 		},
 		computed: {
@@ -144,6 +150,10 @@
 			currentRoute() {
 				const pages = getCurrentPages();
 				return pages.length ? pages[pages.length - 1].route : '';
+			},
+			isUcenterHome() {
+				// 设置按钮跳转的目标就是ucenter/home，在该页显示无意义
+				return this.currentRoute === 'pages/ucenter/home'
 			},
 			isWalletPage() {
 				return this.currentRoute.indexOf('pages/wallet/') === 0
@@ -184,10 +194,16 @@
 				return titles[this.currentRoute] || ''
 			},
 			headerHeightStyle() {
-				const height = this.headerCollapsed ? 85 : this.expandedHeight
-				return height ? {
-					height: `${height}px`
-				} : {}
+				const style = {}
+				// App端状态栏悬浮在header上方，用padding把内容压到状态栏之下，背景色延伸到状态栏底部
+				if (this.statusBarHeight) {
+					style.paddingTop = `${this.statusBarHeight + (this.headerCollapsed ? 8 : 0)}px`
+				}
+				const height = this.headerCollapsed ? 85 + this.statusBarHeight : this.expandedHeight
+				if (height) {
+					style.height = `${height}px`
+				}
+				return style
 			}
 		},
 		created() {},
@@ -289,9 +305,9 @@
 
 				// 立即发射估算高度，让占位元素同步过渡（不等CSS动画完成）
 				if (nextCollapsed) {
-					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px
+					// 收起状态：标题栏(~41px) + 返回栏(42px) ≈ 85px，App端另加状态栏高度
 					if (this.isLogin) {
-						this.$emit('headerHeightChange', 85)
+						this.$emit('headerHeightChange', 85 + this.statusBarHeight)
 					}
 				} else if (this.expandedHeight) {
 					// 展开：立即恢复到之前测量的精确高度

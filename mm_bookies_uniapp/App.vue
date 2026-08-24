@@ -11,8 +11,7 @@
 	// plus.runtime.quit = function() {
 	// 	main.moveTaskToBack(false);
 	// };
-	//应用全屏，不显示状态栏
-	plus.navigator.setFullscreen(true);
+	//显示手机状态栏（不再全屏），页面顶部元素需用 --status-bar-height 做偏移
 
 	//重写toast方法如果内容为 ‘再按一次退出应用’ 就隐藏应用，其他正常toast
 	plus.nativeUI.toast = (function(str) {

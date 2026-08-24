@@ -62,9 +62,11 @@
 					<view class="profile-phone-row">
 						<text class="profile-phone-label">{{ $t('phone_no') }}:
 							{{ $store.state.userInfo.phone || userInfo.phone || '0987654321' }}</text>
-						<theme-icon class="profile-phone-copy-icon" name="copy" size="20px"
-							color="var(--theme-icon-primary, var(--theme-primary))" @click="copy"
-							v-if="canInvite"></theme-icon>
+						<!-- App端theme-icon的svg根元素不转发点击事件，click必须绑在原生view上 -->
+						<view class="profile-phone-copy-btn" @click="copy" v-if="canInvite">
+							<theme-icon class="profile-phone-copy-icon" name="copy" size="20px"
+								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+						</view>
 					</view>
 
 					<!-- Change Password 按钮 -->
@@ -431,14 +433,14 @@
 						img: '../../static/icon/ucenter/language.png',
 						para: {},
 					},
-					{
-						title: "theme_test",
-						content: '',
-						method: 'showThemeModal',
-						args: [],
-						img: '../../static/icon/ucenter/about.png',
-						para: {},
-					},
+					// {
+					// 	title: "theme_test",
+					// 	content: '',
+					// 	method: 'showThemeModal',
+					// 	args: [],
+					// 	img: '../../static/icon/ucenter/about.png',
+					// 	para: {},
+					// },
 					{
 						title: "logout", // from tangjq--- 使用语言文件中的键名
 						content: '',
@@ -1631,9 +1633,16 @@
 		white-space: nowrap;
 	}
 
+	.profile-phone-copy-btn {
+		flex-shrink: 0;
+		margin-left: 4px;
+		padding: 4px;
+		display: flex;
+		align-items: center;
+	}
+
 	.profile-phone-copy-icon {
 		flex-shrink: 0;
-		margin-left: 8px;
 	}
 
 	.profile-edit-icon {
