@@ -69,6 +69,20 @@
 	import DraggableButton from '@/components/common/draggable-button.vue'
 	import siteinfo from '@/siteinfo'
 
+	// 模块级互斥锁：App端打开客服是通过 navigateTo 新开页面。
+	// 若页面栈里残留了多个 <customer-service> 实例（如从挂了组件的 index 页进入其他页），
+	// uni.$emit 全局广播会让每个实例各执行一次 navigateTo，导致客服页叠加、Welly Talk 显示两次。
+	// 锁保证同一时间只打开一次，覆盖所有入口（Settings的Live Chat、悬浮客服按钮、全局事件）。
+	let AppCsNavigationOpen = false
+	function acquireAppCsNavigationLock() {
+		if (AppCsNavigationOpen) return false
+		AppCsNavigationOpen = true
+		setTimeout(() => {
+			AppCsNavigationOpen = false
+		}, 1500)
+		return true
+	}
+
 	export default {
 		name: 'CustomerService',
 		components: {
@@ -165,6 +179,11 @@
 				})
 			},
 			openAppCustomerServicePage() {
+				// #ifdef APP-PLUS
+				if (!acquireAppCsNavigationLock()) {
+					return
+				}
+				// #endif
 				const url = encodeURIComponent(this.customerServiceUrl)
 				const title = encodeURIComponent(this.$t('welcome_to_live_chat'))
 				uni.navigateTo({
