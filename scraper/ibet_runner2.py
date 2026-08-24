@@ -538,7 +538,7 @@ def process_match_data(match_data, db_session, old_matches, live_matches, abort_
         old_match.HOST_TEAM = host_team
         old_match.GUEST_TEAM = guest_team
         old_match.hide = api_hide
-        old_match.UPDATE_TIME = datetime.now()
+        # UPDATE_TIME 交给模型 onupdate 自动处理，避免仅赔率变动也刷新主表更新时间，利于第三方增量同步
         # 如果接口要求隐藏，设置隐藏原因
         if api_hide == "1":
             hide_reason = match_data.get('hideReason') or ''
@@ -602,7 +602,7 @@ def process_match_data(match_data, db_session, old_matches, live_matches, abort_
                 existing_match.HOST_TEAM_WEBID = match_data.get('hostTeamWebid', '')
                 existing_match.GUEST_TEAM_WEBID = match_data.get('guestTeamWebid', '')
                 existing_match.hide = api_hide
-                existing_match.UPDATE_TIME = datetime.now()
+                # UPDATE_TIME 交给模型 onupdate 自动处理，避免仅赔率变动也刷新主表更新时间，利于第三方增量同步
 
                 # 如果接口要求隐藏，设置隐藏原因
                 if api_hide == "1":
