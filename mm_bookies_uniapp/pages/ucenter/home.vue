@@ -627,22 +627,36 @@
 			parseHtmlToNodes(html) {
 				if (!html) return []
 				const nodes = []
+				const stack = [] // 当前打开的节点栈，用于处理 p/ul/ol/li 嵌套
 				// 匹配 HTML 标签：支持普通标签和自闭合标签
 				const tagRegex = /<(\/?)(\w+)([^>]*?)(\/?)>/g
 				let lastIndex = 0
 				let match
-				let currentParent = null // 当前打开的块级标签节点（如 p）
+
+				const appendNode = (node) => {
+					const parent = stack[stack.length - 1]
+					if (parent && parent.children) {
+						parent.children.push(node)
+					} else {
+						nodes.push(node)
+					}
+				}
+
+				const appendText = (text) => {
+					if (!text) return
+					const textParts = this._parseUrlsInText(text)
+					const parent = stack[stack.length - 1]
+					if (parent && parent.children) {
+						parent.children.push(...textParts)
+					} else {
+						nodes.push(...textParts)
+					}
+				}
 
 				while ((match = tagRegex.exec(html)) !== null) {
 					// 处理标签之前的文本
 					if (match.index > lastIndex) {
-						const text = html.substring(lastIndex, match.index)
-						const textParts = this._parseUrlsInText(text)
-						if (currentParent && currentParent.children) {
-							currentParent.children.push(...textParts)
-						} else {
-							nodes.push(...textParts)
-						}
+						appendText(html.substring(lastIndex, match.index))
 					}
 
 					const isClosing = match[1] === '/'
@@ -651,45 +665,52 @@
 					const isSelfClosing = match[4] === '/'
 
 					if (tagName === 'br' || (isSelfClosing && tagName === 'br')) {
-						const brNode = {
-							name: 'br',
-							attrs: {}
-						}
-						if (currentParent && currentParent.children) {
-							currentParent.children.push(brNode)
-						} else {
-							nodes.push(brNode)
-						}
+						appendNode({ name: 'br', attrs: {} })
 					} else if (isClosing) {
-						if (tagName === 'p' || tagName === 'div') {
-							currentParent = null
+						if (tagName === 'p' || tagName === 'div' || tagName === 'ul' || tagName === 'ol' || tagName === 'li') {
+							stack.pop()
 						}
 					} else {
 						// 开标签
 						if (tagName === 'a') {
 							const hrefMatch = attrsStr.match(/href=["']([^"']+)["']/)
 							const href = hrefMatch ? hrefMatch[1] : ''
-							const aNode = {
+							appendNode({
 								name: 'a',
 								attrs: {
 									href: href,
 									style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
 								},
 								children: []
-							}
-							if (currentParent && currentParent.children) {
-								currentParent.children.push(aNode)
-							} else {
-								nodes.push(aNode)
-							}
+							})
 						} else if (tagName === 'p') {
 							const pNode = {
 								name: 'p',
 								attrs: {},
 								children: []
 							}
-							nodes.push(pNode)
-							currentParent = pNode
+							appendNode(pNode)
+							stack.push(pNode)
+						} else if (tagName === 'ul' || tagName === 'ol') {
+							// 列表容器：li 渲染为带圆点/编号的段落
+							stack.push({ type: tagName, counter: 1 })
+						} else if (tagName === 'li') {
+							const parent = stack[stack.length - 1]
+							let prefix = '• '
+							if (parent && parent.type === 'ol') {
+								prefix = parent.counter + '. '
+								parent.counter++
+							}
+							const liNode = {
+								name: 'p',
+								// attrs: { style: 'padding-left: 16px; margin: 0;' },
+								children: [{
+									type: 'text',
+									text: prefix
+								}]
+							}
+							appendNode(liNode)
+							stack.push(liNode)
 						}
 						// 其他标签按需扩展
 					}
@@ -699,13 +720,7 @@
 
 				// 处理剩余文本
 				if (lastIndex < html.length) {
-					const text = html.substring(lastIndex)
-					const textParts = this._parseUrlsInText(text)
-					if (currentParent && currentParent.children) {
-						currentParent.children.push(...textParts)
-					} else {
-						nodes.push(...textParts)
-					}
+					appendText(html.substring(lastIndex))
 				}
 
 				if (nodes.length === 0) {

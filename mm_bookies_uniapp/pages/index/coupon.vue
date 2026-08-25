@@ -125,8 +125,8 @@
 
 						<!-- 空状态 -->
 						<view class="empty-state" v-if="list.length === 0 && !loading">
-							<theme-icon name="deals" class="empty-icon"
-								color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+							<!-- App webview 对内联 SVG 的 CSS 缩放渲染有偏移缺陷，改用静态图 -->
+							<image src="/static/theme/deals.svg" mode="aspectFit" class="empty-icon"></image>
 							<text class="empty-text">No coupons available</text>
 						</view>
 					</view>
@@ -189,8 +189,8 @@
 
 							<!-- 空状态 -->
 							<view class="empty-state" v-if="promotion_list.length === 0 && !loading">
-								<theme-icon name="deals" class="empty-icon"
-									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								<image src="/static/theme/deals.svg" mode="aspectFit"
+									class="empty-icon"></image>
 								<text class="empty-text">{{ $t('No promotions available') }}</text>
 							</view>
 						</template>
@@ -253,8 +253,8 @@
 							<!-- 空状态 -->
 							<view class="empty-state"
 								v-if="promotion_history.length === 0 && !promotion_history_loading">
-								<theme-icon name="deals" class="empty-icon"
-									color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
+								<image src="/static/theme/deals.svg" mode="aspectFit"
+									class="empty-icon"></image>
 								<text class="empty-text">{{ $t('No claim history') }}</text>
 							</view>
 						</template>
@@ -2480,15 +2480,17 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 60px 20px;
+		text-align: center;
+		padding: 60px 0px;
 		width: 100%;
 	}
 
 	.empty-icon {
+		width: 60px;
 		height: 60px;
 		margin-bottom: 16px;
 		opacity: 0.6;
-		filter: brightness(0) saturate(100%) invert(31%) sepia(14%) saturate(1119%) hue-rotate(138deg) brightness(89%) contrast(90%);
+		filter: grayscale(10);
 	}
 
 	.empty-text {

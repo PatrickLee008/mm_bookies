@@ -109,66 +109,103 @@
 			// 解析 HTML 为 rich-text nodes 数组
 			parseHtmlToNodes(html) {
 				if (!html) return []
-				
-				// 简单的 HTML 解析器，提取 a 标签并保持其他内容
 				const nodes = []
-				let tempHtml = html
-				
-				// 正则匹配 a 标签
-				const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>(.*?)<\/a>/gi
+				const stack = [] // 当前打开的节点栈，用于处理 p/ul/ol/li 嵌套
+				// 匹配 HTML 标签：支持普通标签和自闭合标签
+				const tagRegex = /<(\/?)(\w+)([^>]*?)(\/?)>/g
 				let lastIndex = 0
 				let match
-				
-				while ((match = linkRegex.exec(tempHtml)) !== null) {
-					// 添加链接前的文本
+
+				const appendNode = (node) => {
+					const parent = stack[stack.length - 1]
+					if (parent && parent.children) {
+						parent.children.push(node)
+					} else {
+						nodes.push(node)
+					}
+				}
+
+				const appendText = (text) => {
+					if (!text) return
+					const textParts = this._parseUrlsInText(text)
+					const parent = stack[stack.length - 1]
+					if (parent && parent.children) {
+						parent.children.push(...textParts)
+					} else {
+						nodes.push(...textParts)
+					}
+				}
+
+				while ((match = tagRegex.exec(html)) !== null) {
+					// 处理标签之前的文本
 					if (match.index > lastIndex) {
-						const textBefore = tempHtml.substring(lastIndex, match.index)
-						if (textBefore.trim()) {
-							nodes.push({
-								name: 'text',
+						appendText(html.substring(lastIndex, match.index))
+					}
+
+					const isClosing = match[1] === '/'
+					const tagName = match[2].toLowerCase()
+					const attrsStr = match[3]
+					const isSelfClosing = match[4] === '/'
+
+					if (tagName === 'br' || (isSelfClosing && tagName === 'br')) {
+						appendNode({ name: 'br', attrs: {} })
+					} else if (isClosing) {
+						if (tagName === 'p' || tagName === 'div' || tagName === 'ul' || tagName === 'ol' || tagName === 'li') {
+							stack.pop()
+						}
+					} else {
+						// 开标签
+						if (tagName === 'a') {
+							const hrefMatch = attrsStr.match(/href=["']([^"']+)["']/)
+							const href = hrefMatch ? hrefMatch[1] : ''
+							appendNode({
+								name: 'a',
+								attrs: {
+									href: href,
+									style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
+								},
+								children: []
+							})
+						} else if (tagName === 'p') {
+							const pNode = {
+								name: 'p',
 								attrs: {},
+								children: []
+							}
+							appendNode(pNode)
+							stack.push(pNode)
+						} else if (tagName === 'ul' || tagName === 'ol') {
+							// 列表容器：li 渲染为带圆点/编号的段落
+							stack.push({ type: tagName, counter: 1 })
+						} else if (tagName === 'li') {
+							const parent = stack[stack.length - 1]
+							let prefix = '• '
+							if (parent && parent.type === 'ol') {
+								prefix = parent.counter + '. '
+								parent.counter++
+							}
+							const liNode = {
+								name: 'p',
+								attrs: { style: 'padding-left: 16px; margin: 0;' },
 								children: [{
 									type: 'text',
-									text: textBefore
+									text: prefix
 								}]
-							})
+							}
+							appendNode(liNode)
+							stack.push(liNode)
 						}
+						// 其他标签按需扩展
 					}
-					
-					// 添加链接节点
-					const href = match[1]
-					const linkText = match[2]
-					nodes.push({
-						name: 'a',
-						attrs: {
-							href: href,
-							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
-						},
-						children: [{
-							type: 'text',
-							text: linkText
-						}]
-					})
-					
+
 					lastIndex = match.index + match[0].length
 				}
-				
-				// 添加剩余文本
-				if (lastIndex < tempHtml.length) {
-					const textAfter = tempHtml.substring(lastIndex)
-					if (textAfter.trim()) {
-						nodes.push({
-							name: 'text',
-							attrs: {},
-							children: [{
-								type: 'text',
-								text: textAfter
-							}]
-						})
-					}
+
+				// 处理剩余文本
+				if (lastIndex < html.length) {
+					appendText(html.substring(lastIndex))
 				}
-				
-				// 如果没有解析到任何节点，就把整个 HTML 作为一个文本节点
+
 				if (nodes.length === 0) {
 					return [{
 						name: 'div',
@@ -179,8 +216,58 @@
 						}]
 					}]
 				}
-				
 				return nodes
+			},
+			// 将文本中的裸 URL 转为 <a> 节点
+			_parseUrlsInText(text) {
+				if (!text) return []
+				const parts = []
+				// 匹配以 http:// 或 https:// 开头的 URL
+				const urlRegex = /(https?:\/\/[^\s<>]+)/gi
+				let lastIdx = 0
+				let m
+
+				while ((m = urlRegex.exec(text)) !== null) {
+					if (m.index > lastIdx) {
+						const before = text.substring(lastIdx, m.index)
+						if (before) {
+							parts.push({
+								type: 'text',
+								text: before
+							})
+						}
+					}
+					parts.push({
+						name: 'a',
+						attrs: {
+							href: m[0],
+							style: 'color: var(--theme-primary, #1C667C); text-decoration: underline;'
+						},
+						children: [{
+							type: 'text',
+							text: m[0]
+						}]
+					})
+					lastIdx = m.index + m[0].length
+				}
+
+				if (lastIdx < text.length) {
+					const after = text.substring(lastIdx)
+					if (after) {
+						parts.push({
+							type: 'text',
+							text: after
+						})
+					}
+				}
+
+				if (parts.length === 0 && text) {
+					parts.push({
+						type: 'text',
+						text
+					})
+				}
+				return parts
 			},
 			goBack() {
 				uni.navigateBack()

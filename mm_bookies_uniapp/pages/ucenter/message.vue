@@ -692,6 +692,8 @@
 		color: $color-primary;
 		background-color: white;
 		flex-shrink: 0;
+		border-top-left-radius: 20px;
+		border-top-right-radius: 20px;
 	}
 
 	.header-left {
