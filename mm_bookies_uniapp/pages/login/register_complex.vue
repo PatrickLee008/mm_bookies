@@ -658,11 +658,11 @@
 						// 	uni.removeStorageSync('loginInfo');
 						// };
 						uni.setStorageSync('Authorization', res.data.token);
+						uni.setStorageSync('login_success', true)
+						uni.setStorageSync('rigister_success', true)
 						uni.redirectTo({
 							url: '../index/index'
 						});
-						uni.setStorageSync('login_success', true)
-						uni.setStorageSync('rigister_success', true)
 					} else if (res.statusCode == 400) {
 						this.$notice.show({
 							title: 'Tips',

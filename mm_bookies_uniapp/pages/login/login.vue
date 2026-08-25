@@ -487,10 +487,10 @@
 							app.getConfigs()
 						}
 
+						uni.setStorageSync('login_success', true)
 						uni.redirectTo({
 							url: '/pages/index/index'
 						});
-						uni.setStorageSync('login_success', true)
 						return
 					} else if (res.statusCode == 400) {
 						uni.showToast({
