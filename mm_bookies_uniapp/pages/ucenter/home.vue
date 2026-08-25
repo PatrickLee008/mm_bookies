@@ -1741,7 +1741,8 @@
 		color: $color-primary;
 		line-height: 1.8;
 		margin-bottom: 16px;
-		word-break: break-all;
+		word-break: break-word;
+		overflow-wrap: break-word;
 	}
 
 	.contact-row-item {

@@ -460,7 +460,8 @@
 
 
 	body {
-		font-family: 'regular';
+		font-family: 'regular', system-ui, -apple-system, sans-serif;
+		word-break: break-word;
 	}
 
 	:root {
