@@ -894,7 +894,7 @@
 	.user-account-section {
 		background-color: $bg-color-info;
 		margin: 20px 20px 0;
-		padding: 20px;
+		padding: 15px 20px;
 		border-radius: $radius-large;
 	}
 
@@ -904,7 +904,7 @@
 		color: $color-primary;
 		display: block;
 		text-align: center;
-		margin-bottom: 22px;
+		margin-bottom: 20px;
 	}
 
 	.info-row {
@@ -964,7 +964,7 @@
 	.wallet-info-section {
 		background-color: $bg-color-info;
 		margin: 15px 20px 0;
-		padding: 20px 40px;
+		padding: 15px 20px;
 		border-radius: $radius-large;
 	}
 
@@ -973,7 +973,8 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 18px;
+		margin-bottom: 10px;
+		line-height: 1.6;
 	}
 
 	.wallet-info-row:last-child {
@@ -983,7 +984,8 @@
 	.wallet-info-label {
 		font-size: 12px;
 		font-weight: 400;
-		width: 120px;
+		min-width: 135px;
+		// max-width: calc(100% - 100px);
 		text-align: end;
 		color: $color-primary;
 	}
@@ -993,6 +995,7 @@
 		font-weight: bold;
 		color: $color-primary;
 		font-style: italic;
+		text-align: end;
 	}
 
 	.amount-section {

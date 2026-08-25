@@ -171,6 +171,20 @@
 			handleAdClick(ad) {
 				if (!ad.link_url) return
 				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
+			},
+			show_login_toast() {
+				// 登录/注册成功后跳转到首页时提示，一次性消费并清除标志
+				if (!uni.getStorageSync('login_success')) return
+				let title = `${this.$t('Congratulations')}!\r\n${this.$t('login_success')}`
+				if (uni.getStorageSync('rigister_success')) {
+					title = `${this.$t('Congratulations')}!\r\n${this.$t('register_success')}`
+				}
+				uni.showToast({
+					title: title,
+					icon: 'none'
+				})
+				uni.removeStorageSync('login_success')
+				uni.removeStorageSync('rigister_success')
 			}
 		},
 		onShow() {
@@ -180,6 +194,7 @@
 				})
 				return
 			}
+			this.show_login_toast()
 			this.getUserInfo()
 			this.getAdvertisements()
 			this.updateUnreadCount()

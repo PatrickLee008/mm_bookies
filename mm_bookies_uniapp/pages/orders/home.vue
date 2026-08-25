@@ -482,7 +482,7 @@
 				this.wallet_list = parse_list(wallets, 'pay_wallet')
 			},
 			page_change(page) {
-				if (this.$toolbox.click_too_fast(1)) return
+				// if (this.$toolbox.click_too_fast(1)) return
 				this.current_page = page
 				this.date_filtered = false
 				this.reset_list()
@@ -1702,11 +1702,12 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 10upx;
+		margin-bottom: 8upx;
+		line-height: 1.5;
 	}
 
 	.info-row:last-child {
-		margin-bottom: 0;
+		// margin-bottom: 0;
 	}
 
 	.label {

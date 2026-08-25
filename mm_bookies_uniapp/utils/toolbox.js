@@ -72,20 +72,26 @@ export const toolbox = {
 	 * @param {boolean} return_number //返回数字
 	 */
 	num_format(num, decimalPlaces = 0, return_number = false) {
-		let res = ''
-		switch (typeof num) {
-			case 'number':
-				res = parseFloat(num)
-				break
-			case 'string':
-				res = parseFloat(num.replace(/\,/g, ''))
-				break
-		}
-		return return_number ? res : res.toLocaleString('en-US', {
-			minimumFractionDigits: decimalPlaces,
-			maximumFractionDigits: decimalPlaces
-		});
-	},
+			let res = ''
+			switch (typeof num) {
+				case 'number':
+					res = parseFloat(num)
+					break
+				case 'string':
+					res = parseFloat(num.replace(/\,/g, ''))
+					break
+			}
+			if (return_number) return res
+			// 千分号：改用手动分组，不依赖 toLocaleString。App 端 WebView 的 Intl 不分组，
+			// 导致 H5 正常但 App 的金额/预期金额/收益不显示千分号
+			if (typeof res !== 'number' || isNaN(res)) {
+				return res + ''
+			}
+			const sign = res < 0 ? '-' : ''
+			const parts = Math.abs(res).toFixed(decimalPlaces).split('.')
+			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+			return sign + parts.join('.')
+		},
 	/** 删除对象的某个属性
 	 * @param {Object} obj
 	 * @param {Array}propertiesToRemove

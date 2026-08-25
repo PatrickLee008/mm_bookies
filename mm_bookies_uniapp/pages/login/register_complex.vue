@@ -659,7 +659,7 @@
 						// };
 						uni.setStorageSync('Authorization', res.data.token);
 						uni.redirectTo({
-							url: '../match/home'
+							url: '../index/index'
 						});
 						uni.setStorageSync('login_success', true)
 						uni.setStorageSync('rigister_success', true)

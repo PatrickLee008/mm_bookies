@@ -376,7 +376,7 @@
 					<view class="bet-info-rows">
 						<view class="bet-info-row">
 							<text class="info-label">{{$t('Bet Time')}}</text>
-							<text class="info-value">{{new Date().toLocaleString()}}</text>
+							<text class="info-value">{{bet_time}}</text>
 						</view>
 						<view class="bet-info-row">
 							<text class="info-label">{{$t('Potential Winnings')}}</text>
@@ -711,6 +711,7 @@
 				hide_league_filter: true,
 				hide_match_detail: true,
 				hide_bets_slip: true,
+				bet_time: '',
 				hide_login_modal: true,
 				hide_fuzzy_search: true,
 				hide_success_popup: true, // from tangjq--- 控制投注成功提示弹窗显示
@@ -736,7 +737,6 @@
 					match_detail: {},
 					league_list: [],
 				},
-				login_success: uni.getStorageSync('login_success') || false,
 				use_promotion_wallet: false, // 是否优先使用Promotion Wallet
 				searchKeyword: '', // from tangjq--- 搜索关键字
 				advertisements: [], // from tangjq--- 广告列表
@@ -1174,6 +1174,7 @@
 				let _this = this
 				// 点击赔率时不再自动预填最小投注金额，保持输入框为空，显示占位提示
 				_this.amount = ''
+				_this.bet_time = _this.formatMatchDateTime(new Date())
 				_this.hide_bets_slip = false
 			},
 			getAdvertisements() {
@@ -1214,7 +1215,7 @@
 						_this.all_matches_data = res.data;
 						_this.loadding_data(res.data);
 						uni.hideLoading();
-						if (res.data.items.length == 0 && !_this.login_success) {
+						if (res.data.items.length == 0) {
 							uni.showToast({
 								title: _this.$t('no_more_data'),
 								icon: 'none'
@@ -1549,19 +1550,6 @@
 					complete(res) {}
 				})
 			},
-			show_login_toast() {
-				let _this = this
-				if (!this.login_success) return
-				let title = `${this.$t('Congratulations')}!\r\n${this.$t('login_success')}`
-				if (this.register_success) {
-					title = `${this.$t('Congratulations')}!\r\n${this.$t('register_success')}`
-				}
-				uni.showToast({
-					title: title,
-					icon: 'none'
-				})
-				uni.removeStorageSync('login_success')
-			},
 			// from tangjq--- 显示投注成功提示弹窗
 			show_success_popup() {
 				this.hide_success_popup = false
@@ -1644,7 +1632,6 @@
 				this.mix_slip = uni.getStorageSync('mix_slip') || []
 			}
 			this.get_list()
-			this.show_login_toast()
 			this.getAdvertisements() // from tangjq--- 获取广告列表
 			let _this = this
 			if (_this.isLogin) {
@@ -2241,7 +2228,7 @@
 	.bet-odds {
 		flex: 0 0 auto;
 		min-width: 80px;
-		text-align: center;
+		text-align: end;
 	}
 
 	.bet-odds text {
