@@ -114,8 +114,8 @@
 									<!-- <text v-if="item.pay_wallet">
 										({{getWalletBadgeLabel(item.pay_wallet)}})</text> -->
 								</text>
-								<text class="value  value-amount"
-									style="font-style: italic;">{{$toolbox.num_format(item.BET_MONEY,0)}} MMK</text>
+								<text class="value  value-amount text-italic">{{$toolbox.num_format(item.BET_MONEY,0)}}
+									MMK</text>
 							</view>
 							<view class="info-row" v-if="current_page==='pending'">
 								<text class="label">{{$t('Potential Win Amount')}}</text>
@@ -302,8 +302,7 @@
 					<view class="parlay-confirm-button" @click="close_parlay_detail">
 						<text>{{$t('Confirm')}}</text>
 					</view>
-					<view class="parlay-download-button"
-						:class="{ 'is-downloading': downloading_slip }"
+					<view class="parlay-download-button" :class="{ 'is-downloading': downloading_slip }"
 						@click="download_parlay_slip">
 						<image class="parlay-download-icon" src="/static/icon/download-slip.svg" mode="aspectFit">
 						</image>
@@ -326,21 +325,19 @@
 				<text class="parlay-slip-preview-title">{{$t('Download Slip')}}</text>
 				<scroll-view class="parlay-slip-preview-scroll" scroll-y>
 					<!-- #ifdef H5 -->
-					<img class="parlay-slip-preview-image" :src="slip_preview_src" alt="Bet slip"
-						draggable="true">
+					<img class="parlay-slip-preview-image" :src="slip_preview_src" alt="Bet slip" draggable="true">
 					<!-- #endif -->
 					<!-- #ifndef H5 -->
 					<image class="parlay-slip-preview-image" :src="slip_preview_src" mode="widthFix"></image>
 					<!-- #endif -->
 				</scroll-view>
 				<text class="parlay-slip-preview-tip">{{$t('save_slip_instruction')}}</text>
-				<view class="parlay-slip-preview-share" v-if="can_share_slip"
-					:class="{ 'is-sharing': sharing_slip }" @click="share_slip_preview">
+				<view class="parlay-slip-preview-share" v-if="can_share_slip" :class="{ 'is-sharing': sharing_slip }"
+					@click="share_slip_preview">
 					<text>{{$t('share')}}</text>
 				</view>
 				<view class="parlay-slip-preview-actions">
-					<view class="parlay-confirm-button parlay-download-confirm-button"
-						@click="download_slip_preview">
+					<view class="parlay-confirm-button parlay-download-confirm-button" @click="download_slip_preview">
 						<text>{{$t('Download')}}</text>
 					</view>
 					<view class="parlay-confirm-button" @click="close_slip_preview">
@@ -353,8 +350,8 @@
 
 		<!-- #ifdef APP-PLUS -->
 		<!-- App端触发器：逻辑层数据变化后由renderjs在视图层执行html2canvas截图 -->
-		<view class="parlay-capture-trigger" :prop="slip_capture_request"
-			:change:prop="slipCanvas.on_capture_request"></view>
+		<view class="parlay-capture-trigger" :prop="slip_capture_request" :change:prop="slipCanvas.on_capture_request">
+		</view>
 		<!-- #endif -->
 	</view>
 </template>
@@ -765,7 +762,9 @@
 						type: 'image/png'
 					})
 					if (typeof navigator.canShare === 'function' &&
-						!navigator.canShare({ files: [file] })) {
+						!navigator.canShare({
+							files: [file]
+						})) {
 						return Promise.resolve(false)
 					}
 					return navigator.share({
@@ -1788,8 +1787,37 @@
 	.result-text {
 		font-size: 24upx;
 		font-weight: 700;
-		letter-spacing: 1upx;
 	}
+
+	.text-italic {
+		font-style: italic;
+	}
+
+	.parlay-summary-value {
+		font-style: italic;
+	}
+
+	/* #ifdef APP-PLUS */
+	/* App 端合成斜体会撑大字距，改为 skew 实现紧凑斜体，避免字符间出现空隙 */
+	.result-bar {
+		font-style: normal;
+	}
+
+	.result-text {
+		display: inline-block;
+		transform: skewX(-10deg);
+		transform-origin: center;
+	}
+
+	.parlay-summary-value,
+	.text-italic {
+		font-style: normal;
+		display: inline-block;
+		transform: skewX(-10deg);
+		transform-origin: center;
+	}
+
+	/* #endif */
 
 	/* Parlay 特殊样式 */
 	.parlay-card {
@@ -1990,10 +2018,6 @@
 
 	.parlay-summary-row:last-of-type {
 		margin-bottom: 0;
-	}
-
-	.parlay-summary-value {
-		font-style: italic;
 	}
 
 	.parlay-detail-actions {
