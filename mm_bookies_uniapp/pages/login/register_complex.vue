@@ -776,15 +776,6 @@
 		min-height: var(--app-viewport-height, 100vh);
 	}
 
-	/* #ifdef H5 */
-	/* iOS 内嵌浏览器：将整页作为内部纵向滚动容器，使右滑返回手势只在左右边缘生效 */
-	.dark-teal-bg {
-		height: var(--app-viewport-height, 100vh);
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
-	}
-	/* #endif */
-
 	.default-bank {
 		height: 32px;
 		width: 32px;

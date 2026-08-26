@@ -224,12 +224,16 @@
 			},
 		},
 		mounted() {
+			this._attachSwipeBackGuard()
 			this.$nextTick(() => {
 				setTimeout(() => {
 					this.calculateDimensions()
 					if (this.autoGenerate) this.$emit('init-generate')
 				}, 100)
 			})
+		},
+		beforeDestroy() {
+			this._detachSwipeBackGuard()
 		},
 		methods: {
 			onCaptchaGenerated(data) {
@@ -240,6 +244,57 @@
 			onCaptchaError() {
 				this.$emit('error')
 			},
+			// #ifdef H5
+			_attachSwipeBackGuard() {
+				if (this._swipeGuardMove) return
+				const inCaptcha = (e) => {
+					const t = e.target
+					return !!(t && t.closest && t.closest('.slider-captcha-container'))
+				}
+				const state = { startX: 0, startY: 0, inside: false, horizontal: false }
+				this._swipeGuardStart = (e) => {
+					state.horizontal = false
+					state.inside = e.touches.length === 1 && inCaptcha(e)
+					if (state.inside) {
+						state.startX = e.touches[0].clientX
+						state.startY = e.touches[0].clientY
+					}
+				}
+				this._swipeGuardMove = (e) => {
+					if (!state.inside || e.touches.length !== 1) return
+					// 滑块拖动中：无条件拦截（此时手指在滑块按钮上，防止 iOS 内嵌浏览器右滑返回）
+					if (this.isDragging) {
+						e.preventDefault()
+						return
+					}
+					const touch = e.touches[0]
+					const dx = touch.clientX - state.startX
+					const dy = touch.clientY - state.startY
+					if (!state.horizontal) {
+						// 仅拦截"横向为主的右滑"，验证码区域内纵向滚动不受影响
+						if (dx >= 10 && dx > Math.abs(dy)) {
+							state.horizontal = true
+						} else {
+							return
+						}
+					}
+					e.preventDefault()
+				}
+				// 捕获阶段监听：滑块按钮 @touchmove.stop 只能阻断冒泡，捕获先于其执行
+				document.addEventListener('touchstart', this._swipeGuardStart, { passive: true, capture: true })
+				document.addEventListener('touchmove', this._swipeGuardMove, { passive: false, capture: true })
+			},
+			_detachSwipeBackGuard() {
+				if (this._swipeGuardStart) {
+					document.removeEventListener('touchstart', this._swipeGuardStart, { capture: true })
+				}
+				if (this._swipeGuardMove) {
+					document.removeEventListener('touchmove', this._swipeGuardMove, { capture: true })
+				}
+				this._swipeGuardStart = null
+				this._swipeGuardMove = null
+			},
+			// #endif
 			calculateDimensions() {
 				const canvasQuery = uni.createSelectorQuery().in(this)
 				canvasQuery.select('.captcha-canvas-area').boundingClientRect((rect) => {
