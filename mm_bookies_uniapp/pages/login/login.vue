@@ -878,6 +878,15 @@
 		box-sizing: border-box;
 	}
 
+	/* #ifdef H5 */
+	/* iOS 内嵌浏览器：将整页作为内部纵向滚动容器，使右滑返回手势只在左右边缘生效 */
+	.login-container {
+		height: var(--app-viewport-height, 100vh);
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+	/* #endif */
+
 	/* 标题区域 */
 	.login-title-container {
 		display: flex;

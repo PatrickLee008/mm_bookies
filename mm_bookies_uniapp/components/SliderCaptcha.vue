@@ -22,7 +22,7 @@
 			<view class="slider-progress" :class="{ 'progress-animating': isSnapping || isResetting }"
 				:style="{ width: trackProgressWidth + 'px' }"></view>
 			<view class="slider-button" :class="buttonClass" :style="{ left: trackSliderPosition + 'px' }"
-				@touchstart="onTouchStart" @touchmove.stop.prevent="onTouchMove"
+				@touchstart="onTouchStart" @touchmove.stop="onTouchMove"
 				@touchend="onTouchEnd" @touchcancel="onTouchEnd"
 				@mousedown="onMouseDown">
 				<view v-if="!isSuccess" class="slider-grip">
