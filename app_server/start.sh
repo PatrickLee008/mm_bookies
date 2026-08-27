@@ -16,7 +16,7 @@ if [ "${1:-}" != "" ]; then
 fi
 
 # 激活虚拟环境
-VENV_ACTIVATE="/root/envApp/bin/activate"
+VENV_ACTIVATE="/www/server/pyporject_evn/envFS/bin/activate"
 if [ ! -f "$VENV_ACTIVATE" ]; then
     echo "[start.sh] 错误: 虚拟环境不存在: $VENV_ACTIVATE" >&2
     exit 1
