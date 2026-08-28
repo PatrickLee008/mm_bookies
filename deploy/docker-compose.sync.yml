@@ -21,6 +21,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"   # 让容器能访问物理机上的 MySQL
     volumes:
-      - /data/mmbookies/sync/state:/app/state
-      - /data/mmbookies/sync/logs:/app/logs
+      - ${SYNC_STATE_DIR:-/data/mmbookies/sync/state}:/app/state
+      - ${SYNC_LOG_DIR:-/data/mmbookies/sync/logs}:/app/logs
     mem_limit: 256m

@@ -8,6 +8,7 @@
 # 数据存储：MySQL 用【物理机】上的 MySQL8，三套连不同库(onex2_db_1/2/3)，
 #          容器经 host.docker.internal 访问物理机 MySQL。Redis 仍每套独立容器。
 # 配置/日志/上传/静态：落在 ${DATA_ROOT} 物理目录。
+# 可选：通过 ${CONFIG_ROOT} 把配置目录与数据目录分开（Windows 脚本使用该模式）。
 # ============================================================================
 
 networks:
@@ -47,8 +48,8 @@ services:
     environment:
       TZ: Asia/Yangon
     volumes:
-      - ${DATA_ROOT}/config/app_server/.env:/app/.env:ro
-      - ${DATA_ROOT}/config/app_server/.env.production:/app/.env.production:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/app_server/.env:/app/.env:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/app_server/.env.production:/app/.env.production:ro
       - ${DATA_ROOT}/logs/app_server:/app/logs
       - ${DATA_ROOT}/static/app_server:/app/static
     ports:
@@ -71,8 +72,8 @@ services:
       SCRAPER_ENTRY: ${SCRAPER_ENTRY:-cache_only.py}
       SCRAPE_INTERVAL: ${SCRAPE_INTERVAL:-30}
     volumes:
-      - ${DATA_ROOT}/config/scraper/.env:/app/.env:ro
-      - ${DATA_ROOT}/config/scraper/.env.production:/app/.env.production:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/scraper/.env:/app/.env:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/scraper/.env.production:/app/.env.production:ro
       - ${DATA_ROOT}/logs/scraper:/app/logs
     networks: [mmnet]
     mem_limit: 512m
@@ -88,7 +89,7 @@ services:
       TZ: Asia/Yangon
       JAVA_OPTS: "-server -Xms512m -Xmx${XMX_JXBOOT:-1536m} -Djava.awt.headless=true -Dfile.encoding=UTF-8"
     volumes:
-      - ${DATA_ROOT}/config/jxboot:/app/config:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/jxboot:/app/config:ro
       - ${DATA_ROOT}/logs/jxboot:/app/log
     ports:
       - "${PORT_JXBOOT:-19101}:9101"
@@ -107,7 +108,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       JAVA_OPTS: "-server -Xms512m -Xmx${XMX_JEEPLUS:-1536m} -XX:+UseG1GC -Djava.awt.headless=true -Dfile.encoding=UTF-8"
     volumes:
-      - ${DATA_ROOT}/config/jeeplus-web:/app/config:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/jeeplus-web:/app/config:ro
       - ${DATA_ROOT}/logs/jeeplus-web:/app/logs
       - ${DATA_ROOT}/uploads/jeeplus:/www/wwwroot/web_manager_api/filedir
     ports:
@@ -127,7 +128,7 @@ services:
       PROFILE: prod
       JAVA_OPTS: "-server -Xms512m -Xmx${XMX_JXPUSH:-1024m} -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Djava.security.egd=file:/dev/./urandom"
     volumes:
-      - ${DATA_ROOT}/config/jx-push:/app/config:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/jx-push:/app/config:ro
       - ${DATA_ROOT}/logs/jx-push:/app/logs
     ports:
       - "${PORT_JXPUSH:-18090}:8090"
@@ -141,7 +142,7 @@ services:
     depends_on: [app_server, jx-push]
     volumes:
       - ${UNIAPP_DIST}:/usr/share/nginx/html:ro
-      - ${DATA_ROOT}/config/nginx/uniapp.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/nginx/uniapp.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "${PORT_UNIAPP:-18080}:80"
     networks: [mmnet]
@@ -153,7 +154,7 @@ services:
     depends_on: [jeeplus-web]
     volumes:
       - ${WEB_MANAGER_DIR}:/usr/share/nginx/html:ro
-      - ${DATA_ROOT}/config/nginx/web_manager.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${CONFIG_ROOT:-${DATA_ROOT}/config}/nginx/web_manager.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "${PORT_MANAGER:-18081}:80"
     networks: [mmnet]

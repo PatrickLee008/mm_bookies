@@ -1,5 +1,9 @@
 # MM Bookies · 单机三套 Docker 部署方案
 
+> Windows + Docker Desktop 部署请看 `deploy/README-WINDOWS.md`，并使用
+> `deploy/scripts/windows-deploy.ps1` 在项目根目录生成 `config/deploy/hosts/<主机名>/`
+> 的按主机、按应用拆分配置。
+
 > 目标：一台 CentOS 7 服务器上部署 **3 套**互相隔离的完整应用，端口隔离 + 数据隔离，
 > 配置与数据落物理存储目录。
 >

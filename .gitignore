@@ -2,3 +2,8 @@
 /app_server/app_server/static/liquid-galaxy-466810-d0-9360f89e5cc1.json
 /app_server/.env
 /db_sync/__pycache__
+
+# Windows Docker deployment generates host-specific configs with secrets/runtime data.
+/config/deploy/hosts/*
+!/config/deploy/hosts/example-host/
+!/config/deploy/hosts/example-host/**
