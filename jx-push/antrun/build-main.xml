@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="maven-antrun-" default="main">
-  <target name="main">
-    <copy file="D:\GIT\jiaxu\javasaas-game\publish\jx-push/jx-push.jar" tofile="D:\GIT\jiaxu\javasaas-game\publish\jx-push/jx-push.jar" overwrite="true" />
-  </target>
-</project>

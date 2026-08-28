@@ -1,1 +1,0 @@
-import{_ as o,a as t,u as _,A as n}from"./index.80da1cb2.js";const c={};function r(a,l){const e=t("icon-list",!0);return _(),n(e)}const s=o(c,[["render",r]]),f=Object.freeze(Object.defineProperty({__proto__:null,default:s},Symbol.toStringTag,{value:"Module"}));export{f as _};

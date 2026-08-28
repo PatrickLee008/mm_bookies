@@ -1,1 +1,0 @@
-import{s as o}from"./httpRequest.3b80f148.js";const r={getCode:function(){return o({url:"/sys/getCode",method:"get"})},login:function(t){return o({url:"/sys/login",method:"post",data:t})},logout:function(){return o({url:"/sys/logout",method:"get"})}};export{r as l};

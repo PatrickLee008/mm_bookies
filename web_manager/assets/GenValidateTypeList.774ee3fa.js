@@ -1,1 +1,0 @@
-import{_ as t,a as o,u as _,A as n}from"./index.80da1cb2.js";const a={};function r(s,l){const e=o("gen-validate-type-list",!0);return _(),n(e)}const c=t(a,[["render",r]]),p=Object.freeze(Object.defineProperty({__proto__:null,default:c},Symbol.toStringTag,{value:"Module"}));export{p as _};
