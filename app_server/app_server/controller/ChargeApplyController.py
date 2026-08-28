@@ -9,6 +9,7 @@ from app_server.model.AppAgentBankcard import AppAgentBankcard
 from app_server.model.AppAgentModel import AppAgent
 from app_server.model.AppMemberBankModel import AppMemberBank
 from app_server.model.ChargeApplyModel import ChargeApply, StatusLabelMap
+from app_server.model.SysBisDictModel import SysBisDict
 from flask import g, request, jsonify, Blueprint
 
 from app_server.service.PayOrderService import pay_order_service
@@ -21,6 +22,19 @@ charge_apply = Blueprint('charge_apply', __name__)
 logger = get_logger()
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF'}
+
+DEFAULT_ORDER_EXPIRE_MINUTES = 5  # 充值订单过期时间默认值，单位分钟
+
+
+def get_order_expire_minutes(tenant_id=None):
+    """从 sys_bis_dict 表(platformOrder.orderExpireMinutes)读取充值订单过期时间（分钟），读取失败则回退默认值"""
+    try:
+        cfg = SysBisDict.get_platform_order_config(tenant_id)
+        if cfg and cfg.orderExpireMinutes:
+            return int(cfg.orderExpireMinutes)
+    except Exception as e:
+        logger.error(f"读取充值订单过期时间配置失败: {e}")
+    return DEFAULT_ORDER_EXPIRE_MINUTES
 
 
 @charge_apply.route('/add', methods=['POST'])
@@ -142,8 +156,8 @@ def add_apply():
             receive_account_name = ""
 
         apply_id = Kits.generate_uuid()
-        # 订单有效期
-        ORDER_EXPIRE_MINUTES = 5
+        # 订单有效期（从 sys_bis_dict 读取，读取失败回退默认值）
+        ORDER_EXPIRE_MINUTES = get_order_expire_minutes(getattr(g.user, 'tenant_id', None))
         apply = ChargeApply(id=apply_id, aid=g.user.aid, mb_id=g.user.id, mb_nickname=g.user.name, mb_username=g.user.username,
                             mb_bank_code=bank_code, mb_acc_name=acc_name, mb_acc_number=acc_number, remark=subject,
                             charge_way=charge_way, money=amount, remarks=memo, status=StatusLabelMap.New, expire_time=datetime.now() + timedelta(minutes=ORDER_EXPIRE_MINUTES))

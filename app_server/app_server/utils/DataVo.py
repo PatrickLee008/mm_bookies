@@ -129,6 +129,7 @@ class PlatformOrderCfgVo(BaseVO):
         self.singleDoubleRatio = 0.0  # Odd/Even Commission Rate
         self.singleDodanRatio = 0.0  # Correct Score Commission Rate
         self.blendRatio = 0.0  # Mixed Commission Rate
+        self.orderExpireMinutes = 5  # 充值订单过期时间（分钟）
 
 
 # App前端配置
