@@ -8,7 +8,7 @@ $theme-preset: mm-bookies !default;
 
 $theme-config: map-get($theme-presets, $theme-preset);
 @if $theme-config == null {
-	// $theme-config: map-get($theme-presets, mm-bookies);
+	$theme-config: map-get($theme-presets, mm-bookies);
 	// $theme-config: map-get($theme-presets, shwe-goal);
 	// $theme-config: map-get($theme-presets, phoe-wa-maung);
 }
