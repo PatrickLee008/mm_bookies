@@ -20,9 +20,9 @@ if (process.env.NODE_ENV == 'development') {
 	siteinfo.payUrl = "http://payapi.1x2mmm.net";
 } else {
 	//测试环境
-	siteinfo.payUrl = "http://payapi.1x2mmm.net";
+	// siteinfo.payUrl = "http://payapi.1x2mmm.net";
 	// 测试环境在线客服链接
-	siteinfo.liveChatLink = 'https://chat.wellytalk.com/MDE5ZDA1MDItYzU3MC03YjYyLThkMGItMjQ4YTJjMjQ0ODkwfGQzZjQwNTg3NzExOTAzMjFmOWU4MWM4ZDZmMGM4ZDQ4YjAyNDg5ZjQyM2EyZjgyZjc2NmJmMjI2ZTdlM2MxMzA=';
+	siteinfo.liveChatLink = 'https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=';
 
 }
 
