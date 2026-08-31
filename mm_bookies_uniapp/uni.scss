@@ -2,10 +2,10 @@
 // Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
 // 主题开关：与 siteinfo.js 的 site 同名同步（mmbookies / shwegoal / phoe_wa_maung）
 // 切换站点时改这里 $site，主题会自动跟随，无需再手动注释三行。
-// $site: mm-bookies;
-// $theme-preset: mm-bookies !default;
-$site: shwegoal;
-$theme-preset: shwegoal !default;
+$site: mm-bookies;
+$theme-preset: mm-bookies !default;
+// $site: shwegoal;
+// $theme-preset: shwegoal !default;
 // $site: phoe_wa_maung;
 // $theme-preset: phoe_wa_maung !default;
 
