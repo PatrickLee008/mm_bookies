@@ -42,7 +42,9 @@
 	--theme-icon-primary: #{$theme-primary-value};
 	--theme-icon-secondary: #{$theme-secondary-value};
 	--theme-icon-on-primary: #{$text-color-inverse};
+	// #ifndef APP-PLUS
 	--theme-home-background-image: #{$theme-home-background};
+	// #endif
 	--theme-home-background-color: #{$theme-page-start};
 	--theme-home-background-position: center;
 	--theme-home-background-size: cover;
@@ -62,7 +64,9 @@
 	--theme-register-background-position: center;
 	--theme-register-background-size: cover;
 	--theme-register-background-repeat: no-repeat;
+	// #ifndef APP-PLUS
 	--theme-header-background-image: #{$theme-header-background};
+	// #endif
 	--theme-header-background-color: #{$theme-header-background-color};
 	--theme-header-background-position: center top;
 	--theme-header-background-size: 100% 552px;
@@ -73,17 +77,23 @@
 	--theme-page-background-position: center;
 	--theme-page-background-size: cover;
 	--theme-page-background-repeat: no-repeat;
+	// #ifndef APP-PLUS
 	--theme-no-header-background-image: #{$theme-no-header-background};
+	// #endif
 	--theme-no-header-background-color: #{$theme-page-start};
 	--theme-no-header-background-position: center;
 	--theme-no-header-background-size: cover;
 	--theme-no-header-background-repeat: no-repeat;
+	// #ifndef APP-PLUS
 	--theme-with-header-background-image: #{$theme-with-header-background};
+	// #endif
 	--theme-with-header-background-color: #{$theme-with-header-background-color};
 	--theme-with-header-background-position: center;
 	--theme-with-header-background-size: cover;
 	--theme-with-header-background-repeat: no-repeat;
+	// #ifndef APP-PLUS
 	--theme-app-background-image: #{$theme-app-background};
+	// #endif
 	--theme-app-background-color: #{$theme-app-background-color};
 	--theme-app-background-position: center;
 	--theme-app-background-size: cover;

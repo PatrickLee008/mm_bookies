@@ -207,25 +207,6 @@
 			</view>
 		</view>
 
-		<!-- Theme 测试弹窗 -->
-		<view class="modal-overlay" v-if="themeModalVisible" @click="hideThemeModal">
-			<view class="modal-content theme-modal" @click.stop="">
-				<view class="modal-header">
-					<text class="modal-title">{{ $t('theme_test') }}</text>
-					<text class="modal-close" @click="hideThemeModal">✕</text>
-				</view>
-				<view class="modal-body">
-					<view v-for="theme in themeOptions" :key="theme.value" class="language-item"
-						@click="selectTheme(theme.value)">
-						<text class="language-label">{{ theme.label }}</text>
-						<view class="radio-circle" :class="{ 'radio-selected': selectedTheme === theme.value }">
-							<view class="radio-dot" v-if="selectedTheme === theme.value"></view>
-						</view>
-					</view>
-				</view>
-			</view>
-		</view>
-
 		<!-- Customer Support 弹窗 -->
 		<view class="modal-overlay" v-if="customerSupportModalVisible" @click="hideCustomerSupportModal">
 			<view class="modal-content support-modal" @click.stop="">
@@ -366,7 +347,6 @@
 	import CustomerService from '@/components/common/customer-service.vue'
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
-	import themeManager from '@/utils/theme/manager.js'
 
 	export default {
 		components: {
@@ -519,18 +499,6 @@
 
 				// from tangjq--- 语言选择器
 				selectedLanguage: uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm',
-				themeModalVisible: false,
-				selectedTheme: uni.getStorageSync('frontend_theme_preset'),
-				themeOptions: [{
-					value: 'mm-bookies',
-					label: 'MM Bookies',
-				}, {
-					value: 'shwe-goal',
-					label: 'Shwe Goal',
-				}, {
-					value: 'phoe-wa-maung',
-					label: 'Phoe Wa Maung',
-				}],
 
 				// from tangjq--- Change Password 弹窗相关变量
 				passwordChangeModalVisible: false,
@@ -847,18 +815,6 @@
 					})
 				}, 300)
 			},
-			showThemeModal() {
-				this.themeModalVisible = true
-			},
-			hideThemeModal() {
-				this.themeModalVisible = false
-			},
-			selectTheme(theme) {
-				themeManager.applyPreset(theme)
-				this.selectedTheme = theme
-				this.hideThemeModal()
-			},
-
 			// from tangjq--- Customer Support弹窗方法
 			showCustomerSupportModal() {
 				this.customerSupportModalVisible = true
