@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from app_server import app, db, auth, app_opt
 from app_server.model.AppAgentModel import AppAgent
 from app_server.model.AppMemberModel import AppMember
@@ -453,7 +454,8 @@ def add_app_user():
             response = jsonify({'message': "Phone number format error"})
             response.status_code = 400
             return response
-        old_user = AppMember.query.filter_by(phone=phone, del_flag=0).first()
+        # 悲观锁：并发注册时锁定该 phone 的间隙/记录，防止两个请求同时通过检查导致重复账号
+        old_user = AppMember.query.filter_by(phone=phone, del_flag=0).with_for_update().first()
         if old_user:
             response = jsonify(
                 {'message': "The phone number already exists. Please register with a different phone number"})
@@ -635,6 +637,14 @@ def add_app_user():
             app.logger.warning(f"Failed to add behavior log: {str(e)}")
 
         return jsonify({'message': "add successful."})
+    except IntegrityError as e:
+        # 数据库唯一约束兜底：并发下重复的 username/phone 触发唯一键冲突，回滚并返回友好提示
+        db.session.rollback()
+        app.logger.warning(f"Register uniqueness conflict, user not saved: {e}")
+        response = jsonify(
+            {'message': "The phone number already exists. Please register with a different phone number"})
+        response.status_code = 409
+        return response
     except Exception as e:
         print("add user error:", e)
     response = jsonify({'message': "System or Technical Error"})
