@@ -210,7 +210,8 @@
 			},
 			formatAmount(amount) {
 				if (!amount) return '0';
-				return new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+				// App 端 JS 引擎无 Intl，手动加千分号
+				return String(Math.round(Number(amount))).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 			},
 			loadInviteStats() {
 				var _this = this;

@@ -25,9 +25,9 @@ if (process.env.NODE_ENV == 'development') {
 	siteinfo.liveChatLink = 'https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=';
 	
 	//SHWEGOAL
-	siteinfo.apiUrl = "https://m.shwegoal.net/api";
-	siteinfo.imgUrl = "https://m.shwegoal.net/img";
-	siteinfo.wsUrl = "wss://ag.shwegoal.net";
+	// siteinfo.apiUrl = "https://m.shwegoal.net/api";
+	// siteinfo.imgUrl = "https://m.shwegoal.net/img";
+	// siteinfo.wsUrl = "wss://ag.shwegoal.net";
 }
 
 module.exports = siteinfo;
