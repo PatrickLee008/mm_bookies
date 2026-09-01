@@ -641,21 +641,10 @@
 
 				// 将中国时间转换为缅甸时间（减去1.5小时）
 				const chinaDate = new Date(createTime);
+				if (isNaN(chinaDate.getTime())) return '';
 				const myanmarTime = new Date(chinaDate.getTime() - (1.5 * 60 * 60 * 1000));
 
-				const options = {
-					weekday: 'long',
-					day: '2-digit',
-					month: 'short',
-					year: 'numeric',
-					hour: '2-digit',
-					minute: '2-digit',
-					hour12: true,
-					timeZone: 'Asia/Yangon' // 使用缅甸时区
-				};
-
-				const formattedDate = myanmarTime.toLocaleDateString('en-US', options);
-				return `Due by ${formattedDate}`;
+				return `Due by ${this.$toolbox.formatDateTime(myanmarTime)}`;
 			},
 		}
 	};

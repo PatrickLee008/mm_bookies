@@ -2,7 +2,7 @@
     "name" : "MM Bookies",
     "appid" : "__UNI__A9409C8",
     "description" : "",
-    "versionName" : "1.0.6",
+    "versionName" : "1.0.7",
     "versionCode" : 21,
     "transformPx" : false,
     "sassImplementationName" : "node-sass",

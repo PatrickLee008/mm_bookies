@@ -300,13 +300,7 @@
 				}
 			},
 			formatDate(dateString) {
-				if (!dateString) return '';
-				const date = new Date(String(dateString).replace(/-/g, '/'));
-				if (isNaN(date.getTime())) return String(dateString);
-				const day = String(date.getDate()).padStart(2, '0');
-				const month = date.toLocaleString('en', { month: 'short' });
-				const year = date.getFullYear();
-				return `${day} ${month} ${year}`;
+				return this.$toolbox.formatDate(dateString);
 			},
 		}
 	}

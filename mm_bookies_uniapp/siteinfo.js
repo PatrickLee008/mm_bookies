@@ -8,7 +8,7 @@ var siteinfo = {
 	"site": "mmbookies",
 	// "site": "shwegoal",
 	// "site": "phoe_wa_maung",
-	"version": 'v1.0.6',
+	"version": 'v1.0.7',
 	"tenant_id": "10000",
 	"awcImgUrl": "https://tttuat.apihub55.com", //awc图片前缀（各站点共用）
 };
@@ -26,10 +26,10 @@ var SITES = {
 		"wsUrl": "wss://ag.shwegoal.net",
 	},
 	phoe_wa_maung: {
-		// 暂无独立地址，回退 mmbookies
-		"apiUrl": "http://m.mmbookies.com/api", //后端接口
-		"imgUrl": "http://m.mmbookies.com/img", //java后端图片前缀中心
-		"wsUrl": "wss://ag.mmbookies.com", //WebSocket服务器
+		// 暂无独立地址，复用 mmbookies 的地址
+		"apiUrl": "https://m.pwmaung.com/api",
+		"imgUrl": "http://m.pwmaung.com/img",
+		"wsUrl": "wss://ag.pwmaung.com",
 	}
 };
 // 应用所选站点的基础地址（未知站点回退 mmbookies）
@@ -46,12 +46,12 @@ if (process.env.NODE_ENV == 'development') {
 	// siteinfo.apiUrl = "http://m.1x2mmm.net/api";
 	// siteinfo.apiUrl = "http://m.onex2.com/api";
 	// siteinfo.imgUrl = "http://m.1x2mmm.net/img"; //java后端图片前缀
-	siteinfo.payUrl = "http://payapi.1x2mmm.net";
+	// siteinfo.payUrl = "http://payapi.1x2mmm.net";
 } else {
 	//测试环境在线客服链接（与正式相同，保留原分支语义）
 	// siteinfo.payUrl = "http://payapi.1x2mmm.net";
-	siteinfo.liveChatLink =
-		'https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=';
+	// siteinfo.liveChatLink =
+	// 	'https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=';
 }
 
 module.exports = siteinfo;

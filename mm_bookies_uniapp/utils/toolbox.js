@@ -92,6 +92,49 @@ export const toolbox = {
 			parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 			return sign + parts.join('.')
 		},
+	/** 接收任意日期输入，返回有效 Date；无法解析返回 null
+	 * 兼容：Date 实例 / 数字时间戳(秒或毫秒) / 'YYYY-MM-DD HH:mm:ss' 等字符串
+	 */
+	_parseDate(input) {
+		if (!input) return null;
+		if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+		if (typeof input === 'number') {
+			const d = input > 100000000000 ? new Date(input) : new Date(input * 1000);
+			return isNaN(d.getTime()) ? null : d;
+		}
+		const s = String(input).trim();
+		if (/^\d{10,13}$/.test(s)) {
+			const n = Number(s);
+			const d = n > 100000000000 ? new Date(n) : new Date(n * 1000);
+			return isNaN(d.getTime()) ? null : d;
+		}
+		const d = new Date(s.replace(/-/g, '/'));
+		return isNaN(d.getTime()) ? null : d;
+	},
+	/** 格式化日期为 "DD MMM YYYY"，例如 13 Aug 2026
+	 * 手动取值，避免依赖 Intl（App 端 JSCore 无 Intl，toLocaleString 会退化成完整日期串）
+	 */
+	formatDate(input) {
+		const date = this._parseDate(input);
+		if (!date) return input ? String(input) : '';
+		const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const day = String(date.getDate()).padStart(2, '0');
+		return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+	},
+	/** 格式化日期时间为 "Weekday, MMM DD, YYYY at h:mm AM/PM"，例如 Thursday, Aug 13, 2026 at 2:15 PM
+	 */
+	formatDateTime(input) {
+		const date = this._parseDate(input);
+		if (!date) return '';
+		const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+		const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const h24 = date.getHours();
+		const ampm = h24 >= 12 ? 'PM' : 'AM';
+		const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+		const day = String(date.getDate()).padStart(2, '0');
+		const minute = String(date.getMinutes()).padStart(2, '0');
+		return `${weekdays[date.getDay()]}, ${months[date.getMonth()]} ${day}, ${date.getFullYear()} at ${h12}:${minute} ${ampm}`;
+	},
 	/** 删除对象的某个属性
 	 * @param {Object} obj
 	 * @param {Array}propertiesToRemove
