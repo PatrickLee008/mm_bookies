@@ -2228,7 +2228,7 @@
 	.bet-odds {
 		flex: 0 0 auto;
 		min-width: 80px;
-		text-align: end;
+		text-align: center;
 	}
 
 	.bet-odds text {

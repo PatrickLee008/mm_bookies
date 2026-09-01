@@ -224,7 +224,9 @@
 			},
 		},
 		mounted() {
+			// #ifdef H5
 			this._attachSwipeBackGuard()
+			// #endif
 			this.$nextTick(() => {
 				setTimeout(() => {
 					this.calculateDimensions()
@@ -233,7 +235,9 @@
 			})
 		},
 		beforeDestroy() {
+			// #ifdef H5
 			this._detachSwipeBackGuard()
+			// #endif
 		},
 		methods: {
 			onCaptchaGenerated(data) {
