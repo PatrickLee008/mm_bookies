@@ -613,7 +613,8 @@
 	.promo-label {
 		padding: 3px 12px;
 		border-radius: 12px;
-		background: $color-secondary-light;
+		background: $color-secondary;
+		color: white;
 		font-size: 11px;
 		font-weight: 700;
 	}

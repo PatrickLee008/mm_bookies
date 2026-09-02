@@ -5,6 +5,8 @@ $theme-presets: (
 		primary: #1C667C,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #37BDCC,
+		// 联赛标题栏背景色：指向 primary 或 secondary 对应的颜色。
+		league-bg: primary,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
 		secondary-light: #F1FAFB,
 		// 背景明暗模式：控制无 header 页面上的前景色。
@@ -61,7 +63,7 @@ $theme-presets: (
 	),
 	shwe-goal: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
-		primary: #136201,
+		primary: #043C2F,
 		// 背景明暗模式：控制无 header 页面上的前景色。
 		background: dark,
 		// Header、登录和注册页面的背景明暗模式。
@@ -71,17 +73,19 @@ $theme-presets: (
 		// Header logo 背景圆角。
 		header-logo-radius: 0,
 		// 边框色：当前暂时跟随主色，后续可由后台单独配置。
-		border: #136201,
+		border: #043C2F,
 		// 其他组件边框色：输入框、筛选项和辅助卡片边框。
-		border-other: #A0FF82,
+		border-other:#00FFB9,
 		// 首页顶部区域底部边框色。
-		home-top-border: #A0FF82,
+		home-top-border: #00FFB9,
 		// 副色：充值图标、次级按钮、辅助强调文字。
-		secondary: #3C9320,
+		secondary: #007057,
+		// 联赛标题栏背景色：指向 primary 或 secondary 对应的颜色。
+		league-bg: secondary,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
 		secondary-light: #81BB1D,
 		// 行为强调色：激活标签、选中项和需要突出显示的状态。
-		active: #89D423,
+		active: #FEDD00,
 		// 主要文字：页面标题、重要数据和主要内容文字。
 		text: #136201,
 		// 次要文字：说明文字、占位文字和弱化信息。
@@ -142,6 +146,8 @@ $theme-presets: (
 		home-top-border: #028206,
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #3C9320,
+		// 联赛标题栏背景色：指向 primary 或 secondary 对应的颜色。
+		league-bg: secondary,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
 		secondary-light: #81BB1D,
 		// 行为强调色：激活标签、选中项和需要突出显示的状态。

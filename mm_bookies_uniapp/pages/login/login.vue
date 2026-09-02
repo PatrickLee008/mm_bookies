@@ -81,8 +81,8 @@
 						:placeholder="$t('enter_password')" maxlength="32" @blur="handlePasswordBlur"
 						@input="handlePasswordBlur" />
 					<view class="password-toggle" @click="togglePasswordVisibility">
-						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24"
-							color="rgba(255,255,255,0.8)"></uni-icons>
+						<text class="eye-icon"
+							:class="showPassword ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
 					</view>
 					<view class="error-message" v-if="passwordError">
 						{{$t("L_password_limit")}}
@@ -985,7 +985,7 @@
 
 	.eye-icon {
 		font-size: 36rpx;
-		color: rgba(255, 255, 255, 0.8);
+		color: $color-login-input;
 	}
 
 	.error-message {

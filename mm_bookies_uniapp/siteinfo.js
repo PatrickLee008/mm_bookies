@@ -27,7 +27,7 @@ var SITES = {
 	},
 	phoe_wa_maung: {
 		// 暂无独立地址，复用 mmbookies 的地址
-		"apiUrl": "https://m.pwmaung.com/api",
+		"apiUrl": "http://m.pwmaung.com/api",
 		"imgUrl": "http://m.pwmaung.com/img",
 		"wsUrl": "wss://ag.pwmaung.com",
 	}

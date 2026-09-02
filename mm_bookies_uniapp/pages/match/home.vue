@@ -1976,7 +1976,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		background-color: $color-primary;
+		background-color: var(--theme-league-bg, $color-primary);
 		border-radius: $radius-medium;
 		padding: 7px 12px;
 		margin-bottom: 10px;

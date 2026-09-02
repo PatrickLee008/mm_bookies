@@ -841,8 +841,14 @@
 					} else if (this.promotion_tab_index === 0 && this.promotion_list.length === 0) {
 						this.loadPromotionList()
 					}
-				} else if (type === 'coupon' && this.list.length === 0) {
-					this.getCouponList()
+				} else if (type === 'coupon') {
+					this.$nextTick(() => {
+						// 首次切换时才渲染 tab-selector，需在此测量指示器（mounted 时无该节点）
+						this.initIndicator()
+					})
+					if (this.list.length === 0) {
+						this.getCouponList()
+					}
 				}
 			},
 			handleTabClick(index) {

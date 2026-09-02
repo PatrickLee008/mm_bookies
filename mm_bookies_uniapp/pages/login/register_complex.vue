@@ -97,7 +97,7 @@
 								@focus="password_focused = true" @blur="handle_password_blur"
 								@input="handle_password_blur" />
 							<view class="eye-icon" @tap="toggle_password_visibility">
-								<text :class="show_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
+								<text :class="show_password ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
 							</view>
 						</view>
 						<view class="error-message" v-if="password_error">
@@ -120,7 +120,7 @@
 								@focus="password_focused = true" @blur="handle_password_blur"
 								@input="handle_password_blur" />
 							<view class="eye-icon" @tap="toggle_password_visibility">
-								<text :class="show_password ? 'cuIcon-attentionfill' : 'cuIcon-attention'"></text>
+								<text :class="show_password ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
 							</view>
 						</view>
 						<view class="error-message" v-if="password_error">
@@ -789,6 +789,10 @@
 		margin: 0 0px;
 		border-radius: 9px;
 		box-shadow: 0px 5upx 10px 1px $color-primary;
+	}
+
+	.eye-icon {
+		color: $color-login-input;
 	}
 
 	.bank-horizon {

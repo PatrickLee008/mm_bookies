@@ -373,7 +373,7 @@
 
 	/* 筛选器 */
 	.filter-bar {
-		background: $color-primary;
+		background: var(--theme-league-bg, $color-primary);
 		border-radius: $radius-large;
 		padding: 8px 14px;
 		display: flex;

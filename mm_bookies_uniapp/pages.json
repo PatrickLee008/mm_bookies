@@ -192,6 +192,8 @@
 		},
 		"navigationBarBackgroundColor": "#0081ff",
 		"navigationBarTitleText": "MM Bookies",
+		// "navigationBarTitleText": "Shwe Goal",
+		// "navigationBarTitleText": "Phoe Wa Maung",
 		"navigationStyle": "custom",
 		"navigationBarTextStyle": "white"
 	},
