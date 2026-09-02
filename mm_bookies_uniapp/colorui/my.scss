@@ -43,6 +43,7 @@
 	--theme-icon-secondary: #{$theme-secondary-value};
 	--theme-icon-on-primary: #{$text-color-inverse};
 	--theme-league-bg: #{$theme-league-bg-value};
+	--theme-link-color: #{$theme-link-color-value};
 	// #ifndef APP-PLUS
 	--theme-home-background-image: #{$theme-home-background};
 	// #endif
@@ -413,6 +414,7 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
 		--theme-header-logo-type: #{$preset-header-logo-type};
 		--theme-league-bg: #{$preset-league-bg-value};
+		--theme-link-color: #{map-get($preset-config, link-color)};
 	}
 
 	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {

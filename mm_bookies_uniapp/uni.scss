@@ -77,6 +77,9 @@ $theme-league-bg-value: $theme-primary-value;
 	$theme-league-bg-value: $theme-secondary-value;
 }
 
+// 登录注册 remember me 选择器和注册链接文本的独立链接色。
+$theme-link-color-value: theme-color(link-color);
+
 $theme-background-foreground-value: #FFFFFF;
 $theme-background-foreground-filter-value: brightness(0) invert(1);
 $theme-header-background-foreground-value: #FFFFFF;

@@ -1017,7 +1017,7 @@
 	.custom-switch {
 		width: 32rpx;
 		height: 32rpx;
-		border: 4rpx solid $theme-background-foreground;
+		border: 4rpx solid $theme-link-color-value;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -1034,7 +1034,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $theme-background-foreground;
+		background-color: $theme-link-color-value;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -1108,7 +1108,7 @@
 	}
 
 	.register-link-text {
-		color: $color-secondary;
+		color: $theme-link-color-value;
 		text-decoration: underline;
 	}
 
