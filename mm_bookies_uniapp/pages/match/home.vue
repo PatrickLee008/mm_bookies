@@ -48,7 +48,7 @@
 			@scroll="onScrollHandler" @scrolltoupper="handleHeaderTop">
 			<!-- from tangjq--- 重构联赛和比赛卡片布局，严格按照设计稿 -->
 			<view class="flex-column" v-for="(league,index) in league_list" :key="index"
-				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league)'>
+				v-show='league.checked  && league[`include_${tomorrow?"tomorrow":"today"}`] && isLeagueMatchSearch(league) && league_has_visible_match(league)'>
 				<!-- 联赛标题栏 -->
 				<view class="new-league-header" @click="league.show_match = !league.show_match">
 					<view class="league-left">
@@ -65,7 +65,7 @@
 				<view v-show="league.show_match" class="width-100">
 						<!-- 比赛卡片 -->
 						<view class="new-match-card" v-for="(match,_index) in league.match_list" :key="_index"
-							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match)">
+							v-show="match.checked && match.MATCH_DAY ===(!tomorrow?'today':'tomorrow') && isMatchSearch(match) && get_available_bet_count(match) > 0">
 							<view class="match-summary">
 								<view class="match-teams">
 									<view class="match-logo-row">
@@ -101,8 +101,9 @@
 							<!-- from tangjq--- 投注选项区域：循环显示所有投注选项 -->
 							<view class="new-bet-options">
 								<!-- 循环显示所有投注选项，前2个始终显示，其余根据expanded状态显示 -->
-								<template v-for="(attr, attr_index) in match.ATTR">
-									<view class="bet-row" v-if="!attr.disabled && (attr_index < 2 || match.expanded)"
+								<!-- from tangjq--- 使用过滤掉disabled占位后的可见玩法列表渲染，避免缺失HDP/OU时真实玩法被占位挤到index>=2而无法显示 -->
+								<template v-for="(attr, attr_index) in get_visible_attr(match)">
+									<view class="bet-row" v-if="attr_index < 2 || match.expanded"
 										:key="attr_index">
 										<!-- HDP类型 -->
 										<template
@@ -187,6 +188,31 @@
 													:class="{'bet-btn-selected':attr.guest_selected,}"
 													@click="betClick('guest',index,_index,attr_index,attr)">
 													<text class="bet-text-small">Away</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
+												</view>
+											</view>
+										</template>
+
+										<!-- OE单双类型 -->
+										<template
+											v-else-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_EVEN || attr.MATCH_ATTR_TYPE == bet_type.MIX_EVEN">
+											<view class="bet-type-label">
+												<text>O</text>
+												<text>E</text>
+											</view>
+											<view class="bet-buttons">
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.host_selected,}"
+													@click="betClick('host',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Odd</text>
+													<text class="bet-odds-small"
+														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
+												</view>
+												<view class="bet-btn bet-btn-small"
+													:class="{'bet-btn-selected':attr.guest_selected,}"
+													@click="betClick('guest',index,_index,attr_index,attr)">
+													<text class="bet-text-small">Even</text>
 													<text class="bet-odds-small"
 														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
 												</view>
@@ -355,9 +381,9 @@
 					<!-- from tangjq--- 投注类型详情 -->
 					<view class="bet-detail-row">
 						<text
-							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : 'O/U')}}</text>
+							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : ((bet_type.SINGLE_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'OE' : 'O/U'))}}</text>
 						<text
-							class="bet-odds">{{match_ref.bet_match.sa ? (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
+							class="bet-odds">{{match_ref.bet_match.sa ? ((bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.SINGLE_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
 						<!-- <text
 							class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text> -->
 					</view>
@@ -868,7 +894,8 @@
 			firstVisibleLeagueIndex() {
 				const dayKey = `include_${this.tomorrow ? 'tomorrow' : 'today'}`
 				return this.league_list.findIndex(league =>
-					league.checked && league[dayKey] && this.isLeagueMatchSearch(league)
+					league.checked && league[dayKey] && this.isLeagueMatchSearch(league) && this
+					.league_has_visible_match(league)
 				)
 			},
 			calc_slip_height() {
@@ -1280,7 +1307,9 @@
 					})
 
 					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] :
-						[_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, ]
+						[_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, _this.bet_type
+							.SINGLE_EVEN,
+						]
 					server_matches.forEach(match => {
 						match.click_arr = []
 						match.show_image = true
@@ -1568,6 +1597,23 @@
 				const count = match.ATTR.filter(attr => !attr.disabled).length
 				// console.log('get_available_bet_count:', count, 'for match:', match.MATCH_ID)
 				return count
+			},
+			// from tangjq--- 获取比赛可见的投注选项（过滤掉缺失玩法的disabled占位），用于列表渲染
+			get_visible_attr(match) {
+				if (!match || !match.ATTR) return []
+				return match.ATTR.filter(attr => !attr.disabled)
+			},
+			// from tangjq--- 联赛在当前日期下是否还有可显示的比赛（有玩法且匹配搜索），否则整个联赛不显示
+			// 混合模式下比赛可能只有非MIX玩法（如仅1X2/OE），过滤后无玩法，需连联赛一起隐藏
+			league_has_visible_match(league) {
+				if (!league || !league.match_list) return false
+				const dayKey = this.tomorrow ? 'tomorrow' : 'today'
+				return league.match_list.some(match =>
+					match.checked &&
+					match.MATCH_DAY === dayKey &&
+					this.get_available_bet_count(match) > 0 &&
+					this.isMatchSearch(match)
+				)
 			},
 			// from tangjq--- 切换比赛投注选项的展开/收起状态
 			toggle_match_expand(match) {
