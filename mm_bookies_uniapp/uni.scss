@@ -2,7 +2,7 @@
 // Frontend debug mode: edit the "shwe-goal" palette in common/styles/_theme-presets.scss.
 // 主题开关：与 siteinfo.js 的 site 同名同步（mmbookies / shwegoal / phoe_wa_maung）
 // 切换站点时改这里 $site，主题会自动跟随，无需再手动注释三行。
-$site: mm-bookies;
+$site: mmbookies;
 $theme-preset: mm-bookies !default;
 // $site: shwegoal;
 // $theme-preset: shwegoal !default;
@@ -68,6 +68,17 @@ $theme-primary-value: theme-color(primary);
 $theme-secondary-value: theme-color(secondary);
 $theme-secondary-light-value: theme-color(secondary-light);
 $theme-active-value: theme-color(active);
+
+// 联赛标题栏背景色：preset 里 league-bg 配置为 primary 或 secondary，
+// 这里解析成对应的实际颜色值（默认取 primary）。
+$theme-league-bg-key: theme-color(league-bg);
+$theme-league-bg-value: $theme-primary-value;
+@if $theme-league-bg-key == secondary {
+	$theme-league-bg-value: $theme-secondary-value;
+}
+
+// 登录注册 remember me 选择器和注册链接文本的独立链接色。
+$theme-link-color-value: theme-color(link-color);
 
 $theme-background-foreground-value: #FFFFFF;
 $theme-background-foreground-filter-value: brightness(0) invert(1);

@@ -81,8 +81,8 @@
 						:placeholder="$t('enter_password')" maxlength="32" @blur="handlePasswordBlur"
 						@input="handlePasswordBlur" />
 					<view class="password-toggle" @click="togglePasswordVisibility">
-						<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24"
-							color="rgba(255,255,255,0.8)"></uni-icons>
+						<text class="eye-icon"
+							:class="showPassword ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
 					</view>
 					<view class="error-message" v-if="passwordError">
 						{{$t("L_password_limit")}}
@@ -985,7 +985,7 @@
 
 	.eye-icon {
 		font-size: 36rpx;
-		color: rgba(255, 255, 255, 0.8);
+		color: $color-login-input;
 	}
 
 	.error-message {
@@ -1017,7 +1017,7 @@
 	.custom-switch {
 		width: 32rpx;
 		height: 32rpx;
-		border: 4rpx solid $theme-background-foreground;
+		border: 4rpx solid $theme-link-color-value;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -1034,7 +1034,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $theme-background-foreground;
+		background-color: $theme-link-color-value;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -1108,7 +1108,7 @@
 	}
 
 	.register-link-text {
-		color: $color-secondary;
+		color: $theme-link-color-value;
 		text-decoration: underline;
 	}
 

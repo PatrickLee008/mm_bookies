@@ -70,8 +70,8 @@
 					:placeholder="$t('enter_password')" maxlength="32" @blur="handle_password_blur"
 					@input="handle_password_blur" />
 				<view class="password-toggle" @click="togglePasswordVisibility">
-					<uni-icons :type="showPassword ? 'eye' : 'eye-slash'" size="24"
-						color="rgba(255,255,255,0.8)"></uni-icons>
+					<text class="eye-icon"
+						:class="showPassword ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
 				</view>
 				<view class="error-message" v-if="password_error">
 					{{$t("r_password_limit")}}
@@ -85,9 +85,9 @@
 					v-model="loginInfo.confirm_password" :placeholder="$t('confirm_password')" maxlength="32"
 					@blur="handle_confirm_password_blur" @input="handle_confirm_password_blur" />
 				<view class="password-toggle" @click="toggleConfirmPasswordVisibility">
-					<uni-icons :type="showConfirmPassword ? 'eye' : 'eye-slash'" size="24"
-						color="rgba(255,255,255,0.8)"></uni-icons>
-				</view>
+						<text class="eye-icon"
+							:class="showConfirmPassword ? 'cuIcon-attentionfill' : 'cuIcon-attentionforbidfill'"></text>
+					</view>
 				<view class="error-message" v-if="confirm_password_error">
 					{{$t("those_passwords")}}
 				</view>
@@ -813,7 +813,7 @@
 
 	.eye-icon {
 		font-size: 36rpx;
-		color: rgba(255, 255, 255, 0.8);
+		color: $color-login-input;
 	}
 
 	.error-message {
@@ -845,7 +845,7 @@
 	.custom-switch {
 		width: 40rpx;
 		height: 40rpx;
-		border: 3rpx solid $theme-background-foreground;
+		border: 3rpx solid $theme-link-color-value;
 		border-radius: 50%;
 		position: relative;
 		display: flex;
@@ -861,7 +861,7 @@
 	.switch-dot {
 		width: 0;
 		height: 0;
-		background-color: $theme-background-foreground;
+		background-color: $theme-link-color-value;
 		border-radius: 50%;
 		transition: width 0.2s, height 0.2s;
 	}
@@ -942,7 +942,7 @@
 	}
 
 	.register-link-text {
-		color: $color-secondary;
+		color: $theme-link-color-value;
 		text-decoration: underline;
 	}
 

@@ -42,6 +42,8 @@
 	--theme-icon-primary: #{$theme-primary-value};
 	--theme-icon-secondary: #{$theme-secondary-value};
 	--theme-icon-on-primary: #{$text-color-inverse};
+	--theme-league-bg: #{$theme-league-bg-value};
+	--theme-link-color: #{$theme-link-color-value};
 	// #ifndef APP-PLUS
 	--theme-home-background-image: #{$theme-home-background};
 	// #endif
@@ -401,9 +403,18 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 @each $preset-name, $preset-config in $theme-presets {
 	$preset-header-logo-type: map-get($preset-config, header-logo-type);
 
+	// 解析当前 preset 的联赛标题栏背景色（league-bg 指向 primary 或 secondary）。
+	$preset-league-bg-value: map-get($preset-config, primary);
+	$preset-league-bg-key: map-get($preset-config, league-bg);
+	@if $preset-league-bg-key == secondary {
+		$preset-league-bg-value: map-get($preset-config, secondary);
+	}
+
 	:root[data-theme-preset="#{$preset-name}"] {
 		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
 		--theme-header-logo-type: #{$preset-header-logo-type};
+		--theme-league-bg: #{$preset-league-bg-value};
+		--theme-link-color: #{map-get($preset-config, link-color)};
 	}
 
 	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
