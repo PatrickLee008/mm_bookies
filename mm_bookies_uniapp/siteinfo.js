@@ -8,7 +8,6 @@ var siteinfo = {
 	"site": "mmbookies",
 	// "site": "shwegoal",
 	// "site": "phoe_wa_maung",
-	"version": 'v1.0.8',
 	"tenant_id": "10000",
 	"awcImgUrl": "https://tttuat.apihub55.com", //awc图片前缀（各站点共用）
 };
