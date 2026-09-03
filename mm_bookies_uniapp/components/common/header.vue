@@ -94,7 +94,8 @@
 
 			<view class="header-page-row">
 				<view class="header-back" @click="goBack">
-					<view class="header-back-icon"></view>
+					<image class="header-back-icon header-back-icon-default" src="/static/icon/basic/back.svg" mode="aspectFit"></image>
+					<image class="header-back-icon header-back-icon-shwe-goal" src="/static/icon/basic/back-yellow.svg" mode="aspectFit"></image>
 					<text>{{$t('Back')}}</text>
 				</view>
 				<text class="header-page-title">{{ $t(pageTitle) }}</text>
@@ -478,10 +479,27 @@
 	.header-back-icon {
 		width: 18px;
 		height: 18px;
-		background-color: var(--theme-back-color, #{$theme-back-color-value});
-		/* 返回栏图标颜色跟随 back-color；SVG 作为 mask 形状填充主题色。 */
-		-webkit-mask: url('/static/icon/basic/back.svg') center / contain no-repeat;
-		mask: url('/static/icon/basic/back.svg') center / contain no-repeat;
+		flex-shrink: 0;
+	}
+
+	// 返回栏图标：跟随 uni.scss 的 $theme-preset（编译期），shwe-goal 使用黄色图标，其余站点使用默认图标。
+	// App 端无 document，无法运行时读取 CSS 变量，故用 SCSS 编译期切换显示（与 theme-logo 同思路）。
+	.header-back-icon-default {
+		display: inline-block;
+	}
+
+	.header-back-icon-shwe-goal {
+		display: none;
+	}
+
+	@if "#{$theme-preset}" == "shwe-goal" {
+		.header-back-icon-default {
+			display: none;
+		}
+
+		.header-back-icon-shwe-goal {
+			display: inline-block;
+		}
 	}
 
 	.header-page-title {

@@ -8,7 +8,7 @@ var siteinfo = {
 	"site": "mmbookies",
 	// "site": "shwegoal",
 	// "site": "phoe_wa_maung",
-	"version": 'v1.0.7',
+	"version": 'v1.0.8',
 	"tenant_id": "10000",
 	"awcImgUrl": "https://tttuat.apihub55.com", //awc图片前缀（各站点共用）
 };
@@ -27,8 +27,8 @@ var SITES = {
 	},
 	phoe_wa_maung: {
 		// 暂无独立地址，复用 mmbookies 的地址
-		"apiUrl": "http://m.pwmaung.com/api",
-		"imgUrl": "http://m.pwmaung.com/img",
+		"apiUrl": "https://m.pwmaung.com/api",
+		"imgUrl": "https://m.pwmaung.com/img",
 		"wsUrl": "wss://ag.pwmaung.com",
 	}
 };

@@ -328,7 +328,7 @@ const inlineIcons = {
 				fill: 'currentColor',
 			},
 		}],
-	},
+		},
 }
 
 // Keep the deals path byte-for-byte identical to the source SVG.

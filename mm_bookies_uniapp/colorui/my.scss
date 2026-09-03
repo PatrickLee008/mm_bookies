@@ -414,13 +414,13 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	}
 
 	:root[data-theme-preset="#{$preset-name}"] {
-		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
-		--theme-header-logo-type: #{$preset-header-logo-type};
-		--theme-league-bg: #{$preset-league-bg-value};
-		--theme-link-color: #{map-get($preset-config, link-color)};
-		--theme-login-btn: #{map-get($preset-config, login-btn)};
-		--theme-back-color: #{map-get($preset-config, back-color)};
-	}
+			--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
+			--theme-header-logo-type: #{$preset-header-logo-type};
+			--theme-league-bg: #{$preset-league-bg-value};
+			--theme-link-color: #{map-get($preset-config, link-color)};
+			--theme-login-btn: #{map-get($preset-config, login-btn)};
+			--theme-back-color: #{map-get($preset-config, back-color)};
+		}
 
 	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
 		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {
