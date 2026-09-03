@@ -79,6 +79,10 @@ $theme-league-bg-value: $theme-primary-value;
 
 // 登录注册 remember me 选择器和注册链接文本的独立链接色。
 $theme-link-color-value: theme-color(link-color);
+// 登录注册登录/注册/verify 按钮背景色，以及 back 按钮边框和文本颜色。
+$theme-login-btn-value: theme-color(login-btn);
+// header 返回栏按钮和文本颜色。
+$theme-back-color-value: theme-color(back-color);
 
 $theme-background-foreground-value: #FFFFFF;
 $theme-background-foreground-filter-value: brightness(0) invert(1);

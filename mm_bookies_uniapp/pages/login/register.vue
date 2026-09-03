@@ -873,7 +873,7 @@
 
 	.login-btn {
 		height: 70rpx;
-		background-color: $theme-auth-button-background;
+		background-color: $theme-login-btn-value;
 		border-radius: 25rpx;
 		display: flex;
 		justify-content: center;
@@ -913,12 +913,12 @@
 		height: 70rpx;
 		margin-bottom: 30rpx;
 		margin-top: 30rpx;
-		border: 2rpx solid $theme-background-foreground;
+		border: 2rpx solid $theme-login-btn-value;
 		border-radius: 25rpx;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: $theme-background-foreground;
+		color: $theme-login-btn-value;
 		font-size: 30rpx;
 		font-weight: 600;
 	}

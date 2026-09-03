@@ -23,6 +23,10 @@ $theme-presets: (
 		border-other: none,
 		// 登录注册 remember me 选择器和注册链接文本颜色。
 		link-color: #37BDCC,
+		// 登录注册登录/注册/verify 按钮背景色，以及 back 按钮边框和文本颜色。
+		login-btn: #FFFFFF,
+		// header 返回栏按钮和文本颜色。
+		back-color: #FFFFFF,
 		// 首页顶部区域底部边框色。
 		home-top-border: #44696E,
 		
@@ -80,6 +84,10 @@ $theme-presets: (
 		border-other:#00FFB9,
 		// 登录注册 remember me 选择器和注册链接文本颜色。
 		link-color: #00FFB9,
+		// 登录注册登录/注册/verify 按钮背景色，以及 back 按钮边框和文本颜色。
+		login-btn: #FEDD00,
+		// header 返回栏按钮和文本颜色。
+		back-color: #FEDD00,
 		// 首页顶部区域底部边框色。
 		home-top-border: #00FFB9,
 		// 副色：充值图标、次级按钮、辅助强调文字。
@@ -87,13 +95,13 @@ $theme-presets: (
 		// 联赛标题栏背景色：指向 primary 或 secondary 对应的颜色。
 		league-bg: secondary,
 		// 浅副色：选中态背景、浅色卡片和辅助区域底色。
-		secondary-light: #81BB1D,
+		secondary-light: #89D423,
 		// 行为强调色：激活标签、选中项和需要突出显示的状态。
 		active: #FEDD00,
 		// 主要文字：页面标题、重要数据和主要内容文字。
 		text: #136201,
 		// 次要文字：说明文字、占位文字和弱化信息。
-		text-secondary: #3C9320,
+		text-secondary: #028206,
 		// 通用浅背景：浅色提示区和非主内容背景。
 		bg-light: #17A2B8,
 		// 信息背景：提示区、筛选下拉和浅色内容卡片。
@@ -148,6 +156,10 @@ $theme-presets: (
 		border-other: #99BA4A,
 		// 登录注册 remember me 选择器和注册链接文本颜色。
 		link-color: #3C9320,
+		// 登录注册登录/注册/verify 按钮背景色，以及 back 按钮边框和文本颜色。
+		login-btn: #005E12,
+		// header 返回栏按钮和文本颜色。
+		back-color: #FFFFFF,
 		// 首页顶部区域底部边框色。
 		home-top-border: #028206,
 		// 副色：充值图标、次级按钮、辅助强调文字。

@@ -1,13 +1,15 @@
 <template>
 	<view class="invite-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
-		<view class="invite-header-placeholder" :style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
-		<scroll-view class="user-scroll invite-scroll" scroll-y @scroll="handleHeaderScroll" @scrolltoupper="handleHeaderTop">
+		<view class="invite-header-placeholder"
+			:style="{ height: headerHeight + 'px', transition: 'height 0.3s ease' }"></view>
+		<scroll-view class="user-scroll invite-scroll" scroll-y @scroll="handleHeaderScroll"
+			@scrolltoupper="handleHeaderTop">
 			<view class="dashboard-content">
 				<view class="dashboard-card revenue-card">
 					<text class="card-label">{{ $t('Total Revenue from Invitees') }}</text>
-					<text class="money-value">{{ formatAmount(bonusSummary.total_amount) }}<text
-							class="money-unit"> Ks</text></text>
+					<text class="money-value">{{ formatAmount(bonusSummary.total_amount) }}<text class="money-unit">
+							Ks</text></text>
 				</view>
 
 				<view class="dashboard-card invitation-card">
@@ -48,8 +50,7 @@
 
 				<view class="dashboard-filters">
 					<view class="date-filter-container">
-						<view class="user-filter-pill date-filter"
-							:class="{ 'date-filter-selected': date_filtered }"
+						<view class="user-filter-pill date-filter" :class="{ 'date-filter-selected': date_filtered }"
 							@click="$refs.date_picker.show()">
 							<theme-icon v-if="!date_filtered" name="calendar" class="user-filter-calendar"
 								color="var(--theme-icon-on-primary, #fff)"></theme-icon>
@@ -65,8 +66,8 @@
 					</view>
 					<view class="search-box">
 						<text class="cuIcon-search search-icon"></text>
-						<input type="text" v-model="searchKeyword" :placeholder="$t('search')"
-							@input="onSearch" @confirm="onSearch" />
+						<input type="text" v-model="searchKeyword" :placeholder="$t('search')" @input="onSearch"
+							@confirm="onSearch" />
 					</view>
 				</view>
 
@@ -84,17 +85,20 @@
 							<view class="user-stats-row">
 								<view class="stat-item">
 									<text class="stat-label">{{ $t('Deposit') }}</text>
-									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_recharge : 0) }}<text
+									<text
+										class="stat-value">{{ formatAmount(user.stats ? user.stats.total_recharge : 0) }}<text
 											class="stat-unit"> Ks</text></text>
 								</view>
 								<view class="stat-item">
 									<text class="stat-label">{{ $t('Turnover') }}</text>
-									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.total_bet : 0) }}<text
+									<text
+										class="stat-value">{{ formatAmount(user.stats ? user.stats.total_bet : 0) }}<text
 											class="stat-unit"> Ks</text></text>
 								</view>
 								<view class="stat-item">
 									<text class="stat-label">{{ $t('Net Win') }}</text>
-									<text class="stat-value">{{ formatAmount(user.stats ? user.stats.net_win : 0) }}<text
+									<text
+										class="stat-value">{{ formatAmount(user.stats ? user.stats.net_win : 0) }}<text
 											class="stat-unit"> Ks</text></text>
 								</view>
 							</view>
@@ -106,7 +110,8 @@
 						</view>
 					</view>
 
-					<view v-if="filteredUserList.length === 0" class="flex-column align-center" style="padding: 40px 0;">
+					<view v-if="filteredUserList.length === 0" class="flex-column align-center"
+						style="padding: 40px 0;">
 						<text class="text-gray">{{ $t('No data available for the selected period') }}</text>
 					</view>
 				</view>
@@ -187,7 +192,9 @@
 		},
 		methods: {
 			back_to() {
-				uni.navigateTo({ url: './index' })
+				uni.navigateTo({
+					url: './index'
+				})
 			},
 			onStatusSelect(selectedOption) {
 				this.status_list.forEach((option) => {
@@ -231,7 +238,9 @@
 				const selectedStatus = _this.status_list.find(option => option.checked);
 				if (selectedStatus && selectedStatus.value !== 'all') params.status = selectedStatus.value;
 
-				_this.$http.get('/invitation_v2/invitees-summary', { data: params }, (res) => {
+				_this.$http.get('/invitation_v2/invitees-summary', {
+					data: params
+				}, (res) => {
 					if (res.statusCode == 200 && res.data.code == 200) {
 						_this.inviteesRewardsData = res.data.data;
 						_this.userList = res.data.data.invitee_details || [];
@@ -247,25 +256,36 @@
 				const dateRange = this.getDateRange();
 				if (dateRange.start_date) params.start_date = dateRange.start_date;
 				if (dateRange.end_date) params.end_date = dateRange.end_date;
-				this.$http.get('/invitation_v2/rewards/bonus-type-summary', { data: params }, (res) => {
+				this.$http.get('/invitation_v2/rewards/bonus-type-summary', {
+					data: params
+				}, (res) => {
 					if (res.statusCode == 200 && res.data.code == 200) {
 						this.bonusSummary = (res.data.data && res.data.data.summary) ? res.data.data.summary : {
-							total_amount: 0, bonus_type_breakdown: {}
+							total_amount: 0,
+							bonus_type_breakdown: {}
 						};
 					} else {
-						this.bonusSummary = { total_amount: 0, bonus_type_breakdown: {} };
+						this.bonusSummary = {
+							total_amount: 0,
+							bonus_type_breakdown: {}
+						};
 					}
 				})
 			},
 			getDateRange() {
 				if (this.date_range[0].value !== '0000-00-00' && this.date_range[1].value !== '0000-00-00') {
-					return { start_date: this.date_range[0].value, end_date: this.date_range[1].value };
+					return {
+						start_date: this.date_range[0].value,
+						end_date: this.date_range[1].value
+					};
 				}
 				return {};
 			},
 			onSearch() {
 				if (this.searchTimeout) clearTimeout(this.searchTimeout);
-				this.searchTimeout = setTimeout(() => { this.loadInviteesRewards(); }, 500);
+				this.searchTimeout = setTimeout(() => {
+					this.loadInviteesRewards();
+				}, 500);
 			},
 			filterUserList() {
 				this.filteredUserList = this.userList;
@@ -292,11 +312,16 @@
 			},
 			getStatusBadgeClass(status) {
 				switch (status) {
-					case 'Active': return 'status-active';
-					case 'Inactive': return 'status-inactive';
-					case 'Pending': return 'status-pending';
-					case 'Signed Up': return 'status-signed';
-					default: return 'status-default';
+					case 'Active':
+						return 'status-active';
+					case 'Inactive':
+						return 'status-inactive';
+					case 'Pending':
+						return 'status-pending';
+					case 'Signed Up':
+						return 'status-signed';
+					default:
+						return 'status-default';
 				}
 			},
 			formatDate(dateString) {
@@ -337,8 +362,8 @@
 	}
 
 	.dashboard-card {
-		border: 1px solid #d3e1e3;
-		border-radius: 12px;
+		border: 1px solid $color-border;
+		border-radius: $radius-large;
 		background: #ffffff;
 		box-shadow: 0 2px 2px rgba(18, 63, 70, 0.18);
 		box-sizing: border-box;
@@ -398,7 +423,7 @@
 		align-items: stretch;
 		margin-top: 9px;
 		padding: 13px 6px;
-		border-radius: 12px;
+		border-radius: $radius-small;
 		background: $bg-color-info;
 		box-sizing: border-box;
 	}
@@ -434,7 +459,7 @@
 		margin-top: 19px;
 	}
 
-	.financial-card + .financial-card {
+	.financial-card+.financial-card {
 		margin-top: 19px;
 	}
 
@@ -455,7 +480,7 @@
 	.user-filter-pill,
 	.search-box {
 		height: 56upx;
-		border-radius: 999upx;
+		border-radius: $radius-medium;
 		box-sizing: border-box;
 	}
 
@@ -553,7 +578,7 @@
 		min-width: 0;
 		padding: 0 10px;
 		border: 2px solid $color-primary;
-		border-radius: 999upx;
+		border-radius: $radius-large;
 		color: $color-primary;
 	}
 
@@ -594,7 +619,7 @@
 		overflow: hidden;
 		margin-bottom: 19px;
 		border: 1px solid #d3e1e3;
-		border-radius: 15px;
+		border-radius: $radius-large;
 		background: #ffffff;
 		box-shadow: 0 2px 2px rgba(18, 63, 70, 0.18);
 	}
@@ -647,17 +672,17 @@
 	}
 
 	.status-active {
-		background: $color-primary;
+		background: $color-secondary-light;
 		color: #ffffff;
 	}
 
 	.status-inactive {
-		background: #ff4e4e;
+		background: #D0342C;
 		color: #ffffff;
 	}
 
 	.status-pending {
-		background: #e7f0f2;
+		background: $bg-color-info;
 		color: $color-primary;
 	}
 

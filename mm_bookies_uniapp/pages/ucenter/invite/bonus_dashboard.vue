@@ -184,9 +184,9 @@
 						"data": []
 					}]
 				},
-				color_list: ["#3DB7C7", "#1C6B80", "#75C9D3", "#2F5D62", "#8DB2BD", "#DCECEE"],
-				pieChartOpts: {
-					color: ["#3DB7C7", "#1C6B80", "#75C9D3", "#2F5D62", "#8DB2BD", "#DCECEE"],
+				color_list: [],
+					pieChartOpts: {
+						color: [],
 					padding: [0, 0, 0, 0],
 					dataLabel: false,
 					enableLegend: false,
@@ -249,10 +249,45 @@
 		},
 		onLoad() {
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
+			this.loadThemeColors()
 			this.parse_option_list()
 			this.get_summary()
 		},
 		methods: {
+			/* 从运行时主题 CSS 变量读取饼图五色：primary、secondary、secondary-light、home-top-border、active */
+			loadThemeColors() {
+				const cssVar = (name) => {
+					try {
+						const rootStyle = typeof document !== 'undefined' && document.documentElement
+							? getComputedStyle(document.documentElement)
+							: null;
+						if (rootStyle) {
+							const val = rootStyle.getPropertyValue(name).trim();
+							if (val) return val;
+						}
+					} catch (e) {}
+					// 极端兜底（正常走上方 CSS 变量），使用默认主题色。
+					const fallback = {
+						'--theme-primary': '#1C667C',
+						'--theme-secondary': '#37BDCC',
+						'--theme-secondary-light': '#F1FAFB',
+						'--theme-home-top-border': '#44696E',
+						'--theme-active': '#FFC857',
+					};
+					return fallback[name] || '#1C667C';
+				};
+				const colors = [
+					cssVar('--theme-primary'),
+					cssVar('--theme-secondary'),
+					cssVar('--theme-secondary-light'),
+					cssVar('--theme-home-top-border'),
+					cssVar('--theme-active'),
+				];
+				this.color_list = colors;
+				this.pieChartOpts = Object.assign({}, this.pieChartOpts, {
+					color: colors
+				});
+			},
 			back_to() {
 				uni.navigateTo({
 					url: './index'

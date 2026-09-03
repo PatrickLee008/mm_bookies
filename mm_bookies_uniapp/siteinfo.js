@@ -16,8 +16,8 @@ var siteinfo = {
 // 各站点地址表：apiUrl/imgUrl/wsUrl 随站点切换
 var SITES = {
 	mmbookies: {
-		"apiUrl": "http://m.mmbookies.com/api", //后端接口
-		"imgUrl": "http://m.mmbookies.com/img", //java后端图片前缀中心
+		"apiUrl": "https://m.mmbookies.com/api", //后端接口
+		"imgUrl": "https://m.mmbookies.com/img", //java后端图片前缀中心
 		"wsUrl": "wss://ag.mmbookies.com", //WebSocket服务器
 	},
 	shwegoal: {
