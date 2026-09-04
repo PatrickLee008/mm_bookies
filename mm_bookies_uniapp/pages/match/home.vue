@@ -193,31 +193,6 @@
 												</view>
 											</view>
 										</template>
-
-										<!-- OE单双类型 -->
-										<template
-											v-else-if="attr.MATCH_ATTR_TYPE == bet_type.SINGLE_EVEN || attr.MATCH_ATTR_TYPE == bet_type.MIX_EVEN">
-											<view class="bet-type-label">
-												<text>O</text>
-												<text>E</text>
-											</view>
-											<view class="bet-buttons">
-												<view class="bet-btn bet-btn-small"
-													:class="{'bet-btn-selected':attr.host_selected,}"
-													@click="betClick('host',index,_index,attr_index,attr)">
-													<text class="bet-text-small">Odd</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text>
-												</view>
-												<view class="bet-btn bet-btn-small"
-													:class="{'bet-btn-selected':attr.guest_selected,}"
-													@click="betClick('guest',index,_index,attr_index,attr)">
-													<text class="bet-text-small">Even</text>
-													<text class="bet-odds-small"
-														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS_GUEST)}}</text>
-												</view>
-											</view>
-										</template>
 									</view>
 								</template>
 							</view>
@@ -381,9 +356,9 @@
 					<!-- from tangjq--- 投注类型详情 -->
 					<view class="bet-detail-row">
 						<text
-							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : ((bet_type.SINGLE_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'OE' : 'O/U'))}}</text>
+							class="bet-type">{{match_ref.bet_match.sa && (bet_type.SINGLE_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_BODY == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? 'HDP' : (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? '1X2' : 'O/U')}}</text>
 						<text
-							class="bet-odds">{{match_ref.bet_match.sa ? ((bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.SINGLE_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE || bet_type.MIX_EVEN == match_ref.bet_match.sa.MATCH_ATTR_TYPE) ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
+							class="bet-odds">{{match_ref.bet_match.sa ? (bet_type.SINGLE_WDL == match_ref.bet_match.sa.MATCH_ATTR_TYPE ? (match_ref.bet_match.sa.draw_selected ? match_ref.bet_match.sa.DRAW_ODDS : (match_ref.bet_match.sa.guest_selected ? match_ref.bet_match.sa.ODDS_GUEST : match_ref.bet_match.sa.ODDS)) : calc_real_odds(match_ref.bet_match.sa)) : ''}}</text>
 						<!-- <text
 							class="bet-time">{{match_ref.bet_match.SLIP_DATE && match_ref.bet_match.SLIP_DATE.includes('@') ? match_ref.bet_match.SLIP_DATE.split('@')[1] : ''}}</text> -->
 					</view>
@@ -1307,9 +1282,7 @@
 					})
 
 					let all_attr_type_list = _this.match_ref.mixed ? [_this.bet_type.MIX_BODY, _this.bet_type.MIX_GOAL, ] :
-						[_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, _this.bet_type
-							.SINGLE_EVEN,
-						]
+						[_this.bet_type.SINGLE_BODY, _this.bet_type.SINGLE_GOAL, _this.bet_type.SINGLE_WDL, ]
 					server_matches.forEach(match => {
 						match.click_arr = []
 						match.show_image = true
