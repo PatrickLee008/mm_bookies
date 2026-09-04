@@ -2,8 +2,7 @@
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
 		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
-		<view class="zw-header-wrapper"
-			:class="{ 'header-logged-out': !isLogin, 'header-collapsed': headerCollapsed }"
+		<view class="zw-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': headerCollapsed }"
 			:style="headerHeightStyle">
 			<!-- from tangjq--- 顶部标题区域 -->
 			<view class="header-title-bar" :class="{ 'title-bar-collapsed': headerCollapsed }">
@@ -95,7 +94,8 @@
 
 			<view class="header-page-row">
 				<view class="header-back" @click="goBack">
-					<image src="/static/icon/basic/back.svg" mode="aspectFit"></image>
+					<image class="header-back-icon header-back-icon-default" src="/static/icon/basic/back.svg" mode="aspectFit"></image>
+					<image class="header-back-icon header-back-icon-shwe-goal" src="/static/icon/basic/back-yellow.svg" mode="aspectFit"></image>
 					<text>{{$t('Back')}}</text>
 				</view>
 				<text class="header-page-title">{{ $t(pageTitle) }}</text>
@@ -461,7 +461,7 @@
 		height: 42px;
 		padding: 0 20px;
 		font-size: 14px;
-		color: #ffffff;
+		color: var(--theme-back-color, #{$theme-back-color-value});
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -476,10 +476,30 @@
 		font-weight: 700;
 	}
 
-	.header-back image {
+	.header-back-icon {
 		width: 18px;
 		height: 18px;
-		filter: brightness(0) invert(1);
+		flex-shrink: 0;
+	}
+
+	// 返回栏图标：跟随 uni.scss 的 $theme-preset（编译期），shwe-goal 使用黄色图标，其余站点使用默认图标。
+	// App 端无 document，无法运行时读取 CSS 变量，故用 SCSS 编译期切换显示（与 theme-logo 同思路）。
+	.header-back-icon-default {
+		display: inline-block;
+	}
+
+	.header-back-icon-shwe-goal {
+		display: none;
+	}
+
+	@if "#{$theme-preset}" == "shwe-goal" {
+		.header-back-icon-default {
+			display: none;
+		}
+
+		.header-back-icon-shwe-goal {
+			display: inline-block;
+		}
 	}
 
 	.header-page-title {
@@ -917,7 +937,7 @@
 
 
 	.header-page-title {
-		color: #fff;
+		color: var(--theme-back-color, #{$theme-back-color-value});
 		font-size: 16px;
 	}
 

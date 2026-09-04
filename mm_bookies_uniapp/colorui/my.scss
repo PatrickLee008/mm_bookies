@@ -22,6 +22,7 @@
 	--theme-bg-login-input: #{$theme-bg-login-input-value};
 	--theme-color-login-input: #{$theme-color-login-input-value};
 	--theme-border: #{$theme-border-value};
+        --theme-home-top-border: #{$theme-home-top-border-value};
 	--theme-radius-large: #{$theme-radius-large-value};
 	--theme-radius-medium: #{$theme-radius-medium-value};
 	--theme-radius-small: #{$theme-radius-small-value};
@@ -44,6 +45,8 @@
 	--theme-icon-on-primary: #{$text-color-inverse};
 	--theme-league-bg: #{$theme-league-bg-value};
 	--theme-link-color: #{$theme-link-color-value};
+	--theme-login-btn: #{$theme-login-btn-value};
+	--theme-back-color: #{$theme-back-color-value};
 	// #ifndef APP-PLUS
 	--theme-home-background-image: #{$theme-home-background};
 	// #endif
@@ -411,11 +414,13 @@ $white-list:primary,lprimary,info,lightblue,deepblue,orange,purple,dgrey,ddgrey,
 	}
 
 	:root[data-theme-preset="#{$preset-name}"] {
-		--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
-		--theme-header-logo-type: #{$preset-header-logo-type};
-		--theme-league-bg: #{$preset-league-bg-value};
-		--theme-link-color: #{map-get($preset-config, link-color)};
-	}
+			--theme-home-logo-height: #{map-get($preset-config, home-logo-height)};
+			--theme-header-logo-type: #{$preset-header-logo-type};
+			--theme-league-bg: #{$preset-league-bg-value};
+			--theme-link-color: #{map-get($preset-config, link-color)};
+			--theme-login-btn: #{map-get($preset-config, login-btn)};
+			--theme-back-color: #{map-get($preset-config, back-color)};
+		}
 
 	@if $preset-header-logo-type == "text" or $preset-header-logo-type == text {
 		:root[data-theme-preset="#{$preset-name}"] .theme-logo-header .theme-logo-title {

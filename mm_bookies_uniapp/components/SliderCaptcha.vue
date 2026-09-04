@@ -22,9 +22,8 @@
 			<view class="slider-progress" :class="{ 'progress-animating': isSnapping || isResetting }"
 				:style="{ width: trackProgressWidth + 'px' }"></view>
 			<view class="slider-button" :class="buttonClass" :style="{ left: trackSliderPosition + 'px' }"
-				@touchstart="onTouchStart" @touchmove.stop="onTouchMove"
-				@touchend="onTouchEnd" @touchcancel="onTouchEnd"
-				@mousedown="onMouseDown">
+				@touchstart="onTouchStart" @touchmove.stop="onTouchMove" @touchend="onTouchEnd"
+				@touchcancel="onTouchEnd" @mousedown="onMouseDown">
 				<view v-if="!isSuccess" class="slider-grip">
 					<view class="grip-bar"></view>
 					<view class="grip-bar"></view>
@@ -57,7 +56,8 @@
 			plus.io.resolveLocalFileSystemURL(localUrl, (entry) => {
 				entry.file((file) => {
 					const reader = new plus.io.FileReader()
-					reader.onload = (event) => onLoad(event && event.target ? event.target.result : reader.result)
+					reader.onload = (event) => onLoad(event && event.target ? event.target.result : reader
+						.result)
 					reader.onerror = onError
 					reader.readAsDataURL(file)
 				}, onError)
@@ -255,7 +255,12 @@
 					const t = e.target
 					return !!(t && t.closest && t.closest('.slider-captcha-container'))
 				}
-				const state = { startX: 0, startY: 0, inside: false, horizontal: false }
+				const state = {
+					startX: 0,
+					startY: 0,
+					inside: false,
+					horizontal: false
+				}
 				this._swipeGuardStart = (e) => {
 					state.horizontal = false
 					state.inside = e.touches.length === 1 && inCaptcha(e)
@@ -285,15 +290,25 @@
 					e.preventDefault()
 				}
 				// 捕获阶段监听：滑块按钮 @touchmove.stop 只能阻断冒泡，捕获先于其执行
-				document.addEventListener('touchstart', this._swipeGuardStart, { passive: true, capture: true })
-				document.addEventListener('touchmove', this._swipeGuardMove, { passive: false, capture: true })
+				document.addEventListener('touchstart', this._swipeGuardStart, {
+					passive: true,
+					capture: true
+				})
+				document.addEventListener('touchmove', this._swipeGuardMove, {
+					passive: false,
+					capture: true
+				})
 			},
 			_detachSwipeBackGuard() {
 				if (this._swipeGuardStart) {
-					document.removeEventListener('touchstart', this._swipeGuardStart, { capture: true })
+					document.removeEventListener('touchstart', this._swipeGuardStart, {
+						capture: true
+					})
 				}
 				if (this._swipeGuardMove) {
-					document.removeEventListener('touchmove', this._swipeGuardMove, { capture: true })
+					document.removeEventListener('touchmove', this._swipeGuardMove, {
+						capture: true
+					})
 				}
 				this._swipeGuardStart = null
 				this._swipeGuardMove = null
@@ -499,7 +514,7 @@
 		width: 100%;
 		height: 44px;
 		margin-top: 12px;
-		background: rgba(3, 44, 45, 0.72);
+		background: $bg-color-info;
 		border: 1px solid rgba(136, 224, 229, 0.12);
 		border-radius: 22px;
 		overflow: hidden;
@@ -589,7 +604,7 @@
 		align-items: center;
 		justify-content: center;
 		height: 44px;
-		color: rgba(255, 255, 255, 0.28);
+		color: $color-primary;
 		font-size: 12px;
 		font-weight: 500;
 		letter-spacing: 2.5px;

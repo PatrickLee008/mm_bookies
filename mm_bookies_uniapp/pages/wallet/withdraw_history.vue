@@ -147,7 +147,8 @@ async loadRecords() {
 				const para = {
 					page: this.page,
 					limit: this.pageSize,
-					// from tangjq--- 去掉 type=Withdraw 限制，显示所有交易类型（Deposit/Withdraw 都会显示）
+					// 提现记录页只展示提现类型：type=Withdraw 让后端仅查 WithDraw 表（见 /withdraw/get 的 get_wallet_list）
+					type: 'Withdraw',
 					...filterParams
 				};
 

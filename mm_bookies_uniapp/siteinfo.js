@@ -8,7 +8,6 @@ var siteinfo = {
 	"site": "mmbookies",
 	// "site": "shwegoal",
 	// "site": "phoe_wa_maung",
-	"version": 'v1.0.7',
 	"tenant_id": "10000",
 	"awcImgUrl": "https://tttuat.apihub55.com", //awc图片前缀（各站点共用）
 };
@@ -16,8 +15,8 @@ var siteinfo = {
 // 各站点地址表：apiUrl/imgUrl/wsUrl 随站点切换
 var SITES = {
 	mmbookies: {
-		"apiUrl": "http://m.mmbookies.com/api", //后端接口
-		"imgUrl": "http://m.mmbookies.com/img", //java后端图片前缀中心
+		"apiUrl": "https://m.mmbookies.com/api", //后端接口
+		"imgUrl": "https://m.mmbookies.com/img", //java后端图片前缀中心
 		"wsUrl": "wss://ag.mmbookies.com", //WebSocket服务器
 		"payUrl": "https://pay.okbetmm.com", //支付中心
 		"liveChatLink": "https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=", //wellytalk
@@ -31,8 +30,8 @@ var SITES = {
 	},
 	phoe_wa_maung: {
 		// 暂无独立地址，复用 mmbookies 的地址
-		"apiUrl": "http://m.pwmaung.com/api",
-		"imgUrl": "http://m.pwmaung.com/img",
+		"apiUrl": "https://m.pwmaung.com/api",
+		"imgUrl": "https://m.pwmaung.com/img",
 		"wsUrl": "wss://ag.pwmaung.com",
 		"payUrl": "https://pay.okbetmm.com", //支付中心
 		"liveChatLink": "https://chat.wellytalk.com/MDFhMDQyMjgtZjQ2ZC03MGFlLWJjNjUtZTYxMmE5MmVmM2E4fGVmNTc2NGI0YTBiMzMyYzQ5YTI1YTJmNGYzMmEwYjQ4NGEwNTQ0YjQzYmI0ZTNkZjBlNzcyOGFjOWQ3NWQ0NzQ=", //wellytalk
