@@ -163,7 +163,15 @@
 <script>
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import siteinfo from '@/siteinfo'
 	let intervalSearch;
+
+	// 支付码合成背景图：按站点（与 uni.scss 的 $site 同步切换）选择不同的底图
+	const PAY_BG = {
+		mmbookies: '/static/image/pay/payment-qrcode-bg.jpg',
+		shwegoal: '/static/image/pay/swg-bg.jpg',
+		phoe_wa_maung: '/static/image/pay/pwm-bg.jpg'
+	};
 	export default {
 		components: {
 			tkiQrcode
@@ -436,8 +444,9 @@
 			 */
 			async compositePaymentImage() {
 				return new Promise((resolve, reject) => {
-					// 先加载底图获取其实际尺寸
-					this.loadImage('/static/image/pay/payment-qrcode-bg.jpg').then((bgImage) => {
+					// 先加载底图获取其实际尺寸（按当前主题站点选择）
+					const bgPath = PAY_BG[siteinfo.site] || PAY_BG.mmbookies;
+					this.loadImage(bgPath).then((bgImage) => {
 						const ctx = uni.createCanvasContext('paymentCanvas', this);
 
 						// 使用底图的实际尺寸作为Canvas尺寸
