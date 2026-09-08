@@ -226,7 +226,11 @@
 		<view class="parlay-detail-modal" v-if="show_parlay_modal">
 			<view class="parlay-detail-mask" @click="close_parlay_detail"></view>
 			<view class="parlay-detail-dialog" @click.stop="">
-				<text class="parlay-detail-title"></text>
+				<view class="parlay-detail-title" @click.stop="">
+					<image class="parlay-detail-title-logo" src="/static/theme/test-old/phoewaa_maung_logo.png"
+						mode="heightFix"></image>
+					<text class="parlay-detail-title-text"></text>
+				</view>
 
 				<scroll-view scroll-y class="parlay-detail-scroll" v-if="parlay_modal_order">
 					<view class="parlay-match-detail-card"
@@ -1891,17 +1895,39 @@
 	}
 
 	.parlay-detail-title {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 		padding: 11px 10px 9px;
+		min-height: 18px;
+	}
+
+	.parlay-detail-title-text {
 		color: $color-primary;
 		font-size: 18px;
 		font-weight: 700;
 		text-align: center;
 	}
 
-	.parlay-detail-title::after {
+	.parlay-detail-title-text::after {
 		content: var(--theme-title, "#{$theme-title-value}");
+	}
+
+	// 图标切换：slip-title 为 logo 时显示站点 logo（32px heightFix），隐藏文字标题。
+	.parlay-detail-title-logo {
+		display: none;
+		height: 32px;
+	}
+
+	@if "#{$theme-slip-title-value}" == "logo" {
+		.parlay-detail-title-logo {
+			display: block;
+		}
+
+		.parlay-detail-title-text {
+			display: none;
+		}
 	}
 
 	.parlay-detail-scroll {

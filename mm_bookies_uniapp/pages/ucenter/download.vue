@@ -56,34 +56,32 @@
 					url: '/pages/ucenter/home'
 				})
 			},
-			// 判断是否为 iOS 设备
+			// 判断是否为 iOS 设备（H5 用 UA，App 端用运行时 platform）
 			isIOSDevice() {
+				let isIOS = false;
 				// #ifdef H5
 				const userAgent = navigator.userAgent.toLowerCase();
-				return /iphone|ipad|ipod/.test(userAgent);
+				isIOS = /iphone|ipad|ipod/.test(userAgent);
 				// #endif
-
 				// #ifndef H5
-				// #ifdef ios / #ifdef android 小写值不是有效条件编译，App 端改为运行时判断
-				return uni.getSystemInfoSync().platform === 'ios';
+				isIOS = uni.getSystemInfoSync().platform === 'ios';
 				// #endif
+				return isIOS;
 			},
 
 			download() {
 				let _this = this
-				//#ifdef APP-PLUS
+				// #ifdef APP-PLUS
 				plus.runtime.openURL(_this.download_url, function(err) {
 					console.warn('[Download] openURL failed, fallback to location.href:', JSON.stringify(err));
 					// @ts-ignore
 					window.location.href = _this.download_url;
 				});
-				//#endif
+				// #endif
 
-				//#ifdef H5
-				// debugger
+				// #ifdef H5
 				window.location.href = _this.download_url
-				// window.open(url);
-				//#endif
+				// #endif
 			},
 			async loadDownloadUrl() {
 				// iOS 设备使用后台 "App iOS URL"（appInfo.appIosUrl），其他设备使用 APK 链接

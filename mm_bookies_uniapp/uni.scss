@@ -85,6 +85,11 @@ $theme-login-btn-value: theme-color(login-btn);
 $theme-back-color-value: theme-color(back-color);
 // 滑动验证码背景图路径（无此配置时保持为空，组件回退到默认背景）。
 $theme-slider-bg-value: theme-color(slider-bg);
+// Orders 页 parlay 详情弹窗标题模式：logo 显示站点 logo，text 显示文字（默认 text）。
+$theme-slip-title-value: theme-color(slip-title);
+@if $theme-slip-title-value == null {
+	$theme-slip-title-value: text;
+}
 
 $theme-background-foreground-value: #FFFFFF;
 $theme-background-foreground-filter-value: brightness(0) invert(1);

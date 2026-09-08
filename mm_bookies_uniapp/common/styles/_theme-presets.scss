@@ -212,6 +212,8 @@ $theme-presets: (
 		header-background-image: "/static/theme/header-bg-white.png",
 		// 品牌 logo：首页、登录注册和 Header 使用 Phoewaa Maung logo。
 		logo-image: "/static/theme/test-old/phoewaa_maung_logo.png",
+		// Orders 页 parlay 详情弹窗标题：logo 显示站点 logo，text 显示文字标题（默认 text）。
+		slip-title: logo,
 		// Header logo 类型：文字或图片。
 		header-logo-type: image,
 		// 首页、登录和注册页 logo 高度；logo 图片使用 heightFix 模式保持比例。
