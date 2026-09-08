@@ -1,6 +1,8 @@
 <template>
 	<view class="home-page theme-bg-no-header">
 		<global-notice ref="globalNotice"></global-notice>
+		<!-- 实时消息弹窗提醒（全局挂载点） -->
+		<message-notification></message-notification>
 		<scroll-view scroll-y class="home-scroll">
 			<view class="home-top">
 				<theme-logo variant="page" height="var(--theme-home-logo-height)" class="home-logo"></theme-logo>

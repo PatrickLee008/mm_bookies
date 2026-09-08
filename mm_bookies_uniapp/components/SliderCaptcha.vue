@@ -119,8 +119,8 @@
 					reportImageError(ownerInstance)
 				}
 
-				// 从主题预设读取滑动验证码背景图：优先 --theme-slider-bg，缺省回退到默认背景。
-				let bgPath = this.getThemeSliderBackground() || '/static/icon/login/verify-bg.png'
+				// 滑动验证码背景图路径来源于主题预设（--theme-slider-bg）。
+				let bgPath = this.getThemeSliderBackground()
 				loadImageAsDataUrl(bgPath, (dataUrl) => {
 					sourceImage.src = dataUrl
 				}, () => reportImageError(ownerInstance))

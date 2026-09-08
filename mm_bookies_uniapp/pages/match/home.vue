@@ -2615,7 +2615,7 @@
 		align-items: center;
 		margin-bottom: 10px;
 		padding-bottom: 10px;
-		border-bottom: 1px solid $color-border-other;
+		border-bottom: 1px solid $color-border;
 	}
 
 	.team-section {

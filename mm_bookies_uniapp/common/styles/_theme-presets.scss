@@ -3,6 +3,8 @@ $theme-presets: (
 	mm-bookies: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #1C667C,
+		// 滑动验证码背景图路径。
+		slider-bg: "/static/icon/login/verify-bg.png",
 		// 副色：充值图标、次级按钮、辅助强调文字。
 		secondary: #37BDCC,
 		// 联赛标题栏背景色：指向 primary 或 secondary 对应的颜色。
@@ -148,6 +150,8 @@ $theme-presets: (
 	phoe-wa-maung: (
 		// 主色：主按钮、主要文字、边框和单色业务图标。
 		primary: #005E12,
+		// 滑动验证码背景图路径。
+		slider-bg: "/static/theme/phoe-wa-maung-slider.jpg",
 		// 背景明暗模式：控制无 header 页面上的前景色。
 		background: light,
 		// Header、登录和注册页面的背景明暗模式。
