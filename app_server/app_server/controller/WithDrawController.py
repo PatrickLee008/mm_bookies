@@ -135,12 +135,10 @@ def get_wallet_list():
     # 优化3: 根据类型选择查询策略
     if type_filter == "Withdraw":
         # 单表查询 - 最快
-        # 过滤掉 pay_type 为 ADJUSTMENT 的数据
+        # 不按 pay_type 过滤：adjustment 与提现同表，一并统计展示
         union_query = apply_filters(build_base_query(WithDraw, "Withdraw"), WithDraw)
-        union_query = union_query.filter(or_(WithDraw.pay_type != 'ADJUSTMENT', WithDraw.pay_type.is_(None)))
         # 保存无日期过滤的查询用于fallback
         union_query_no_date = apply_filters_no_date(build_base_query(WithDraw, "Withdraw"), WithDraw)
-        union_query_no_date = union_query_no_date.filter(or_(WithDraw.pay_type != 'ADJUSTMENT', WithDraw.pay_type.is_(None)))
 
     elif type_filter == "Deposit":
         # 单表查询 - 最快

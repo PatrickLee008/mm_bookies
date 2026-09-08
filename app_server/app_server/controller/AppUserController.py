@@ -1,8 +1,10 @@
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from app_server import app, db, auth, app_opt
 from app_server.model.AppAgentModel import AppAgent
 from app_server.model.AppMemberModel import AppMember
 from app_server.model.AppMemberBankModel import AppMemberBank
+from app_server.model.WithDrawModel import WithDraw
 from flask import g, request, jsonify, Blueprint
 
 from app_server.model.SysBisDictModel import SysBisDict
@@ -354,6 +356,12 @@ def get_user_info():
         if not user:
             return Kits.rt_error("User does not exist.")
         user_info = user.to_dict()
+        # 提现金额(Cash Out)仅统计成功提现，排除 Pending/Rejected；用户栏不区分 adjustment，统计全部成功提现
+        success_withdraw = db.session.query(func.sum(WithDraw.amount)).filter(
+            WithDraw.mb_id == mb_id,
+            WithDraw.status == 'Success'
+        ).scalar() or 0
+        user_info['total_withdraw'] = format(int(success_withdraw), ",")
         # 获取用户默认卡
         bank_card = AppMemberBank.query.filter_by(mb_id=mb_id, is_default=1).first()
         user_info['bank_card'] = bank_card.to_dict() if bank_card else None
