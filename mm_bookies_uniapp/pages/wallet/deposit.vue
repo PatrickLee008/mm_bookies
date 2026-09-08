@@ -2,7 +2,7 @@
 	<view class="deposit-component">
 		<global-notice ref="globalNotice"></global-notice>
 		<scroll-view scroll-y class="deposit-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit">
-			<!-- from tangjq--- 银行卡列表界面（默认显示） -->
+			<!-- 银行卡列表界面（默认显示） -->
 			<view class="bank-list-container" v-if="current_progress==0">
 				<!-- 银行卡列表 -->
 				<view class="bank-card-item" v-for="(card,index) in card_list" :key="index">
@@ -23,7 +23,7 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- 顶栏：AUTO/MANUAL 切换 -->
+			<!-- 顶栏：AUTO/MANUAL 切换 -->
 			<view class="title-tab justify-around" style="box-shadow: none;padding: 10px 0;" v-if="current_progress>0">
 				<view class="register-btn" :style="`width: ${90/charge_way.length}%`"
 					:class="item.checked?'mybg-lprimary':'mycolor-primary route-shadow'"
@@ -32,7 +32,7 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- Step 0: 银行选择和金额输入（隐藏，改为显示银行卡列表） -->
+			<!-- Step 0: 银行选择和金额输入（隐藏，改为显示银行卡列表） -->
 			<view v-if="false">
 				<!-- 银行选择  -->
 				<view class="flex-column justify-center padding-top-sm mycolor-primary">
@@ -87,7 +87,7 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- Step 1 AUTO: 银行卡选择 -->
+			<!-- Step 1 AUTO: 银行卡选择 -->
 			<view class="" style="margin-left: 10%;width: 80%;" v-if="current_progress==1 && chargeForm.charge_way==0">
 				<input class="search-rec" style="" :placeholder="$t('search')"
 					placeholder-class="cuIcon-search mycolor-info" v-model="card_search" @input="clean_acc" />
@@ -160,7 +160,7 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- Step 1 MANUAL: 手动充值 -->
+			<!-- Step 1 MANUAL: 手动充值 -->
 			<view v-if="current_progress==1 && chargeForm.charge_way==1">
 				<!-- 收款信息 -->
 				<view class="padding">
@@ -221,13 +221,13 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- 提交按钮 -->
+			<!-- 提交按钮 -->
 			<!-- <button class="login-btn" style="width: 70%;margin: 20px 15% 10px 15%;" :disabled="confirmDisabled" v-if="(!chargeForm.charge_way&&current_progress!=1 ) || chargeForm.charge_way" @click="next_or_submit()">
 				{{language.submit}}</button> -->
 			<view class="padding-xs"></view>
 		</scroll-view>
 
-		<!-- from tangjq--- 添加/编辑银行卡 Modal（新设计） -->
+		<!-- 添加/编辑银行卡 Modal（新设计） -->
 		<view class="cu-modal" style="z-index: 9999;" :class="modalName=='add_modal'?'show':''">
 			<view class="add-bank-dialog">
 				<!-- 标题栏 -->
@@ -274,7 +274,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- 充值弹窗（Auto Deposit） -->
+		<!-- 充值弹窗（Auto Deposit） -->
 		<view class="cu-modal" style="z-index: 9999;" :class="modalName=='deposit_modal'?'show':''">
 			<view class="deposit-modal-dialog">
 				<!-- 标题栏 -->
@@ -347,7 +347,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- Transfer Tips弹窗 -->
+		<!-- Transfer Tips弹窗 -->
 		<view class="cu-modal" style="z-index: 9999;" :class="showTipsModal?'show':''">
 			<view class="transfer-tips-dialog">
 				<!-- 标题栏 -->
@@ -379,7 +379,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- Transfer Confirm弹窗 -->
+		<!-- Transfer Confirm弹窗 -->
 		<view class="cu-modal" style="z-index: 9999;" :class="showConfirmModal?'show':''">
 			<view class="transfer-confirm-dialog">
 				<!-- 标题栏 -->
@@ -497,7 +497,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- QR Code弹窗 -->
+		<!-- QR Code弹窗 -->
 		<view class="cu-modal" style="z-index: 9999;" :class="showQRCodeModal?'show':''">
 			<view class="qrcode-dialog">
 				<!-- 标题栏 -->
@@ -549,7 +549,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- Notice弹窗 -->
+		<!-- Notice弹窗 -->
 		<view class="cu-modal" style="z-index: 9999;" :class="showNoticeModal?'show':''">
 			<view class="notice-dialog">
 				<!-- 标题栏 -->
@@ -577,7 +577,7 @@
 </template>
 
 <script>
-	// from tangjq--- Deposit 组件,从 charge.vue 完整移植
+	// Deposit 组件,从 charge.vue 完整移植
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
@@ -740,11 +740,11 @@
 			},
 		},
 		methods: {
-			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			// 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
 			},
-			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			// 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
 			onScrollTopEmit() {
 				this.$emit('contentScrollTop')
 			},
@@ -1166,7 +1166,7 @@
 							url: `/pages/payment/payment?id=${order.out_order_id}`
 						});
 					} else {
-						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
+						// 先关闭当前弹窗，再显示错误提示，避免被遮挡
 						_this.modalName = ''
 						_this.$nextTick(() => {
 							this.$notice.show({
@@ -1377,7 +1377,7 @@
 							url: `/pages/payment/payment?id=${order.out_order_id}`
 						})
 					} else {
-						// from tangjq--- 先关闭当前弹窗，再显示错误提示，避免被遮挡
+						// 先关闭当前弹窗，再显示错误提示，避免被遮挡
 						this.closeDepositModal()
 						this.$nextTick(() => {
 							this.$notice.show({
@@ -1404,7 +1404,7 @@
 			},
 		},
 		mounted() {
-			// from tangjq--- 组件挂载时调用 API
+			// 组件挂载时调用 API
 			this.get_bank_card_list()
 			this.get_agent_bank_card()
 			this.set_info()
@@ -1564,7 +1564,7 @@
 		margin-bottom: 4px;
 	}
 
-	/* from tangjq--- 银行卡列表样式 */
+	/* 银行卡列表样式 */
 	.bank-list-container {
 		padding: 20px 5px;
 	}
@@ -1640,7 +1640,7 @@
 		color: $color-primary;
 	}
 
-	/* from tangjq--- 添加银行卡弹窗样式 */
+	/* 添加银行卡弹窗样式 */
 	.cu-modal {
 		display: none;
 		position: fixed;
@@ -1782,7 +1782,7 @@
 		color: white;
 	}
 
-	/* from tangjq--- 充值弹窗样式 */
+	/* 充值弹窗样式 */
 	.deposit-modal-dialog {
 		width: 90%;
 		max-width: 650px;
@@ -2023,7 +2023,7 @@
 		color: #fff;
 	}
 
-	/* from tangjq--- Transfer Tips弹窗样式 */
+	/* Transfer Tips弹窗样式 */
 	.transfer-tips-dialog {
 		width: 90%;
 		max-width: 600px;
@@ -2102,7 +2102,7 @@
 		justify-content: center;
 	}
 
-	/* from tangjq--- Transfer Confirm弹窗样式 */
+	/* Transfer Confirm弹窗样式 */
 	.transfer-confirm-dialog {
 		width: 90%;
 		max-width: 650px;
@@ -2294,7 +2294,7 @@
 		justify-content: center;
 	}
 
-	/* from tangjq--- Notice弹窗样式 */
+	/* Notice弹窗样式 */
 	.notice-dialog {
 		width: 90%;
 		max-width: 600px;
@@ -2342,7 +2342,7 @@
 		justify-content: center;
 	}
 
-	/* from tangjq--- QR Code弹窗样式 */
+	/* QR Code弹窗样式 */
 	.qrcode-dialog {
 		width: 90%;
 		max-width: 650px;

@@ -2,7 +2,7 @@
 	<view class="full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<view class="coupon-list-view" v-if="!showDetailModal && !showPromotionDetailModal">

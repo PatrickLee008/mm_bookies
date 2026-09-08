@@ -60,7 +60,7 @@
 				uni.navigateBack()
 			},
 			loadAboutInfo() {
-				// from tangjq--- 从store或API加载About信息
+				// 从store或API加载About信息
 				if (this.$store.state.configs && this.$store.state.configs.about) {
 					// 可以根据实际数据格式解析
 					// this.rules = ...

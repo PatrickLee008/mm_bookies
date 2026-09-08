@@ -1,10 +1,10 @@
 <template>
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
-		<!-- from tangjq--- 新的统一顶部组件，按照设计稿 -->
+		<!-- 新的统一顶部组件，按照设计稿 -->
 		<view class="zw-header-wrapper" :class="{ 'header-logged-out': !isLogin, 'header-collapsed': headerCollapsed }"
 			:style="headerHeightStyle">
-			<!-- from tangjq--- 顶部标题区域 -->
+			<!-- 顶部标题区域 -->
 			<view class="header-title-bar" :class="{ 'title-bar-collapsed': headerCollapsed }">
 				<theme-logo variant="header" height="32px" class="header-logo"></theme-logo>
 				<!-- 收起状态：紧凑余额 + 铃铛 + 设置 -->
@@ -77,7 +77,7 @@
 				</view>
 			</view>
 
-			<!-- from tangjq--- 未登录状态 -->
+			<!-- 未登录状态 -->
 			<view class="user-info-card login-prompt-card" v-if="!isLogin">
 				<view class="login-prompt-content">
 					<text class="login-prompt-text">{{ $t('please_login') }}</text>
@@ -115,7 +115,7 @@
 	export default {
 		components: {},
 		props: {
-			// from tangjq--- 接收当前激活的导航项
+			// 接收当前激活的导航项
 			active: {
 				type: String,
 				default: ''
@@ -132,7 +132,7 @@
 				userInfo: {},
 				mounted: false,
 				unreadMessageCount: 0, // 未读消息数量
-				activeNav: '', // from tangjq--- 当前激活的导航项
+				activeNav: '', // 当前激活的导航项
 				headerHeight: 0, // 组件实际高度
 				balanceVisible: true,
 				collapsed: false, // header收起状态
@@ -226,7 +226,7 @@
 			});
 		},
 		watch: {
-			// from tangjq--- 监听active prop变化
+			// 监听active prop变化
 			active(newVal) {
 				this.activeNav = newVal;
 			}
@@ -236,7 +236,7 @@
 				const formattedBalance = this.$toolbox.floor_format(value || 0)
 				return this.balanceVisible ? formattedBalance : formattedBalance.replace(/\d/g, '*')
 			},
-			// from tangjq--- 更新当前激活的导航项
+			// 更新当前激活的导航项
 			updateActiveNav() {
 				if (this.active) {
 					this.activeNav = this.active;
@@ -423,7 +423,7 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- 新的统一顶部样式 - 固定定位 */
+	/* 新的统一顶部样式 - 固定定位 */
 	.zw-header-wrapper {
 		position: fixed;
 		top: 0;
@@ -444,7 +444,7 @@
 		min-height: 190px;
 	}
 
-	/* from tangjq--- 顶部标题栏 */
+	/* 顶部标题栏 */
 	.header-title-bar {
 		padding: 10px 0;
 		text-align: center;
@@ -507,7 +507,7 @@
 		font-weight: 700;
 	}
 
-	/* from tangjq--- 用户信息卡片 */
+	/* 用户信息卡片 */
 	.user-info-card {
 		background-color: white;
 		border-radius: 20px;
@@ -720,7 +720,7 @@
 		white-space: nowrap;
 	}
 
-	/* from tangjq--- 未登录状态卡片 */
+	/* 未登录状态卡片 */
 	.login-prompt-card {
 		flex-direction: column;
 		align-items: stretch;
@@ -779,7 +779,7 @@
 		color: white;
 	}
 
-	/* from tangjq--- 导航图标区域 */
+	/* 导航图标区域 */
 	.nav-icons-bar {
 		display: flex;
 		flex-direction: row;
@@ -824,7 +824,7 @@
 		height: 35px;
 	}
 
-	/* from tangjq--- 导航徽章（红点通知） */
+	/* 导航徽章（红点通知） */
 	.nav-badge {
 		position: absolute;
 		top: -2px;

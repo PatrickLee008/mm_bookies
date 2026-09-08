@@ -2,7 +2,7 @@
 	<view class="full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- <view class="flex-row mybg-lprimary padding-tb justify-around myfont-17px line-height-17px">
@@ -21,7 +21,7 @@
 		</view> -->
 
 
-		<!-- from tangjq--- 标题栏 -->
+		<!-- 标题栏 -->
 		<view class="title-bar">
 			<view class="order-filter">
 				<view class="order-filter-pill order-filter-calendar-pill">
@@ -62,7 +62,7 @@
 						<text class="promotion-tab-text">{{$t('Finished')}}</text>
 					</view>
 
-					<!-- from tangjq--- 底部滑动指示器 -->
+					<!-- 底部滑动指示器 -->
 					<view class="promotion-slide-indicator" :class="{'indicator-finished': current_page==='Finished'}">
 					</view>
 				</view>
@@ -389,7 +389,7 @@
 				status_list: [],
 				wallet_list: [],
 				date_range: [{}, {}],
-				date_preset: '', // from tangjq--- 当前选中的日期预设 label（如 Today / Yesterday / Weekly 等），为空时回退到 date_range 拼接
+				date_preset: '', // 当前选中的日期预设 label（如 Today / Yesterday / Weekly 等），为空时回退到 date_range 拼接
 				date_filtered: false,
 				send_date: true,
 				report: {
@@ -446,7 +446,7 @@
 				this.get_list()
 			},
 			date_click(arr, presetLabel) {
-				// from tangjq--- 优先使用预设 label；presetLabel 为空时回退到日期范围拼接
+				// 优先使用预设 label；presetLabel 为空时回退到日期范围拼接
 				this.date_preset = presetLabel || ''
 				this.date_range = arr
 				this.date_filtered = presetLabel !== this.$t('today')
@@ -1280,7 +1280,7 @@
 			status_color(status) {
 				return status.indexOf('n') > -1 ? 'color:#60C07A' : 'color:#E52626'
 			},
-			// from tangjq--- 卡片右上角钱包徽章：Money→Main Wallet，Promotion→Promo Wallet
+			// 卡片右上角钱包徽章：Money→Main Wallet，Promotion→Promo Wallet
 			getWalletBadgeLabel(payWallet) {
 				if (!payWallet) return ''
 				const w = String(payWallet).toLowerCase()
@@ -1288,7 +1288,7 @@
 				if (w === 'promotion' || w === 'promo' || w === 'promo wallet') return 'Promo Wallet'
 				return payWallet
 			},
-			// from tangjq--- 卡片右上角钱包徽章：返回颜色类名 badge-main / badge-promo
+			// 卡片右上角钱包徽章：返回颜色类名 badge-main / badge-promo
 			getWalletBadgeClass(payWallet) {
 				if (!payWallet) return 'badge-main'
 				const w = String(payWallet).toLowerCase()
@@ -1319,7 +1319,7 @@
 		},
 		mounted() {
 			this.date_range = [this.getCurrentDate(0), this.getCurrentDate(0)]
-			// from tangjq--- 初始化时默认选中 today 预设
+			// 初始化时默认选中 today 预设
 			this.date_preset = this.$t('today')
 			this.parse_option_list()
 			this.get_list()
@@ -1411,7 +1411,7 @@
 </script>
 
 <style scoped lang="scss">
-	/* from tangjq--- header占位元素样式 */
+	/* header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
 		width: 100%;
@@ -1449,7 +1449,7 @@
 		// border-bottom: 1upx solid #eef2f4;
 	}
 
-	/* from tangjq--- 参考 History_Finished.png：4 个青绿色填充的胶囊按钮排在同一行 */
+	/* 参考 History_Finished.png：4 个青绿色填充的胶囊按钮排在同一行 */
 	.order-filter-pill {
 		display: flex;
 		align-items: center;
@@ -1489,7 +1489,7 @@
 		flex-shrink: 0;
 	}
 
-	/* from tangjq--- 日历胶囊内的日期/预设文本，宽度不够时省略号 */
+	/* 日历胶囊内的日期/预设文本，宽度不够时省略号 */
 	.calendar-text {
 		// flex: 1;
 		min-width: 0;
@@ -1516,7 +1516,7 @@
 	}
 
 	/* 让 selector 在 pill 内部显示为白字 + 白箭头（用 ::v-deep 穿透 scoped） */
-	/* from tangjq--- 让 selector-wrapper 占满整个 pill 宽度，使下拉面板（.selector-bg 用 left:0）和 pill 左对齐 */
+	/* 让 selector-wrapper 占满整个 pill 宽度，使下拉面板（.selector-bg 用 left:0）和 pill 左对齐 */
 	.order-filter-pill ::v-deep .selector-wrapper {
 		width: 100%;
 		display: flex;
@@ -1635,7 +1635,7 @@
 		overflow: hidden;
 	}
 
-	/* from tangjq--- 横向布局的比赛信息 */
+	/* 横向布局的比赛信息 */
 	.header-match {
 		display: flex;
 		flex-direction: row;
@@ -1662,7 +1662,7 @@
 		color: #FF4D4F !important;
 	}
 
-	/* from tangjq--- 主队名称使用青绿色 */
+	/* 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
 		color: $color-secondary;
 	}
@@ -1771,7 +1771,7 @@
 		font-style: italic;
 	}
 
-	/* from tangjq--- 单笔投注的result-bar四个角都圆角 */
+	/* 单笔投注的result-bar四个角都圆角 */
 	.bet-card:not(.parlay-card) .result-bar {
 		border-radius: 15px;
 	}
@@ -1824,7 +1824,7 @@
 		position: relative;
 	}
 
-	/* from tangjq--- Parlay汇总信息，与上方内容连接 */
+	/* Parlay汇总信息，与上方内容连接 */
 	.parlay-summary {
 		padding: 5px 15px;
 		background: #FFFFFF;
@@ -1836,7 +1836,7 @@
 		align-items: center;
 		background: $color-secondary-light;
 		cursor: pointer;
-		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
+		/* Parlay的parlay-toggle左下右下圆角 */
 		border-radius: 0 0 $radius-large $radius-large;
 	}
 
@@ -1844,7 +1844,7 @@
 		font-size: 28upx;
 		color: $color-primary;
 		font-weight: bold;
-		/* from tangjq--- 文字左右两侧留出箭头间距 */
+		/* 文字左右两侧留出箭头间距 */
 		margin: 0 16upx;
 	}
 
@@ -2229,7 +2229,7 @@
 		justify-content: center;
 	}
 
-	/* from tangjq--- 细双箭头图标：两个细箭头(cuIcon)上下紧凑堆叠 */
+	/* 细双箭头图标：两个细箭头(cuIcon)上下紧凑堆叠 */
 	.toggle-icon .arrow {
 		font-size: 22upx;
 		line-height: 0.55;

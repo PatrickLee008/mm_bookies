@@ -2,7 +2,7 @@
 	<view class="full-page ucenter-page">
 		<zw-header @doSomething="" @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<scroll-view class="ucenter-content-scroll" scroll-y @scroll="handleHeaderScroll"
@@ -366,11 +366,11 @@
 				contact2: '',
 				contact: [],
 				bar_list: [
-					// from tangjq--- 按设计稿顺序排列的新列表项
+					// 按设计稿顺序排列的新列表项
 					{
-						title: "profile", // from tangjq--- 使用语言文件中的键名
+						title: "profile", // 使用语言文件中的键名
 						content: '',
-						method: 'showProfileModal', // from tangjq--- 改为显示弹窗
+						method: 'showProfileModal', // 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/profile.png',
 						para: {
@@ -388,29 +388,37 @@
 						},
 					},
 					{
-						title: "contact us", // from tangjq--- 使用语言文件中的键名
+						title: "contact us", // 使用语言文件中的键名
 						content: '',
-						method: 'openCustomerService', // from tangjq--- 改为显示弹窗
+						method: 'openCustomerService', // 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/contact_lblue.png',
 						para: {},
 						highlight: false, // 高亮提醒用户点击
 					},
 					{
-						title: "about us", // from tangjq--- 使用语言文件中的键名
+						title: "about us", // 使用语言文件中的键名
 						content: '',
-						method: 'showAboutModal', // from tangjq--- 改为显示弹窗
+						method: 'showAboutModal', // 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/about.png',
 						para: {},
 						highlight: false, // 高亮提醒用户点击
 					},
 					{
-						title: "language", // from tangjq--- 使用语言文件中的键名
+						title: "language", // 使用语言文件中的键名
 						content: '',
-						method: 'showLanguageModal', // from tangjq--- 改为显示弹窗
+						method: 'showLanguageModal', // 改为显示弹窗
 						args: [],
 						img: '../../static/icon/ucenter/language.png',
+						para: {},
+					},
+					{
+						title: "downloadapp", // 下载应用入口
+						content: '',
+						method: 'goto',
+						args: ['/pages/ucenter/download'],
+						img: '../../static/icon/ucenter/download.png',
 						para: {},
 					},
 					// {
@@ -422,7 +430,7 @@
 					// 	para: {},
 					// },
 					{
-						title: "logout", // from tangjq--- 使用语言文件中的键名
+						title: "logout", // 使用语言文件中的键名
 						content: '',
 						method: 'showLogoutModal',
 						args: [],
@@ -431,7 +439,7 @@
 							need_login: true
 						},
 					},
-					// from tangjq--- 保留的原有列表项（不在设计稿中但保留）
+					// 保留的原有列表项（不在设计稿中但保留）
 					// {
 					// 	title: 'account_information',
 					// 	content: '',
@@ -472,14 +480,6 @@
 					// 		need_login: true
 					// 	},
 					// },
-					// {
-					// 	title: "downloadapp",
-					// 	content: 'V 0.0.1',
-					// 	method: 'goto',
-					// 	args: ['/pages/ucenter/download'],
-					// 	img: '../../static/icon/ucenter/download.png',
-					// 	para: {},
-					// },
 				],
 				contact: '',
 				dislan: 0,
@@ -487,20 +487,20 @@
 				version: uni.getStorageSync("version"),
 				modal_name: '',
 
-				// from tangjq--- Logout弹窗控制变量
+				// Logout弹窗控制变量
 				showLogoutConfirm: false,
 
-				// from tangjq--- 各个弹窗的控制变量
+				// 各个弹窗的控制变量
 				profileModalVisible: false,
 				contactModalVisible: false,
 				aboutModalVisible: false,
 				languageModalVisible: false,
 				customerSupportModalVisible: false,
 
-				// from tangjq--- 语言选择器
+				// 语言选择器
 				selectedLanguage: uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm',
 
-				// from tangjq--- Change Password 弹窗相关变量
+				// Change Password 弹窗相关变量
 				passwordChangeModalVisible: false,
 				old_password: '',
 				new_password: '',
@@ -536,23 +536,23 @@
 			onHeaderHeightChange(height) {
 				this.headerHeight = height;
 			},
-			// from tangjq--- 输入时清除密码错误信息
+			// 输入时清除密码错误信息
 			clearPasswordErrors() {
 				this.old_password_error = false
 				this.new_password_error = false
 				this.confirm_password_error = false
 				this.password_error_message = ''
 			},
-			// from tangjq--- 显示Logout确认弹窗
+			// 显示Logout确认弹窗
 			showLogoutModal() {
 				this.showLogoutConfirm = true
 			},
-			// from tangjq--- 隐藏Logout确认弹窗
+			// 隐藏Logout确认弹窗
 			hideLogoutModal() {
 				this.showLogoutConfirm = false
 			},
 
-			// from tangjq--- Profile弹窗方法
+			// Profile弹窗方法
 			showProfileModal() {
 				this.profileModalVisible = true
 			},
@@ -560,7 +560,7 @@
 				this.profileModalVisible = false
 			},
 
-			// from tangjq--- Contact弹窗方法
+			// Contact弹窗方法
 			showContactModal() {
 				this.contactModalVisible = true
 			},
@@ -781,7 +781,7 @@
 			openCustomerService() {
 				uni.$emit('open-customer-service-fullscreen');
 			},
-			// from tangjq--- About弹窗方法
+			// About弹窗方法
 			showAboutModal() {
 				this.aboutModalVisible = true
 			},
@@ -789,7 +789,7 @@
 				this.aboutModalVisible = false
 			},
 
-			// from tangjq--- Language弹窗方法
+			// Language弹窗方法
 			showLanguageModal() {
 				this.languageModalVisible = true
 			},
@@ -815,7 +815,7 @@
 					})
 				}, 300)
 			},
-			// from tangjq--- Customer Support弹窗方法
+			// Customer Support弹窗方法
 			showCustomerSupportModal() {
 				this.customerSupportModalVisible = true
 			},
@@ -980,7 +980,7 @@
 			},
 			logout() {
 				// this.music.play_dede();
-				// from tangjq--- 隐藏确认弹窗
+				// 隐藏确认弹窗
 				this.hideLogoutModal()
 
 				uni.removeStorageSync('splash_last_shown_time')
@@ -1034,13 +1034,13 @@
 
 			},
 
-			// from tangjq--- Change Password 弹窗方法
+			// Change Password 弹窗方法
 			showPasswordChangeModal() {
-				// from tangjq--- 先关闭 Profile 弹窗
+				// 先关闭 Profile 弹窗
 				this.hideProfileModal()
-				// from tangjq--- 打开密码修改弹窗
+				// 打开密码修改弹窗
 				this.passwordChangeModalVisible = true
-				// from tangjq--- 重置表单
+				// 重置表单
 				this.old_password = ''
 				this.new_password = ''
 				this.confirm_password = ''
@@ -1052,18 +1052,18 @@
 			hidePasswordChangeModal() {
 				this.passwordChangeModalVisible = false
 			},
-			// from tangjq--- Old Password 输入框失焦处理
+			// Old Password 输入框失焦处理
 			handleOldPasswordBlur() {
 				this.old_password_focused = false
-				// from tangjq--- 不在输入时显示错误提示，仅在提交时验证
+				// 不在输入时显示错误提示，仅在提交时验证
 				this.old_password_error = false
 				this.password_error_message = ''
 			},
-			// from tangjq--- New Password 输入框失焦处理
+			// New Password 输入框失焦处理
 			handleNewPasswordBlur() {
 				this.new_password_focused = false
 				const pwd = this.new_password
-				// from tangjq--- 密码验证：长度 ≥ 8，包含大小写字母和数字
+				// 密码验证：长度 ≥ 8，包含大小写字母和数字
 				const isValid =
 					pwd &&
 					pwd.length >= 8 &&
@@ -1080,13 +1080,13 @@
 					this.password_error_message = ''
 				}
 
-				// from tangjq--- 如果确认密码已输入，检查是否匹配
+				// 如果确认密码已输入，检查是否匹配
 				if (this.confirm_password && this.new_password !== this.confirm_password) {
 					this.confirm_password_error = true
 					this.password_error_message = this.$t('those_passwords') || 'Passwords do not match'
 				}
 			},
-			// from tangjq--- Confirm Password 输入框失焦处理
+			// Confirm Password 输入框失焦处理
 			handleConfirmPasswordBlur() {
 				this.confirm_password_focused = false
 				if (this.new_password !== this.confirm_password) {
@@ -1097,17 +1097,17 @@
 					this.password_error_message = ''
 				}
 			},
-			// from tangjq--- 提交密码修改
+			// 提交密码修改
 			submitPasswordChange() {
 				var _this = this
 
-				// from tangjq--- 清除之前的错误信息
+				// 清除之前的错误信息
 				_this.old_password_error = false
 				_this.new_password_error = false
 				_this.confirm_password_error = false
 				_this.password_error_message = ''
 
-				// from tangjq--- 表单验证
+				// 表单验证
 				if (!this.old_password) {
 					this.old_password_error = true
 					this.password_error_message = this.$t('old_password_required')
@@ -1133,7 +1133,7 @@
 				}
 
 				if (this.new_password === this.old_password) {
-					// from tangjq--- 先关闭弹窗，再显示错误提示，避免被遮挡
+					// 先关闭弹窗，再显示错误提示，避免被遮挡
 					this.hidePasswordChangeModal()
 					this.$nextTick(() => {
 						_this.pwdResultDialogTitle = _this.$t('tips')
@@ -1144,7 +1144,7 @@
 					return
 				}
 
-				// from tangjq--- 提交到后端
+				// 提交到后端
 				var para = {
 					USER_PWD: this.new_password,
 					OLD_PASSWORD: this.old_password
@@ -1162,7 +1162,7 @@
 					}
 
 					if (res.statusCode == 200) {
-						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
+						// 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePasswordChangeModal()
 						_this.$nextTick(() => {
 							_this.pwdResultDialogTitle = _this.$t('success_word')
@@ -1200,7 +1200,7 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- header占位元素样式 - 高度由动态计算控制 */
+	/* header占位元素样式 - 高度由动态计算控制 */
 	.header-placeholder {
 		width: 100%;
 		flex-shrink: 0;
@@ -1494,7 +1494,7 @@
 		color: #fff;
 	}
 
-	/* from tangjq--- 弹窗通用样式 */
+	/* 弹窗通用样式 */
 	.modal-overlay {
 		position: fixed;
 		top: 0;
@@ -1889,7 +1889,7 @@
 		// text-decoration: underline;
 	}
 
-	/* from tangjq--- Change Password 弹窗样式 */
+	/* Change Password 弹窗样式 */
 	.password-change-modal {
 		max-width: 450px;
 	}

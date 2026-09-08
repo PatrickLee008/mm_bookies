@@ -56,7 +56,7 @@
 				type: String,
 				default: '0'
 			},
-			// from tangjq--- 当选中项 value 为 'All'（不区分大小写）时，触发器显示该 prop 代替 'All'
+			// 当选中项 value 为 'All'（不区分大小写）时，触发器显示该 prop 代替 'All'
 			default_label: {
 				type: String,
 				default: ''
@@ -77,7 +77,7 @@
 				if (checked.length > 0) {
 					res = checked[0]
 				}
-				// from tangjq--- 当选中项是 'All'（默认初始值）时，用 default_label 替代显示
+				// 当选中项是 'All'（默认初始值）时，用 default_label 替代显示
 				if (res && typeof res.value === 'string' && res.value.toLowerCase() === 'all' && this.default_label) {
 					res = Object.assign({}, res, {
 						label: this.default_label

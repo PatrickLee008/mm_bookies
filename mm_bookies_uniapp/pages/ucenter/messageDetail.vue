@@ -467,6 +467,7 @@
 		.btn-text {
 			color: #666666;
 			font-weight: 500;
+			line-height: 1.6;
 		}
 
 		&:active {
@@ -477,6 +478,7 @@
 	.btn-text {
 		font-size: 14px;
 		display: block;
+		line-height: 1.6;
 	}
 
 	.title-text {

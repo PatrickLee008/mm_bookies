@@ -1,21 +1,21 @@
 <template>
-	<!-- from tangjq--- 改造为右侧弹出的过滤器弹窗 -->
+	<!-- 改造为右侧弹出的过滤器弹窗 -->
 	<view class="filter-popup-wrapper" v-show="!hidden">
-		<!-- from tangjq--- 遮罩层 -->
+		<!-- 遮罩层 -->
 		<view class="filter-mask" @click="set_dialog_hide(true)"></view>
 
-		<!-- from tangjq--- 右侧弹出的内容容器 -->
+		<!-- 右侧弹出的内容容器 -->
 		<view class="filter-container" :class="{'filter-show': !hidden}">
-			<!-- from tangjq--- 标题栏 -->
+			<!-- 标题栏 -->
 			<view class="filter-header">
 				<text class="filter-title">{{ $t('filter') }}</text>
 			</view>
 
-			<!-- from tangjq--- 滚动列表区域 -->
+			<!-- 滚动列表区域 -->
 			<scroll-view scroll-y class="filter-scroll">
 				<view class="filter-list">
 					<checkbox-group @change="CheckboxChange">
-						<!-- from tangjq--- All选项 -->
+						<!-- All选项 -->
 						<view class="filter-item" @click="toggleAll">
 							<text class="filter-item-text">All</text>
 							<view class="filter-radio" :class="{'filter-radio-checked': all_status}">
@@ -23,25 +23,25 @@
 							</view>
 						</view>
 
-						<!-- from tangjq--- 联赛列表 -->
+						<!-- 联赛列表 -->
 						<view class="filter-item" v-for="(league,index) in league_list" :key="index"
 							v-show='league[`include_${tomorrow?"tomorrow":"today"}`]' @click="toggleLeague(index)">
 							<text class="filter-item-text">{{league.name}}</text>
 							<view class="filter-radio" :class="{'filter-radio-checked': league.checked}">
 								<view class="filter-radio-inner" v-if="league.checked"></view>
 							</view>
-							<!-- from tangjq--- 隐藏的checkbox用于保持原有逻辑 -->
+							<!-- 隐藏的checkbox用于保持原有逻辑 -->
 							<checkbox style="display: none;" :checked="league.checked" :value="String(index)">
 							</checkbox>
 						</view>
 
-						<!-- from tangjq--- 隐藏的All checkbox用于保持原有逻辑 -->
+						<!-- 隐藏的All checkbox用于保持原有逻辑 -->
 						<checkbox style="display: none;" :checked="all_status" value="All"></checkbox>
 					</checkbox-group>
 				</view>
 			</scroll-view>
 
-			<!-- from tangjq--- 底部确认按钮 -->
+			<!-- 底部确认按钮 -->
 			<view class="filter-footer">
 				<view class="filter-confirm-btn" @click="set_dialog_hide(true)">
 					<text class="filter-confirm-text">{{ $t('confirm') }}</text>
@@ -108,7 +108,7 @@
 			show_dialog(...args) {
 
 			},
-			// from tangjq--- 切换All选项
+			// 切换All选项
 			toggleAll() {
 				this.all_status = !this.all_status
 				let list = this.$toolbox.deep_clone(this.league_list)
@@ -122,7 +122,7 @@
 				})
 				this.$emit('update:league_list', list)
 			},
-			// from tangjq--- 切换单个联赛选项
+			// 切换单个联赛选项
 			toggleLeague(index) {
 				let list = this.$toolbox.deep_clone(this.league_list)
 				list[index].checked = !list[index].checked
@@ -161,7 +161,7 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- 右侧弹出过滤器样式 */
+	/* 右侧弹出过滤器样式 */
 	.filter-popup-wrapper {
 		position: fixed;
 		top: 0;
@@ -171,7 +171,7 @@
 		z-index: 10000;
 	}
 
-	/* from tangjq--- 遮罩层 */
+	/* 遮罩层 */
 	.filter-mask {
 		position: absolute;
 		top: 0;
@@ -182,7 +182,7 @@
 		z-index: 1;
 	}
 
-	/* from tangjq--- 右侧弹出容器 */
+	/* 右侧弹出容器 */
 	.filter-container {
 		position: absolute;
 		top: 0;
@@ -199,12 +199,12 @@
 		border-radius: 10px 0 0 10px;
 	}
 
-	/* from tangjq--- 显示时滑入 */
+	/* 显示时滑入 */
 	.filter-container.filter-show {
 		transform: translateX(0);
 	}
 
-	/* from tangjq--- 标题栏 */
+	/* 标题栏 */
 	.filter-header {
 		background-color: $color-primary;
 		padding: 15px 20px;
@@ -221,7 +221,7 @@
 		font-weight: 600;
 	}
 
-	/* from tangjq--- 滚动区域 */
+	/* 滚动区域 */
 	.filter-scroll {
 		flex: 1;
 		overflow-y: auto;
@@ -238,7 +238,7 @@
 		overflow: hidden;
 	}
 
-	/* from tangjq--- 过滤项样式 */
+	/* 过滤项样式 */
 	.filter-item {
 		background-color: $bg-color-info;
 		margin-bottom: 1px;
@@ -263,7 +263,7 @@
 		flex: 1;
 	}
 
-	/* from tangjq--- 自定义单选按钮样式 */
+	/* 自定义单选按钮样式 */
 	.filter-radio {
 		width: 22px;
 		height: 22px;
@@ -288,7 +288,7 @@
 		border-radius: 50%;
 	}
 
-	/* from tangjq--- 底部按钮区域 */
+	/* 底部按钮区域 */
 	.filter-footer {
 		padding: 20px;
 		flex-shrink: 0;

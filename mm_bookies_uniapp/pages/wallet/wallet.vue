@@ -2,10 +2,10 @@
 	<view class="full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<!-- from tangjq--- 入口按钮栏：Deposit / Withdraw / Promotion Transaction（图标使用首页index的同款图标） -->
+		<!-- 入口按钮栏：Deposit / Withdraw / Promotion Transaction（图标使用首页index的同款图标） -->
 		<view class="entry-bar">
 			<view class="entry-item" @click="goto('/pages/wallet/deposit_page')">
 				<theme-icon name="deposit" class="entry-icon entry-icon-svg"
@@ -29,7 +29,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- 默认列表：调用 /withdraw/get 不带 type，显示所有充值+提现信息 -->
+		<!-- 默认列表：调用 /withdraw/get 不带 type，显示所有充值+提现信息 -->
 		<view class="transaction-list-wrap">
 			<!-- 筛选器 -->
 			<view class="filter-bar" @click="toggleFilterDropdown">
@@ -104,7 +104,7 @@
 			</scroll-view>
 		</view>
 
-		<!-- from tangjq--- 悬浮的 Refresh 按钮，点击刷新列表数据 -->
+		<!-- 悬浮的 Refresh 按钮，点击刷新列表数据 -->
 		<view class="refresh-btn-float" @click="refreshList">
 			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
 		</view>
@@ -112,7 +112,7 @@
 </template>
 
 <script>
-	// from tangjq--- wallet 默认页面：入口按钮 + 统一交易列表
+	// wallet 默认页面：入口按钮 + 统一交易列表
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import headerCollapse from '@/mixins/headerCollapse.js'
@@ -125,7 +125,7 @@
 				language: config.language,
 				userInfo: null,
 
-				// from tangjq--- 默认列表数据（调用 /withdraw/get 不带 type）
+				// 默认列表数据（调用 /withdraw/get 不带 type）
 				recordList: [],
 				loading: false,
 				refreshing: false,
@@ -242,7 +242,7 @@
 					const para = {
 						page: this.page,
 						limit: this.pageSize,
-						// from tangjq--- 不传 type，显示所有充值+提现
+						// 不传 type，显示所有充值+提现
 						...filterParams
 					};
 
@@ -323,7 +323,7 @@
 
 		onLoad(options) {
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
-			// from tangjq--- 默认页面加载列表数据
+			// 默认页面加载列表数据
 			this.loadRecords()
 		},
 
@@ -332,7 +332,7 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- header占位元素样式 */
+	/* header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
 		width: 100%;
@@ -346,7 +346,7 @@
 		flex-direction: column;
 	}
 
-	/* from tangjq--- 入口按钮栏（参考 Wallet_Page.png：3个圆角矩形按钮，圆形icon背景+文字） */
+	/* 入口按钮栏（参考 Wallet_Page.png：3个圆角矩形按钮，圆形icon背景+文字） */
 	.entry-bar {
 		background: #fff;
 		border-radius: 20px 20px 0 0;
@@ -395,7 +395,7 @@
 		text-align: center;
 	}
 
-	/* from tangjq--- 交易列表容器 */
+	/* 交易列表容器 */
 	.transaction-list-wrap {
 		flex: 1;
 		height: 0;
@@ -670,7 +670,7 @@
 		height: 20px;
 	}
 
-	/* from tangjq--- 悬浮 Refresh 按钮样式 */
+	/* 悬浮 Refresh 按钮样式 */
 	.refresh-btn-float {
 		position: fixed;
 		right: 20px;

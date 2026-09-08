@@ -1,9 +1,9 @@
 <template>
 	<view class="match-page-container">
-		<!-- from tangjq--- 使用新的统一header组件 -->
+		<!-- 使用新的统一header组件 -->
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
 		<!-- Search Bar and Filter Button -->
@@ -114,7 +114,7 @@
 				loading: false,
 				pageNo: 1,
 				pageSize: 100,
-				// from tangjq--- 新增搜索和筛选相关变量
+				// 新增搜索和筛选相关变量
 				searchKeyword: '', // 搜索关键词
 				showFilterPopup: false, // 控制筛选弹窗显示
 				filterOption: 'All', // 当前选中的筛选选项
@@ -131,7 +131,7 @@
 				}
 				return 'var(--app-viewport-height, 100vh)'
 			},
-			// from tangjq--- 计算过滤后的游戏列表
+			// 计算过滤后的游戏列表
 			filteredGames() {
 				let games = this.allGames
 
@@ -156,7 +156,7 @@
 			filter_type() {
 				this.loadGames()
 			},
-			// from tangjq--- 监听搜索关键词和筛选选项变化，重新分组游戏
+			// 监听搜索关键词和筛选选项变化，重新分组游戏
 			searchKeyword() {
 				this.groupGamesByPlatform(this.filteredGames)
 			},
@@ -190,7 +190,7 @@
 
 					if (res.statusCode == 200 && res.data.code == 200) {
 						const games = res.data.data.records || []
-						// from tangjq--- 保存原始游戏数据并转换格式
+						// 保存原始游戏数据并转换格式
 						_this.allGames = games.map(game => ({
 							id: game.id,
 							platform: game.platform,
@@ -204,9 +204,9 @@
 							isHot: game.isHot === 1,
 							isNew: game.isNew === 1
 						}))
-						// from tangjq--- 提取所有游戏类型并添加到筛选选项
+						// 提取所有游戏类型并添加到筛选选项
 						_this.extractGameTypes()
-						// from tangjq--- 使用过滤后的游戏数据进行分组
+						// 使用过滤后的游戏数据进行分组
 						_this.groupGamesByPlatform(_this.filteredGames)
 						// 如果有外部传入的厂商平台参数，过滤只显示该平台
 						if (_this.pendingPlatform) {
@@ -251,7 +251,7 @@
 				this.game_categories = Object.values(platformMap)
 			},
 
-			// from tangjq--- 提取所有游戏类型并添加到筛选选项
+			// 提取所有游戏类型并添加到筛选选项
 			extractGameTypes() {
 				const gameTypes = new Set()
 				this.allGames.forEach(game => {
@@ -419,27 +419,27 @@
 				})
 			},
 
-			// from tangjq--- 打开筛选弹窗
+			// 打开筛选弹窗
 			openFilterPopup() {
 				this.showFilterPopup = true
 			},
 
-			// from tangjq--- 关闭筛选弹窗
+			// 关闭筛选弹窗
 			closeFilterPopup() {
 				this.showFilterPopup = false
 			},
 
-			// from tangjq--- 选择筛选选项
+			// 选择筛选选项
 			selectFilterOption(option) {
 				this.filterOption = option
 			},
 
-			// from tangjq--- 确认筛选
+			// 确认筛选
 			confirmFilter() {
 				// 关闭弹窗，筛选会通过watch自动触发
 				this.showFilterPopup = false
 			},
-			// from tangjq--- 清空搜索关键字
+			// 清空搜索关键字
 			clearSearch() {
 				this.searchKeyword = ''
 			}
@@ -457,7 +457,7 @@
 </script>
 
 <style lang="scss">
-	/* from tangjq--- header占位元素样式 */
+	/* header占位元素样式 */
 	.header-placeholder {
 		height: 255px;
 		width: 100%;

@@ -118,12 +118,25 @@
 				sourceImage.onerror = function() {
 					reportImageError(ownerInstance)
 				}
-				loadImageAsDataUrl('/static/icon/login/verify-bg.png', (dataUrl) => {
+
+				// 从主题预设读取滑动验证码背景图：优先 --theme-slider-bg，缺省回退到默认背景。
+				let bgPath = this.getThemeSliderBackground() || '/static/icon/login/verify-bg.png'
+				loadImageAsDataUrl(bgPath, (dataUrl) => {
 					sourceImage.src = dataUrl
 				}, () => reportImageError(ownerInstance))
 			},
+		getThemeSliderBackground() {
+			try {
+				const root = document.documentElement
+				const value = root && getComputedStyle(root).getPropertyValue('--theme-slider-bg')
+				if (value && value.trim()) {
+					return value.trim()
+				}
+			} catch (e) { /* 保持默认背景 */ }
+			return ''
 		},
-	}
+	},
+}
 </script>
 
 <script>

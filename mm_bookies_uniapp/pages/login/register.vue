@@ -538,7 +538,7 @@
 				});
 				return encrypted.toString();
 			},
-			// from tangjq--- 切换记住我状态
+			// 切换记住我状态
 			toggleRememberMe() {
 				this.rememberMe = !this.rememberMe
 			}
@@ -841,7 +841,7 @@
 		margin-right: auto;
 	}
 
-	/* from tangjq--- 自定义圆形复选框 */
+	/* 自定义圆形复选框 */
 	.custom-switch {
 		width: 40rpx;
 		height: 40rpx;

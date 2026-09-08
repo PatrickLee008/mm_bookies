@@ -102,11 +102,11 @@
 			}
 		},
 		methods: {
-			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			// 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
 			},
-			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			// 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
 			onScrollTopEmit() {
 				this.$emit('contentScrollTop')
 			},
@@ -145,12 +145,12 @@ async loadRecords() {
 			try {
 				const filterParams = this.getFilterParams();
 				const para = {
-					page: this.page,
-					limit: this.pageSize,
-					// 提现记录页只展示提现类型：type=Withdraw 让后端仅查 WithDraw 表（见 /withdraw/get 的 get_wallet_list）
-					type: 'Withdraw',
-					...filterParams
-				};
+								page: this.page,
+								limit: this.pageSize,
+								// 提现记录页只展示提现类型：type=Withdraw 让后端仅查 WithDraw 表（见 /withdraw/get 的 get_wallet_list）
+								type: 'Withdraw',
+								...filterParams
+							};
 
 					await new Promise((resolve, reject) => {
 						this.$http.get('/withdraw/get', { data: para }, (res) => {

@@ -1,8 +1,8 @@
 <template>
 	<view class="withdraw-component">
-		<!-- from tangjq--- Withdraw 组件内容从 withdraw.vue 提取 -->
+		<!-- Withdraw 组件内容从 withdraw.vue 提取 -->
 		<scroll-view scroll-y class="withdraw-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit">
-			<!-- from tangjq--- 银行卡列表界面（仿照deposit.vue） -->
+			<!-- 银行卡列表界面（仿照deposit.vue） -->
 			<view class="bank-list-container">
 				<!-- 银行卡列表 -->
 				<view class="bank-card-item" v-for="(card,index) in card_list" :key="index">
@@ -24,7 +24,7 @@
 			</view>
 		</scroll-view>
 
-		<!-- from tangjq--- 提现详情弹窗（仿照deposit-modal-dialog） -->
+		<!-- 提现详情弹窗（仿照deposit-modal-dialog） -->
 		<view class="cu-modal" style="z-index: 9999;" :class="modalName=='withdraw_modal'?'show':''">
 			<view class="withdraw-modal-dialog">
 				<!-- 标题栏 -->
@@ -64,7 +64,7 @@
 					</view>
 				</view>
 
-				<!-- from tangjq--- 钱包信息部分 -->
+				<!-- 钱包信息部分 -->
 				<view class="wallet-info-section">
 					<view class="wallet-info-row">
 						<text class="wallet-info-label">{{ $t('wallet_balance') }} :</text>
@@ -111,7 +111,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- 添加/编辑银行卡 Modal（仿照deposit.vue） -->
+		<!-- 添加/编辑银行卡 Modal（仿照deposit.vue） -->
 		<view class="cu-modal" style="z-index: 9999;" :class="modalName=='add_modal'?'show':''">
 			<view class="add-bank-dialog">
 				<!-- 标题栏 -->
@@ -169,7 +169,7 @@
 </template>
 
 <script>
-	// from tangjq--- Withdraw 组件,从 withdraw.vue 提取并简化
+	// Withdraw 组件,从 withdraw.vue 提取并简化
 	import config from '../../utils/config.js';
 	import dateFormatUtils from "../../utils/utils.js"
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
@@ -192,10 +192,10 @@
 					required_turnover: 0,
 					current_turnover: 0,
 				},
-				// from tangjq--- 添加银行卡相关变量
+				// 添加银行卡相关变量
 				modalName: '',
 				card_conf: {},
-				selectedCard: {}, // from tangjq--- 选中的银行卡
+				selectedCard: {}, // 选中的银行卡
 				withdraw_amount_list: [5000, 10000, 30000, 50000, 100000, 200000, 500000, 1000000,
 					5000000
 				], // 提现快速金额列表（由系统配置动态生成）
@@ -267,11 +267,11 @@
 			},
 		},
 		methods: {
-			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			// 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
 			},
-			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			// 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
 			onScrollTopEmit() {
 				this.$emit('contentScrollTop')
 			},
@@ -327,14 +327,14 @@
 					}
 				})
 			},
-			// from tangjq--- 选择银行卡，打开提现弹窗
+			// 选择银行卡，打开提现弹窗
 			selectCard(card) {
 				this.selectedCard = card
 				this.amount = ''
 				this.loadTurnoverStatus()
 				this.modalName = 'withdraw_modal'
 			},
-			// from tangjq--- 提现提交
+			// 提现提交
 			withdrawSubmit() {
 				var _this = this;
 
@@ -405,7 +405,7 @@
 					}
 				})
 			},
-			// from tangjq--- 显示添加银行卡弹窗
+			// 显示添加银行卡弹窗
 			show_add_modal(type) {
 				this.modalName = 'add_modal'
 				const defaultBank = this.bank_add_list.length > 0 ? this.bank_add_list[0].bank_code : ''
@@ -416,11 +416,11 @@
 				}
 				this.add_disable = true
 			},
-			// from tangjq--- 选择银行
+			// 选择银行
 			select_modal_bank(bank) {
 				this.card_conf.bank_code = bank.bank_code
 			},
-			// from tangjq--- 设置添加按钮是否禁用
+			// 设置添加按钮是否禁用
 			set_add_disable() {
 				if (!this.card_conf.acc_number || !this.card_conf.bank_code || !this.card_conf.acc_name) {
 					this.add_disable = true
@@ -428,7 +428,7 @@
 				}
 				this.add_disable = false
 			},
-			// from tangjq--- 添加银行卡
+			// 添加银行卡
 			add_card() {
 				var _this = this;
 				if (!_this.card_conf.acc_number || !_this.card_conf.bank_code || !_this.card_conf.acc_name) return
@@ -455,7 +455,7 @@
 					}
 				})
 			},
-			// from tangjq--- 删除银行卡
+			// 删除银行卡
 			removeBank(bank) {
 				var _this = this;
 				_this.deleteTargetBank = bank
@@ -531,7 +531,7 @@
 			},
 		},
 		mounted() {
-			// from tangjq--- 组件挂载时获取银行卡列表和用户信息
+			// 组件挂载时获取银行卡列表和用户信息
 			this.get_bank_card_list()
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 			this.configs = Object.assign({}, this.$store.state.configs)
@@ -555,7 +555,7 @@
 		height: 0;
 	}
 
-	/* from tangjq--- 银行卡列表样式（完全仿照deposit.vue） */
+	/* 银行卡列表样式（完全仿照deposit.vue） */
 	.bank-list-container {
 		padding: 20px 5px;
 	}
@@ -597,7 +597,7 @@
 		color: #003D5B;
 	}
 
-	/* from tangjq--- 删除按钮样式 */
+	/* 删除按钮样式 */
 	.delete-btn {
 		width: 32px;
 		height: 32px;
@@ -709,7 +709,7 @@
 		box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
 	}
 
-	/* from tangjq--- 添加银行卡模态框样式（仿照deposit.vue） */
+	/* 添加银行卡模态框样式（仿照deposit.vue） */
 	.cu-modal {
 		position: fixed;
 		top: 0;
@@ -851,7 +851,7 @@
 		color: white;
 	}
 
-	/* from tangjq--- 提现弹窗样式（仿照deposit-modal-dialog） */
+	/* 提现弹窗样式（仿照deposit-modal-dialog） */
 	.withdraw-modal-dialog {
 		width: 90%;
 		max-width: 650px;
@@ -960,7 +960,7 @@
 		font-weight: 600;
 	}
 
-	/* from tangjq--- 钱包信息部分样式 */
+	/* 钱包信息部分样式 */
 	.wallet-info-section {
 		background-color: $bg-color-info;
 		margin: 15px 20px 0;

@@ -2,7 +2,7 @@
 	<view class="full-page">
 		<zw-header></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder"></view>
 
 		<!-- <view class="flex-row mybg-lprimary padding-tb justify-around myfont-17px line-height-17px">
@@ -21,7 +21,7 @@
 		</view> -->
 
 
-		<!-- from tangjq--- 标题栏 -->
+		<!-- 标题栏 -->
 		<view class="title-bar">
 			<view class="tab-selector">
 				<view class="tab-container">
@@ -32,7 +32,7 @@
 						<text class="tab-text">Finished</text>
 					</view>
 
-					<!-- from tangjq--- 底部滑动指示器 -->
+					<!-- 底部滑动指示器 -->
 					<view class="slide-indicator" :class="{'indicator-finished': current_page==='Finished'}"></view>
 				</view>
 			</view>
@@ -760,7 +760,7 @@
 </script>
 
 <style scoped lang="scss">
-	/* from tangjq--- header占位元素样式 */
+	/* header占位元素样式 */
 	.header-placeholder {
 		height: 276px;
 		width: 100%;
@@ -884,7 +884,7 @@
 		padding: 0 8px;
 	}
 
-	/* from tangjq--- 横向布局的比赛信息 */
+	/* 横向布局的比赛信息 */
 	.header-match {
 		display: flex;
 		flex-direction: row;
@@ -902,7 +902,7 @@
 		flex-shrink: 1;
 	}
 
-	/* from tangjq--- 主队名称使用青绿色 */
+	/* 主队名称使用青绿色 */
 	.header-match .team-name:first-child {
 		color: $color-secondary;
 		min-width: 0;
@@ -972,7 +972,7 @@
 		text-align: center;
 	}
 
-	/* from tangjq--- 单笔投注的result-bar四个角都圆角 */
+	/* 单笔投注的result-bar四个角都圆角 */
 	.bet-card:not(.parlay-card) .result-bar {
 		border-radius: 15px;
 	}
@@ -999,7 +999,7 @@
 		/* Parlay卡片的额外样式 */
 	}
 
-	/* from tangjq--- Parlay汇总信息，与上方内容连接 */
+	/* Parlay汇总信息，与上方内容连接 */
 	.parlay-summary {
 		padding: 0 15px 10px;
 		background: #FFFFFF;
@@ -1013,7 +1013,7 @@
 		background: #edfffe;
 		border-top: 2upx solid #E0E0E0;
 		cursor: pointer;
-		/* from tangjq--- Parlay的parlay-toggle左下右下圆角 */
+		/* Parlay的parlay-toggle左下右下圆角 */
 		border-radius: 0 0 15px 15px;
 	}
 

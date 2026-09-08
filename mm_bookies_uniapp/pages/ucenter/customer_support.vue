@@ -60,14 +60,14 @@
 				uni.navigateBack()
 			},
 			loadSupportInfo() {
-				// from tangjq--- 从store或API加载客服信息
+				// 从store或API加载客服信息
 				if (this.$store.state.configs && this.$store.state.configs.customer_support) {
 					// 可以根据实际数据格式解析
 					// this.supportChannels = ...
 				}
 			},
 			openLink(url) {
-				// from tangjq--- 打开链接
+				// 打开链接
 				//#ifdef H5
 				window.open(url, '_blank')
 				//#endif

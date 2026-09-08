@@ -369,7 +369,8 @@
 
 	.notice-btn-simple {
 		flex: 1;
-		height: 60upx;
+		min-height: 60upx;
+		padding: 16upx 24upx;
 		border-radius: $radius-large;
 		display: flex;
 		align-items: center;
@@ -377,6 +378,7 @@
 		cursor: pointer;
 		transition: all 0.2s;
 		font-weight: 500;
+		min-width: 160upx;
 		max-width: 300upx;
 	}
 
@@ -388,7 +390,7 @@
 	.notice-btn-cancel-simple {
 		background-color: transparent;
 		border: 2px solid $color-primary;
-		max-width: 300upx;
+		min-width: 160upx;
 	}
 
 	.notice-btn-confirm-simple {
@@ -397,11 +399,15 @@
 
 	.notice-btn-simple-text {
 		font-size: 28upx;
+		line-height: 1.5;
+		white-space: nowrap;
 		color: #FF5341;
 	}
 
 	.notice-btn-simple-text-white {
 		font-size: 28upx;
+		line-height: 1.5;
+		white-space: nowrap;
 		color: #FFFFFF;
 	}
 
@@ -414,7 +420,8 @@
 
 	.notice-btn-normal {
 		flex: 1;
-		height: 60upx;
+		min-height: 60upx;
+		padding: 16upx 24upx;
 		border-radius: $radius-medium;
 		display: flex;
 		align-items: center;
@@ -437,6 +444,8 @@
 
 	.notice-btn-normal-text {
 		font-size: 28upx;
+		line-height: 1.5;
+		white-space: nowrap;
 		color: #FF5341;
 		font-weight: 500;
 	}

@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<global-notice ref="globalNotice"></global-notice>
-		<!-- from tangjq--- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
+		<!-- 开屏广告（由后端 /splash_screen/get_active 控制是否启用与时长） -->
 		<view class="splash-screen theme-bg-no-header" v-if="showSplash">
 			<!-- Skip 按钮（由 enable_skip_button 控制） -->
 			<view class="skip-button" @click="closeSplash" v-if="enableSkipButton">
@@ -210,7 +210,7 @@
 				captchaTrigger: 0,
 				captchaVerified: false,
 				showCaptchaView: false,
-				// from tangjq--- 开屏广告相关数据（由后端配置驱动）
+				// 开屏广告相关数据（由后端配置驱动）
 				showSplash: false,
 				splashCountdown: 5,
 				displayDuration: 5,
@@ -284,7 +284,7 @@
 			this.reloadUser()
 			uni.removeStorageSync('login_success')
 			this.getAdvertisements()
-			// from tangjq--- 启动启动界面倒计时
+			// 启动启动界面倒计时
 			this.checkShouldShowSplash()
 		},
 		methods: {
@@ -529,7 +529,7 @@
 			// updateImageCode() {
 			// 	this.mcaptcha.refresh()
 			// },
-			// from tangjq--- 开屏广告相关方法
+			// 开屏广告相关方法
 			startSplashTimer() {
 				this.clearSplashTimer()
 				this.splashTimer = setInterval(() => {
@@ -638,7 +638,7 @@
 			toggleRememberMe() {
 				this.loginInfo.rememberMe = !this.loginInfo.rememberMe
 			},
-			// from tangjq--- 语言切换
+			// 语言切换
 			openLangModal() {
 				this.currentLang = uni.getStorageSync('language') || uni.getStorageSync('UNI_LOCALE') || 'mm'
 				this.showLangModal = true
@@ -655,7 +655,7 @@
 				this.showLangModal = false
 			}
 		},
-		// from tangjq--- 页面销毁时清理定时器
+		// 页面销毁时清理定时器
 		beforeDestroy() {
 			if (this.splashTimer) {
 				clearInterval(this.splashTimer)
@@ -665,7 +665,7 @@
 	}
 </script>
 <style lang="scss">
-	/* from tangjq--- 启动界面样式 */
+	/* 启动界面样式 */
 	.splash-screen {
 		position: fixed;
 		top: 0;
@@ -1013,7 +1013,7 @@
 		margin-right: auto;
 	}
 
-	/* from tangjq--- 自定义圆形复选框 */
+	/* 自定义圆形复选框 */
 	.custom-switch {
 		width: 32rpx;
 		height: 32rpx;

@@ -273,7 +273,7 @@
 				uni.navigateBack()
 			},
 			loadContactInfo() {
-				// from tangjq--- 从store或API加载联系方式
+				// 从store或API加载联系方式
 				if (this.$store.state.configs && this.$store.state.configs.contact_us) {
 					// 解析联系方式数据
 					let contactText = this.$store.state.configs.contact_us
@@ -286,7 +286,7 @@
 				}
 			},
 			extractContact(text, type) {
-				// from tangjq--- 简单的提取逻辑，根据实际数据格式调整
+				// 简单的提取逻辑，根据实际数据格式调整
 				if (!text) return ''
 				let lines = text.split('\n')
 				for (let line of lines) {
@@ -298,7 +298,7 @@
 			},
 			copyText(text) {
 				const _this = this
-				// from tangjq--- 复制文本到剪贴板
+				// 复制文本到剪贴板
 				uni.setClipboardData({
 					data: text,
 					success: function() {

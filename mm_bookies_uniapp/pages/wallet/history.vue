@@ -106,11 +106,11 @@
 			}
 		},
 		methods: {
-			// from tangjq--- 滚动事件冒泡给父页面，用于驱动 header 收起/展开
+			// 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)
 			},
-			// from tangjq--- 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
+			// 原生滚动到顶部事件冒泡给父页面，保证到达顶部时 header 一定展开还原
 			onScrollTopEmit() {
 				this.$emit('contentScrollTop')
 			},

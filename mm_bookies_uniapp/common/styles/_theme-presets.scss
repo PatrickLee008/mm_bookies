@@ -132,6 +132,8 @@ $theme-presets: (
 		no-header-background-image: "/static/theme/bg-green.png",
 		with-header-background-image: "/static/theme/bg-green.png",
 		header-background-image: "/static/theme/bg-green.png",
+		// 滑动验证码背景图路径；不设置则回退到组件默认背景。
+		slider-bg: "/static/theme/shwe-goal-slider.jpg",
 		// 品牌 logo：首页、登录注册和 Header 使用绿色 ShweGoal logo。
 		logo-image: "/static/theme/test/shwegoal_logo.png",
 		// Header logo 类型：文字或图片。

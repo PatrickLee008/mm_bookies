@@ -109,18 +109,18 @@
 					title: this.$t('phone_edit_coming_soon')
 				})
 			},
-			// from tangjq--- 显示修改密码弹窗
+			// 显示修改密码弹窗
 			showChangePasswordModal() {
 				this.showPwdModal = true
 			},
-			// from tangjq--- 隐藏修改密码弹窗
+			// 隐藏修改密码弹窗
 			hidePwdModal() {
 				this.showPwdModal = false
 				this.oldPassword = ''
 				this.newPassword = ''
 				this.confirmPassword = ''
 			},
-			// from tangjq--- 保存密码
+			// 保存密码
 			savePassword() {
 				let _this = this
 
@@ -177,7 +177,7 @@
 				}, (res) => {
 					uni.hideLoading()
 					if (res.statusCode === 200) {
-						// from tangjq--- 先关闭弹窗，再显示成功提示，避免被遮挡
+						// 先关闭弹窗，再显示成功提示，避免被遮挡
 						_this.hidePwdModal()
 						_this.$nextTick(() => {
 							this.$notice.show({

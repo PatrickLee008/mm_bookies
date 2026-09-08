@@ -58,7 +58,7 @@
 			}
 		},
 		methods: {
-			// from tangjq--- 返回上一页
+			// 返回上一页
 			goBack() {
 				uni.navigateBack()
 			},

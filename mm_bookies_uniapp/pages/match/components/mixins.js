@@ -65,11 +65,9 @@ export default {
 					league.favor = !league.favor
 					// _this.get_list()
 				} else {
-					this.$notice.show({
-						content: fail_content,
-						title: _this.$t('tips'),
-						showCancel: false,
-						confirmText: _this.$t('ok')
+					this.$notice.notice(fail_content, {
+						title: this.$t('tips'),
+						confirmText: this.$t('ok')
 					})
 				}
 			})

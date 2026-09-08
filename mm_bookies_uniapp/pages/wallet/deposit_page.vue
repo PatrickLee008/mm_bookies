@@ -2,10 +2,10 @@
 	<view class="full-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<!-- from tangjq--- 顶部 tab：Deposit（充值表单）/ Deposit History（充值记录） -->
+		<!-- 顶部 tab：Deposit（充值表单）/ Deposit History（充值记录） -->
 		<view class="title-bar">
 			<view class="promotion-tab-selector">
 				<view class="promotion-tab-container">
@@ -16,7 +16,7 @@
 						<text class="promotion-tab-text">{{ $t('deposit_history') }}</text>
 					</view>
 
-					<!-- from tangjq--- 底部滑动指示器 -->
+					<!-- 底部滑动指示器 -->
 					<view class="promotion-slide-indicator" :style="{
 						width: indicator_width + 'px',
 						transform: `translateX(${indicator_offset}px)`
@@ -25,7 +25,7 @@
 			</view>
 		</view>
 
-		<!-- from tangjq--- Tab 内容区域 -->
+		<!-- Tab 内容区域 -->
 		<view class="tab-content">
 			<!-- Deposit 表单（现有 deposit.vue 子组件） -->
 			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-deposit>
@@ -35,7 +35,7 @@
 				@contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-history>
 		</view>
 
-		<!-- from tangjq--- 悬浮的 Refresh 按钮，仅在 Deposit History tab 显示 -->
+		<!-- 悬浮的 Refresh 按钮，仅在 Deposit History tab 显示 -->
 		<view class="refresh-btn-float" v-if="tab_index === 1" @click="refreshList">
 			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
 		</view>

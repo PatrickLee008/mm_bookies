@@ -2,10 +2,10 @@
 	<view class="promotion-page">
 		<zw-header @headerHeightChange="onHeaderHeightChange"></zw-header>
 
-		<!-- from tangjq--- header占位元素，防止内容被遮挡 -->
+		<!-- header占位元素，防止内容被遮挡 -->
 		<view class="header-placeholder" :style="{ height: headerHeight + 'px' }"></view>
 
-		<!-- from tangjq--- 页面内容 -->
+		<!-- 页面内容 -->
 		<view class="promotion-content">
 			<!-- 筛选器 -->
 			<view class="filter-bar" @click="toggleFilterDropdown">
@@ -100,7 +100,7 @@
 				pageSize: 10,
 
 				filterExpanded: false,
-				// from tangjq--- 钱包筛选：默认 promotion
+				// 钱包筛选：默认 promotion
 				filterOptions: [{
 						label: 'filter_all',
 						value: '',
@@ -170,7 +170,7 @@
 						page: this.page,
 						limit: this.pageSize,
 					};
-					// from tangjq--- 仅当未选 all 时传 pay_wallet
+					// 仅当未选 all 时传 pay_wallet
 					if (selectedWallet && selectedWallet.value) {
 						para.pay_wallet = selectedWallet.value;
 					}
@@ -209,7 +209,7 @@
 			},
 
 			parseLog(ele) {
-				// from tangjq--- 格式化时间和显示文字（参考 onex2 balance_log）
+				// 格式化时间和显示文字（参考 onex2 balance_log）
 				if (ele.create_time) {
 					ele.submit_time = this.formatTime(ele.create_time)
 					ele.confirm_time = ele.update_time ? this.formatTime(ele.update_time) : null
@@ -343,7 +343,7 @@
 </script>
 
 <style lang="scss" scoped>
-	/* from tangjq--- 页面级样式 */
+	/* 页面级样式 */
 	.promotion-page {
 		height: var(--app-viewport-height, 100vh);
 		min-height: 0;
