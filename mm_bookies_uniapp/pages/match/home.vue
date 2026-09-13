@@ -646,12 +646,14 @@
 		<fuzzy-search ref='fuzzy_search' :hidden.sync="hide_fuzzy_search"
 			:league_list.sync='league_list'></fuzzy-search>
 
+		<customer-service></customer-service>
 	</view>
 </template>
 
 <script>
 	import config from '../../utils/config.js'
 	import Vue from "vue";
+	import CustomerService from '@/components/common/customer-service.vue'
 	import match_mixins from './components/mixins.js'
 	import headerCollapse from '@/mixins/headerCollapse.js'
 	import LeagueFilter from './components/league_filter.vue'
@@ -666,6 +668,7 @@
 			LeagueFilter,
 			CountDown,
 			FuzzySearch,
+			CustomerService,
 			// MatchDetail,
 			// BetsSlip,
 		},

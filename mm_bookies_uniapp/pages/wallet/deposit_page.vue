@@ -39,6 +39,8 @@
 		<view class="refresh-btn-float" v-if="tab_index === 1" @click="refreshList">
 			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
 		</view>
+
+		<customer-service></customer-service>
 	</view>
 </template>
 
@@ -48,11 +50,13 @@
 	import WalletDeposit from './deposit.vue'
 	import WalletHistory from './history.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
 		components: {
 			WalletDeposit,
 			WalletHistory,
+			CustomerService,
 		},
 		mixins: [headerCollapse],
 		data() {

@@ -77,6 +77,8 @@
 				<view class="blank"></view>
 			</scroll-view>
 		</view>
+
+		<customer-service></customer-service>
 	</view>
 </template>
 
@@ -84,9 +86,13 @@
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
 		name: 'PromotionTransaction',
+		components: {
+			CustomerService
+		},
 		mixins: [headerCollapse],
 		data() {
 			return {

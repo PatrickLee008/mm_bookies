@@ -108,6 +108,8 @@
 		<view class="refresh-btn-float" @click="refreshList">
 			<text class="cuIcon-refresh text-white text-bold myfont-20px"></text>
 		</view>
+
+		<customer-service></customer-service>
 	</view>
 </template>
 
@@ -116,8 +118,12 @@
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import headerCollapse from '@/mixins/headerCollapse.js'
+	import CustomerService from '@/components/common/customer-service.vue'
 
 	export default {
+		components: {
+			CustomerService
+		},
 		mixins: [headerCollapse],
 		data() {
 			return {
