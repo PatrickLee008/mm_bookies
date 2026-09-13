@@ -1205,8 +1205,8 @@
 				if (this.current_page === 'Finished') {
 					//直接返回
 					str = order.BONUS
-					if (str < parseInt(order.BET_MONEY) && order.bet_status != 'Refund') {
-						// str = str - order.BET_MONEY
+					if (str < parseInt(order.BET_MONEY)) {
+						// 实际净赢小于投注额（含 Refund 异常单）时，用 netwin_actual 兜底
 						str = order.netwin_actual
 					}
 				} else {
