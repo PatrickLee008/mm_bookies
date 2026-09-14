@@ -149,8 +149,8 @@
 														v-if="!match_ref.mixed">{{formatOdds(attr.ODDS)}}</text> -->
 											</view>
 											<view class="bet-odds">
-												<text>{{attr.LOSE_BALL_NUM}}+{{attr.DRAW_ODDS}}</text>
-											</view>
+													<text>{{attr.LOSE_BALL_NUM}}({{attr.DRAW_BUNKO == '0' ? '+' : '-'}}{{attr.DRAW_ODDS}})</text>
+												</view>
 											<view class="bet-btn bet-btn-small"
 												:class="{'bet-btn-selected':attr.guest_selected,}"
 												@click="betClick('guest',index,_index,attr_index,attr)">

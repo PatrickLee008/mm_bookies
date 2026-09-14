@@ -673,7 +673,7 @@
 
 	.status-active {
 		background: $color-secondary-light;
-		color: #ffffff;
+		color: $color-primary;
 	}
 
 	.status-inactive {

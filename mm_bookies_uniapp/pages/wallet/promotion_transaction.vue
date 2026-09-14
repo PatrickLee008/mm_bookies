@@ -48,11 +48,11 @@
 						<view class="type-left">
 							<text class="type-name">{{item.display_type || item.type}}</text>
 						</view>
-						<view class="pay-right">
+						<!-- <view class="pay-right">
 							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
 								class="pay-logo"></image>
 							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
-						</view>
+						</view> -->
 					</view>
 
 					<!-- 金额行 -->
@@ -63,10 +63,10 @@
 					</view>
 
 					<!-- 状态 -->
-					<view class="card-status">
+					<!-- <view class="card-status">
 						<text class="status-text"
 							:class="getStatusClass(item.status)">{{getStatusText(item.status)}}</text>
-					</view>
+					</view> -->
 				</view>
 
 				<!-- 加载更多 -->
