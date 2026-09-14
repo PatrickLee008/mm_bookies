@@ -342,7 +342,7 @@
 						<text class="coupon-scenarios-title">Applicable Scenarios:</text>
 						<view class="coupon-scenarios-icons">
 							<!-- 1x2 Sports Betting -->
-							<view class="coupon-scenario-icon-item" v-if="betTypes.length > 0" @click="openCouponSport">
+							<view class="coupon-scenario-icon-item" v-if="betTypeList(this.betTypes, 'Single')" @click="openCouponSport">
 								<view class="coupon-scenario-icon-circle">
 									<theme-icon name="single" class="coupon-scenario-img"
 										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
@@ -350,9 +350,9 @@
 								<text class="coupon-scenario-label">Single</text>
 							</view>
 							<!-- Mix Parlay -->
-							<view class="coupon-scenario-icon-item" v-if="displayVendors.length > 0"
-								@click="openVendorGames(displayVendors[0])">
-								<view class="coupon-scenario-icon-diamond">
+							<view class="coupon-scenario-icon-item" v-if="betTypeList(this.betTypes, 'Mix')"
+								@click="openCouponMix">
+								<view class="coupon-scenario-icon-circle">
 									<theme-icon name="mixparlay" class="coupon-scenario-img"
 										color="var(--theme-icon-primary, var(--theme-primary))"></theme-icon>
 								</view>
@@ -1131,8 +1131,20 @@
 					console.error('Failed to parse usage_scenario_config:', e)
 				}
 			},
-			// 获取所有游戏厂商列表
-			fetchAllGameVendors() {
+			// Mix/MPL/Mixparlay 三种写法统一判定
+				isMixBetType(t) {
+					return ['Mix', 'Mixparlay', 'MPL'].includes(String(t || '').trim())
+				},
+				// 按目标类型判定 betTypes 是否启用；空数组视作默认仅 Single
+				betTypeList(betTypes, type) {
+					const list = Array.isArray(betTypes) ? betTypes : []
+					if (list.length === 0) return type === 'Single'
+					if (type === 'Single') return list.includes('Single')
+					if (type === 'Mix') return list.some(t => this.isMixBetType(t))
+					return list.includes(type)
+				},
+				// 获取所有游戏厂商列表
+				fetchAllGameVendors() {
 				let _this = this
 				_this.$http.get('/awc/getAllVendors', {
 					data: {}
@@ -1165,11 +1177,27 @@
 					confirmText: _this.$t('Confirm'),
 					cancelText: _this.$t('Cancel'),
 					success: () => {
-						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const nonMix = betTypes.filter(t => !_this.isMixBetType(t))
+						const isMixOnly = betTypes.length > 0 && nonMix.length === 0
 						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
 						_this.closeDetailModal()
 						uni.navigateTo({
 							url: url
+						})
+					}
+				})
+			},
+			openCouponMix() {
+				let _this = this
+				if (_this.$toolbox.click_too_fast(1)) return
+				_this.$notice.confirm(`Do you want to view Mix Parlay?`, {
+					title: _this.$t('title_alert'),
+					confirmText: _this.$t('Confirm'),
+					cancelText: _this.$t('Cancel'),
+					success: () => {
+						_this.closeDetailModal()
+						uni.navigateTo({
+							url: '/pages/match/home?mix=1'
 						})
 					}
 				})
@@ -1494,9 +1522,8 @@
 			},
 			hasPromotionBetType(type) {
 				const scenario = this.selectedPromotion && this.selectedPromotion.usage_scenario_1x2
-				if (!scenario) return false
-				const betTypes = scenario.bet_types || []
-				return betTypes.length === 0 ? type === 'Single' : betTypes.includes(type)
+				const betTypes = (scenario && scenario.bet_types) || []
+				return this.betTypeList(betTypes, type)
 			},
 			// Promotion - 跳转到 1x2 体育投注
 			openPromotionSport() {
@@ -1510,7 +1537,8 @@
 					cancelText: _this.$t('Cancel'),
 					success: () => {
 						const betTypes = scenario.bet_types || []
-						const isMixOnly = betTypes.length === 1 && betTypes[0] === 'Mix'
+						const nonMix = betTypes.filter(t => !_this.isMixBetType(t))
+						const isMixOnly = betTypes.length > 0 && nonMix.length === 0
 						const url = isMixOnly ? '/pages/match/home?mix=1' : '/pages/match/home'
 						_this.closePromotionDetail()
 						uni.navigateTo({
@@ -3262,16 +3290,6 @@
 		justify-content: center;
 	}
 
-	.coupon-scenario-icon-diamond {
-		width: 40px;
-		height: 40px;
-		border: 2px solid $color-primary;
-		transform: rotate(45deg);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
 	.coupon-scenario-emoji {
 		font-size: 18px;
 		line-height: 1;
@@ -3280,14 +3298,6 @@
 	.coupon-scenario-img {
 		width: 100%;
 		height: 100%;
-	}
-
-	.coupon-scenario-icon-diamond .coupon-scenario-img {
-		transform: rotate(-45deg);
-	}
-
-	.coupon-scenario-icon-diamond .coupon-scenario-emoji {
-		transform: rotate(-45deg);
 	}
 
 	.coupon-scenario-label {

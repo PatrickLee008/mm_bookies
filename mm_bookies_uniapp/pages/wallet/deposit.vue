@@ -332,9 +332,8 @@
 					</view>
 				</view>
 
-				<!-- 支付渠道：仅支持 QR Pay -->
-				<view class="payment-channel-section">
-					<!-- <text class="section-title">{{ $t('payment_channel') }}</text> -->
+				<!-- 支付渠道：仅支持 QR Pay，单一渠道时不显示渠道名 -->
+				<view class="payment-channel-section" v-if="paymentChannelCount > 1">
 					<view class="payment-channel-single">
 						<text class="payment-channel-name">{{ $t('qr_pay') }}</text>
 					</view>
@@ -688,6 +687,10 @@
 		computed: {
 			globalConfigs() {
 				return this.$store.state.configs || {}
+			},
+			// 当前可用支付渠道（目前仅 QR Pay 单一渠道）
+			paymentChannelCount() {
+				return 1
 			},
 			confirmDisabled() {
 				if (this.current_progress == 0 && this.amount_error) return true

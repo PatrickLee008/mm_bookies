@@ -1642,15 +1642,17 @@ def end_promotion():
         #     }), 400
 
         # ==================== 3. 计算转移金额 ====================
-        # 优先退还活动奖励金额给代理，多余部分再给玩家
         # 使用 activity_record.bonus_amount，因为如果是百分比奖励，promotion_obj.reward_amount 只是百分比数值
         reward_amount = Decimal(str(activity_record.bonus_amount)) if activity_record.bonus_amount else Decimal('0')
         max_withdrawal = None
         if promotion_obj.max_withdrawal_amount and promotion_obj.max_withdrawal_amount > 0:
             max_withdrawal = Decimal(str(promotion_obj.max_withdrawal_amount))
 
-        # Step 1: 优先退还活动金额给代理
-        agent_refund = min(reward_amount, promo_balance)
+        # Step 1: 达到要求时奖励金归玩家，未达到要求时奖励金退还代理
+        if requirements_met:
+            agent_refund = Decimal('0')
+        else:
+            agent_refund = min(reward_amount, promo_balance)
 
         # Step 2: 计算玩家可得的盈余
         player_surplus = promo_balance - agent_refund
@@ -1661,7 +1663,7 @@ def end_promotion():
         else:
             transfer_amount = player_surplus
 
-        # Step 4: 超出 max_withdrawal 的盈余也退还给代理
+        # Step 4: 超出 max_withdrawal 的盈余退还给代理
         excess = player_surplus - transfer_amount
         remaining_amount = agent_refund + excess
 
