@@ -168,7 +168,12 @@
 											<count-down :count_time="promo.end_time_full"></count-down>
 										</view>
 										<text class="promo-label promo-label-mt">Terms & Conditions</text>
-										<text class="promo-terms">{{ getTruncatedTerms(promo.terms, 100) }}</text>
+										<text class="promo-terms"
+											:class="{ 'promo-terms-expanded': expandedTermsId === promo.id }">{{ promo.terms }}</text>
+										<text v-if="(promo.terms || '').length > 80" class="promo-terms-more"
+											@click.stop="toggleCardTerms(promo.id)">
+											{{ expandedTermsId === promo.id ? 'Show less' : 'Read more' }}
+										</text>
 									</view>
 								</view>
 								<view class="promotion-card2-footer">
@@ -670,6 +675,7 @@
 				showPromotionDetailModal: false,
 				selectedPromotion: null,
 				isTermsExpanded: false,
+				expandedTermsId: null,
 
 				// Join Promotion 弹窗
 				showJoinPromotionModal: false,
@@ -1570,6 +1576,9 @@
 			},
 			toggleTerms() {
 				this.isTermsExpanded = !this.isTermsExpanded
+			},
+			toggleCardTerms(id) {
+				this.expandedTermsId = this.expandedTermsId === id ? null : id
 			},
 			loadPromotionProgress(promotionId) {
 				let _this = this
@@ -2473,6 +2482,25 @@
 		line-height: 1.35;
 		max-height: 44px;
 		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		text-overflow: ellipsis;
+	}
+
+	.promo-terms-expanded {
+		max-height: none;
+		-webkit-line-clamp: unset;
+		display: block;
+	}
+
+	.promo-terms-more {
+		display: block;
+		margin-top: 4px;
+		font-size: 12px;
+		font-weight: 700;
+		color: $color-primary;
+		text-decoration: underline;
 	}
 
 	.promotion-card2-footer {
