@@ -20,6 +20,9 @@
 					<view class="type-btn" :class="{ 'active': activity_type === 'coupon' }"
 						@click="change_type('coupon')">
 						<text>{{ $t('coupon') }}</text>
+						<view class="promo-count-badge" v-if="activity_type !== 'coupon' && couponCount > 0">
+							{{ couponCount > 99 ? '99+' : couponCount }}
+						</view>
 					</view>
 				</view>
 
@@ -629,6 +632,7 @@
 				page: 1,
 				limit: 15,
 				list_end: false,
+				couponCount: 0,
 
 				// 当前活动
 				currentActivity: {},
@@ -967,6 +971,10 @@
 					}
 					if (res.statusCode === 200 && res.data.code === 200) {
 						let coupons = res.data.data.history || []
+						const pagination = res.data.data.pagination || {}
+						if (_this.tab_index === 0 && pagination.total_count != null) {
+							_this.couponCount = pagination.total_count
+						}
 						// 若存在进行中的活动，将对应 Used 记录标记为 Active（参考onex2_test逻辑）
 						if (_this.tab_index === 1 && _this.currentActivity.status === 'Active' && _this
 							.currentActivity.coupon_id) {
@@ -1071,10 +1079,21 @@
 							duration: 2000
 						})
 						if (params.coupon_code) _this.key_word = ''
-						if (_this.showDetailModal) _this.closeDetailModal()
-						_this.getCurrentActivity()
-						_this.getCouponList()
-						_this.refreshUserInfo()
+					if (_this.showDetailModal) _this.closeDetailModal()
+					_this.getCurrentActivity()
+					_this.getCouponList()
+					if (_this.tab_index !== 0) {
+						// 非 Unused 标签下兑换，静默刷新角标计数
+						_this.$http.get('/coupon/history', {
+							data: { page: 1, page_size: 1, status: 'Unused' }
+						}, (r) => {
+							if (r.statusCode === 200 && r.data.code === 200 && r.data.data.pagination &&
+								r.data.data.pagination.total_count != null) {
+								_this.couponCount = r.data.data.pagination.total_count
+							}
+						}, () => {})
+					}
+					_this.refreshUserInfo()
 					} else {
 						this.$notice.show({
 							title: _this.$t('title_alert'),
