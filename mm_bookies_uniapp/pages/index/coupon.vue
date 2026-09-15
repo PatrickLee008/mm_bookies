@@ -469,6 +469,10 @@
 									{{ $toolbox.num_format(selectedPromotion.required_netwin || 0) }}
 								</text>
 							</view>
+							<view class="promotion-progress-bar">
+								<view class="promotion-progress-fill"
+									:style="{ width: (selectedPromotion.netwin_percentage || 0) + '%' }"></view>
+							</view>
 						</view>
 						<view class="promotion-progress-wallet">
 							<view class="promotion-progress-row">
@@ -1259,6 +1263,7 @@
 					item.turnover_progress = p.turnover_percentage || 0
 					item.achieved_netwin = p.netwin_progress || 0
 					item.required_netwin = p.netwin_requirement || 0
+					item.netwin_percentage = p.netwin_percentage || 0
 					const uinfo = this.$store.state.userInfo || {}
 					item.promo_wallet_balance = uinfo.money_promotion || 0
 					item.can_end = p.can_end || false
@@ -1579,6 +1584,7 @@
 								turnover_progress: d.turnover_percentage || 0,
 								achieved_netwin: d.netwin_progress || 0,
 								required_netwin: d.netwin_requirement || 0,
+								netwin_percentage: d.netwin_percentage || 0,
 								max_withdrawal: d.max_withdrawal_limit || _this.selectedPromotion
 									.max_withdrawal || 0,
 								promo_wallet_balance: uinfo.money_promotion || 0,
@@ -2992,7 +2998,7 @@
 	.promotion-progress-bar {
 		width: 100%;
 		height: 8px;
-		background: #e0e8ec;
+		background: $bg-color-info;
 		border-radius: 4px;
 		overflow: hidden;
 	}

@@ -90,7 +90,7 @@
 
 				const width = 300
 				const height = 202
-				const puzzleSize = 40
+				const puzzleSize = 50
 				const gapX = Math.floor(Math.random() * (width - puzzleSize - 50)) + 25
 				const gapY = Math.floor(Math.random() * (height - puzzleSize - 30)) + 15
 				const sourceImage = document.createElement('img')
@@ -156,7 +156,7 @@
 					successText: 'Verification successful',
 					canvasWidth: 300,
 					canvasHeight: 202,
-					sliderSize: 40,
+					sliderSize: 50,
 				}),
 			},
 			autoGenerate: {
@@ -351,6 +351,14 @@
 				this.isSnapping = false
 				this.sliderPosition = 0
 			},
+			// 拖动上限：滑块按钮不出轨道，且拼图块右边缘不超出背景画布
+			maxDragPosition() {
+				const buttonLimit = this.trackWidth - this.sliderButtonSize
+				const puzzleW = this.internalCaptchaData.sliderWidth || 0
+				if (!puzzleW || !this.canvasScaleRatio) return buttonLimit
+				const puzzleLimit = (this.config.canvasWidth - puzzleW) * this.trackScaleRatio / this.canvasScaleRatio
+				return Math.min(buttonLimit, puzzleLimit)
+			},
 			onTouchStart(e) {
 				if (!this.isReady || this.isSuccess) return
 				this.isDragging = true
@@ -360,8 +368,7 @@
 			onTouchMove(e) {
 				if (!this.isDragging) return
 				let newPosition = e.touches[0].clientX - this.startX
-				const maxPosition = this.trackWidth - this.sliderButtonSize
-				newPosition = Math.max(0, Math.min(newPosition, maxPosition))
+				newPosition = Math.max(0, Math.min(newPosition, this.maxDragPosition()))
 				this.sliderPosition = newPosition
 			},
 			onTouchEnd() {
@@ -378,8 +385,7 @@
 				const mouseMoveHandler = (event) => {
 					if (!this.isDragging) return
 					let newPosition = event.clientX - this.startX
-					const maxPosition = this.trackWidth - this.sliderButtonSize
-					newPosition = Math.max(0, Math.min(newPosition, maxPosition))
+					newPosition = Math.max(0, Math.min(newPosition, this.maxDragPosition()))
 					this.sliderPosition = newPosition
 				}
 				const mouseUpHandler = () => {
@@ -401,9 +407,9 @@
 				const isValid = Math.abs(userX - this.internalCaptchaData.correctX) <= 8
 				if (isValid) {
 					const targetPosition = Math.max(0, Math.min(
-						this.trackWidth - this.sliderButtonSize,
-						this.internalCaptchaData.correctX * this.trackScaleRatio
-					))
+					this.maxDragPosition(),
+					this.internalCaptchaData.correctX * this.trackScaleRatio
+				))
 					this.isSnapping = true
 					this.sliderPosition = targetPosition
 					this.isSuccess = true
@@ -461,8 +467,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 40px;
-		height: 40px;
+		width: 50px;
+		height: 50px;
 		box-sizing: border-box;
 		border: 2px dashed #FFFFFF4D;
 		background: rgba(0, 0, 0, 0.60);
@@ -471,8 +477,8 @@
 	}
 
 	.captcha-gap-pattern {
-		width: 29px;
-		height: 30px;
+		width: 39px;
+		height: 40px;
 		opacity: 0.4;
 	}
 
@@ -482,8 +488,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 40px;
-		height: 40px;
+		width: 50px;
+		height: 50px;
 		box-sizing: border-box;
 		overflow: hidden;
 		border: 3px solid $color-secondary;
@@ -501,8 +507,8 @@
 	.slider-puzzle-pattern {
 		position: relative;
 		z-index: 1;
-		width: 29px;
-		height: 30px;
+		width: 39px;
+		height: 40px;
 	}
 
 	.success-overlay {

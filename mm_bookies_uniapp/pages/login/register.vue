@@ -252,7 +252,7 @@
 					successText: this.$t('verification_success'),
 					canvasWidth: 300,
 					canvasHeight: 202,
-					sliderSize: 40,
+					sliderSize: 50,
 				}
 			},
 			currentLangLabel() {

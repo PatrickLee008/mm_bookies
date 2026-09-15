@@ -1,24 +1,15 @@
 var dateFormatUtils = {
 	numFormat: function(n) {
-		if(!n){n =0} ;
+		if (!n) { n = 0 };
 		n = parseInt(n);
-		let num = n.toString()
-		let decimals = ''
-		// 判断是否有小数
-		num.indexOf('.') > -1 ? decimals = num.split('.')[1] : decimals
-		let len = num.length
+		if (isNaN(n)) n = 0;
+		let sign = n < 0 ? '-' : '';
+		let num = Math.abs(n).toString();
+		let len = num.length;
 		if (len <= 3) {
-			return num
-		} else {
-			let temp = ''
-			let remainder = len % 3
-			decimals ? temp = '.' + decimals : temp
-			if (remainder > 0) { // 不是3的整数倍
-				return num.slice(0, remainder) + ',' + num.slice(remainder, len).match(/\d{3}/g).join(',') + temp
-			} else { // 是3的整数倍
-				return num.slice(0, len).match(/\d{3}/g).join(',') + temp
-			}
+			return sign + num;
 		}
+		return sign + num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	},
 	formatNumber: function(n) {
 		n = n.toString()

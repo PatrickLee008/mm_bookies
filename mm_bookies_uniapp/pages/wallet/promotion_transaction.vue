@@ -186,7 +186,9 @@
 							data: para
 						}, (res) => {
 							if (res.statusCode === 200) {
-								const items = (res.data.items || []).map(ele => this.parseLog(ele));
+								const items = (res.data.items || [])
+								.map(ele => this.parseLog(ele))
+								.filter(ele => !(ele.type === 'Settlement' && parseFloat(ele.money) === 0));
 
 								if (this.page === 1) {
 									this.recordList = items;
@@ -194,7 +196,9 @@
 									this.recordList.push(...items);
 								}
 
-								this.hasMore = items.length === this.pageSize;
+								const totalCount = res.data.totalCount || 0;
+								const loadedCount = this.page * this.pageSize;
+								this.hasMore = loadedCount < totalCount;
 
 								resolve();
 							} else {
