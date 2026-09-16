@@ -14,7 +14,9 @@
 		<view class="modal-mask" v-if="showModal" @click="closeModal"></view>
 
 		<!-- 聊天模态框 -->
-		<view class="modal-content" :class="{'fullscreen': isFullscreen}" v-if="showModal" @click.stop>
+		<view class="modal-content" :class="{'fullscreen': isFullscreen}" :style="modalStyle" v-if="showModal"
+			@click.stop>
+			<view class="modal-surface" :class="{'fullscreen': isFullscreen}"></view>
 			<!-- 标题区域 -->
 			<view class="modal-header">
 				<view class="header-left">
@@ -32,7 +34,9 @@
 
 			<!-- iframe 聊天内容 -->
 			<view class="modal-iframe-body">
-				<iframe :src="iframeUrl" frameborder="0" class="cs-iframe" @load="handleIframeLoad"></iframe>
+				<iframe :src="iframeUrl" frameborder="0" class="cs-iframe"
+					allow="clipboard-read; clipboard-write; microphone; camera; fullscreen" allowfullscreen
+					@load="handleIframeLoad"></iframe>
 			</view>
 		</view>
 		<!-- #endif -->
@@ -103,6 +107,27 @@
 			}
 		},
 		computed: {
+			// 检测是否为iOS设备
+			isIOSDevice() {
+				if (typeof navigator !== 'undefined' && navigator.userAgent) {
+					return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+				}
+				// #ifdef APP-PLUS
+				return uni.getSystemInfoSync().platform === 'ios'
+				// #endif
+				return false
+			},
+			// H5 modal动态样式：iOS Safari 键盘弹起时 Tab Bar 会盖住 iframe 底部，
+			// 给全屏模态底部加 50px padding 让 iframe 不会被遮挡
+			modalStyle() {
+				if (this.isFullscreen && this.isIOSDevice) {
+					return {
+						paddingBottom: '50px',
+						backgroundColor: '#F6F6F7'
+					}
+				}
+				return {}
+			},
 			// 获取用户信息
 			userInfo() {
 				return this.$store.state.userInfo || {}
@@ -572,10 +597,34 @@
 		height: 100vh;
 		border-radius: 0;
 		z-index: 1001;
+		/* iOS Safari 键盘弹出时 Safari Tab Bar 会盖住 iframe 底部。
+		   让白底背景由独立 .modal-surface 层提供，使 modal-content 保持
+		   透明以便 modalStyle 的 paddingBottom 能露出白底填充 */
+		background-color: transparent;
+		box-shadow: none;
+	}
+
+	.modal-surface {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		border-radius: 20px;
+		background-color: #ffffff;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	.modal-surface.fullscreen {
+		border-radius: 0;
 	}
 
 	/* 标题区域 */
 	.modal-header {
+		position: relative;
+		z-index: 1;
 		background: linear-gradient(135deg, $color-primary 0%, #3c787d 100%);
 		padding: 8px 20px;
 		color: #ffffff;
@@ -642,6 +691,8 @@
 		flex: 1;
 		overflow: hidden;
 		position: relative;
+		z-index: 1;
+		min-height: 0;
 	}
 
 	.cs-iframe {

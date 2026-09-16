@@ -1,5 +1,5 @@
 <template>
-	<view class="customer-service-page" :style="pageStyle">
+	<view class="customer-service-page">
 		<web-view
 			v-if="pageUrl"
 			:src="pageUrl"
@@ -23,23 +23,11 @@ export default {
 			pageUrl: '',
 			pageTitle: 'Customer Service',
 			loading: true,
-			nativeCloseButton: null,
-			isIOS: false,
-			keyboardHeight: 0
-		}
-	},
-	computed: {
-		pageStyle() {
-			if (this.isIOS) {
-				const offset = 85 + this.keyboardHeight
-				return { height: `calc(100vh - ${offset}px)` }
-			}
-			return {}
+			nativeCloseButton: null
 		}
 	},
 	onLoad(options) {
 		const systemInfo = uni.getSystemInfoSync()
-		this.isIOS = systemInfo.platform === 'ios'
 
 		if (options.title) {
 			this.pageTitle = decodeURIComponent(options.title)
@@ -63,19 +51,11 @@ export default {
 	},
 	onReady() {
 		// #ifdef APP-PLUS
-		// 监听键盘事件（iOS web-view内输入时键盘遮挡问题）
-		if (this.isIOS) {
-			try {
-				const currentWebview = this.$scope.$getAppWebview()
-				currentWebview.addEventListener('resize', (e) => {
-					if (e && e.keyboardHeight !== undefined) {
-						this.keyboardHeight = e.keyboardHeight || 0
-					}
-				})
-			} catch (e) {
-				console.warn('keyboard listener failed:', e)
-			}
-		}
+		this.$nextTick(() => {
+			setTimeout(() => {
+				this.createNativeActionButtons()
+			}, 80)
+		})
 		// #endif
 	},
 	onShow() {
@@ -105,7 +85,7 @@ export default {
 	methods: {
 		// #ifdef APP-PLUS
 		// createNativeActionButtons() {
-		// 	if (typeof plus === 'undefined' || !plus.nativeObj || !plus.nativeObj.View) {
+			// 	if (typeof plus === 'undefined' || !plus.nativeObj || !plus.nativeObj.View) {
 		// 		return
 		// 	}
 		// 	this.destroyNativeActionButtons()
