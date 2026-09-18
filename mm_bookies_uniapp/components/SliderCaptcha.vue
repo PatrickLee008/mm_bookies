@@ -21,7 +21,7 @@
 		<view class="slider-track" :class="trackClass">
 			<view class="slider-progress" :class="{ 'progress-animating': isSnapping || isResetting }"
 				:style="{ width: trackProgressWidth + 'px' }"></view>
-			<view class="slider-button" :class="buttonClass" :style="{ left: trackSliderPosition + 'px' }"
+			<view class="slider-button" :class="buttonClass" :style="buttonStyle"
 				@touchstart="onTouchStart" @touchmove.stop="onTouchMove" @touchend="onTouchEnd"
 				@touchcancel="onTouchEnd" @mousedown="onMouseDown">
 				<view v-if="!isSuccess" class="slider-grip">
@@ -41,6 +41,17 @@
 </template>
 
 <script module="canvasCaptcha" lang="renderjs">
+	// 画布基准尺寸（逻辑坐标，必须与外部 config.canvasWidth / canvasHeight 保持一致）
+	const CANVAS_WIDTH = 300
+	const CANVAS_HEIGHT = 202
+	// 拼图块边长：想放大改这里。上限由下方 clamp 兜底，避免吃满画布
+	const PUZZLE_SIZE = 50
+	// 缺口定位边距：左 25、右 50、上 15、下 30（逻辑坐标）
+	const GAP_MIN_X = 25
+	const GAP_MAX_RIGHT = 50
+	const GAP_MIN_Y = 15
+	const GAP_BOTTOM = 30
+
 	function reportImageError(ownerInstance) {
 		if (ownerInstance && typeof ownerInstance.callMethod === 'function') {
 			ownerInstance.callMethod('onCaptchaError')
@@ -88,11 +99,15 @@
 			generateCaptcha(newValue, oldValue, ownerInstance) {
 				if (!newValue) return
 
-				const width = 300
-				const height = 202
-				const puzzleSize = 50
-				const gapX = Math.floor(Math.random() * (width - puzzleSize - 50)) + 25
-				const gapY = Math.floor(Math.random() * (height - puzzleSize - 30)) + 15
+				const width = CANVAS_WIDTH
+				const height = CANVAS_HEIGHT
+				// 拼图块不得吃满画布：至少留出左侧 GAP_MIN_X 与右侧 GAP_MAX_RIGHT
+				const puzzleSize = Math.min(PUZZLE_SIZE, width - GAP_MIN_X - GAP_MAX_RIGHT)
+				// 缺口左/上边缘的取值范围，保证缺口右/下边缘不越出画布
+				const gapXMax = width - GAP_MAX_RIGHT - puzzleSize
+				const gapYMax = height - GAP_BOTTOM - puzzleSize
+				const gapX = Math.floor(Math.random() * Math.max(1, gapXMax - GAP_MIN_X)) + GAP_MIN_X
+				const gapY = Math.floor(Math.random() * Math.max(1, gapYMax - GAP_MIN_Y)) + GAP_MIN_Y
 				const sourceImage = document.createElement('img')
 
 				sourceImage.onload = function() {
@@ -184,36 +199,64 @@
 				containerWidth: 0,
 				trackWidth: 0,
 				canvasHeight: 202,
-				trackScaleRatio: 1,
 				canvasScaleRatio: 1,
 				sliderPosition: 0,
 				startX: 0,
-				sliderButtonSize: 42,
+				// 滑块按钮边长(px)：拼图块 / 缺口的显示边长与它保持严格一致。
+				// 大于轨道高度(44px)时按钮上下鼓出轨道，属预期效果。
+				sliderButtonSize: 50,
 			}
 		},
 		computed: {
+			// 背景图（画布）的显示宽度，与轨道等宽
+			canvasDisplayWidth() {
+				return this.config.canvasWidth * this.canvasScaleRatio
+			},
+			// 拼图块 / 缺口的显示边长：与滑块按钮严格同尺寸。
+			// 这是「拼图块右边缘贴背景图右边缘」与「滑块按钮贴轨道右边缘」
+			// 能同时成立的唯一条件；两者不等时会固定差 |拼图块宽 − 按钮宽|。
+			puzzleDisplaySize() {
+				if (!this.internalCaptchaData.sliderWidth) return 0
+				return this.sliderButtonSize
+			},
+			puzzleDisplayHeight() {
+				const w = this.internalCaptchaData.sliderWidth || 0
+				if (!w) return 0
+				const h = this.internalCaptchaData.sliderHeight || w
+				return this.puzzleDisplaySize * (h / w)
+			},
+			// 拼图块 / 缺口允许出现的范围，超出即被背景图裁掉
+			puzzleMaxLeft() {
+				return Math.max(0, this.canvasDisplayWidth - this.puzzleDisplaySize)
+			},
+			puzzleMaxTop() {
+				return Math.max(0, this.canvasHeight - this.puzzleDisplayHeight)
+			},
+			// 滑块按钮尺寸固定由 sliderButtonSize 决定（高度大于轨道高度时上下自然鼓出，
+			// 因此 .slider-track 不能再有 overflow: hidden，否则会把按钮裁掉）
+			buttonStyle() {
+				const s = this.sliderButtonSize
+				return { left: `${this.sliderPosition}px`, width: `${s}px`, height: `${s}px` }
+			},
 			sliderImageStyle() {
-				if (!this.internalCaptchaData.sliderWidth) return {}
+				if (!this.puzzleDisplaySize) return {}
 				return {
 					position: 'absolute',
-					left: `${this.sliderPosition * this.canvasScaleRatio / this.trackScaleRatio}px`,
-					top: `${this.internalCaptchaData.sliderY * this.canvasScaleRatio}px`,
-					width: `${this.internalCaptchaData.sliderWidth * this.canvasScaleRatio}px`,
-					height: `${(this.internalCaptchaData.sliderHeight || this.internalCaptchaData.sliderWidth) * this.canvasScaleRatio}px`,
+					left: `${Math.min(this.sliderPosition, this.puzzleMaxLeft)}px`,
+					top: `${Math.min(this.internalCaptchaData.sliderY * this.canvasScaleRatio, this.puzzleMaxTop)}px`,
+					width: `${this.puzzleDisplaySize}px`,
+					height: `${this.puzzleDisplayHeight}px`,
 				}
 			},
 			gapStyle() {
-				if (!this.internalCaptchaData.sliderWidth) return {}
+				if (!this.puzzleDisplaySize) return {}
 				return {
 					position: 'absolute',
-					left: `${this.internalCaptchaData.correctX * this.canvasScaleRatio}px`,
-					top: `${this.internalCaptchaData.sliderY * this.canvasScaleRatio}px`,
-					width: `${this.internalCaptchaData.sliderWidth * this.canvasScaleRatio}px`,
-					height: `${(this.internalCaptchaData.sliderHeight || this.internalCaptchaData.sliderWidth) * this.canvasScaleRatio}px`,
+					left: `${Math.min(this.internalCaptchaData.correctX * this.canvasScaleRatio, this.puzzleMaxLeft)}px`,
+					top: `${Math.min(this.internalCaptchaData.sliderY * this.canvasScaleRatio, this.puzzleMaxTop)}px`,
+					width: `${this.puzzleDisplaySize}px`,
+					height: `${this.puzzleDisplayHeight}px`,
 				}
-			},
-			trackSliderPosition() {
-				return this.sliderPosition
 			},
 			trackProgressWidth() {
 				return Math.min(this.trackWidth, this.sliderPosition + this.sliderButtonSize)
@@ -340,7 +383,6 @@
 					if (rect && rect.width) {
 						this.containerWidth = rect.width
 						this.trackWidth = rect.width
-						this.trackScaleRatio = rect.width / this.config.canvasWidth
 					}
 				}).exec()
 			},
@@ -351,13 +393,17 @@
 				this.isSnapping = false
 				this.sliderPosition = 0
 			},
-			// 拖动上限：滑块按钮不出轨道，且拼图块右边缘不超出背景画布
+			// 拖动上限：拼图块右边缘贴背景图最右侧，与滑块按钮贴轨道最右侧是同一个位置。
+			//
+			// 因为拼图块显示尺寸 == 滑块按钮尺寸（见 puzzleDisplaySize），
+			// 且背景图与轨道等宽同起点，所以两个约束在数值上完全一致：
+			//   按钮不出轨道   : sliderPosition ≤ trackWidth − buttonSize
+			//   拼图块不出画布 : sliderPosition ≤ canvasDisplayWidth − puzzleDisplaySize
+			// 取 min 只是防御性写法（两者理论上相等）。
 			maxDragPosition() {
 				const buttonLimit = this.trackWidth - this.sliderButtonSize
-				const puzzleW = this.internalCaptchaData.sliderWidth || 0
-				if (!puzzleW || !this.canvasScaleRatio) return buttonLimit
-				const puzzleLimit = (this.config.canvasWidth - puzzleW) * this.trackScaleRatio / this.canvasScaleRatio
-				return Math.min(buttonLimit, puzzleLimit)
+				const puzzleLimit = this.canvasDisplayWidth - this.puzzleDisplaySize
+				return Math.max(0, Math.min(buttonLimit, puzzleLimit))
 			},
 			onTouchStart(e) {
 				if (!this.isReady || this.isSuccess) return
@@ -403,12 +449,15 @@
 			onMouseDown() {},
 			// #endif
 			verify() {
-				const userX = Math.round(this.sliderPosition / this.trackScaleRatio)
+				if (!this.canvasScaleRatio) return
+				// 拼图块 left(px) 与缺口 left(px) 都用 canvasScaleRatio 映射，
+				// 所以这里必须用同一个比例换算回画布坐标，否则会整体偏移。
+				const userX = Math.round(this.sliderPosition / this.canvasScaleRatio)
 				const isValid = Math.abs(userX - this.internalCaptchaData.correctX) <= 8
 				if (isValid) {
 					const targetPosition = Math.max(0, Math.min(
 					this.maxDragPosition(),
-					this.internalCaptchaData.correctX * this.trackScaleRatio
+					this.internalCaptchaData.correctX * this.canvasScaleRatio
 				))
 					this.isSnapping = true
 					this.sliderPosition = targetPosition
@@ -477,8 +526,9 @@
 	}
 
 	.captcha-gap-pattern {
-		width: 39px;
-		height: 40px;
+		/* 用百分比而非固定 px：拼图块/缺口尺寸随滑块按钮变化，图标才不会溢出被裁 */
+		width: 86%;
+		height: 88%;
 		opacity: 0.4;
 	}
 
@@ -507,8 +557,9 @@
 	.slider-puzzle-pattern {
 		position: relative;
 		z-index: 1;
-		width: 39px;
-		height: 40px;
+		/* 同上：跟随拼图块尺寸缩放 */
+		width: 86%;
+		height: 88%;
 	}
 
 	.success-overlay {
@@ -534,21 +585,24 @@
 		height: 44px;
 		margin-top: 12px;
 		background: $bg-color-info;
-		border: 1px solid rgba(136, 224, 229, 0.12);
+		/* 用内阴影代替 border：border 会挤占内容盒宽度，使轨道可用宽度比
+		   背景图少 2px，从而导致滑块按钮与拼图块的「最右」位置差 2px */
+		box-shadow: inset 0 0 0 1px rgba(136, 224, 229, 0.12);
 		border-radius: 22px;
-		overflow: hidden;
+		/* 这里不能设 overflow: hidden —— 滑块按钮(50px)高于轨道(44px)时需要鼓出来，
+		   设了会被裁成半圆。进度条自身带 999px 圆角，不依赖父级裁剪。 */
 		box-sizing: border-box;
 
 		&.track-success {
-			border-color: rgba(136, 224, 229, 0.55);
+			box-shadow: inset 0 0 0 1px rgba(136, 224, 229, 0.55);
 		}
 
 		&.track-error {
-			border-color: rgba(255, 91, 104, 0.75);
+			box-shadow: inset 0 0 0 1px rgba(255, 91, 104, 0.75);
 		}
 
 		&.track-snapping {
-			border-color: rgba(255, 255, 255, 0.55);
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
 		}
 	}
 
@@ -557,7 +611,7 @@
 		top: 0;
 		left: 0;
 		height: 100%;
-		border-radius: 22px;
+		border-radius: 999px;
 		background: $color-secondary;
 
 		&.progress-animating {
@@ -573,8 +627,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 42px;
-		height: 42px;
+		width: 50px;
+		height: 50px;
 		background: $color-secondary-light;
 		border: 0;
 		border-radius: 50%;
@@ -622,7 +676,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		height: 44px;
+		height: 100%;
 		color: $color-primary;
 		font-size: 12px;
 		font-weight: 500;

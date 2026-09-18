@@ -30,7 +30,7 @@
 					v-show="searchKeyword" @tap="clearSearch"></theme-icon>
 			</view>
 			<view class="filter-btn" @tap="hide_league_filter = false">
-				<view>{{$t('league')}}</view>
+			<view>League</view>
 				<view class="filter-icon">
 					<view class="filter-line"></view>
 					<view class="filter-line"></view>

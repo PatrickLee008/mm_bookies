@@ -874,7 +874,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 0 30rpx;
+		padding: 0 30rpx 30rpx;
 		box-sizing: border-box;
 	}
 
@@ -932,6 +932,9 @@
 	.login-form {
 		width: 100%;
 		margin-bottom: 30rpx;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
 	}
 
 	.welcome-text {
@@ -949,12 +952,15 @@
 
 	.input-field {
 		height: 85rpx;
+		line-height: 85rpx;
 		background-color: $bg-login-input;
 		border: 2rpx solid $color-border-other;
 		border-radius: 20rpx;
-		padding: 0 100rpx 0 40rpx;
+		padding: 0 70rpx 0 40rpx;
 		font-size: 28rpx;
 		color: $color-login-input;
+		-webkit-text-fill-color: $color-login-input;
+		caret-color: $color-login-input;
 		box-sizing: border-box;
 		text-align: center;
 		font-style: italic;
@@ -965,6 +971,7 @@
 		text-align: center;
 		font-style: italic;
 		font-size: 24rpx;
+		line-height: 85rpx;
 	}
 
 	.input-error {
@@ -973,7 +980,7 @@
 
 	.password-toggle {
 		position: absolute;
-		right: 20rpx;
+		right: 8rpx;
 		top: 42.5rpx;
 		transform: translateY(-50%);
 		width: 60rpx;
@@ -981,6 +988,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		z-index: 1;
 	}
 
 	.eye-icon {
@@ -1101,6 +1109,8 @@
 		font-size: 24rpx;
 		font-weight: bold;
 		font-style: italic;
+		margin-top: auto;
+		padding-top: 20rpx;
 	}
 
 	.register-text {

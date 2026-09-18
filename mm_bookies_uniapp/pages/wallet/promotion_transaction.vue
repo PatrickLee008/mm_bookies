@@ -43,16 +43,14 @@
 						<text class="order-time">{{formatTime(item.create_time)}}</text>
 					</view>
 
-					<!-- 类型行：● + 类型 | 支付方式logo+名称 -->
+					<!-- 类型行：● + 类型 | 资金去向 -->
 					<view class="card-type-row">
 						<view class="type-left">
 							<text class="type-name">{{item.display_type || item.type}}</text>
 						</view>
-						<!-- <view class="pay-right">
-							<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
-								class="pay-logo"></image>
-							<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
-						</view> -->
+						<view v-if="item.display_target" class="type-right">
+							<text class="target-text">{{item.display_target}}</text>
+						</view>
 					</view>
 
 					<!-- 金额行 -->
@@ -123,6 +121,11 @@
 						checked: true
 					},
 				],
+				// 结算去向文案映射：target 实际为 Ewallet 时业务上即主钱包(Main Wallet)。
+				// 未收录的 target 原样输出，因此 target 为 System 时会显示 To System。
+				settlementTargetLabels: {
+					Ewallet: 'Main Wallet',
+				},
 			}
 		},
 		methods: {
@@ -254,6 +257,10 @@
 					ele.display_type = 'Settlement'
 					ele.display_subtype = type_sub === 'Football' ? 'Football Win' : type_sub === 'Egame' ? 'eGame Win' :
 						''
+					// 促销钱包结算：在类型行右侧标出资金去向
+					if (ele.source === 'ProWallet') {
+						ele.display_target = this.getSettlementTargetText(ele)
+					}
 				} else if (type === 'Refund') {
 					ele.display_type = 'Refund'
 					ele.display_subtype = type_sub === 'Football' ? 'Football Refund' : type_sub === 'Egame' ?
@@ -274,6 +281,13 @@
 					ele.display_type = type
 				}
 				return ele
+			},
+
+			// 结算去向文案：每条数据的 target 只有一个值，所以只取一段，不拼 source
+			getSettlementTargetText(ele) {
+				const targetLabel = this.settlementTargetLabels[ele.target] || ele.target
+				if (!targetLabel) return ''
+				return `To ${targetLabel}`
 			},
 
 			formatTime(time) {
@@ -503,6 +517,19 @@
 		font-size: 15px;
 		font-weight: 600;
 		color: $color-primary;
+	}
+
+	/* 类型行右侧：结算资金去向 */
+	.type-right {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.target-text {
+		font-size: 13px;
+		font-weight: 600;
+		color: $color-secondary;
 	}
 
 	.pay-right {

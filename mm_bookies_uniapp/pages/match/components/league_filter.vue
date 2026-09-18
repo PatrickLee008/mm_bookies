@@ -8,7 +8,7 @@
 		<view class="filter-container" :class="{'filter-show': !hidden}">
 			<!-- 标题栏 -->
 			<view class="filter-header">
-				<text class="filter-title">{{ $t('filter') }}</text>
+				<text class="filter-title">Filter</text>
 			</view>
 
 			<!-- 滚动列表区域 -->
