@@ -51,7 +51,7 @@ promotion = Blueprint('promotion', __name__)
 # ==================== 辅助函数 ====================
 
 def is_promotion_valid(promotion):
-    """检查促销活动是否有效"""
+    """检查促销活动是否有效（参考 InvitationActivityV2Controller.is_activity_valid）"""
     if not promotion or promotion.del_flag != 0:
         return False
 
@@ -63,7 +63,13 @@ def is_promotion_valid(promotion):
     if promotion.is_pool_exhausted == 1:
         return False
 
-    # 检查奖金池余额
+    # 检查托管状态：2-已退款，说明活动已完成资金结算并终止
+    # 正常结束流程应同步把 status 置为 Inactive，但历史脏数据可能残留 status=Active，
+    # 表现为"状态正常、时间有效、奖金池为 0"，前端仍能看到并点击参与，直到报错
+    if promotion.escrow_status == 2:
+        return False
+
+    # 检查奖金池余额（NULL 视为无效：后续扣减发生在 participate 中，NULL 会直接报错）
     if not promotion.bonus_pool_remaining or promotion.bonus_pool_remaining <= 0:
         return False
 
@@ -258,6 +264,57 @@ def should_use_main_wallet(promotion):
     return turnover_multiplier == 0 and net_win_amount == 0
 
 
+def calc_manual_end_conditions(promotion, promo_balance, cur_turnover=None, req_turnover=None,
+                               cur_netwin=None, req_netwin=None):
+    """统一计算"手动结束促销"的判定条件，供 /list、/progress、/end 三处共用。
+
+    背景：该判定原先在三个接口里各写了一遍，且对 manual_end_min_amount 为 NULL 的处理互不一致
+    （/list、/progress 把 NULL 当 0 算出 can_end=true，/end 却因真值判断直接拒绝），
+    导致"App 显示可结束、一点就报 The current promotion cannot be manually ended."。
+
+    判定规则（与原逻辑一致，只统一了口径）：
+      条件1 balance_condition_met：促销钱包余额 <= manual_end_min_amount（即"输光了"）。
+           阈值语义：NULL 代表后台未填阈值，按下限 0 处理；不能当成"不允许手动结束"。
+      条件2 requirements_met：流水、净赢要求都达标（未配置的要求视为已达标）。
+      两个条件满足任意一个即可结束。
+
+    Returns:
+        (can_end, balance_condition_met, requirements_met, unmet_conditions)
+        unmet_conditions 可直接返回给前端，仅包含未达标项。
+    """
+    promo_balance = Decimal(str(promo_balance or 0))
+
+    min_end_amount = promotion.manual_end_min_amount
+    min_end_amount = Decimal('0') if min_end_amount is None else Decimal(str(min_end_amount))
+
+    # 条件1：促销钱包余额低于阈值
+    balance_condition_met = promo_balance <= min_end_amount
+
+    # 条件2：流水和净赢达标
+    unmet_conditions = []
+
+    cur_turnover = Decimal(str(cur_turnover or 0))
+    req_turnover = Decimal(str(req_turnover or 0))
+    if req_turnover > 0 and cur_turnover < req_turnover:
+        unmet_conditions.append(
+            f'Turnover requirement not met. Required: {float(req_turnover)}, '
+            f'Current: {float(cur_turnover)}, Remaining: {float(req_turnover - cur_turnover)}')
+
+    cur_netwin = Decimal(str(cur_netwin or 0))
+    req_netwin = Decimal(str(req_netwin or 0))
+    if req_netwin > 0 and cur_netwin < req_netwin:
+        unmet_conditions.append(
+            f'Net win requirement not met. Required: {float(req_netwin)}, '
+            f'Current: {float(cur_netwin)}, Remaining: {float(req_netwin - cur_netwin)}')
+
+    requirements_met = len(unmet_conditions) == 0
+
+    # 只要满足其中一个条件即可
+    can_end = balance_condition_met or requirements_met
+
+    return can_end, balance_condition_met, requirements_met, unmet_conditions
+
+
 # ==================== API 接口 ====================
 
 @promotion.route('/test_list', methods=['GET'])
@@ -378,6 +435,9 @@ def get_promotion_list():
 
         # 检查用户是否有任何正在参加的活动（不限类型）
         # INVITATION活动如果已完成流水/净赢要求（is_requirement_met=1）则不阻止参与
+        # 注：此处不过滤活动本身失效的情况（已退款结算 escrow_status=2 / 奖金池耗尽 / 池余额为 0 /
+        #     超出时间范围）。这类活动仍会返回给前端，由 can_participate=false + message 让前端
+        #     置灰并在点击时提示原因，避免"卡片凭空消失"让人以为数据丢了。
         _raw_active = AppPlayerActivityRecord.query.filter(
             AppPlayerActivityRecord.mb_id == user_id,
             AppPlayerActivityRecord.del_flag == 0,
@@ -465,6 +525,9 @@ def get_promotion_list():
                 min_amt = float(promo.min_participation_amount) if promo.min_participation_amount else 0
                 max_amt = float(promo.max_participation_amount) if promo.max_participation_amount else 0
 
+            # 活动本身是否仍然有效（状态 / 托管 / 奖金池 / 时间范围）
+            promotion_valid = is_promotion_valid(promo)
+
             # 根据参与次数限制调整状态显示
             # 若用户当前正在参与该活动，即使达到次数上限也不显示 Completed
             display_status = 'Completed' if (participation_limit_reached and not existing_activity) else (promo.status if promo.status else 'Unknown')
@@ -482,14 +545,18 @@ def get_promotion_list():
                 'turnover_multiplier': float(promo.turnover_multiplier) if promo.turnover_multiplier else 0,
                 'net_win_amount': float(promo.net_win_amount) if promo.net_win_amount else 0,
                 'bonus_pool_remaining': float(promo.bonus_pool_remaining) if promo.bonus_pool_remaining else 0,
+                'is_pool_exhausted': 1 if promo.is_pool_exhausted == 1 else 0,
+                'escrow_status': promo.escrow_status if promo.escrow_status is not None else 0,
                 'fund_source_type': promo.fund_source_type if promo.fund_source_type else 'AGENT',
                 'is_participated': existing_activity is not None,
                 'participation_status': existing_activity.status if existing_activity else None,
-                'can_participate': eligible and not existing_activity and not has_any_active and not participation_limit_reached,
+                'is_promotion_valid': promotion_valid,
+                'can_participate': eligible and not existing_activity and not has_any_active and not participation_limit_reached and promotion_valid,
                 'message': eligible_msg if not eligible else (
-                    'Participation limit reached' if participation_limit_reached else (
-                        'Already participated' if existing_activity else (
-                            'You already have an active activity' if has_any_active else 'Available'))),
+                    'Promotion is not valid or has ended' if not promotion_valid else (
+                        'Participation limit reached' if participation_limit_reached else (
+                            'Already participated' if existing_activity else (
+                                'You already have an active activity' if has_any_active else 'Available')))),
                 # 参与金额相关字段
                 'participation_amount_type': promo.participation_amount_type if promo.participation_amount_type else 'Fixed',
                 'min_amount': min_amt,
@@ -535,23 +602,17 @@ def get_promotion_list():
                         is_completed = existing_activity.cur_netwin >= existing_activity.req_netwin
 
                 # 判断是否可以结束促销：默认不可结束
+                # 判定逻辑与 /progress、/end 共用 calc_manual_end_conditions，勿在此处另写一套
                 can_end = False
                 if promo.manual_end_enabled:
-                    promo_balance = float(user.money_promotion) if user.money_promotion else 0
-                    min_end_amt = float(promo.manual_end_min_amount) if promo.manual_end_min_amount else 0
-
-                    # 条件1：余额低于阈值
-                    balance_condition_met = promo_balance <= min_end_amt
-
-                    # 条件2：流水和净赢达标
-                    turnover_met = turnover_percentage >= 100 or not (
-                            existing_activity.req_turnover and existing_activity.req_turnover > 0)
-                    netwin_met = netwin_percentage >= 100 or not (
-                            existing_activity.req_netwin and existing_activity.req_netwin > 0)
-                    requirements_met = turnover_met and netwin_met
-
-                    # 只要满足其中一个条件即可
-                    can_end = balance_condition_met or requirements_met
+                    can_end, _, _, _ = calc_manual_end_conditions(
+                        promo,
+                        user.money_promotion,
+                        existing_activity.cur_turnover,
+                        existing_activity.req_turnover,
+                        existing_activity.cur_netwin,
+                        existing_activity.req_netwin,
+                    )
 
                 # 添加进度信息
                 promo_info['progress'] = {
@@ -640,6 +701,9 @@ def get_promotion_detail(promotion_id):
             PROMOTION_STATUS_SCHEDULED: 'SCHEDULED'
         }
 
+        # 活动整体是否仍然有效（状态 / 托管 / 奖金池 / 时间范围）
+        promotion_valid = is_promotion_valid(promotion_obj)
+
         detail = {
             'id': promotion_obj.id,
             'title': promotion_obj.title,
@@ -655,10 +719,14 @@ def get_promotion_detail(promotion_id):
             'payout_limit': float(promotion_obj.payout_limit) if promotion_obj.payout_limit else 0,
             'bonus_pool_remaining': float(
                 promotion_obj.bonus_pool_remaining) if promotion_obj.bonus_pool_remaining else 0,
+            'is_pool_exhausted': 1 if promotion_obj.is_pool_exhausted == 1 else 0,
+            'escrow_status': promotion_obj.escrow_status if promotion_obj.escrow_status is not None else 0,
             'fund_source_type': promotion_obj.fund_source_type if promotion_obj.fund_source_type else 'AGENT',
             'is_participated': existing_activity is not None,
-            'can_participate': eligible and not existing_activity and is_promotion_valid(promotion_obj),
-            'eligibility_message': eligible_msg
+            'is_promotion_valid': promotion_valid,
+            'can_participate': eligible and not existing_activity and promotion_valid,
+            'eligibility_message': eligible_msg,
+            'invalid_reason': None if promotion_valid else 'Promotion is not valid or has ended'
         }
 
         return jsonify({
@@ -1216,23 +1284,18 @@ def get_promotion_progress(promotion_id):
                 is_completed = cur_netwin >= activity_record.req_netwin
 
         # 判断是否可以结束促销：默认不可结束
+        # 判定逻辑与 /list、/end 共用 calc_manual_end_conditions，勿在此处另写一套
         can_end = False
         user = g.user
         if promotion_obj.manual_end_enabled:
-            promo_balance = float(user.money_promotion) if user.money_promotion else 0
-            min_end_amt = float(promotion_obj.manual_end_min_amount) if promotion_obj.manual_end_min_amount else 0
-
-            # 条件1：余额低于阈值
-            balance_condition_met = promo_balance <= min_end_amt
-
-            # 条件2：流水和净赢达标
-            turnover_met = turnover_percentage >= 100 or not (
-                    activity_record.req_turnover and activity_record.req_turnover > 0)
-            netwin_met = netwin_percentage >= 100 or not (activity_record.req_netwin and activity_record.req_netwin > 0)
-            requirements_met = turnover_met and netwin_met
-
-            # 只要满足其中一个条件即可
-            can_end = balance_condition_met or requirements_met
+            can_end, _, _, _ = calc_manual_end_conditions(
+                promotion_obj,
+                user.money_promotion,
+                cur_turnover,
+                activity_record.req_turnover,
+                cur_netwin,
+                activity_record.req_netwin,
+            )
 
         progress_data = {
             'has_participated': True,
@@ -1547,11 +1610,14 @@ def end_promotion():
                 'data': None,
                 'message': 'Promotion does not exist'
             }), 404
-        if not promotion_obj.manual_end_enabled or not promotion_obj.manual_end_min_amount:
+        # 只判断是否启用手动结束；manual_end_min_amount 为 NULL 时按下限 0 处理
+        # （见 calc_manual_end_conditions）。原先用真值判断会把 NULL 当成"未配置"而直接拒绝，
+        # 造成玩家输光后 App 显示可结束、一点就报 The current promotion cannot be manually ended.
+        if not promotion_obj.manual_end_enabled:
             return jsonify({
                 'code': CONDITION_NOT_MET_CODE,
                 'data': None,
-                'message': f'The current promotion cannot be manually ended.'
+                'message': 'The current promotion cannot be manually ended.'
             }), 400
         # ==================== 0. 检查促销钱包余额 ====================
         # 获取会员信息（加锁）
@@ -1581,36 +1647,21 @@ def end_promotion():
         win_statuses = [BetStatus.Win, BetStatus.HalfWin]
         cur_netwin = member.money_promotion if member.money_promotion else Decimal('0')
 
-        # 检查条件是否满足
+        # 检查条件是否满足（与 /list、/progress 共用 calc_manual_end_conditions，保证 can_end 展示与接口放行口径一致）
         # 逻辑：
         # 1. 如果促销钱包余额 <= 最小结束金额，则允许结束（输光了）
         # 2. 否则，必须满足所有流水/净赢要求才能结束
-
-        balance_condition_met = False
-        requirements_met = True
-        unmet_conditions = []
-
-        # 检查条件1：余额是否低于阈值
-        if promotion_obj.manual_end_min_amount is not None and promo_balance <= promotion_obj.manual_end_min_amount:
-            balance_condition_met = True
-
-        # 检查条件2：是否满足流水/净赢要求
-        if activity_record.req_turnover and activity_record.req_turnover > 0:
-            if cur_turnover < activity_record.req_turnover:
-                requirements_met = False
-                remaining_turnover = activity_record.req_turnover - cur_turnover
-                unmet_conditions.append(
-                    f'Turnover requirement not met. Required: {float(activity_record.req_turnover)}, Current: {float(cur_turnover)}, Remaining: {float(remaining_turnover)}')
-
-        if activity_record.req_netwin and activity_record.req_netwin > 0:
-            if cur_netwin < activity_record.req_netwin:
-                requirements_met = False
-                remaining_netwin = activity_record.req_netwin - cur_netwin
-                unmet_conditions.append(
-                    f'Net win requirement not met. Required: {float(activity_record.req_netwin)}, Current: {float(cur_netwin)}, Remaining: {float(remaining_netwin)}')
+        can_end, balance_condition_met, requirements_met, unmet_conditions = calc_manual_end_conditions(
+            promotion_obj,
+            promo_balance,
+            cur_turnover,
+            activity_record.req_turnover,
+            cur_netwin,
+            activity_record.req_netwin,
+        )
 
         # 综合判断：只要满足其中一个条件即可
-        if not balance_condition_met and not requirements_met:
+        if not can_end:
             return jsonify({
                 'code': CONDITION_NOT_MET_CODE,
                 'data': {
