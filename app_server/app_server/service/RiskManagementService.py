@@ -20,6 +20,16 @@ def get_blacklist_model():
         return None
 
 
+def get_member_coupon_model():
+    """延迟导入会员优惠券领取记录模型"""
+    try:
+        from app_server.model.MAppMemberCouponModel import MAppMemberCoupon
+        return MAppMemberCoupon
+    except ImportError:
+        logger.warning("无法导入 MAppMemberCoupon 模型，优惠券持久化IP/设备校验将被跳过")
+        return None
+
+
 class RiskManagementService:
     """
     风险管理服务
@@ -110,13 +120,13 @@ class RiskManagementService:
 
             # 2. IMEI/设备ID 限制检查（全局限制）
             if imei:
-                imei_result = service._check_imei_restrictions(imei, coupon_id, config)
+                imei_result = service._check_imei_restrictions(imei, coupon_id, config, activity_type=activity_type)
                 if not imei_result['allowed']:
                     logger.warning(f"设备限制拦截: {imei_result['reason']}")
                     return imei_result
 
             # 3. IP地址限流检查（全局限制）
-            ip_result = service._check_ip_throttling(ip, coupon_id, config)
+            ip_result = service._check_ip_throttling(ip, coupon_id, config, activity_type=activity_type)
             if not ip_result['allowed']:
                 logger.warning(f"IP限制拦截: {ip_result['reason']}")
                 return ip_result
@@ -201,8 +211,63 @@ class RiskManagementService:
             # 黑名单检查失败时，允许通过，避免影响正常业务
             return {'allowed': True, 'reason': f'Blacklist check error: {str(e)}', 'risk_level': 'LOW'}
 
-    def _check_imei_restrictions(self, imei: str, coupon_id: str, config: Dict) -> Dict[str, Any]:
-        """IMEI限制检查 - 针对当前优惠券的限制"""
+    def _count_coupon_claims_by_ip(self, ip: str, coupon_id: str, window_start: datetime,
+                                    activity_type: Optional[str]) -> Optional[int]:
+        """查询指定IP在时间窗口内对当前优惠券的持久化领取次数。
+
+        仅对 activity_type='Coupon' 生效；不是优惠券或无法查询时返回 None，
+        由调用方回退到内存计数。
+        """
+        if activity_type != 'Coupon':
+            return None
+        if not ip or ip == '0.0.0.0':
+            return None
+        MAppMemberCoupon = get_member_coupon_model()
+        if MAppMemberCoupon is None:
+            return None
+        try:
+            return MAppMemberCoupon.query.filter(
+                MAppMemberCoupon.p_id == coupon_id,
+                MAppMemberCoupon.mb_ip == ip,
+                MAppMemberCoupon.create_time >= window_start,
+                MAppMemberCoupon.del_flag == 0,
+            ).count()
+        except Exception as e:
+            logger.error(f"查询优惠券IP领取次数失败: {str(e)}")
+            return None
+
+    def _count_coupon_claims_by_device(self, device_id: str, coupon_id: str, window_start: datetime,
+                                        activity_type: Optional[str]) -> Optional[int]:
+        """查询指定设备在时间窗口内对当前优惠券的持久化领取次数。
+
+        仅对 activity_type='Coupon' 生效；不是优惠券或无法查询时返回 None，
+        由调用方回退到内存计数。
+        """
+        if activity_type != 'Coupon':
+            return None
+        if not device_id:
+            return None
+        MAppMemberCoupon = get_member_coupon_model()
+        if MAppMemberCoupon is None:
+            return None
+        try:
+            return MAppMemberCoupon.query.filter(
+                MAppMemberCoupon.p_id == coupon_id,
+                MAppMemberCoupon.device_id == device_id,
+                MAppMemberCoupon.create_time >= window_start,
+                MAppMemberCoupon.del_flag == 0,
+            ).count()
+        except Exception as e:
+            logger.error(f"查询优惠券设备领取次数失败: {str(e)}")
+            return None
+
+    def _check_imei_restrictions(self, imei: str, coupon_id: str, config: Dict,
+                                 activity_type: Optional[str] = None) -> Dict[str, Any]:
+        """IMEI限制检查 - 针对当前优惠券的限制
+
+        对于 activity_type='Coupon'，直接查询持久化的 MAppMemberCoupon 领取记录，
+        避免内存状态在 uWSGI 多 worker 之间不一致以及进程重启后丢失计数。
+        """
         imei_limit = config.get('imei_limit_count', 5)
         time_window_hours = config.get('ip_time_window_hours', 1)  # 使用相同的时间窗口
 
@@ -213,11 +278,16 @@ class RiskManagementService:
         # 计算时间窗口
         window_start = datetime.now() - timedelta(hours=time_window_hours)
 
-        # 检查该IMEI在时间窗口内对当前优惠券的成功兑换次数
-        successful_redemptions = sum(
-            1 for attempt in self.imei_attempts.get(imei, [])
-            if attempt.timestamp > window_start and attempt.successful and attempt.coupon_id == coupon_id
+        # 优先用数据库持久化记录计数（当前仅覆盖优惠券）
+        successful_redemptions = self._count_coupon_claims_by_device(
+            imei, coupon_id, window_start, activity_type
         )
+        if successful_redemptions is None:
+            # 非优惠券场景或查询失败，退回内存计数（旧行为）
+            successful_redemptions = sum(
+                1 for attempt in self.imei_attempts.get(imei, [])
+                if attempt.timestamp > window_start and attempt.successful and attempt.coupon_id == coupon_id
+            )
 
         if successful_redemptions >= imei_limit:
             return {
@@ -236,8 +306,13 @@ class RiskManagementService:
             f"IMEI检查通过: imei={imei}, redemptions={successful_redemptions}/{imei_limit}, window={time_window_hours}h")
         return {'allowed': True, 'reason': 'IMEI restriction check passed', 'risk_level': 'LOW'}
 
-    def _check_ip_throttling(self, ip: str, coupon_id: str, config: Dict) -> Dict[str, Any]:
-        """IP地址监控和限流 - 针对当前优惠券的限制"""
+    def _check_ip_throttling(self, ip: str, coupon_id: str, config: Dict,
+                             activity_type: Optional[str] = None) -> Dict[str, Any]:
+        """IP地址监控和限流 - 针对当前优惠券的限制
+
+        对于 activity_type='Coupon'，直接查询持久化的 MAppMemberCoupon 领取记录，
+        避免内存状态在 uWSGI 多 worker 之间不一致以及进程重启后丢失计数。
+        """
         ip_limit = config.get('ip_limit_count', 10)
         time_window_hours = config.get('ip_time_window_hours', 1)
 
@@ -248,12 +323,17 @@ class RiskManagementService:
         # 计算时间窗口
         window_start = datetime.now() - timedelta(hours=time_window_hours)
 
-        # 检查该IP在时间窗口内对当前优惠券的成功兑换次数
-        recent_attempts = sum(
-            1 for attempt in self.ip_attempts.get(ip, [])
-            if attempt.timestamp > window_start and attempt.successful and attempt.coupon_id == coupon_id
+        # 优先用数据库持久化记录计数（当前仅覆盖优惠券）
+        recent_attempts = self._count_coupon_claims_by_ip(
+            ip, coupon_id, window_start, activity_type
         )
-      
+        if recent_attempts is None:
+            # 非优惠券场景或查询失败，退回内存计数（旧行为）
+            recent_attempts = sum(
+                1 for attempt in self.ip_attempts.get(ip, [])
+                if attempt.timestamp > window_start and attempt.successful and attempt.coupon_id == coupon_id
+            )
+
         if recent_attempts >= ip_limit:
             return {
                 'allowed': False,
