@@ -103,8 +103,12 @@ class Config(object):
     PAY_CENTER_API = get_env_required('PAY_CENTER_API')
     PAY_CENTER_APP_ID = get_env_required('PAY_CENTER_APP_ID')
     PAY_CENTER_APP_AES_SECRET = get_env_required('PAY_CENTER_APP_AES_SECRET')
-    # 支付通道类型：VIPPay 或 TCPay
+    # 支付通道类型：VIPPay 或 TCPay（仅作为 /channels 失败时的降级兜底）
     PAY_CHANNEL_TYPE = get_env_optional('PAY_CHANNEL_TYPE', 'VIPPay')
+    # 联调用：临时覆盖支付中心的 agentId（留空则用用户实际 aid）
+    PAY_CENTER_AGENT_ID = get_env_optional('PAY_CENTER_AGENT_ID', None)
+    # H5 端外部收银页付款后回跳地址（留空则不传 returnUrl）
+    CHARGE_RETURN_URL = get_env_optional('CHARGE_RETURN_URL', '')
 
     # AWC API配置
     AWC_API_ENABLED = get_env_bool('AWC_API_ENABLED')

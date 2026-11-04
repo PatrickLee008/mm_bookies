@@ -218,6 +218,8 @@
 			});
 			// 监听页面滚动事件，控制header收起/展开
 			uni.$on('header:setCollapsed', this.handleSetCollapsed);
+			// 充值/提现成功后刷新顶栏余额，否则用户看到的是旧值
+			uni.$on('userInfo:refresh', this.getUserInfo);
 		},
 		activated() {
 			this.updateActiveNav();
@@ -418,6 +420,7 @@
 			uni.$off('message:update')
 			uni.$off('message:unreadUpdate')
 			uni.$off('header:setCollapsed', this.handleSetCollapsed)
+			uni.$off('userInfo:refresh', this.getUserInfo)
 		}
 	}
 </script>

@@ -137,7 +137,7 @@
 					<view class="padding-sm"></view>
 					<view class="solid-top flex-row justify-between height-57px text-black"
 						style="border-top: 1px solid #626262;">
-						<view class="width-50" @click="modalName=''">
+						<view class="width-50" @click="cancelOrder">
 							{{$t('payment.cancel')}}
 						</view>
 						<view class="height-100 width-1px" style="background-color: #626262;"></view>
@@ -209,6 +209,33 @@
 			if (intervalSearch) clearInterval(intervalSearch);
 		},
 		methods: {
+			/**
+			 * 取消订单：之前只是 modalName='' 关掉提示，订单仍然有效、页面也不返回，
+			 * 用户返回历史页时依然看到可继续的订单。
+			 */
+			cancelOrder() {
+				this.$notice.confirm(
+					'Are you sure you want to cancel this order?',
+					() => {
+						this.$http.post('/charge_apply/cancel', { order_id: this.dataId }, (res) => {
+							const d = res.data || {};
+							const map = {
+								NOT_CANCELLABLE: 'This order can no longer be cancelled.',
+								CANCEL_LIMIT_REACHED: "Today's cancellation limit has been reached."
+							};
+							uni.showToast({
+								title: d.code === 20000 ? 'Order cancelled' : (map[d.error_code] || d.message || 'Unable to cancel'),
+								icon: 'none'
+							});
+							setTimeout(() => uni.navigateBack(), 800);
+						}, {
+							fail: () => uni.navigateBack()
+						});
+					},
+					null,
+					{ confirmText: 'Yes', cancelText: 'No' }
+				);
+			},
 			getdata() {
 				let that = this;
 				that.$httpPay.post('/pay/order/payment', {

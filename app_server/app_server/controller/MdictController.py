@@ -58,6 +58,11 @@ def get_configs():
         "under_maintenance": app_front_setting.updateState,
         "ai_helper_host": app_front_setting.aiHelperHost,
         "ai_helper_token": app_front_setting.aiHelperToken,
+        # 各通道的充值教程视频（后台 setting/AppConfigForm 配置）
+        "vip_video_link": app_front_setting.vipVideoLink or '',
+        "king_video_link": app_front_setting.kingVideoLink or '',
+        "tc_video_link": app_front_setting.tcVideoLink or '',
+        "mc_video_link": app_front_setting.mcVideoLink or '',
     }
     #items属性重decimal转float
     items = Kits.decimal_to_float( items)

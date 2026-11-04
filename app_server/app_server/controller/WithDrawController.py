@@ -10,6 +10,7 @@ from app_server.model.WithDrawModel import WithDraw
 from app_server.model.WithDrawGroupModel import WithDrawGroup
 # from app_server.model.AppAdjustmentModel import AppAdjustment
 from app_server.utils.Kits import Kits
+from app_server.utils import BankCodeMap
 from app_server.model.AppAgentModel import AppAgent
 from app_server.utils.MessageHelper import MessageHelper
 from app_server.utils.MemberMessageService import MemberMessageService
@@ -414,20 +415,33 @@ def apply_withdraw():
             return response
         # ============= 流水验证结束 =============
 
-        spare_groups = WithDrawGroup.query.filter(WithDrawGroup.HANDLE_ON).all()
-        if not len(spare_groups):
-            response = jsonify({'message': "Too many players withdrawing cash, please try again later."})
-            response.status_code = 429
-            return response
+        # 2026-10-29 支付中心接入：按提现金额路由到对应提现组
+        # 取代原 m_dict 轮询 + 用户粘滞组（Redis user_withdraw{x}）。
+        # 金额需落入某组的 [MIN_AMOUNT, MAX_AMOUNT]（含端点）；MAX_AMOUNT<=0 视为未配置，不参与路由。
+        wd_money = float(money)
+        matched_group = WithDrawGroup.query.filter(
+            WithDrawGroup.MAX_AMOUNT > 0,
+            WithDrawGroup.MIN_AMOUNT <= wd_money,
+            WithDrawGroup.MAX_AMOUNT >= wd_money,
+        ).order_by(WithDrawGroup.MIN_AMOUNT.asc()).first()
+        if not matched_group:
+            db.session.rollback()
+            response = jsonify({'message': "No withdrawal counter available for this amount."})
             response.status_code = 400
             return response
-        spare_groups = [u.ID for u in spare_groups]
-        logger.info(f"可用提现组: {spare_groups}")
+
+        # 行锁匹配到的组，校验开关与处理上限（关闭或已满则拒绝）
+        next_group = WithDrawGroup.query.filter(
+            WithDrawGroup.ID == matched_group.ID).with_for_update().first()
+        if (not next_group.HANDLE_ON) or (next_group.NOW_HANDLE >= next_group.MAX_HANDLE):
+            db.session.rollback()
+            response = jsonify({'message': "The withdrawal counter is full or closed, please try again later."})
+            response.status_code = 400
+            return response
+        next_group_id = next_group.ID
 
         now = datetime.datetime.now()
         key_date = now.date()
-        # if now.hour < 12:
-        #     key_date -= datetime.timedelta(days=1)
 
         after_amount = before_amount - float(money)
         user.money = after_amount
@@ -441,39 +455,30 @@ def apply_withdraw():
         Redis.incr(date_key)
         withdraw_code = "%05d" % int(Redis.get(date_key))
 
-        group_key = "user_withdraw%s" % user.id
-        group_value = Redis.get(group_key)
-        if group_value and int(group_value) in spare_groups:
-            logger.info(f"用户已有提现组 - 用户ID: {user.id}, 组ID: {group_value}, 过期时间(秒): {Redis.ttl(group_key)}")
-            next_group_id = int(group_value)
-        else:
-            cur_work_group = finance_default_config.cur_withdraw_group
-            cur_group_id = int(cur_work_group)
-            next_group_id = spare_groups[0]
-            for gr in spare_groups:
-                if gr > cur_group_id:
-                    next_group_id = gr
-                    break
-            cur_work_group = next_group_id
-        # 处理达到上限
-        next_group = WithDrawGroup.query.filter(WithDrawGroup.ID == next_group_id).with_for_update().first()
+        # 累计该组处理数，达到上限自动关闭
         next_group.NOW_HANDLE += 1
         if next_group.NOW_HANDLE >= next_group.MAX_HANDLE:
             next_group.HANDLE_ON = False
+        logger.info("提现路由到组 - 用户ID: %s, 组ID: %s, 金额: %s", user.id, next_group_id, wd_money)
 
-        # 组过期时间
-        expiration = finance_default_config.withdraw_group_expiration
-        logger.info(f"分配新提现组 - 用户ID: {user.id}, 组ID: {next_group_id}, 过期时间(秒): {expiration}, 当前时间: {datetime.datetime.now()}")
-        Redis.set("user_withdraw%s" % user.id, next_group_id, expiration)
-
-        bank_card = AppMemberBank.query.filter_by(id=card_id).first()
+        # 卡归属校验（原来只按 id 查，不校验 mb_id）
+        bank_card = AppMemberBank.query.filter(
+            AppMemberBank.id == card_id,
+            AppMemberBank.mb_id == user.id,
+            AppMemberBank.del_flag == 0,
+        ).first()
+        if not bank_card:
+            db.session.rollback()
+            response = jsonify({'message': "bank card not found"})
+            response.status_code = 400
+            return response
         current_time = datetime.datetime.now()
         the_withdraw = WithDraw(id=Kits.generate_uuid(), withdraw_code=withdraw_code, aid=user.aid, mb_id=user.id,
                                 mb_username=user.username,
                                 mb_nickname=bank_card.acc_name, amount=money, status=StatusLabelMap.Pending,
                                 withdraw_type="USER", before_amount=before_amount, after_amount=after_amount,
                                 mb_acc_name=bank_card.acc_name,
-                                work_group_id=next_group_id, mb_bank_code=bank_card.bank_code,
+                                work_group_id=next_group_id, mb_bank_code=BankCodeMap.normalize(bank_card.bank_code),
                                 mb_acc_number=bank_card.acc_number, confirm_time=current_time)
 
         if float(money) > float(user.money_promotion_withdrawable):

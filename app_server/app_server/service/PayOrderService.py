@@ -1,89 +1,66 @@
 import requests
 import traceback
-from datetime import datetime
-from app_server import app, db
+from app_server import app
 from app_server.logger import get_logger
 from app_server.model.ChargeApplyModel import ChargeApply
 from app_server.utils.Kits import Kits
 
 logger = get_logger()
 
+# 支付中心异常对外统一话术（不把内部地址/堆栈抛给玩家）
+MSG_UNAVAILABLE = 'Payment service is temporarily unavailable. Please try again later.'
+MSG_BUSY = 'Payment service is busy, please try again later.'
+MSG_BAD_RESPONSE = 'Payment service returned an invalid response. Please try again later.'
+MSG_FAILED = 'Failed to create order, please try again later.'
+
+
+def pay_center_error_message(error):
+    """把 requests/解析异常翻译成对玩家友好的文案，原文只进日志。"""
+    text = str(error) or ''
+    lowered = text.lower()
+    if any(k in lowered for k in ('connection refused', 'failed to establish', 'max retries',
+                                  'connection aborted', 'connection reset', 'newconnectionerror')):
+        return MSG_UNAVAILABLE
+    if 'timeout' in lowered or 'timed out' in lowered:
+        return MSG_BUSY
+    if any(k in lowered for k in ('json', 'expecting value', 'decode')):
+        return MSG_BAD_RESPONSE
+    return MSG_FAILED
+
 
 class PayOrderService:
-    """充值订单服务"""
+    """充值订单服务（对接支付中心 /pay/openapi/*）"""
 
     def __init__(self):
         self.pay_center_api = app.config.get('PAY_CENTER_API', '')
         self.pay_create_url = self.pay_center_api + '/pay/openapi/paycreate'
+        self.pay_cancel_url = self.pay_center_api + '/pay/openapi/ordercancel'
         self.pay_channels_url = self.pay_center_api + '/pay/openapi/channels'
         self.callback_url = app.config.get('CHARGE_CALLBACK_URL', '')
         self.app_id = app.config.get('PAY_CENTER_APP_ID', '')
         self.aes_secret = app.config.get('PAY_CENTER_APP_AES_SECRET', '')
-    
-    def create_recharge_order(self, user_id, agent_id,amount, out_trade_no, subject="充值", memo="充值",
-                            realname="", bank_code="KBZ", phone="", payment_type="KBZ",
-                            receive_account="", receive_account_name="", client_ip="127.0.0.1", channelType=None, nFM2PayCenter=False):
-        """
-        创建充值订单
-        
-        Args:
-            user_id: 用户ID
-            amount: 充值金额
-            out_trade_no: 交易订单编号
-            subject: 订单标题
-            memo: 交易备注
-            realname: 实名用户
-            bank_code: 付款银行
-            phone: 充值会员手机号
-            payment_type: 支付类型
-            receive_account: 收款账号
-            receive_account_name: 收款账号户名
-            client_ip: 客户IP
-            
-        Returns:
-            dict: 返回支付中心响应数据
-            {
-                "success": True/False,
-                "data": {
-                    "payUserPhone": "Custo (******2241)",
-                    "timeout": 0,
-                    "tradeOrderId": "cdb131ec6bf54f39ace2721b8bdd0ff6",
-                    "payUserName": "小牛",
-                    "paymentUrl": "http://api.wisina.top/mpay/pages/pay/payment?id=cdb131ec6bf54f39ace2721b8bdd0ff6",
-                    "tradeNo": "PI202508186400000007",
-                    "outTradeNo": "01002789010072577693",
-                    "receiveAccount": "09942471300",
-                    "success": true,
-                    "notifyUrl": "",
-                    "curType": "MMK",
-                    "qrcode": "",
-                    "payTimeout": "2025-08-18 17:40:14",
-                    "receiveAccountName": "Custo"
-                },
-                "message": "success message"
-            }
+        # 联调用：临时覆盖 agentId（支付中心按 appid 配置代理白名单，
+        # 借用他项目 appid 时本项目 aid 不在白名单，可用此项指定一个已登记的值）
+        # None = 未配置，使用用户实际 aid；'' = 显式置空（联调跳过代理映射校验）；其它 = 覆盖值
+
+    def create_recharge_order(self, user_id, agent_id, amount, out_trade_no, subject="充值", memo="充值",
+                              realname="", bank_code="KBZ", phone="", payment_type="KBZ",
+                              receive_account="", receive_account_name="", client_ip="127.0.0.1",
+                              channelType=None, nFM2PayCenter=False, cash_code="",
+                              order_expire_minutes=None, return_url=""):
+        """创建充值订单。
+
+        注意：payment_type / bank_code 必须是「支付中心取值」，调用方先用 BankCodeMap 转换。
         """
         try:
-            # 未指定channelType时，使用配置文件中的默认支付通道
             if channelType is None:
                 channelType = app.config.get('PAY_CHANNEL_TYPE', 'VIPPay')
 
-            #转换bank_code
-            if payment_type == "KBZ Pay":
-                payment_type = "KBZ"
-
-            if payment_type == "Wave Money":
-                payment_type = "WaveMoney"
-
+            # NFM2 默认不走支付中心（遗留链路）
             if channelType == "NFM2" and not nFM2PayCenter:
-                # NFM2支付方式，默认不走支付中心
-                return {
-                    'success': True,
-                    'data': {
-                        'tradeNo': out_trade_no,
-                        'tradeOrderId': out_trade_no
-                    }
-                }
+                return {'success': True,
+                        'data': {'tradeNo': out_trade_no, 'tradeOrderId': out_trade_no}}
+
             params = {
                 "orderType": "recharge",
                 "outTradeNo": out_trade_no,
@@ -100,103 +77,79 @@ class PayOrderService:
                 "receiveAccountName": receive_account_name,
                 "clientIp": client_ip,
                 "callbackUrl": self.callback_url,
-                "channelType": channelType
+                "channelType": channelType,
             }
+            if cash_code:
+                params["cashCode"] = cash_code
+            if order_expire_minutes:
+                params["orderExpireMinutes"] = int(order_expire_minutes)
+            if return_url:
+                params["returnUrl"] = return_url
 
-            logger.info(f"创建充值订单请求 - 用户ID: {user_id}, 交易单号: {out_trade_no}, 金额: {amount}, 支付类型: {payment_type}, 渠道类型: {channelType}")
-            #  请求头增加appid
+            logger.info("创建充值订单请求 - 用户:%s 单号:%s 金额:%s 银行:%s 支付方式:%s 通道:%s",
+                        user_id, out_trade_no, amount, bank_code, payment_type, channelType)
+
             headers = {'Content-Type': 'text/plain', 'appid': self.app_id}
-            # 进行数据加密
-            plain_text = Kits.json_dumps(params)
-            plain_text = Kits.encrypt(plain_text, self.aes_secret)
-            logger.info(f"充值订单请求数据已加密 - 交易单号: {out_trade_no}")
-            response = requests.post(self.pay_create_url, data=plain_text, headers=headers)
+            plain_text = Kits.encrypt(Kits.json_dumps(params), self.aes_secret)
+            # 只设连接超时：避免支付中心已建单、本地却判失败
+            response = requests.post(self.pay_create_url, data=plain_text, headers=headers, timeout=(5, None))
             resp_json = response.json()
+            logger.info("充值订单响应 - 单号:%s 响应:%s", out_trade_no, resp_json)
 
-            logger.info(f"充值订单响应 - 交易单号: {out_trade_no}, 响应: {resp_json}")
+            data = resp_json.get('data') or {}
+            if resp_json.get('code') == "OK" and resp_json.get('ok') and data.get('success'):
+                return {'success': True, 'data': data, 'message': 'Recharge order created successfully'}
 
-            if resp_json.get('code') == "OK" and resp_json.get('ok') and resp_json.get('data', {}).get('success'):
-                logger.info(f"充值订单创建成功 - 用户ID: {user_id}, 交易单号: {out_trade_no}, 支付中心订单号: {resp_json.get('data', {}).get('tradeNo')}")
-                return {
-                    'success': True,
-                    'data': resp_json.get('data'),
-                    'message': 'Recharge order created successfully'
-                }
-            else:
-                logger.warning(f"充值订单创建失败 - 用户ID: {user_id}, 交易单号: {out_trade_no}, 错误信息: {resp_json.get('msg', 'Unknown error')}")
-                return {
-                    'success': False,
-                    'data': None,
-                    'message': resp_json.get('msg', 'Failed to create recharge order'),
-                    'error': resp_json
-                }
+            return {'success': False, 'data': None,
+                    'message': resp_json.get('msg') or 'Failed to create recharge order',
+                    'error': resp_json}
 
         except Exception as e:
-            logger.error(f"创建充值订单异常 - 用户ID: {user_id}, 交易单号: {out_trade_no}, 错误: {e}", exc_info=True)
-            return {
-                'success': False,
-                'data': None,
-                'message': f'Exception occurred , Please Wait for a moment and try again'
-            }
+            logger.error("创建充值订单异常 - 单号:%s 错误:%s\n%s", out_trade_no, e, traceback.format_exc())
+            return {'success': False, 'data': None, 'message': pay_center_error_message(e)}
+
+    def cancel_order(self, order_id, order_type='pay'):
+        """取消支付中心订单（代收 order_type='pay'，代付 'payout'）。
+
+        返回：
+            {'success': True, ...}
+            {'success': False, 'outcome_unknown': True}  → 网络异常，结果未知，调用方应保留租约
+            {'success': False}                            → 支付中心明确拒绝
+        """
+        if not order_id:
+            return {'success': False, 'message': 'Payment center order id is missing'}
+
+        try:
+            params = {'orderId': str(order_id), 'orderType': order_type}
+            headers = {'Content-Type': 'text/plain', 'appid': self.app_id}
+            plain_text = Kits.encrypt(Kits.json_dumps(params), self.aes_secret)
+            response = requests.post(self.pay_cancel_url, data=plain_text, headers=headers, timeout=(5, 20))
+            resp_json = response.json()
+            logger.info("取消订单响应 - 订单:%s 类型:%s 响应:%s", order_id, order_type, resp_json)
+
+            if resp_json.get('ok') and resp_json.get('code') == "OK":
+                return {'success': True, 'data': resp_json.get('data'), 'message': 'cancelled'}
+            return {'success': False,
+                    'message': resp_json.get('msg') or 'Cancel rejected by payment center',
+                    'error': resp_json}
+
+        except Exception as e:
+            logger.error("取消订单异常 - 订单:%s 错误:%s\n%s", order_id, e, traceback.format_exc())
+            return {'success': False, 'outcome_unknown': True, 'message': pay_center_error_message(e)}
 
     def get_recharge_order_status(self, out_trade_no):
-        """
-        查询充值订单状态
-        
-        Args:
-            out_trade_no: 外部交易订单号
-            
-        Returns:
-            dict: 订单状态信息
-        """
+        """查询本地充值订单状态（不请求支付中心）。"""
         try:
-            charge_apply = ChargeApply.query.filter(
-                ChargeApply.OUT_TRADE_NO == out_trade_no
-            ).first()
-            
+            charge_apply = ChargeApply.query.filter(ChargeApply.id == out_trade_no).first()
             if not charge_apply:
-                return {
-                    'success': False,
-                    'message': 'Order not found'
-                }
-            
-            return {
-                'success': True,
-                'data': {
-                    'out_trade_no': charge_apply.OUT_TRADE_NO,
-                    'trade_no': charge_apply.TRADE_NO,
-                    'order_id': charge_apply.ORDER_ID,
-                    'status': charge_apply.STATUS,
-                    'amount': charge_apply.MONEY,
-                    'user_id': charge_apply.USER_ID,
-                    'create_time': str(charge_apply.CREATE_TIME),
-                    'reason': charge_apply.REASON
-                }
-            }
-
+                return {'success': False, 'message': 'Order not found'}
+            return {'success': True, 'data': charge_apply.to_dict()}
         except Exception as e:
-            logger.error(f"查询充值订单状态异常 - 交易单号: {out_trade_no}, 错误: {e}", exc_info=True)
-            return {
-                'success': False,
-                'message': f'Exception occurred: {str(e)}'
-            }
-
+            logger.error("查询充值订单状态异常 - 单号:%s 错误:%s", out_trade_no, e, exc_info=True)
+            return {'success': False, 'message': pay_center_error_message(e)}
 
     def get_pay_channels(self, channel_type=None, status=None, wallet_provider=None, page=None, limit=None):
-        """
-        获取可用支付通道列表（供前端核查支付是否可用、可路由通道）
-        对接 jxboot-apps-pay OpenapiController.channels()
-
-        Args:
-            channel_type: 支付通道类型，如 VIPPay；不传则支付中心使用默认通道
-            status: 通道状态过滤（ONLINE/BUSY/STANDBY/OFFLINE/ERROR/LOCKED/SUSPENDED/LIMITED）
-            wallet_provider: 钱包供应商（KBZPAY/WAVEPAY）
-            page: 页码
-            limit: 每页数量
-
-        Returns:
-            dict: {'success': bool, 'data': [ChannelInfo,...], 'message': str}
-        """
+        """查询支付中心通道状态（运维用，业务通道列表走 /charge_apply/channels）。"""
         try:
             params = {}
             if channel_type:
@@ -211,36 +164,17 @@ class PayOrderService:
                 params['limit'] = limit
 
             headers = {'Content-Type': 'text/plain', 'appid': self.app_id}
-            # body 采用 AES 加密（与 paycreate 一致）
-            plain_text = Kits.json_dumps(params)
-            encrypted_body = Kits.encrypt(plain_text, self.aes_secret)
-
-            logger.info(f"查询支付通道请求 - 渠道类型: {channel_type}, 过滤: {params}")
-            response = requests.post(self.pay_channels_url, data=encrypted_body, headers=headers)
+            encrypted_body = Kits.encrypt(Kits.json_dumps(params), self.aes_secret)
+            response = requests.post(self.pay_channels_url, data=encrypted_body, headers=headers, timeout=(5, 20))
             resp_json = response.json()
-            logger.info(f"查询支付通道响应: {resp_json}")
-
             if resp_json.get('code') == 'OK' and resp_json.get('ok'):
-                return {
-                    'success': True,
-                    'data': resp_json.get('data') or [],
-                    'message': 'success'
-                }
-            return {
-                'success': False,
-                'data': [],
-                'message': resp_json.get('msg', 'Failed to query pay channels'),
-                'error': resp_json
-            }
-
+                return {'success': True, 'data': resp_json.get('data') or [], 'message': 'success'}
+            return {'success': False, 'data': [],
+                    'message': resp_json.get('msg') or 'Failed to query pay channels',
+                    'error': resp_json}
         except Exception as e:
-            logger.error(f"查询支付通道异常 - 错误: {e}", exc_info=True)
-            return {
-                'success': False,
-                'data': [],
-                'message': f'Exception occurred: {str(e)}'
-            }
+            logger.error("查询支付通道异常 - 错误:%s", e, exc_info=True)
+            return {'success': False, 'data': [], 'message': pay_center_error_message(e)}
 
 
-# 创建全局实例
 pay_order_service = PayOrderService()

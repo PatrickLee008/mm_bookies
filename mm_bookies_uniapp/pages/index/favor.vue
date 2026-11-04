@@ -121,7 +121,7 @@
 					let favor_leagues = data.favor_leagues
 					let server_leagues = [...new Set(server_matches.map(ele => ele.LEAGUE))]
 					// leauges排序
-					server_leagues = _this.sort_object(server_leagues, '', config.leagues)
+					server_leagues = _this.sort_object(server_leagues, '', data.leagues)
 					let league_list = server_leagues.map(ele => {
 						return {
 							name: ele,

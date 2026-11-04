@@ -76,19 +76,26 @@
 				<text>{{$t('no_more_data') || 'No more data'}}</text>
 			</view> -->
 		</scroll-view>
-	</view>
+		<PayModal :visible="payVisible" :order="payOrder" @close="onPayClose" @payment-url="handlePaymentUrl"
+			@payment-page="handlePaymentPage" />
+			</view>
 </template>
 
 <script>
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
+	import PayModal from '@/components/payment/PayModal.vue'
+	import { getPaymentAction, getTransferPageUrl, openPaymentUrl } from '@/utils/payment-flow.js'
 
 	export default {
 		name: 'WalletHistory',
+		components: { PayModal },
 		data() {
 			return {
 				language: config.language,
 				recordList: [],
+			payVisible: false,
+			payOrder: {},
 				loading: false,
 				refreshing: false,
 				refresherTriggered: false,
@@ -133,6 +140,48 @@
 						this.refresherTriggered = false;
 					});
 				}, 500)
+			},
+
+			onPayClose() {
+				// 取消/超时/成功后回到列表必须刷新，否则状态还是旧的（仍显示 Continue）
+				this.payVisible = false;
+				this.payOrder = {};
+				this.page = 1;
+				this.recordList = [];
+				// 关键：loadChargeRecords 里有 `if (this.loading) return`，
+				// 关闭弹窗时若列表正在加载（滚动/轮询），这次刷新会被静默丢弃，所以先复位
+				this.loading = false;
+				this.$nextTick(() => this.loadChargeRecords());
+			},
+
+			handlePaymentUrl(url) {
+				this.payVisible = false;
+				this.payOrder = {};
+				this.launchPaymentUrl(url);
+			},
+
+			handlePaymentPage(order) {
+				this.payVisible = false;
+				this.payOrder = {};
+				this.openTransferPage(order);
+			},
+
+			launchPaymentUrl(url) {
+				if (!openPaymentUrl(url)) {
+					uni.showToast({ title: 'Payment link unavailable', icon: 'none' });
+				}
+			},
+
+			openTransferPage(order) {
+				const url = getTransferPageUrl(order);
+				if (!url) {
+					uni.showToast({ title: 'Payment order ID is missing', icon: 'none' });
+					return;
+				}
+				uni.navigateTo({
+					url,
+					fail: () => uni.showToast({ title: 'Unable to open payment page', icon: 'none' })
+				});
 			},
 
 			loadMore() {
@@ -210,12 +259,18 @@
 			},
 
 			formatPayChannel(channel) {
+				// 与充值页入口命名保持一致
 				const channelMap = {
-					'TCPay': 'QR Pay',
-					'VIPPay': 'QR Pay',
-					'NFM2': 'Transfer'
+					'VIPPay': 'ViPPay',
+					'VIPPay_CashCode': 'ViPPay',
+					'TCPay': 'TC Pay',
+					'MCPay': 'MC Pay',
+					'KingPay': 'King Pay',
+					'NFM2': 'Transfer',
+					'NFM': 'Transfer',
+					'Manual': 'Manual Transfer'
 				};
-				return channelMap[channel] || channel;
+				return channelMap[channel] || channel || '-';
 			},
 
 			getStatusText(status) {
@@ -225,7 +280,9 @@
 					'Rejected': this.$t('rejected') || 'Rejected',
 					'New': this.$t('new') || 'New',
 					'Failed': this.$t('failed') || 'Failed',
-					'Timeout': this.$t('timeout') || 'Timeout'
+					'Timeout': this.$t('timeout') || 'Timeout',
+					'Cancelling': 'Cancelling',
+					'Cancelled': 'Cancelled'
 				};
 				return statusMap[status] || status;
 			},
@@ -247,7 +304,9 @@
 					'Rejected': 'status-failed',
 					'New': 'status-new',
 					'Failed': 'status-failed',
-					'Timeout': 'status-timeout'
+					'Timeout': 'status-timeout',
+					'Cancelling': 'status-pending',
+					'Cancelled': 'status-failed'
 				};
 				return classMap[status] || 'status-default';
 			},
@@ -262,21 +321,20 @@
 			},
 
 			canContinuePayment(item) {
-				return item.status === 'Pending';
+				if (item.status !== 'Pending') return false;
+				return Number(item.REMAINING_SECONDS || item.remaining_seconds || 0) > 0;
 			},
 
 			continuePayment(item) {
 				if (this.$toolbox && this.$toolbox.click_too_fast && this.$toolbox.click_too_fast(1)) return;
-
-				if (item.pay_channel === 'TCPay' || item.pay_channel === 'VIPPay') {
-					uni.navigateTo({
-						url: `/pages/payment/payment?id=${item.out_order_id}`
-					});
+				const action = getPaymentAction(item);
+				if (action.type === 'qr') {
+					this.payOrder = Object.assign({}, item);
+					this.payVisible = true;
+				} else if (action.type === 'external') {
+					this.launchPaymentUrl(action.url);
 				} else {
-					uni.showToast({
-						title: this.$t('payment_not_supported') || 'Payment method not supported',
-						icon: 'none'
-					});
+					this.openTransferPage(item);
 				}
 			},
 
@@ -345,7 +403,12 @@
 		},
 
 		mounted() {
+			uni.$on('charge:refresh', this.refreshData);
 			this.loadChargeRecords();
+		},
+
+		beforeDestroy() {
+			uni.$off('charge:refresh', this.refreshData);
 		}
 	}
 </script>

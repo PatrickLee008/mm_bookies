@@ -221,7 +221,7 @@ export default {
 		// 格式化支付渠道显示
 		formatPayChannel(channel) {
 			const channelMap = {
-				'TCPay': 'QR Pay',
+				'TCPay': 'TC Pay',
 				'NFM2': 'Transfer'
 			};
 			return channelMap[channel] || channel;
@@ -290,6 +290,11 @@ export default {
 	
 	onLoad() {
 		this.loadChargeRecords();
+	},
+	// 从支付页返回时刷新列表，否则取消/过期的订单状态不会更新
+	onShow() {
+		if (this.loaded) this.loadChargeRecords();
+		this.loaded = true;
 	}
 }
 </script>

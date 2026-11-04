@@ -1,6 +1,6 @@
 from app_server import db
 from sqlalchemy import Column, String, func, DateTime, Boolean
-from sqlalchemy.dialects.mysql import INTEGER, SMALLINT
+from sqlalchemy.dialects.mysql import INTEGER, SMALLINT, DECIMAL, TINYINT
 
 
 class WithDrawGroup(db.Model):
@@ -15,6 +15,11 @@ class WithDrawGroup(db.Model):
     MAX_HANDLE = Column(SMALLINT(unsigned=True), nullable=False, server_default="10", comment="最大处理数量")
     NOW_HANDLE = Column(SMALLINT(unsigned=True), nullable=False, server_default="0", comment="当前处理数量")
     HANDLE_ON = Column(Boolean, nullable=False, server_default="1", comment="处理开关: 0:关 1:开")
+
+    # 2026-10-29 支付中心接入：按金额区间路由 + 是否允许网关自动出款
+    MIN_AMOUNT = Column(DECIMAL(20, 2), nullable=False, server_default="0.00", comment="处理提现金额下限(含)")
+    MAX_AMOUNT = Column(DECIMAL(20, 2), nullable=False, server_default="0.00", comment="处理提现金额上限(含)")
+    AUTO_PAY = Column(TINYINT, nullable=False, server_default="0", comment="1=允许网关自动出款")
 
     def to_dict(self):
         columns = self.__table__.columns.keys()

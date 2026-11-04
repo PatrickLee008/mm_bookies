@@ -17,6 +17,10 @@ class AppAgentBankcard(db.Model):
     rc_network = Column(String(255), comment='网络类型')
     type = Column(String(255), comment='账户类型（All-全部，Deposit-充值，Withdraw-提现）')
     type_sub = Column(String(255), comment='子账户类型')
+    # 2026-10-29 支付中心接入：排序 / 教程视频 / 自动出款
+    SCORE = Column(Integer, nullable=False, server_default='0', comment='排序分值，越大越前')
+    VIDEO_URL = Column(String(512), nullable=False, server_default='', comment='教程视频地址')
+    AUTO_PAY = Column(SmallInteger, nullable=False, server_default='0', comment='1=参与自动出款')
     balance = Column(DECIMAL(26, 6), comment='帐户总额')
     limit_balance = Column(DECIMAL(26, 6), comment='交易限额')
     limit_current = Column(DECIMAL(26, 6), comment='当前交易额度')

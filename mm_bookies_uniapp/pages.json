@@ -119,6 +119,12 @@
 
 		},
 		{
+			"path": "pages/payment/transfer",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
 			"path": "pages/ucenter/message",
 			"style": {}
 		},

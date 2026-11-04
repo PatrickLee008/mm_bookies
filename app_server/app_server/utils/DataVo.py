@@ -144,8 +144,13 @@ class AppFrontSettingVo(BaseVO):
         self.appApkUrl = None  # App APK URL
         self.appWgtUrl = None  # App WGT URL
         self.appIosUrl = None  # App iOS URL
-        self.transferVideoLink = None  # Transfer Video Link
-        self.nfmVideoLink = None  # NFM Video Link
+        self.transferVideoLink = None  # Transfer Video Link（旧字段，保留兼容）
+        self.nfmVideoLink = None  # NFM Video Link（旧字段，保留兼容）
+        # 按通道配置的充值教程视频（2026-11-04 从银行卡弹窗迁移到应用配置）
+        self.vipVideoLink = None  # VIP Pay 教程视频（VIPPay + CashCode 共用）
+        self.kingVideoLink = None  # King Pay 教程视频
+        self.tcVideoLink = None  # TC Pay 教程视频
+        self.mcVideoLink = None  # MC Pay 教程视频
         self.aiHelperHost = None  # AI Helper Host
         self.aiHelperToken = None  # AI Helper Token
         self.updateState = 0 # Update State

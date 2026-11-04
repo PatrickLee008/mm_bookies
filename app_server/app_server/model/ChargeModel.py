@@ -26,6 +26,8 @@ class Charge(BaseSaasModel):
 
     # 支付信息
     pay_type = Column(String(50), nullable=False, server_default='MANUAL', comment="充值方式（KBZ，KBZ-AUTO，MANUAL）")
+    # 支付通道：VIPPay_CashCode 记账时归 VIPPay（与出款通道规则一致）
+    channel = Column(String(32), comment="支付通道（VIPPay / MCPay / TCPay / Manual）")
     charge_type = Column(String(10), nullable=False, server_default='USER', comment="充值类型（USER、AGENT）")
     amount = Column(DECIMAL(65, 0), nullable=False, server_default='0', comment="存款金额")
 

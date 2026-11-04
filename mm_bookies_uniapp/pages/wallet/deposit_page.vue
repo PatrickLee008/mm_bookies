@@ -28,7 +28,7 @@
 		<!-- Tab 内容区域 -->
 		<view class="tab-content">
 			<!-- Deposit 表单（现有 deposit.vue 子组件） -->
-			<wallet-deposit v-if="tab_index === 0" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-deposit>
+			<wallet-deposit v-if="tab_index === 0" ref="depositRef" @contentScroll="handleHeaderScroll" @contentScrollTop="handleHeaderTop"></wallet-deposit>
 
 			<!-- Deposit History 列表（现有 history.vue 子组件） -->
 			<wallet-history v-if="tab_index === 1" ref="depositHistory"
@@ -109,7 +109,16 @@
 			},
 		},
 
-		onLoad(options) {
+		// 付款弹窗打开时拦截物理返回键（只能点右上角 X 关闭）
+	onBackPress() {
+		const deposit = this.$refs.depositRef
+		if (deposit && deposit.payVisible) return true
+		const history = this.$refs.depositHistory
+		if (history && history.payVisible) return true
+		return false
+	},
+
+	onLoad(options) {
 			this.userInfo = Object.assign({}, this.$store.state.userInfo)
 			if (options && options.tab != null) {
 				const idx = parseInt(options.tab)
