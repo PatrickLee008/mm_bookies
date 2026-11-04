@@ -174,6 +174,28 @@
 				if (!ad.link_url) return
 				this.$toolbox.openAdvertisementLink(ad.link_url, ad.link_target)
 			},
+			resolveUnauthRedirect() {
+				// 若本次访问 URL 携带了广告/代理参数 (_aid / _adl)，视为通过邀请链接进入，默认跳到注册页
+				// #ifdef H5
+				try {
+					if (typeof window !== 'undefined' && window.location) {
+						const hash = window.location.hash || ''
+						const queryIdx = hash.indexOf('?')
+						if (queryIdx !== -1) {
+							const hashParams = new URLSearchParams(hash.substring(queryIdx + 1))
+							if (hashParams.has('_aid') || hashParams.has('_adl')) {
+								return '/pages/login/register'
+							}
+						}
+						const searchParams = new URLSearchParams(window.location.search || '')
+						if (searchParams.has('_aid') || searchParams.has('_adl')) {
+							return '/pages/login/register'
+						}
+					}
+				} catch (e) {}
+				// #endif
+				return '/pages/login/login'
+			},
 			show_login_toast() {
 				// 登录/注册成功后跳转到首页时提示，一次性消费并清除标志
 				if (!uni.getStorageSync('login_success')) return
@@ -191,8 +213,10 @@
 		},
 		onShow() {
 			if (!uni.getStorageSync('Authorization')) {
+				const targetUrl = this.resolveUnauthRedirect()
+				console.log('[Index] Not logged in, redirect to:', targetUrl)
 				uni.reLaunch({
-					url: '/pages/login/login'
+					url: targetUrl
 				})
 				return
 			}
