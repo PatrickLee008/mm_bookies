@@ -701,7 +701,7 @@ def validate_coupon():
         # 原因：用户领取前还没有使用促销钱包下注，查询不到 pro_id 相关的订单
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent = request.headers.get('User-Agent')
         # 获取设备唯一标识（支持多种header格式）
         device_id = (request.headers.get('X-Device-ID') or
@@ -894,7 +894,7 @@ def redeem_coupon():
             }), 400
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent = request.headers.get('User-Agent')
         # 获取设备唯一标识（支持多种header格式）
         device_id = (request.headers.get('X-Device-ID') or
