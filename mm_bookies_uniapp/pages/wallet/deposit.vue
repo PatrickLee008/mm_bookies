@@ -320,12 +320,28 @@
 		},
 		mounted() {
 			this.loadAppConfig()
+			this.checkUnfinishedOrder()
 			this.loadChannels()
 			this.loadCards()
 			this.loadManualCards()
 		},
 		methods: {
 			// ---------- 加载 ----------
+			// 进入页面先查有没有未完成的充值单：有就直接弹「继续 / 取消」，
+			// 而不是等用户选完通道金额、点 Continue 才被 50005 挡回来
+			checkUnfinishedOrder() {
+				this.$http.get('/charge_apply/unfinished', {}, (res) => {
+					const d = res.data || {}
+					if (d.code !== 20000 || !d.data) return
+					const order = d.data
+					this.$notice.confirm(
+						'You have an unfinished deposit order. Continue with it?',
+						() => this.openPay(order),
+						null,
+						{ confirmText: 'Continue', cancelText: 'Cancel' }
+					)
+				})
+			},
 			loadAppConfig() {
 				this.$http.get('/config/get', {}, (res) => {
 					const d = res.data || {}
