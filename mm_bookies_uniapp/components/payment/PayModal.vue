@@ -12,8 +12,7 @@
 						<tki-qrcode v-if="qrValue" ref="qr" cid="payQr" :val="qrValue" :size="320" :onval="false"
 							:loadMake="false" @result="onQrResult" :usingComponents="true" />
 					</view>
-					<image v-if="qrPoster" class="qr-image" :src="qrPoster" mode="aspectFit" />
-					<image v-else-if="qrImage" class="qr-image" :src="qrImage" mode="aspectFit" />
+					<image v-if="qrImage" class="qr-image" :src="qrImage" mode="aspectFit" />
 					<view v-else-if="paymentError" class="qr-error">{{ paymentError }}</view>
 					<view v-else class="qr-loading">{{ $t('loading_dots') }}</view>
 					<view class="save-qr" :class="{ disabled: !qrImage }" @click="saveQr">
@@ -104,7 +103,6 @@
 				timer: null,
 				pollTimer: null,
 				qrImage: '',
-				qrPoster: '',
 				qrData: '',
 				paymentError: '',
 				cancelConfirm: false,
@@ -181,7 +179,6 @@
 				this.orderId = this.order.id || this.order.ID || this.order.out_order_id || this.order.OUT_ORDER_ID || ''
 				this.qrData = ''
 				this.qrImage = ''
-				this.qrPoster = ''
 				this.paymentError = ''
 
 				if (this.qrValue) this.makeQr()
@@ -268,18 +265,8 @@
 				})
 			},
 			onQrResult(path) {
+				// 弹窗只展示纯二维码；带底图的合成图在点「保存」时才生成
 				this.qrImage = path
-				// 生成带站点底图的合成图用于展示（H5 用原生 canvas，App 走 uni canvas 兜底）
-				this.$nextTick(() => {
-					try {
-						const p = this.composeQrPoster()
-						if (p && typeof p.then === 'function') {
-							p.then((url) => { if (url) this.qrPoster = url }).catch(() => {})
-						}
-					} catch (e) {
-						// 合成失败保持纯二维码展示
-					}
-				})
 			},
 			pollStatus() {
 				if (!this.orderId || this.state !== 'paying') return
