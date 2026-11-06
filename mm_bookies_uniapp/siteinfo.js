@@ -44,7 +44,7 @@ Object.assign(siteinfo, SITES[siteinfo.site] || SITES.mmbookies);
 
 if (process.env.NODE_ENV == 'development') {
 	//开发：接口指向本地 Python 服务（支付中心仍走 .env 配置）
-	siteinfo.apiUrl = "http://127.0.0.1:8282";
+	siteinfo.apiUrl = "http://mmmbookies.frp.1x2mmm.net/api";
 	//开发：仅覆盖支付中心差异
 	// siteinfo.apiUrl = "http://localhost:8282";
 	// siteinfo.payUrl = "http://192.168.1.32:9010"; //支付中心
@@ -54,6 +54,8 @@ if (process.env.NODE_ENV == 'development') {
 	// siteinfo.payUrl = "http://payapi.1x2mmm.net";
 } else {
 	//测试环境在线客服链接（与正式相同，保留原分支语义）
+	siteinfo.apiUrl = "http://mmmbookies.frp.1x2mmm.net/api";
+	siteinfo.imgUrl = "http://mmmbookies.frp.1x2mmm.net/img";
 	// siteinfo.payUrl = "http://payapi.1x2mmm.net";
 	// siteinfo.liveChatLink =
 	// 	'https://chat.wellytalk.com/MDE5ZjVlMzktNmEzMy03YWE4LWI3ZTUtMDQwOTQ0ZTAwNTEyfDJiMjZkNzlhOWU1NmJiMDJiZWEzMDI1YTcyNWJmNzVlYWVjN2JlYzQxZjIyYWRjZWFhNjJlNzFkZWZiMDIxZTg=';

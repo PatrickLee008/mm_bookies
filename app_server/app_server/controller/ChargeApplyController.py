@@ -283,7 +283,7 @@ def _create_order_impl():
                      ChargeApply.expire_time > datetime.now()),
                 ChargeApply.status == StatusLabelMap.Cancelling,
             ),
-        ).first()
+        ).order_by(ChargeApply.create_time.desc()).first()
         if unfinished:
             return jsonify({'code': 50005,
                             'message': 'you have unfinished apply order.',
@@ -467,6 +467,29 @@ def create_order():
 def add_apply():
     """老路径，保留下单能力（前端改造完成前继续可用）。"""
     return _create_order_impl()
+
+
+@charge_apply.route('/unfinished', methods=['GET'])
+@auth.login_required
+def get_unfinished_apply():
+    """查询当前会员是否有未完成的充值单。
+
+    充值页进入时调用：有未完成单就直接弹"继续/取消"，避免用户填完金额
+    点 Continue 才被 50005 拦截（那种体验像"点了没反应"）。
+    判定口径与下单时的 5) 未完成订单一致。
+    """
+    user_id = g.user.id
+    apply = ChargeApply.query.filter(
+        ChargeApply.mb_id == user_id,
+        or_(
+            and_(ChargeApply.status.in_((StatusLabelMap.New, StatusLabelMap.Pending)),
+                 ChargeApply.expire_time > datetime.now()),
+            ChargeApply.status == StatusLabelMap.Cancelling,
+        ),
+    ).order_by(ChargeApply.create_time.desc()).first()
+    if not apply:
+        return jsonify({'code': 20000, 'data': None})
+    return jsonify({'code': 20000, 'data': apply.to_dict()})
 
 
 # ------------------------------------------------------------------

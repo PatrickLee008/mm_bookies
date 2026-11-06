@@ -1,6 +1,6 @@
-const QR_CHANNELS = ['VIPPay']
+const QR_CHANNELS = ['VIPPay', 'TCPay']
 // 走外部收银页的通道：有 PAYMENT_URL 时直接跳转，不弹二维码弹窗
-const EXTERNAL_CHANNELS = ['TCPay', 'MCPay', 'KingPay']
+const EXTERNAL_CHANNELS = ['MCPay', 'KingPay']
 
 function firstValue(order, keys) {
 	if (!order) return ''
@@ -16,8 +16,12 @@ export function getPaymentAction(order = {}) {
 	const paymentUrl = firstValue(order, ['PAYMENT_URL', 'payment_url', 'pay_url', 'payUrl', 'paymentUrl'])
 	const hasUrl = /^https?:\/\//i.test(String(paymentUrl || ''))
 
-	// 外部收银页通道（TCPay / MCPay / KingPay）：有链接就直接跳，不弹窗。
-	// TCPay 同时返回二维码和链接，但业务上要求直接跳第三方页，所以放在二维码判断之前。
+	// 二维码通道优先：VIPPay / TCPay 即使拿到了 payment_url 也留在弹窗里，
+	// 由 PayModal 把链接渲染成二维码给用户扫（不跳出 App）。
+	// 这一条必须排在 hasUrl 之前，否则历史订单带 pay_url 时会直接跳转。
+	if (QR_CHANNELS.indexOf(channel) !== -1) return { type: 'qr' }
+
+	// 外部收银页通道（MCPay / KingPay）：有链接就跳转
 	if (EXTERNAL_CHANNELS.indexOf(channel) !== -1 && hasUrl) {
 		return { type: 'external', url: String(paymentUrl) }
 	}
@@ -27,7 +31,6 @@ export function getPaymentAction(order = {}) {
 
 	if (hasUrl) return { type: 'external', url: String(paymentUrl) }
 
-	if (QR_CHANNELS.indexOf(channel) !== -1) return { type: 'qr' }
 	return { type: 'transfer' }
 }
 
