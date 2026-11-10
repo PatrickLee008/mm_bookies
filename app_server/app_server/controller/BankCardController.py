@@ -1,6 +1,6 @@
 from app_server import app, db, auth, app_opt
 from app_server.model.AppMemberBankModel import AppMemberBank
-from flask import g, request, jsonify, Blueprint
+from flask import g, request, jsonify, Blueprint, current_app
 from app_server.utils import OrmUttil
 import uuid
 import hashlib
@@ -243,16 +243,30 @@ def delete_bank_card():
           200:
             description: 解绑成功
         """
-    args = request.get_json()
+    args = request.get_json(silent=True) or {}
     edit_id = args.get("id")
+    if not edit_id:
+        return jsonify({'code': 50002, 'message': 'id cannot be null'})
 
     try:
-        AppMemberBank.query.filter_by(id=edit_id).delete()
+        # 必须校验归属：原实现直接 filter_by(id) 物理删除，任何登录用户都能删别人的卡
+        card = AppMemberBank.query.filter_by(id=edit_id, mb_id=g.user.id, del_flag=0).first()
+        if not card:
+            return jsonify({'code': 50004, 'message': 'bank card not found'})
+
+        # 主卡不允许删除（业务要求：只能删非主卡）
+        if card.is_default == 1:
+            return jsonify({'code': 50005, 'message': 'primary_card_cannot_delete'})
+
+        # 软删除，保留历史记录供对账
+        card.del_flag = 1
+        card.status = 0
         db.session.commit()
-        return jsonify({'message': "解绑成功"})
+        return jsonify({'code': 20000, 'message': 'Deleted'})
     except Exception as e:
         db.session.rollback()
-        response = jsonify({'message': "System or Technical Error"})
+        current_app.logger.error("删除银行卡异常 - 会员:%s 卡:%s 错误:%s", getattr(g.user, 'id', ''), edit_id, e, exc_info=True)
+        response = jsonify({'code': 50001, 'message': 'System or Technical Error'})
         response.status_code = 500
         return response
 

@@ -296,7 +296,7 @@
 						if (this.remain === 0) this.state = 'timeout'
 					}
 				}, 1000)
-				this.pollTimer = setInterval(this.pollStatus, 2000)
+				this.pollTimer = setInterval(() => this.pollStatus(), 2000)
 			},
 			stopTimers() {
 				if (this.timer) {

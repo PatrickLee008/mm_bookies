@@ -44,6 +44,10 @@
 						<view class="card-radio">
 							<view v-if="selectedCardId === c.id" class="radio-dot"></view>
 						</view>
+						<!-- 主卡不可删（is_default=1），非主卡才显示删除 -->
+						<view v-if="c.is_default != 1" class="card-del" @click.stop="removeCard(c)">
+							<text class="card-del-x">×</text>
+						</view>
 					</view>
 					<view class="card-item add" @click="openAddCard">
 						<text class="add-text">{{ $t('add_bank_account') }}</text>
@@ -122,7 +126,10 @@
 		<!-- ============ 新增银行卡弹窗 ============ -->
 		<view class="modal-mask" v-if="showAddCard" @click="showAddCard = false">
 			<view class="modal-panel" @click.stop>
-				<view class="modal-header">{{ $t('bind_wallet_account') }}</view>
+				<view class="modal-header">
+					{{ $t('bind_wallet_account') }}
+					<view class="modal-close" @click="showAddCard = false">×</view>
+				</view>
 				<view class="modal-form">
 					<view class="modal-field">
 						<text class="field-label">{{ $t('account_no') }}</text>
@@ -166,37 +173,14 @@
 		MCPay: '/static/image/pay/mc_logo.png',
 		TCPay: '/static/image/pay/tc_logo.jpg'
 	}
-	// 充值教程文案：按通道区分（对齐 90mins 的 charge_steps_* 四组）
-	// VIPPay / CashCode 走 Cash Code 备注；TCPay 是扫码；MCPay 填交易号后 5 位；KingPay 是托管页
+	// 充值教程文案：按通道区分，文案走 i18n（en / cn / th 已补，mm 回退英文）
+	// VIPPay 走 Cash Code 备注；TCPay 扫码；MCPay 填交易号后 5 位；KingPay 是托管页
 	const STEPS_BY_CHANNEL = {
-		VIPPay: [
-			'Copy the deposit-accepting bank account shown on the payment page.',
-			'Transfer the exact deposit amount to the displayed account.',
-			'Enter the Cash Code shown on the payment page in the transfer note/remark.',
-			'Please ensure both the transferred amount and Cash Code are correct.',
-			'The deposit will be completed automatically after the processing timeout.'
-		],
-		MCPay: [
-			'Copy bank account from payment page.',
-			'Transfer the shown amount.',
-			'After transfer, enter last 5 digits of Transaction ID in Payment page.',
-			'Enter and confirm Payment related information.'
-		],
-		TCPay: [
-			'Select the saved bank account and enter the deposit amount.',
-			'Tap Continue; the payment page will show a QR code.',
-			'Open KBZ Pay / WavePay and scan the QR code (you can also save the QR image and scan from gallery).',
-			'Pay the exact amount shown, then tap "I have paid".',
-			'The deposit is credited automatically once payment is confirmed.'
-		],
-		KingPay: [
-			'Save your bank account number and account holder name before making a deposit.',
-			'Select the saved bank account and enter the deposit amount.',
-			'Copy the deposit-accepting bank account shown on the payment page.',
-			'Transfer the exact entered amount to the displayed account.',
-			'Select I Have Paid after the transfer is complete.',
-			'The transaction completes after the transferring account and holder name are verified.'
-		],
+		VIPPay: ['charge_step_vip_1', 'charge_step_vip_2', 'charge_step_vip_3', 'charge_step_vip_4', 'charge_step_vip_5'],
+		MCPay: ['charge_step_mc_1', 'charge_step_mc_2', 'charge_step_mc_3', 'charge_step_mc_4'],
+		TCPay: ['charge_step_tc_1', 'charge_step_tc_2', 'charge_step_tc_3', 'charge_step_tc_4', 'charge_step_tc_5'],
+		KingPay: ['charge_step_king_1', 'charge_step_king_2', 'charge_step_king_3', 'charge_step_king_4', 'charge_step_king_5', 'charge_step_king_6'],
+		// Manual 暂未接入 i18n，保留英文原文
 		Manual: [
 			'Transfer to the account shown on this page',
 			'Keep the receipt or screenshot',
@@ -263,19 +247,24 @@
 			currentSteps() {
 				const groupKey = STEPS_KEY_BY_CHANNEL[this.selectedChannel] || 'VIPPay'
 				const steps = STEPS_BY_CHANNEL[groupKey] || STEPS_BY_CHANNEL.VIPPay
-				return steps.map(step => step.indexOf('deposit_step_') === 0 ? this.$t(step) : step)
+				// 所有带 i18n key 的走 $t；Manual 的英文原文直接返回
+				return steps.map(step => step.indexOf('charge_step_') === 0 ? this.$t(step) : step)
 			},
 			currentVideo() {
-				// 视频按通道从应用配置取（后台 setting/AppConfigForm 维护），
-				// 不再依赖银行卡上的 VIDEO_URL；迁移期用银行卡配置兜底。
-				const KEY_BY_CHANNEL = {
-					VIPPay: 'vip_video_link',
-					VIPPay_CashCode: 'vip_video_link',
-					TCPay: 'tc_video_link',
-					MCPay: 'mc_video_link',
-					KingPay: 'king_video_link'
+				// 视频按「通道 + 银行」从应用配置取（后台 setting/AppConfigForm 维护）。
+				// VIP Pay 要再分 KBZ Pay / Wave Money 两套教程，因为两者的付款流程不同。
+				const ch = this.selectedChannel
+				const bank = this.selectedBank || ''
+				let cfgKey = ''
+				if (ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
+					cfgKey = /wave/i.test(bank) ? 'vip_wave_video_link' : 'vip_kbz_video_link'
+				} else if (ch === 'TCPay') {
+					cfgKey = 'tc_video_link'
+				} else if (ch === 'MCPay') {
+					cfgKey = 'mc_video_link'
+				} else if (ch === 'KingPay') {
+					cfgKey = 'king_video_link'
 				}
-				const cfgKey = KEY_BY_CHANNEL[this.selectedChannel]
 				const fromConfig = cfgKey ? (this.appConfig[cfgKey] || '') : ''
 				return fromConfig || (this.selectedMethod && this.selectedMethod.video_url) || ''
 			},
@@ -368,6 +357,26 @@
 						this.channelsLoaded = true
 						this.channels = []
 					}
+				})
+			},
+			// 删除银行卡（主卡由后端拦，前端也隐藏按钮）
+			removeCard(card) {
+				this.$notice.confirm('Remove this bank account?', () => {
+					this.$http.post('/bank_card/delete', { id: card.id }, (res) => {
+						const d = res.data || {}
+						if (d.code === 20000) {
+							uni.showToast({ title: 'Removed', icon: 'success' })
+							if (this.selectedCardId === card.id) this.selectedCardId = null
+							this.loadCards()
+						} else if (d.message === 'primary_card_cannot_delete') {
+							this.$notice.alert('Primary account cannot be removed')
+						} else if (d.message === 'bank card not found') {
+							this.$notice.alert('Bank account not found')
+							this.loadCards()
+						} else {
+							this.$notice.alert(d.message || 'Failed to remove')
+						}
+					})
 				})
 			},
 			loadCards() {
@@ -706,10 +715,11 @@
 
 	.gw-item {
 		flex: 1;
+		min-width: 0; /* 关键：允许被压缩，否则 "Manual Transfer" 会把卡片撑宽，导致图标视觉大小不一 */
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 12px 4px;
+		padding: 12px 4px 0;
 		border-radius: $radius-large;
 		background: #fff;
 		border: 2px solid $color-secondary;
@@ -758,14 +768,36 @@
 		color: $color-primary;
 	}
 
+	.card-del {
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: 6px;
+	}
+
+	.card-del-x {
+		font-size: 20px;
+		line-height: 1;
+		color: #b0b0b0;
+	}
+
 	.gw-name {
 		font-size: 12px;
 		color: $color-primary;
 		max-width: 100%;
-		white-space: nowrap;
+		/* 允许换行：Manual Transfer 这类长标题折成两行，不再撑宽卡片 */
+		white-space: normal;
+		word-break: break-word;
 		overflow: hidden;
-		text-overflow: ellipsis;
-		line-height: 1.2;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-height: 1.25;
+		/* 固定两行高度，保证 1 行 / 2 行标题的卡片高度一致（图标纵向对齐） */
+		min-height: 30px;
+		text-align: center;
 	}
 
 	.gw-item.active .gw-name {
@@ -1188,14 +1220,31 @@
 	}
 
 	.modal-header {
+		position: relative;
 		height: 44px;
 		line-height: 44px;
-		padding: 0 18px;
+		padding: 0 44px;
 		background: $color-primary;
 		font-size: 16px;
 		font-weight: 600;
 		color: #fff;
 		text-align: center;
+	}
+
+	/* 右上角关闭按钮（文档第 14 项） */
+	.modal-close {
+		position: absolute;
+		right: 6px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 32px;
+		height: 32px;
+		line-height: 30px;
+		text-align: center;
+		font-size: 22px;
+		font-weight: 400;
+		color: #fff;
+		opacity: 0.85;
 	}
 
 	.modal-form {

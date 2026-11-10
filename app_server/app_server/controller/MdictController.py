@@ -59,7 +59,8 @@ def get_configs():
         "ai_helper_host": app_front_setting.aiHelperHost,
         "ai_helper_token": app_front_setting.aiHelperToken,
         # 各通道的充值教程视频（后台 setting/AppConfigForm 配置）
-        "vip_video_link": app_front_setting.vipVideoLink or '',
+        "vip_kbz_video_link": app_front_setting.vipKbzVideoLink or '',
+        "vip_wave_video_link": app_front_setting.vipWaveVideoLink or '',
         "king_video_link": app_front_setting.kingVideoLink or '',
         "tc_video_link": app_front_setting.tcVideoLink or '',
         "mc_video_link": app_front_setting.mcVideoLink or '',

@@ -391,7 +391,7 @@ export default {
 			uni.$messageNotification.setInstance(this)
 		}
 		// 每分钟刷新一次相对时间
-		this._timesInterval = setInterval(this.refreshTimes, 60000)
+		this._timesInterval = setInterval(() => this.refreshTimes(), 60000)
 	},
 
 	// 组件销毁时清理

@@ -90,7 +90,7 @@
 		methods: {
 			startCountdown() {
 				this.updateCountdown()
-				this.timer = setInterval(this.updateCountdown, 1000)
+				this.timer = setInterval(() => this.updateCountdown(), 1000)
 			},
 			clearCountdown() {
 				if (this.timer) {

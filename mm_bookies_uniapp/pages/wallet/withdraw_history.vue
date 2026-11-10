@@ -40,8 +40,8 @@
 						<text class="type-name">{{item.type || 'Withdraw'}}</text>
 					</view>
 					<view class="pay-right">
-						<text class="pay-name">{{item.bank_code || 'KBZ Pay'}}</text>
-						<image :src="`/static/icon/register/${item.bank_code || 'KBZ Pay'}.png`" mode="aspectFit"
+						<text class="pay-name">{{ bankName(item.bank_code) }}</text>
+						<image :src="bankIcon(item.bank_code)" mode="aspectFit"
 							class="pay-logo"></image>
 					</view>
 				</view>
@@ -102,6 +102,27 @@
 			}
 		},
 		methods: {
+			// 银行代码 → 显示名 / 图标名（与 deposit.vue 的 normalizeBank 保持一致）
+			// 不要再用 `item.bank_code || 'KBZ Pay'`：Wave Money 单没有 bank_code 时会伪装成 KBZ Pay
+			normalizeBank(code) {
+				const map = {
+					'KBZ': 'KBZ Pay',
+					'KBZPAY': 'KBZ Pay',
+					'WaveMoney': 'Wave Money',
+					'WAVEPAY': 'Wave Money',
+					'AYAPAY': 'AYAPAY',
+					'AYABANK': 'AYA BANK'
+				}
+				return map[code] || code || ''
+			},
+			bankName(code) {
+				return this.normalizeBank(code) || '-'
+			},
+			bankIcon(code) {
+				const c = this.normalizeBank(code)
+				return c ? '/static/icon/register/' + c + '.png' : ''
+			},
+
 			// 滚动事件冒泡给父页面，用于驱动 header 收起/展开
 			onScrollEmit(e) {
 				this.$emit('contentScroll', e)

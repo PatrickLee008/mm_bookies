@@ -138,11 +138,14 @@
 			expiryText() {
 				const value = this.order.expire_time || this.order.EXPIRE_TIME || ''
 				if (!value) return '--'
-				const date = new Date(String(value).replace(' ', 'T'))
-				if (isNaN(date.getTime())) return String(value)
-				const pad = number => String(number).padStart(2, '0')
-				return pad(date.getDate()) + '-' + pad(date.getMonth() + 1) + '-' + date.getFullYear() + ' ' +
-					pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds())
+				// 服务器给的是 UTC+8 钟面时间，必须转成用户时区（缅甸 UTC+6:30）再展示，
+				// 统一走 utils 里的 convertTimezone，和 coupon.vue 保持一致。
+				const normalized = String(value).replace('T', ' ')
+				const converted = dateFormatUtils.convertTimezone(normalized)
+				const m = String(converted).match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/)
+				if (!m) return String(value)
+				// 展示成 DD-MM-YYYY HH:mm:ss
+				return m[3] + '-' + m[2] + '-' + m[1] + ' ' + m[4] + ':' + m[5] + ':' + m[6]
 			},
 			countdownText() {
 				const seconds = Math.max(0, this.remain)
@@ -190,7 +193,9 @@
 						if (this.remain === 0) this.state = 'timeout'
 					}
 				}, 1000)
-				this.pollTimer = setInterval(this.pollStatus, 2000)
+				// 必须用箭头函数包一层：直接传 this.pollStatus 会丢失 this，
+				// 进 pollStatus 后 this 指向 window，orderId 取不到，轮询静默失效
+				this.pollTimer = setInterval(() => this.pollStatus(), 2000)
 			},
 			stop() {
 				if (this.timer) {

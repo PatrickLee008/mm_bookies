@@ -147,7 +147,8 @@ class AppFrontSettingVo(BaseVO):
         self.transferVideoLink = None  # Transfer Video Link（旧字段，保留兼容）
         self.nfmVideoLink = None  # NFM Video Link（旧字段，保留兼容）
         # 按通道配置的充值教程视频（2026-11-04 从银行卡弹窗迁移到应用配置）
-        self.vipVideoLink = None  # VIP Pay 教程视频（VIPPay + CashCode 共用）
+        self.vipKbzVideoLink = None   # VIP Pay + KBZ Pay 教程视频
+        self.vipWaveVideoLink = None  # VIP Pay + Wave Money 教程视频
         self.kingVideoLink = None  # King Pay 教程视频
         self.tcVideoLink = None  # TC Pay 教程视频
         self.mcVideoLink = None  # MC Pay 教程视频
