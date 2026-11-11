@@ -7,3 +7,5 @@
 /config/deploy/hosts/*
 !/config/deploy/hosts/example-host/
 !/config/deploy/hosts/example-host/**
+# 离线测试只在本地使用（2026-11-11）
+/tests/

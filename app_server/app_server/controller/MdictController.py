@@ -7,6 +7,7 @@ from app_server.model.ContactFuncModel import ContactFunc
 from app_server.model.SysBisDictModel import SysBisDict
 from app_server.utils import OrmUttil
 from app_server.utils.Kits import Kits
+from app_server.utils import PageConfig
 
 r_conf = Blueprint('config', __name__)
 
@@ -64,6 +65,8 @@ def get_configs():
         "king_video_link": app_front_setting.kingVideoLink or '',
         "tc_video_link": app_front_setting.tcVideoLink or '',
         "mc_video_link": app_front_setting.mcVideoLink or '',
+        # 页面配置版本（2026-11-11）：{页面: 版本}，前端版本不一致时才重新拉取页面配置
+        "page_config_versions": PageConfig.page_versions(),
     }
     #items属性重decimal转float
     items = Kits.decimal_to_float( items)

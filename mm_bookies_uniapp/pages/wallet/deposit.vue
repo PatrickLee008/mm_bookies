@@ -84,10 +84,14 @@
 			<!-- ============ 5. 教程 ============ -->
 			<view class="section steps" v-if="selectedChannel">
 				<view class="steps-title">{{ $t('how_to_recharge') }}</view>
-				<view class="step-row" v-for="(s, i) in currentSteps" :key="i">
-					<text class="step-no">{{ i + 1 }}.</text>
-					<text class="step-text">{{ s }}</text>
-				</view>
+				<!-- 后台页面配置（Setting → Other，wallet/deposit）：配置什么显示什么，保留换行，不自动编号 -->
+				<text v-if="configuredSteps" class="step-text configured-text">{{ configuredSteps }}</text>
+				<template v-else>
+					<view class="step-row" v-for="(s, i) in currentSteps" :key="i">
+						<text class="step-no">{{ i + 1 }}.</text>
+						<text class="step-text">{{ s }}</text>
+					</view>
+				</template>
 				<view class="video-guide">
 					<text class="video-guide-title">{{ $t('watch_video_guide') }}</text>
 					<view class="video-btn" :class="{ disabled: !currentVideo }" @click="openVideoGuide">
@@ -114,7 +118,7 @@
 
 			<view class="notice-card">
 				<text class="notice-title">{{ $t('notice_title') }}</text>
-				<text class="notice-text">{{ $t('deposit_amount_match_notice') }}</text>
+				<text class="notice-text configured-text">{{ noticeText }}</text>
 			</view>
 			<view style="height: 40rpx;"></view>
 		</scroll-view>
@@ -152,6 +156,10 @@
 	import PayModal from '@/components/payment/PayModal.vue'
 	import { getPaymentAction, getTransferPageUrl, openPaymentUrl } from '@/utils/payment-flow.js'
 	import dateFormatUtils from '../../utils/utils.js'
+	import { getCachedPageConfig, syncPageConfig, latestVersionOf, pickText, pageConfigLang } from '@/utils/page-config.js'
+
+	// 后台页面配置的页面标识（Setting → Other，平台 MMBookies，类型 wallet/deposit）
+	const PAGE_CONFIG_PAGE = 'wallet/deposit'
 
 	// 同分时的展示顺序
 	const SORT_ORDER = {
@@ -226,7 +234,9 @@
 				manualCards: [],
 				configs: {},
 				// 后台 setting/AppConfigForm 的「前端展示」配置（含各通道教程视频链接）
-				appConfig: {}
+				appConfig: {},
+				// 后台页面配置（wallet/deposit 的 notice / steps.<通道>，全部语言），先取本地缓存
+				pageConfigItems: []
 			}
 		},
 		computed: {
@@ -249,6 +259,22 @@
 				const steps = STEPS_BY_CHANNEL[groupKey] || STEPS_BY_CHANNEL.VIPPay
 				// 所有带 i18n key 的走 $t；Manual 的英文原文直接返回
 				return steps.map(step => step.indexOf('charge_step_') === 0 ? this.$t(step) : step)
+			},
+			// 页面配置的语言：缅文 mm，其他 en
+			pageConfigLang() {
+				return pageConfigLang(this.$i18n.locale)
+			},
+			// 后台配置的当前通道步骤（按原文显示）；没配置当前语言时为空，回退内置步骤。
+			// Manual 不在配置清单里；VIPPay_CashCode 与 VIPPay 共用
+			configuredSteps() {
+				const groupKey = STEPS_KEY_BY_CHANNEL[this.selectedChannel]
+				if (!groupKey || groupKey === 'Manual') return ''
+				return pickText(this.pageConfigItems, 'steps.' + groupKey, this.pageConfigLang)
+			},
+			// 底部 Notice：后台配置优先，没配置当前语言时用内置文案
+			noticeText() {
+				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang) ||
+					this.$t('deposit_amount_match_notice')
 			},
 			currentVideo() {
 				// 视频按「通道 + 银行」从应用配置取（后台 setting/AppConfigForm 维护）。
@@ -306,6 +332,9 @@
 		},
 		created() {
 			this.configs = Object.assign({}, this.$store.state.configs)
+			// 先用本地缓存的页面配置显示，版本比对在 loadAppConfig 拿到 /config/get 后进行
+			const cached = getCachedPageConfig(PAGE_CONFIG_PAGE)
+			if (cached) this.pageConfigItems = cached.items
 		},
 		mounted() {
 			this.loadAppConfig()
@@ -335,6 +364,11 @@
 				this.$http.get('/config/get', {}, (res) => {
 					const d = res.data || {}
 					this.appConfig = d.items || {}
+					// 页面配置：版本与本地缓存一致时不请求；不一致才拉取最新配置
+					syncPageConfig(this.$http, PAGE_CONFIG_PAGE, latestVersionOf(this.appConfig, PAGE_CONFIG_PAGE),
+						(items) => {
+							this.pageConfigItems = items
+						})
 				})
 			},
 			loadChannels() {
@@ -1194,6 +1228,13 @@
 		font-weight: 600;
 		color: $color-primary;
 		line-height: 1.5;
+	}
+
+	/* 后台页面配置的文案：按原文显示并保留换行（2026-11-11） */
+	.configured-text {
+		display: block;
+		white-space: pre-line;
+		word-break: break-word;
 	}
 
 	/* ---------- 新增卡弹窗 ---------- */

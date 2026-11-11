@@ -15,6 +15,10 @@ class MAppSettingOther(BaseSaasModel):
     id = Column(String(64), primary_key=True, comment="主键ID")
     tenant_id = Column(String(64), server_default='10000', comment="租户ID")
 
+    # 平台标识（2026-11-11）：空=通用；onex2 / mmbookies = 只给对应前端。
+    # 需先执行 javasaas-game/功能迭代/20261111_jp-console_MMBookies测试缺陷修复/sql/01_setting_other_platform.sql
+    platform = Column(String(32), nullable=False, server_default='', comment="平台标识")
+
     # 设置信息
     setting_key = Column(String(128), nullable=False, comment="设置键（唯一标识）")
     setting_name = Column(String(255), comment="设置名称（显示用）")

@@ -24,6 +24,65 @@ withdraw = Blueprint('withdraw', __name__)
 logger = get_logger()
 
 
+def _tenant_of(user):
+    return str(getattr(user, 'tenant_id', None) or '10000')
+
+
+def _groups(tenant_id):
+    """提现组查询（m_app_withdrawal_group）：本租户、未删除"""
+    return WithDrawGroup.query.filter(WithDrawGroup.TENANT_ID == tenant_id, WithDrawGroup.DEL_FLAG == 0)
+
+
+def _group_id_num(gid):
+    """组 ID 是字符串（迁移的原 ID 如 '1'，后台新建的是雪花数字）；按数值排序比较，非数字排最后"""
+    s = str(gid or '')
+    return int(s) if s.isdigit() else float('inf')
+
+
+def _group_scope_aid(aid, tenant_id='10000'):
+    """提现组范围（2026-11-11 按代理配置）：代理有自己的提现组时用自己的，否则用默认组（AID 为空）"""
+    aid = (aid or '').strip()
+    if aid and _groups(tenant_id).filter(WithDrawGroup.AID == aid).count() > 0:
+        return aid
+    return ''
+
+
+def _legacy_pick_group(user, finance_config, scope_aid=''):
+    """原来的提现分组逻辑（2026-11-11 恢复为"未配置金额区间"时的兜底）：
+    在范围内（代理自己的组或默认组）开启的组里选；用户在粘滞期内（Redis user_withdraw{id}）且原组仍开启时沿用原组，
+    否则取第一个 ID 大于 cur_withdraw_group 的组（没有则取第一个）。
+    返回加了行锁的组；没有开启的组时返回 None。
+    """
+    tenant_id = _tenant_of(user)
+    spare_ids = sorted((str(u.ID) for u in _groups(tenant_id).filter(
+        WithDrawGroup.HANDLE_ON, WithDrawGroup.AID == scope_aid).all()), key=_group_id_num)
+    if not spare_ids:
+        return None
+    group_key = "user_withdraw%s" % user.id
+    group_value = Redis.get(group_key)
+    if isinstance(group_value, bytes):
+        group_value = group_value.decode('utf-8')
+    if group_value and str(group_value) in spare_ids:
+        next_group_id = str(group_value)
+        logger.info("用户已有提现组 - 用户ID: %s, 组ID: %s", user.id, next_group_id)
+    else:
+        cur_group_id = int(getattr(finance_config, 'cur_withdraw_group', 0) or 0)
+        next_group_id = spare_ids[0]
+        for gid in spare_ids:
+            if _group_id_num(gid) > cur_group_id:
+                next_group_id = gid
+                break
+    group = WithDrawGroup.query.filter(WithDrawGroup.ID == next_group_id).with_for_update().first()
+    expiration = getattr(finance_config, 'withdraw_group_expiration', None)
+    # 与原代码一致：expiration 原样作为过期时间传给 Redis；为空时不设过期
+    if expiration:
+        Redis.set(group_key, next_group_id, int(expiration))
+    else:
+        Redis.set(group_key, next_group_id)
+    logger.info("提现分组（未配置金额区间，按原逻辑）- 用户ID: %s, 组ID: %s", user.id, next_group_id)
+    return group
+
+
 # 钱包
 @withdraw.route('/get', methods=['GET'])
 @auth.login_required
@@ -290,8 +349,9 @@ def get_withdraw_list():
     withdraw_list = withdraw_list.offset((current_page - 1) * limit).limit(limit).all()
 
     # 修改提现组名称
+    # 2026-11-11：原来写成 u.id（模型只有 ID 属性，会 AttributeError）；组 ID 为字符串
     all_group_names = WithDrawGroup.query.all()
-    name_dict = {u.id: u.GROUP_NAME for u in all_group_names}
+    name_dict = {str(u.ID): u.GROUP_NAME for u in all_group_names}
     logger.info(f"提现组名称映射: {name_dict}")
     items = []
     for wd in withdraw_list:
@@ -418,26 +478,43 @@ def apply_withdraw():
         # 2026-10-29 支付中心接入：按提现金额路由到对应提现组
         # 取代原 m_dict 轮询 + 用户粘滞组（Redis user_withdraw{x}）。
         # 金额需落入某组的 [MIN_AMOUNT, MAX_AMOUNT]（含端点）；MAX_AMOUNT<=0 视为未配置，不参与路由。
+        # 2026-11-11（用户确认）：
+        #   - 范围：代理有自己的提现组时只在自己的组里分配，没有时用默认组（AID 为空）；
+        #   - 范围内所有组都没配置区间时，沿用原来的分组逻辑（开启的组轮流 + 用户粘滞组）；
+        #     只要有一个组配置了区间，就按金额区间分组，金额不在任何区间内则拒绝。
         wd_money = float(money)
-        matched_group = WithDrawGroup.query.filter(
-            WithDrawGroup.MAX_AMOUNT > 0,
-            WithDrawGroup.MIN_AMOUNT <= wd_money,
-            WithDrawGroup.MAX_AMOUNT >= wd_money,
-        ).order_by(WithDrawGroup.MIN_AMOUNT.asc()).first()
-        if not matched_group:
-            db.session.rollback()
-            response = jsonify({'message': "No withdrawal counter available for this amount."})
-            response.status_code = 400
-            return response
+        tenant_id = _tenant_of(user)
+        scope_aid = _group_scope_aid(user.aid, tenant_id)
+        range_configured = _groups(tenant_id).filter(
+            WithDrawGroup.AID == scope_aid, WithDrawGroup.MAX_AMOUNT > 0).count() > 0
+        if range_configured:
+            matched_group = _groups(tenant_id).filter(
+                WithDrawGroup.AID == scope_aid,
+                WithDrawGroup.MAX_AMOUNT > 0,
+                WithDrawGroup.MIN_AMOUNT <= wd_money,
+                WithDrawGroup.MAX_AMOUNT >= wd_money,
+            ).order_by(WithDrawGroup.MIN_AMOUNT.asc()).first()
+            if not matched_group:
+                db.session.rollback()
+                response = jsonify({'message': "No withdrawal counter available for this amount."})
+                response.status_code = 400
+                return response
 
-        # 行锁匹配到的组，校验开关与处理上限（关闭或已满则拒绝）
-        next_group = WithDrawGroup.query.filter(
-            WithDrawGroup.ID == matched_group.ID).with_for_update().first()
-        if (not next_group.HANDLE_ON) or (next_group.NOW_HANDLE >= next_group.MAX_HANDLE):
-            db.session.rollback()
-            response = jsonify({'message': "The withdrawal counter is full or closed, please try again later."})
-            response.status_code = 400
-            return response
+            # 行锁匹配到的组，校验开关与处理上限（关闭或已满则拒绝）
+            next_group = WithDrawGroup.query.filter(
+                WithDrawGroup.ID == matched_group.ID).with_for_update().first()
+            if (not next_group.HANDLE_ON) or (next_group.NOW_HANDLE >= next_group.MAX_HANDLE):
+                db.session.rollback()
+                response = jsonify({'message': "The withdrawal counter is full or closed, please try again later."})
+                response.status_code = 400
+                return response
+        else:
+            next_group = _legacy_pick_group(user, finance_default_config, scope_aid)
+            if next_group is None:
+                db.session.rollback()
+                response = jsonify({'message': "Too many players withdrawing cash, please try again later."})
+                response.status_code = 429
+                return response
         next_group_id = next_group.ID
 
         now = datetime.datetime.now()

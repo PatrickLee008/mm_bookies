@@ -110,6 +110,10 @@ class Config(object):
     # H5 端外部收银页付款后回跳地址（留空则不传 returnUrl）
     CHARGE_RETURN_URL = get_env_optional('CHARGE_RETURN_URL', '')
 
+    # 平台标识（2026-11-11）：Setting → Other（m_app_setting_other）只读取 platform 为空（通用）或等于它的配置。
+    # mm_bookies 这套前端（含 phoewamaung / shwegoal 等品牌）都是 mmbookies。
+    APP_PLATFORM = get_env_optional('APP_PLATFORM', 'mmbookies')
+
     # AWC API配置
     AWC_API_ENABLED = get_env_bool('AWC_API_ENABLED')
     AWC_API_BASE_URL = get_env_required('AWC_API_BASE_URL')
