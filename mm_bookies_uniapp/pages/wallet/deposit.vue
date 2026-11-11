@@ -83,15 +83,11 @@
 
 			<!-- ============ 5. 教程 ============ -->
 			<view class="section steps" v-if="selectedChannel">
-				<view class="steps-title">{{ $t('how_to_recharge') }}</view>
-				<!-- 后台页面配置（Setting → Other，wallet/deposit）：配置什么显示什么，保留换行，不自动编号 -->
-				<text v-if="configuredSteps" class="step-text configured-text">{{ configuredSteps }}</text>
-				<template v-else>
-					<view class="step-row" v-for="(s, i) in currentSteps" :key="i">
-						<text class="step-no">{{ i + 1 }}.</text>
-						<text class="step-text">{{ s }}</text>
-					</view>
-				</template>
+				<view v-if="configuredSteps">
+					<view class="steps-title">{{ $t('how_to_recharge') }}</view>
+					<!-- 无启用的页面配置时不显示充值提示 -->
+					<text class="step-text configured-text">{{ configuredSteps }}</text>
+				</view>
 				<view class="video-guide">
 					<text class="video-guide-title">{{ $t('watch_video_guide') }}</text>
 					<view class="video-btn" :class="{ disabled: !currentVideo }" @click="openVideoGuide">
@@ -116,7 +112,7 @@
 				</view>
 			</view>
 
-			<view class="notice-card">
+			<view class="notice-card" v-if="noticeText">
 				<text class="notice-title">{{ $t('notice_title') }}</text>
 				<text class="notice-text configured-text">{{ noticeText }}</text>
 			</view>
@@ -156,7 +152,7 @@
 	import PayModal from '@/components/payment/PayModal.vue'
 	import { getPaymentAction, getTransferPageUrl, openPaymentUrl } from '@/utils/payment-flow.js'
 	import dateFormatUtils from '../../utils/utils.js'
-	import { getCachedPageConfig, syncPageConfig, latestVersionOf, pickText, pageConfigLang } from '@/utils/page-config.js'
+	import { syncPageConfig, latestVersionOf, pickText, pageConfigLang } from '@/utils/page-config.js'
 	import { fetchConfigShared } from '@/utils/api/config.js'
 
 	// 后台页面配置的页面标识（Setting → Other，平台 MMBookies，类型 wallet/deposit）
@@ -181,21 +177,6 @@
 		KingPay: '/static/image/pay/king_logo.png',
 		MCPay: '/static/image/pay/mc_logo.png',
 		TCPay: '/static/image/pay/tc_logo.jpg'
-	}
-	// 充值教程文案：按通道区分，文案走 i18n（en / cn / th 已补，mm 回退英文）
-	// VIPPay 走 Cash Code 备注；TCPay 扫码；MCPay 填交易号后 5 位；KingPay 是托管页
-	const STEPS_BY_CHANNEL = {
-		VIPPay: ['charge_step_vip_1', 'charge_step_vip_2', 'charge_step_vip_3', 'charge_step_vip_4', 'charge_step_vip_5'],
-		MCPay: ['charge_step_mc_1', 'charge_step_mc_2', 'charge_step_mc_3', 'charge_step_mc_4'],
-		TCPay: ['charge_step_tc_1', 'charge_step_tc_2', 'charge_step_tc_3', 'charge_step_tc_4', 'charge_step_tc_5'],
-		KingPay: ['charge_step_king_1', 'charge_step_king_2', 'charge_step_king_3', 'charge_step_king_4', 'charge_step_king_5', 'charge_step_king_6'],
-		// Manual 暂未接入 i18n，保留英文原文
-		Manual: [
-			'Transfer to the account shown on this page',
-			'Keep the receipt or screenshot',
-			'Upload the receipt and fill in the transaction ID',
-			'Wait for our team to confirm'
-		]
 	}
 	// 通道 → 步骤组的映射（VIPPay_CashCode 与 VIPPay 共用）
 	const STEPS_KEY_BY_CHANNEL = {
@@ -236,7 +217,7 @@
 				configs: {},
 				// 后台 setting/AppConfigForm 的「前端展示」配置（含各通道教程视频链接）
 				appConfig: {},
-				// 后台页面配置（wallet/deposit 的 notice / steps.<通道>，全部语言），先取本地缓存
+				// 后台启用的页面配置（wallet/deposit 的 notice / steps.<通道>，全部语言）
 				pageConfigItems: []
 			}
 		},
@@ -255,27 +236,20 @@
 				if (!this.selectedBank) return []
 				return this.cardList.filter(c => this.normalizeBank(c.bank_code) === this.selectedBank)
 			},
-			currentSteps() {
-				const groupKey = STEPS_KEY_BY_CHANNEL[this.selectedChannel] || 'VIPPay'
-				const steps = STEPS_BY_CHANNEL[groupKey] || STEPS_BY_CHANNEL.VIPPay
-				// 所有带 i18n key 的走 $t；Manual 的英文原文直接返回
-				return steps.map(step => step.indexOf('charge_step_') === 0 ? this.$t(step) : step)
-			},
-			// 页面配置的语言：缅文 mm，其他 en
+			// 页面配置只支持英语和缅语；其他或未设置时使用默认缅语
 			pageConfigLang() {
 				return pageConfigLang(this.$i18n.locale)
 			},
-			// 后台配置的当前通道步骤（按原文显示）；没配置当前语言时为空，回退内置步骤。
+			// 只显示后台启用的当前通道步骤；未配置时为空。
 			// Manual 不在配置清单里；VIPPay_CashCode 与 VIPPay 共用
 			configuredSteps() {
 				const groupKey = STEPS_KEY_BY_CHANNEL[this.selectedChannel]
 				if (!groupKey || groupKey === 'Manual') return ''
 				return pickText(this.pageConfigItems, 'steps.' + groupKey, this.pageConfigLang)
 			},
-			// 底部 Notice：后台配置优先，没配置当前语言时用内置文案
+			// 底部 Notice 只显示后台启用的配置
 			noticeText() {
-				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang) ||
-					this.$t('deposit_amount_match_notice')
+				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang)
 			},
 			currentVideo() {
 				// 视频按「通道 + 银行」从应用配置取（后台 setting/AppConfigForm 维护）。
@@ -284,7 +258,11 @@
 				const bank = this.selectedBank || ''
 				let cfgKey = ''
 				if (ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
-					cfgKey = /wave/i.test(bank) ? 'vip_wave_video_link' : 'vip_kbz_video_link'
+					if (/wave/i.test(bank)) {
+						cfgKey = 'vip_wave_video_link'
+					} else if (/kbz/i.test(bank)) {
+						cfgKey = 'vip_kbz_video_link'
+					}
 				} else if (ch === 'TCPay') {
 					cfgKey = 'tc_video_link'
 				} else if (ch === 'MCPay') {
@@ -293,7 +271,7 @@
 					cfgKey = 'king_video_link'
 				}
 				const fromConfig = cfgKey ? (this.appConfig[cfgKey] || '') : ''
-				return fromConfig || (this.selectedMethod && this.selectedMethod.video_url) || ''
+				return fromConfig
 			},
 			minLimit() {
 				return Number(this.configs.deposit_min_limit) || 3000
@@ -333,9 +311,6 @@
 		},
 		created() {
 			this.configs = Object.assign({}, this.$store.state.configs)
-			// 先用本地缓存的页面配置显示，版本比对在 loadAppConfig 拿到 /config/get 后进行
-			const cached = getCachedPageConfig(PAGE_CONFIG_PAGE)
-			if (cached) this.pageConfigItems = cached.items
 		},
 		mounted() {
 			this.loadAppConfig()
@@ -368,11 +343,11 @@
 					this.$http.beforeResponseFilter(res)
 					const d = res.data || {}
 					this.appConfig = d.items || {}
-					// 页面配置：版本与本地缓存一致时不请求；不一致才拉取最新配置
+					// 每次读取当前启用项，防止本地缓存显示已禁用的提示。
 					syncPageConfig(this.$http, PAGE_CONFIG_PAGE, latestVersionOf(this.appConfig, PAGE_CONFIG_PAGE),
 						(items) => {
 							this.pageConfigItems = items
-						})
+						}, true)
 				})
 			},
 			loadChannels() {
@@ -757,7 +732,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 12px 4px 0;
+		padding: 6px 4px 0;
 		border-radius: $radius-large;
 		background: #fff;
 		border: 2px solid $color-secondary;

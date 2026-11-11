@@ -1930,6 +1930,7 @@
 	"add_bank_account": "Add Bank Account",
 	"select_bank_card": "Please select a bank card",
 	"deposit_with_kpay": "Auto Deposit With Kpay",
+	"deposit_with_wave": "Auto Deposit With Wave Money",
 	"handling_fees": "Handling Fees",
 	"pay_completed": "Pay Completed",
 	"back_home_btn": "Back Home",

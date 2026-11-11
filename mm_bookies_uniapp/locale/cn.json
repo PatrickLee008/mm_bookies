@@ -1930,6 +1930,7 @@
 	"add_bank_account": "添加银行账户",
 	"select_bank_card": "选择银行卡",
 	"deposit_with_kpay": "通过 Kpay 自动充值",
+	"deposit_with_wave": "通过 Wave Money 自动充值",
 	"handling_fees": "手续费",
 	"pay_completed": "支付成功",
 	"back_home_btn": "返回主页",

@@ -1934,6 +1934,7 @@
 	"add_bank_account": "เพิ่มบัญชีธนาคาร",
 	"select_bank_card": "เลือกบัตรธนาคาร",
 	"deposit_with_kpay": "ฝากอัตโนมัติผ่าน Kpay",
+	"deposit_with_wave": "ฝากอัตโนมัติผ่าน Wave Money",
 	"handling_fees": "ค่าธรรมเนียม",
 	"pay_completed": "ชำระเงินสำเร็จ",
 	"back_home_btn": "กลับหน้าแรก",

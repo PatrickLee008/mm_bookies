@@ -5,6 +5,7 @@ from app_server.model.AppSettingBet1x2Model import AppSettingBet1x2Model
 from app_server.model.AppSettingFinanceModel import AppSettingFinanceModel
 from app_server.model.ContactFuncModel import ContactFunc
 from app_server.model.SysBisDictModel import SysBisDict
+from app_server.model.SysTenantModel import SysTenant
 from app_server.utils import OrmUttil
 from app_server.utils.Kits import Kits
 from app_server.utils import PageConfig
@@ -32,7 +33,8 @@ def get_configs():
     # 获取资金配置
     finance_default_config = AppSettingFinanceModel.get_agent_config();
     # 应用配置
-    app_front_setting = SysBisDict.get_app_front_setting()
+    tenant_id = SysTenant.get_tenant_id(request) or '10000'
+    app_front_setting = SysBisDict.get_app_front_setting(tenant_id)
     items = {
         "hdp_min": betting_config.sb_sg_min_bet_hdp,# 单笔HDP最小限制
         "hdp_max": betting_config.sb_sg_max_bet_hdp,# 单笔HDP最大限制
@@ -86,7 +88,8 @@ def get_configs():
 def updates():
     version = request.args.get('version')
     # 应用配置
-    app_front_setting = SysBisDict.get_app_front_setting()
+    tenant_id = SysTenant.get_tenant_id(request) or '10000'
+    app_front_setting = SysBisDict.get_app_front_setting(tenant_id)
     if app_front_setting.appVersion:
         current_version = app_front_setting.appVersion
         print("the current_version:", current_version)
@@ -117,6 +120,7 @@ def updates():
 @r_conf.route('/appinfo', methods=['GET'])
 def appinfo():
     # 应用配置
-    app_front_setting = SysBisDict.get_app_front_setting()
+    tenant_id = SysTenant.get_tenant_id(request) or '10000'
+    app_front_setting = SysBisDict.get_app_front_setting(tenant_id)
     result = app_front_setting.to_dict()
     return Kits.rt_data(result)

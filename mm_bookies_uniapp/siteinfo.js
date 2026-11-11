@@ -44,9 +44,9 @@ Object.assign(siteinfo, SITES[siteinfo.site] || SITES.mmbookies);
 
 if (process.env.NODE_ENV == 'development') {
 	//开发：接口指向本地 Python 服务（支付中心仍走 .env 配置）
-	siteinfo.apiUrl = "http://mmmbookies.frp.1x2mmm.net/api";
+	// siteinfo.apiUrl = "http://mmmbookies.frp.1x2mmm.net/api";
 	//开发：仅覆盖支付中心差异
-	// siteinfo.apiUrl = "http://localhost:8282";
+	siteinfo.apiUrl = "http://localhost:8282";
 	// siteinfo.payUrl = "http://192.168.1.32:9010"; //支付中心
 	// siteinfo.apiUrl = "http://m.1x2mmm.net/api";
 	// siteinfo.apiUrl = "http://m.onex2.com/api";

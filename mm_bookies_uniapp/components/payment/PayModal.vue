@@ -37,6 +37,10 @@
 						<text class="validity-date">{{ expiryText }}</text>
 					</view>
 					<view class="countdown">{{ countdownText }}</view>
+					<view v-if="state === 'success'" class="success-banner">{{ $t('success') }}</view>
+					<view v-else-if="localExpired && state === 'paying'" class="status-checking">
+						{{ $t(statusCheckLimitReached ? 'in progress' : 'pending') }}
+					</view>
 				</view>
 
 				<view class="pay-actions">
@@ -78,8 +82,14 @@
 	// 银行图标（合成图底部用）
 	const BANK_ICON = {
 		KBZ: '/static/icon/register/KBZ Pay.png',
-		WaveMoney: '/static/icon/register/Wave Money.png'
+		'KBZ Pay': '/static/icon/register/KBZ Pay.png',
+		KBZPAY: '/static/icon/register/KBZ Pay.png',
+		WaveMoney: '/static/icon/register/Wave Money.png',
+		'Wave Money': '/static/icon/register/Wave Money.png',
+		WAVEPAY: '/static/icon/register/Wave Money.png'
 	}
+	const LOCAL_EXPIRY_POLL_INTERVAL = 10000
+	const MAX_LOCAL_EXPIRY_POLL_MS = 30 * 60 * 1000
 
 	export default {
 		name: 'PayModal',
@@ -100,8 +110,12 @@
 			return {
 				state: 'paying',
 				remain: 0,
+				localExpired: false,
+				statusCheckDeadline: 0,
+				statusCheckLimitReached: false,
 				timer: null,
 				pollTimer: null,
+				successCloseTimer: null,
 				qrImage: '',
 				qrData: '',
 				paymentError: '',
@@ -114,6 +128,10 @@
 			channel() {
 				return this.order.pay_channel || this.order.CHANNEL || ''
 			},
+			paymentBank() {
+				return String(this.order.receive_bank_code || this.order.RECEIVE_BANK_CODE ||
+					this.order.bank_type || this.order.BANK_TYPE || '').trim()
+			},
 			cancelable() {
 				return this.channel === 'VIPPay'
 			},
@@ -125,7 +143,9 @@
 				return titles[this.channel] || this.channel
 			},
 			paymentTitle() {
-				if (this.channel === 'VIPPay') return this.$t('deposit_with_kpay')
+				if (this.channel === 'VIPPay') {
+					return /wave/i.test(this.paymentBank) ? this.$t('deposit_with_wave') : this.$t('deposit_with_kpay')
+				}
 				return (this.$t('auto_deposit') || 'Auto Deposit') + ' - ' + this.title
 			},
 			moneyText() {
@@ -166,8 +186,15 @@
 			},
 			state(value) {
 				if (value === 'success') {
+					const completedOrderId = this.orderId
 					this.stop()
 					uni.$emit('userInfo:refresh')
+					this.successCloseTimer = setTimeout(() => {
+						this.successCloseTimer = null
+						if (this.visible && this.state === 'success' && this.orderId === completedOrderId) {
+							this.onClose()
+						}
+					}, 1500)
 				} else if (value === 'timeout' || value === 'cancelled') {
 					this.notifyResult(value)
 				}
@@ -179,33 +206,71 @@
 				this.stop()
 				this.state = 'paying'
 				this.remain = Number(this.order.REMAINING_SECONDS || this.order.remaining_seconds || 0)
+				this.localExpired = false
+				this.statusCheckDeadline = 0
+				this.statusCheckLimitReached = false
 				this.orderId = this.order.id || this.order.ID || this.order.out_order_id || this.order.OUT_ORDER_ID || ''
 				this.qrData = ''
 				this.qrImage = ''
 				this.paymentError = ''
 
-				if (this.qrValue) this.makeQr()
-				else this.fetchPayInfo()
+				const hasQr = !!this.qrValue
+				if (hasQr) this.makeQr()
 
-				this.timer = setInterval(() => {
-					if (this.remain > 0) {
-						this.remain -= 1
-						if (this.remain === 0) this.state = 'timeout'
-					}
-				}, 1000)
-				// 必须用箭头函数包一层：直接传 this.pollStatus 会丢失 this，
-				// 进 pollStatus 后 this 指向 window，orderId 取不到，轮询静默失效
-				this.pollTimer = setInterval(() => this.pollStatus(), 2000)
+				this.startCountdown()
+				this.setPollInterval(2000)
+				if (this.remain <= 0) this.markLocallyExpired()
+				if (!hasQr) this.fetchPayInfo()
 			},
 			stop() {
 				if (this.timer) {
 					clearInterval(this.timer)
 					this.timer = null
 				}
+				this.stopPolling()
+				if (this.successCloseTimer) {
+					clearTimeout(this.successCloseTimer)
+					this.successCloseTimer = null
+				}
+			},
+			startCountdown() {
+				if (this.timer) clearInterval(this.timer)
+				this.timer = setInterval(() => {
+					if (this.remain > 0) {
+						this.remain -= 1
+						if (this.remain === 0) this.markLocallyExpired()
+					}
+				}, 1000)
+			},
+			stopPolling() {
 				if (this.pollTimer) {
 					clearInterval(this.pollTimer)
 					this.pollTimer = null
 				}
+			},
+			setPollInterval(interval) {
+				this.stopPolling()
+				// 用箭头函数保留组件 this，避免轮询时丢失订单号。
+				this.pollTimer = setInterval(() => this.pollStatus(), interval)
+			},
+			markLocallyExpired() {
+				if (this.localExpired) return
+				this.localExpired = true
+				if (this.timer) {
+					clearInterval(this.timer)
+					this.timer = null
+				}
+				this.statusCheckLimitReached = false
+				this.statusCheckDeadline = Date.now() + MAX_LOCAL_EXPIRY_POLL_MS
+				this.setPollInterval(LOCAL_EXPIRY_POLL_INTERVAL)
+			},
+			clearLocalExpiry() {
+				if (!this.localExpired) return
+				this.localExpired = false
+				this.statusCheckDeadline = 0
+				this.statusCheckLimitReached = false
+				this.startCountdown()
+				this.setPollInterval(2000)
 			},
 			makeQr() {
 				this.$nextTick(() => {
@@ -216,12 +281,14 @@
 				})
 			},
 			fetchPayInfo() {
+				const activeOrderId = this.orderId
 				const id = this.order.out_order_id || this.order.OUT_ORDER_ID || this.order.id || this.order.ID
 				if (!id) {
 					this.paymentError = 'Payment order ID is missing'
 					return
 				}
 				this.$http.post('/charge_apply/payinfo', { id }, (res) => {
+					if (!this.visible || this.orderId !== activeOrderId) return
 					const data = res.data || {}
 					if (data.code !== 20000 || !data.data) {
 						this.paymentError = data.message || 'Unable to load payment information'
@@ -232,7 +299,10 @@
 						this.state = 'success'
 						return
 					}
-					if (info.timeout > 0) this.remain = Number(info.timeout)
+					if (info.timeout > 0) {
+						this.remain = Number(info.timeout)
+						this.clearLocalExpiry()
+					}
 					if (info.timeout < 0) {
 						this.state = 'timeout'
 						return
@@ -275,16 +345,26 @@
 			},
 			pollStatus() {
 				if (!this.orderId || this.state !== 'paying') return
-				this.$http.post('/charge_apply/status', { id: this.orderId }, (res) => {
+				if (this.localExpired && this.statusCheckDeadline && Date.now() >= this.statusCheckDeadline) {
+					this.statusCheckLimitReached = true
+					this.stopPolling()
+					return
+				}
+				const orderId = this.orderId
+				this.$http.post('/charge_apply/status', { id: orderId }, (res) => {
+					if (!this.visible || this.state !== 'paying' || this.orderId !== orderId) return
 					const data = res.data || {}
 					if (data.code !== 20000) return
-					if (typeof data.remaining_seconds === 'number') this.remain = data.remaining_seconds
 					if (data.status === 'Success') {
 						this.state = 'success'
 					} else if (data.status === 'Timeout') {
 						this.state = 'timeout'
 					} else if (data.status === 'Cancelled') {
 						this.state = 'cancelled'
+					} else if (typeof data.remaining_seconds === 'number') {
+						this.remain = Math.max(0, data.remaining_seconds)
+						if (this.remain > 0) this.clearLocalExpiry()
+						else this.markLocallyExpired()
 					}
 				})
 			},
@@ -438,6 +518,9 @@
 			notifyResult(state) {
 				this.stop()
 				this.state = 'paying'
+				this.localExpired = false
+				this.statusCheckDeadline = 0
+				this.statusCheckLimitReached = false
 				this.$emit('close')
 				if (state === 'timeout') {
 					this.$notice.alert(this.$t('payment.orderTimeoutTip'), () => {}, {
@@ -454,6 +537,9 @@
 			onClose() {
 				this.stop()
 				this.state = 'paying'
+				this.localExpired = false
+				this.statusCheckDeadline = 0
+				this.statusCheckLimitReached = false
 				this.$emit('close')
 			}
 		},
@@ -697,6 +783,13 @@
 		color: $color-primary;
 		font-size: 13px;
 		font-weight: 600;
+		text-align: center;
+	}
+
+	.status-checking {
+		margin-top: 8px;
+		color: #777;
+		font-size: 12px;
 		text-align: center;
 	}
 

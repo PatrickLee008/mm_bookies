@@ -2,15 +2,15 @@
  * 页面配置（后台 Setting → Other，平台 MMBookies，类型为页面路由，如 wallet/deposit）（2026-11-11）
  *
  * 版本号缓存：
- *   - /config/get 返回 page_config_versions: { 页面: 版本 }（App 启动、回到前台、进页面时都会调用）；
+ *   - /config/get 返回 page_config_versions: { 页面: 版本 }；
  *   - 本地缓存 page_cfg:<页面> = { v: 版本, items: [全部语言的配置] }；
- *   - 页面先用缓存显示；版本与服务端一致时不发请求，不一致才拉取 /setting/get_all 并更新缓存；
- *   - 本地存储不可用时退回每次请求。
+ *   - 默认按版本复用缓存；充值页强制读取当前启用项，避免显示已禁用的配置。
  *
  * 显示规则（同《页面自定义参数配置》方案 §7）：配置什么显示什么（保留换行，不编号、不渲染 HTML）；
- * 当前语言没配置时用页面内置文案。
+ * 仅使用英语和缅语；当前语言未配置时回退到默认缅语，没有启用的缅语配置时返回空。
  */
 const CACHE_PREFIX = 'page_cfg:'
+const DEFAULT_PAGE_CONFIG_LANG = 'mm'
 
 function cacheKey(page) {
 	return CACHE_PREFIX + page
@@ -47,25 +47,30 @@ export function latestVersionOf(config, page) {
  * @param http       this.$http
  * @param page       页面标识，如 'wallet/deposit'
  * @param latest     latestVersionOf(...) 的结果；null 表示版本未知
- * @param callback   (items) => void，只有拿到新数据时才调用（缓存命中不调用，调用方先用 getCachedPageConfig 显示）
+ * @param callback   (items) => void
+ * @param force      是否强制读取服务端当前启用项
  */
-export function syncPageConfig(http, page, latest, callback) {
-	const cached = getCachedPageConfig(page)
-	// 版本一致：不请求
-	if (cached && latest && cached.v === latest) return
-	// 版本未知且已有缓存：先用缓存，等下次拿到版本再比对
-	if (cached && !latest) return
-	// 版本为 empty（后台没有配置）：直接清成空，不必请求
-	if (latest === 'empty') {
-		if (!cached || cached.items.length) {
-			saveCache(page, 'empty', [])
-			callback && callback([])
+export function syncPageConfig(http, page, latest, callback, force = false) {
+	if (!force) {
+		const cached = getCachedPageConfig(page)
+		// 版本一致：不请求
+		if (cached && latest && cached.v === latest) return
+		// 版本未知且已有缓存：先用缓存，等下次拿到版本再比对
+		if (cached && !latest) return
+		// 版本为 empty（后台没有配置）：直接清成空，不必请求
+		if (latest === 'empty') {
+			if (!cached || cached.items.length) {
+				saveCache(page, 'empty', [])
+				callback && callback([])
+			}
+			return
 		}
-		return
 	}
 	http.get('/setting/get_all', {
 		data: { setting_type: page, status: 1 },
-		fail: () => {}
+		fail: (error) => {
+			console.error('Failed to load page configuration:', page, error)
+		}
 	}, (res) => {
 		const d = (res && res.data) || {}
 		if (d.code !== 20000 || !d.data) return
@@ -76,18 +81,23 @@ export function syncPageConfig(http, page, latest, callback) {
 }
 
 /**
- * 取某个参数在当前语言下的文本；没有配置返回 ''（调用方回退内置文案）。
+ * 取某个参数在当前语言下的文本；缺少当前语言时回退到启用的默认缅语配置。
+ * 默认语言也未配置时返回 ''。
  * 只取通用配置（aid 为空），同一参数有多条时取 sort 最小的一条（后端已按 sort 排序）。
  */
 export function pickText(items, key, lang) {
 	if (!Array.isArray(items)) return ''
-	const hit = items.find(it => it && it.setting_key === key && it.language_type === lang &&
-		Number(it.status) === 1 && !it.aid)
-	const text = hit && hit.setting_value != null ? String(hit.setting_value) : ''
-	return text.trim() ? text : ''
+	const find = language => {
+		const hit = items.find(it => it && it.setting_key === key && it.language_type === language &&
+			Number(it.status) === 1 && !it.aid)
+		const text = hit && hit.setting_value != null ? String(hit.setting_value) : ''
+		return text.trim() ? text : ''
+	}
+	const currentLanguage = lang === 'en' ? 'en' : DEFAULT_PAGE_CONFIG_LANG
+	return find(currentLanguage) || (currentLanguage === DEFAULT_PAGE_CONFIG_LANG ? '' : find(DEFAULT_PAGE_CONFIG_LANG))
 }
 
-/** 移动端语言 → 页面配置语言：缅文 mm，其他一律 en */
+/** 移动端语言 → 页面配置语言：英文 en，其他一律默认缅文 mm */
 export function pageConfigLang(lang) {
-	return lang === 'mm' ? 'mm' : 'en'
+	return lang === 'en' ? 'en' : DEFAULT_PAGE_CONFIG_LANG
 }

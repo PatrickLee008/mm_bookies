@@ -1977,6 +1977,7 @@
 	"add_bank_account": "ဘဏ်အကောင့် ထည့်ပါ",
 	"select_bank_card": "ဘဏ်ကတ် ရွေးချယ်ပါ",
 	"deposit_with_kpay": "Kpay ဖြင့် အလိုအလျောက် ငွေသွင်းခြင်း",
+	"deposit_with_wave": "Wave Money ဖြင့် အလိုအလျောက် ငွေသွင်းခြင်း",
 	"handling_fees": "ဝန်ဆောင်ခ",
 	"pay_completed": "ငွေပေးချေမှု အောင်မြင်ပါသည်",
 	"back_home_btn": "ပင်မစာမျက်နှာသို့ ပြန်သွားမည်",
