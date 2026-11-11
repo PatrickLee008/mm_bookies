@@ -157,6 +157,7 @@
 	import { getPaymentAction, getTransferPageUrl, openPaymentUrl } from '@/utils/payment-flow.js'
 	import dateFormatUtils from '../../utils/utils.js'
 	import { getCachedPageConfig, syncPageConfig, latestVersionOf, pickText, pageConfigLang } from '@/utils/page-config.js'
+	import { fetchConfigShared } from '@/utils/api/config.js'
 
 	// 后台页面配置的页面标识（Setting → Other，平台 MMBookies，类型 wallet/deposit）
 	const PAGE_CONFIG_PAGE = 'wallet/deposit'
@@ -361,7 +362,10 @@
 				})
 			},
 			loadAppConfig() {
-				this.$http.get('/config/get', {}, (res) => {
+				fetchConfigShared(this.$http).then((res) => {
+					if (!res) return
+					// 共享请求走 skipFilter，这里补上统一的 401 会话过期处理
+					this.$http.beforeResponseFilter(res)
 					const d = res.data || {}
 					this.appConfig = d.items || {}
 					// 页面配置：版本与本地缓存一致时不请求；不一致才拉取最新配置

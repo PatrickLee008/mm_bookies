@@ -4,6 +4,7 @@
 	import language from './utils/language.js'
 	import websocketManager from './utils/websocket.js'
 	import { logAdlinkVisit } from './utils/api/public.js'
+	import { fetchConfigShared } from './utils/api/config.js'
 
 	//#ifdef APP-PLUS
 	// let main = plus.android.runtimeMainActivity();
@@ -199,16 +200,14 @@
 			//#endif
 			getConfigs() {
 				var _this = this;
-				_this.$http.get('/config/get', { skipFilter: true }, (res) => {
-					if (res.statusCode == 200 && res.data) {
+				fetchConfigShared(_this.$http).then((res) => {
+					if (res && res.statusCode == 200 && res.data) {
 						let config = res.data.items
 						if (config) {
 							_this.$store.dispatch('saveConfigs', config);
 							uni.setStorageSync('config', config)
 						}
 					}
-				}, (err) => {
-					// 忽略错误，不处理
 				})
 			},
 			

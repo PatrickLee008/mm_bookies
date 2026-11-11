@@ -3,6 +3,28 @@
  */
 
 /**
+ * /config/get 并发去重：App.onLaunch、App.onShow、充值页 mounted 在同一次加载里都会取配置，
+ * 共享同一个 in-flight 请求，避免一次刷新打多次后端。
+ * 返回原始响应（skipFilter，启动时未登录拿到 401 也不触发会话过期跳转），失败 resolve null；
+ * 请求结束后下一次调用重新发起，不影响"回到前台刷新页面配置版本"的设计。
+ */
+let configInflight = null
+export function fetchConfigShared(http) {
+	if (configInflight) return configInflight
+	const p = new Promise((resolve) => {
+		http.get('/config/get', {
+			skipFilter: true,
+			fail: () => resolve(null)
+		}, (res) => resolve(res))
+	})
+	configInflight = p
+	p.then(() => {
+		if (configInflight === p) configInflight = null
+	})
+	return p
+}
+
+/**
  * 检查用户是否已登录
  * @returns {boolean} 是否已登录
  */
