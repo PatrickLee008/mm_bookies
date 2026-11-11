@@ -7,7 +7,7 @@
 
 
 2026.11.11 更新到测试环境：
-（对应测试反馈 MM Bookies Enhancment v20261111 第 5、8、10、11、15、16、17 项；mm_bookies 1d19b98，javasaas-game 4e8aa7ce、65f91cba）
+（对应测试反馈 MM Bookies Enhancment v20261111 第 5、8、10、11、15、16、17 项）
 
 一、充值（移动端）
 1. 充值页的 Notice 和各通道（VIP Pay / MC Pay / King Pay / TC Pay）的 How to Recharge 可以在后台配置英文、缅文；配置什么显示什么（保留换行，不自动编号），没配置的语言显示原来的内置文案。
@@ -40,7 +40,7 @@
    01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql。
    03 会新建提现组新表并复制原表数据（ID 不变），原表保留不删。
 2. 管理后台和移动后端必须一起发布：两边都改为读写提现组新表，只发一边会导致提现组处理数分在新旧两张表。
-3. onex2 也用同一个管理后台：onex2 库同样要执行 01，onex2 移动后端需同步发布（ox2mm_server 5367be1）。
+3. onex2 也用同一个管理后台：onex2 库同样要执行 01，onex2 移动后端需同步发布。
 4. 发布后在 Finance → Withdrawal Group 检查默认组的金额区间与 Auto Pay；需要单独配置的代理再给代理建组（一个代理内的区间请一次配齐）。
 5. 已有平台银行卡如果通道和银行不匹配，编辑保存时会被拦下，需按提示改正。
 
