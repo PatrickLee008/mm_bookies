@@ -1,7 +1,7 @@
 当前生产版本：待确认（mm_bookies master、javasaas-game master 的生产版本由用户告知后补写）。
 待更新到生产的内容：下方 2026.11.11 测试段。
 待执行的 SQL：javasaas-game 仓库 功能迭代/20261111_jp-console_MMBookies测试缺陷修复/sql/ 下按顺序执行
-  01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql（每个品牌库都要执行）。
+  01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql、04_page_config_menu.sql（每个品牌库都要执行；执行菜单 SQL 后需退出登录再登录）。
 
 说明：MMBookies 的代码在两个仓库——mm_bookies（玩家端后端 app_server、移动端 mm_bookies_uniapp）和 javasaas-game（管理后台 jp-console / jp-ui）。本文件记录两个仓库合起来的每批更新。
 
@@ -26,18 +26,23 @@
 2. 提现列表的 Auto（自动出款）改为弹窗：按用户收款银行列出可用的出款通道，第一个为推荐，管理员可以改选；所属组没开 Auto Pay 或没有可用的自动付款卡时，弹窗里直接提示原因，不再出现一直转圈的遮罩。
 3. 自动出款不再要求付款卡的银行和用户银行一致（KBZ Pay 的 VIP Pay 卡也能给 Wave Money 出款）；KBZ Bank、YOMA、AYA、AYA Pay 只能走 MC Pay。自动出款金额按所属提现组的区间校验，组没配区间时按代理原来的最小 / 最大提现金额。
 4. 自动出款失败（含支付中心失败回调）后记录变为 AutoFail，可以重新自动出款，也可以用 Edit 手动放款或拒绝（拒绝会退回用户）。
-5. 手动放款（Edit）的付款卡只列：启用、非自动付款、用途为全部或提现、银行与用户收款银行一致的卡；同一银行有多张卡时不会再选错。
+5. 手动放款（Edit）的付款卡只列 Channel Type 为 Manual 的卡（不再出现 VIP Pay、MC Pay、TC Pay、King Pay 等支付通道的卡），并且启用、非自动付款、用途为全部或提现、银行与用户收款银行一致；同一银行有多张卡时不会再选错。手动放款完成的记录在 Payout Channel 列显示 Manual，Payout Channel 筛选可以选 Manual。
 6. Account Banking（平台银行卡）改为先选通道再选银行：VIP Pay、Cash Code、TC Pay、King Pay 只能选 KBZ Pay、Wave Money；MC Pay 可选 KBZ Pay、Wave Money、KBZ Bank、YOMA、AYA、AYA Pay；保存时后台也会校验。
 7. Deposit Apply / Withdraw Apply 增加 Query（向支付中心查单）；支付中心显示已成功而本地没处理时，可以 Close Order 补入账 / 补记出款成功（服务端会重新查单核对，不会重复上分）。
 8. Deposit、Deposit Apply、Withdraw、Withdraw Apply 之间可以互相查看关联记录（充值记录 ↔ 充值申请，提现记录 ↔ 该提现的全部代付申请）。
-9. Setting → Other 增加 Platform（Common / ONEX2 / MMBookies）；选 MMBookies 后可以配置充值页（Deposit Page）的说明文案，参数从固定清单里选；同一个设置键可以分别保存英文和缅文。
+   查单弹窗顶部直接给出结论和下一步（已入账 / 已付款未入账 / 未付款 / 订单不匹配），本地与支付中心左右对照，金额不同会标出；关联记录可直接查单，闭环后自动刷新。
+   修复：查单时提示 "Payment center returned no data"（支付中心实际已返回订单）的问题。
+9. 新增 Setting → Page Config（页面配置）：按页面配置移动端文案。列表每个可配置页面一行，点 Configure 后左侧选配置项（Deposit 的 Notice、How to Recharge），右侧按通道（VIP Pay / MC Pay / King Pay / TC Pay）分页签，英文、缅文各一个文本框，每个通道单独保存；没填的语言显示内置文案。Setting → Other 增加 Platform（Common / ONEX2 / MMBookies），页面文案不再在 Other 里维护。
+10. Deposit、Deposit Apply、Withdraw、Withdraw Apply 的 Channel 筛选改为下拉选择；修复 Deposit、Withdraw 的 Channel 筛选原来不生效、Withdraw 列表 Payout Channel 一直显示 "-" 的问题；Deposit Apply 列表增加 Channel 列。
+11. Deposit Apply、Withdraw Apply 操作列加宽，三个按钮都能显示。
 
 四、回调与入账
 1. 代付终态失败回调会把提现记录从处理中改为 AutoFail，避免失败后一直停在处理中、无法再处理。
 
 五、部署注意
 1. SQL（先 SQL 后代码，每个品牌库都执行；脚本在 javasaas-game 仓库 功能迭代/20261111_jp-console_MMBookies测试缺陷修复/sql/）：
-   01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql。
+   01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql、04_page_config_menu.sql。
+   执行 02、04（菜单）后，后台用户需退出登录再登录才能看到新菜单。
    03 会新建提现组新表并复制原表数据（ID 不变），原表保留不删。
 2. 管理后台和移动后端必须一起发布：两边都改为读写提现组新表，只发一边会导致提现组处理数分在新旧两张表。
 3. onex2 也用同一个管理后台：onex2 库同样要执行 01，onex2 移动后端需同步发布。
