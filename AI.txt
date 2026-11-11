@@ -1,0 +1,18 @@
+app_server：移动端后台接口服务（源代码，Python命令启动app.py，配置文件.env控制）
+mm_bookies_uniapp：移动端uniapp项目（发布目录mm_bookies_uniapp\unpackage\dist\build\web）
+scraper：数据爬虫服务（源代码）
+jeeplus-web：管理端后端打包发布文件
+jx-push：websocket消息服务
+web_manager：管理端前端打包文件
+jxboot-services-onex2：java结算服务
+需求：现在需要在同一台服务器上部署三套上述的应用，计划采用docker进行端口和数据隔离，请分析代码和应用，帮忙构建docker打包和发布方案，评估服务器配置需求，一个应用大概需要多少内存和数据。打包方案里面配置文件和数据文件可以放到物理存储的某个目录。运行在centos7
+
+A minimum betting amount is automatically displayed when the user clicks an odd.
+
+Expected
+
+No betting amount is preselected when the user clicks an odd.
+
+
+
+

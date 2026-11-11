@@ -122,18 +122,32 @@ export default {
 		},
 		_saveCode() {
 			let that = this;
-			if (this.result != "") {
-				uni.saveImageToPhotosAlbum({
-					filePath: that.result,
-					success: function () {
-						uni.showToast({
-							title: 'qrcode save success',
-							icon: 'success',
-							duration: 2000
-						});
-					}
-				});
+			if (this.result == "") return;
+			// #ifdef H5
+			// H5 没有相册概念，saveImageToPhotosAlbum 未实现，用 <a download> 下载
+			try {
+				const a = document.createElement('a');
+				a.href = this.result;
+				a.download = 'qrcode.png';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				uni.showToast({ title: 'qrcode save success', icon: 'success', duration: 2000 });
+			} catch (e) {
+				uni.showToast({ title: 'save failed', icon: 'none', duration: 2000 });
 			}
+			return;
+			// #endif
+			uni.saveImageToPhotosAlbum({
+				filePath: that.result,
+				success: function () {
+					uni.showToast({
+						title: 'qrcode save success',
+						icon: 'success',
+						duration: 2000
+					});
+				}
+			});
 		},
 		_result(res) {
 			this.result = res;

@@ -67,6 +67,19 @@
 <script>
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
 	import dateFormatUtils from '../../utils/utils.js'
+	import siteinfo from '@/siteinfo'
+
+	// 支付码合成底图：与 pages/payment/payment.vue 保持一致，按站点切换
+	const PAY_BG = {
+		mmbookies: '/static/image/pay/payment-qrcode-bg.jpg',
+		shwegoal: '/static/image/pay/swg-bg.jpg',
+		phoe_wa_maung: '/static/image/pay/pwm-bg.jpg'
+	}
+	// 银行图标（合成图底部用）
+	const BANK_ICON = {
+		KBZ: '/static/icon/register/KBZ Pay.png',
+		WaveMoney: '/static/icon/register/Wave Money.png'
+	}
 
 	export default {
 		name: 'PayModal',
@@ -120,16 +133,19 @@
 				return dateFormatUtils.numFormat(String(value).replace(/,/g, ''))
 			},
 			qrValue() {
-				return this.qrData || this.order.QRCODE || this.order.qrcode || ''
+				return this.qrData || this.order.QRCODE || this.order.qrcode || this.order.pay_url || ''
 			},
 			expiryText() {
 				const value = this.order.expire_time || this.order.EXPIRE_TIME || ''
 				if (!value) return '--'
-				const date = new Date(String(value).replace(' ', 'T'))
-				if (isNaN(date.getTime())) return String(value)
-				const pad = number => String(number).padStart(2, '0')
-				return pad(date.getDate()) + '-' + pad(date.getMonth() + 1) + '-' + date.getFullYear() + ' ' +
-					pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds())
+				// 服务器给的是 UTC+8 钟面时间，必须转成用户时区（缅甸 UTC+6:30）再展示，
+				// 统一走 utils 里的 convertTimezone，和 coupon.vue 保持一致。
+				const normalized = String(value).replace('T', ' ')
+				const converted = dateFormatUtils.convertTimezone(normalized)
+				const m = String(converted).match(/(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/)
+				if (!m) return String(value)
+				// 展示成 DD-MM-YYYY HH:mm:ss
+				return m[3] + '-' + m[2] + '-' + m[1] + ' ' + m[4] + ':' + m[5] + ':' + m[6]
 			},
 			countdownText() {
 				const seconds = Math.max(0, this.remain)
@@ -177,7 +193,9 @@
 						if (this.remain === 0) this.state = 'timeout'
 					}
 				}, 1000)
-				this.pollTimer = setInterval(this.pollStatus, 2000)
+				// 必须用箭头函数包一层：直接传 this.pollStatus 会丢失 this，
+				// 进 pollStatus 后 this 指向 window，orderId 取不到，轮询静默失效
+				this.pollTimer = setInterval(() => this.pollStatus(), 2000)
 			},
 			stop() {
 				if (this.timer) {
@@ -225,6 +243,15 @@
 						return
 					}
 					if (/^https?:\/\//i.test(info.payment_url || '')) {
+						// TCPay / VIPPay：服务商只返回收银页链接、没有 qrcode 字段，
+						// 用链接本身生成二维码，让用户在本弹窗内扫码，不跳出 App。
+						// MCPay / KingPay 仍走外部跳转。
+						const ch = info.pay_channel || this.order.pay_channel || this.order.CHANNEL || ''
+						if (ch === 'TCPay' || ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
+							this.qrData = info.payment_url
+							this.makeQr()
+							return
+						}
 						this.$emit('payment-url', info.payment_url)
 						return
 					}
@@ -243,6 +270,7 @@
 				})
 			},
 			onQrResult(path) {
+				// 弹窗只展示纯二维码；带底图的合成图在点「保存」时才生成
 				this.qrImage = path
 			},
 			pollStatus() {
@@ -260,7 +288,108 @@
 					}
 				})
 			},
+			// H5 专用：把二维码合成到站点底图上（位置算法照搬 pages/payment/payment.vue）
+			composeQrPoster() {
+				const loadEl = (src) => new Promise((resolve, reject) => {
+					const img = new Image()
+					img.crossOrigin = 'anonymous'
+					img.onload = () => resolve(img)
+					img.onerror = () => reject(new Error('load fail: ' + src))
+					img.src = src
+				})
+				const bgSrc = PAY_BG[siteinfo.site] || PAY_BG.mmbookies
+				return Promise.all([loadEl(bgSrc), loadEl(this.qrImage)])
+					.then(([bg, qr]) => {
+						const canvas = document.createElement('canvas')
+						const w = bg.naturalWidth || bg.width
+						const h = bg.naturalHeight || bg.height
+						canvas.width = w
+						canvas.height = h
+						const ctx = canvas.getContext('2d')
+
+						// 1) 底图
+						ctx.drawImage(bg, 0, 0, w, h)
+
+						// 2) 二维码：白框内居中，整体下移 30px（与旧版一致）
+						const boxTop = h * 0.243
+						const boxBottom = h * 0.725
+						const boxH = boxBottom - boxTop
+						const boxW = w * 0.8125
+						const padding = w * 0.075
+						const qrSize = Math.min(boxW - padding * 2, boxH - padding * 2, 500)
+						const qrX = (w - qrSize) / 2
+						const qrY = boxTop + (boxH - qrSize) / 2 + 30
+						ctx.drawImage(qr, qrX, qrY, qrSize, qrSize)
+
+						// 3) 银行图标（圆角裁剪）
+						const payType = this.order.pay_channel === 'TCPay' || this.order.pay_channel === 'MCPay'
+							? (this.order.receive_bank_code || 'KBZ')
+							: (this.order.bank_type || this.order.receive_bank_code || 'KBZ')
+						const iconSrc = BANK_ICON[payType] || BANK_ICON[this.order.bank_type] || ''
+						const iconSize = Math.min(w * 0.15, 120)
+						const iconX = (w - iconSize) / 2
+						const iconY = h * 0.784
+						const drawAccount = () => {
+							const fontSize = Math.floor(w * 0.035) + 2
+							ctx.font = 'bold ' + fontSize + 'px sans-serif'
+							ctx.fillStyle = '#FFFFFF'
+							ctx.textAlign = 'center'
+							const raw = this.order.receive_account || this.order.receive_acc_number || ''
+							const masked = raw && raw.length > 4 ? '****' + String(raw).slice(-4) : String(raw || '')
+							ctx.fillText(masked, w / 2, iconY + iconSize + fontSize + 13)
+						}
+						if (iconSrc) {
+							return loadEl(iconSrc).then((icon) => {
+								const r = 5
+								ctx.save()
+								ctx.beginPath()
+								ctx.moveTo(iconX + r, iconY)
+								ctx.lineTo(iconX + iconSize - r, iconY)
+								ctx.arc(iconX + iconSize - r, iconY + r, r, 1.5 * Math.PI, 2 * Math.PI)
+								ctx.lineTo(iconX + iconSize, iconY + iconSize - r)
+								ctx.arc(iconX + iconSize - r, iconY + iconSize - r, r, 0, 0.5 * Math.PI)
+								ctx.lineTo(iconX + r, iconY + iconSize)
+								ctx.arc(iconX + r, iconY + iconSize - r, r, 0.5 * Math.PI, Math.PI)
+								ctx.lineTo(iconX, iconY + r)
+								ctx.arc(iconX + r, iconY + r, r, Math.PI, 1.5 * Math.PI)
+								ctx.closePath()
+								ctx.clip()
+								ctx.drawImage(icon, iconX, iconY, iconSize, iconSize)
+								ctx.restore()
+								drawAccount()
+								return canvas.toDataURL('image/png')
+							}).catch(() => {
+								drawAccount()
+								return canvas.toDataURL('image/png')
+							})
+						}
+						drawAccount()
+						return canvas.toDataURL('image/png')
+					})
+					.catch(() => '')
+			},
 			saveQr() {
+				// #ifdef H5
+				// H5 没有 saveImageToPhotosAlbum（uni 仅 App/小程序实现），
+				// 且保存的是「底图 + 二维码 + 银行图标 + 账号」的合成图（与旧 payment 页一致），
+				// 所以这里先用原生 canvas 合成，再用 <a download> 下载。
+				if (this.qrImage) {
+					this.composeQrPoster().then((dataUrl) => {
+						if (!dataUrl) {
+							uni.showToast({ title: this.$t('save_qr'), icon: 'none' })
+							return
+						}
+						const a = document.createElement('a')
+						a.href = dataUrl
+						a.download = 'pay-qr-' + (this.orderId || 'code') + '.png'
+						document.body.appendChild(a)
+						a.click()
+						document.body.removeChild(a)
+						uni.showToast({ title: this.$t('save_qr'), icon: 'none' })
+					})
+					return
+				}
+				// #endif
 				const qr = this.$refs.qr
 				if (qr && qr._saveCode) {
 					qr._saveCode()

@@ -164,6 +164,7 @@
 	import tkiQrcode from '@/components/tki-qrcode/tki-qrcode.vue'
 	import headerCollapse from '@/mixins/headerCollapse.js'
 	import siteinfo from '@/siteinfo'
+	import dateFormatUtils from '../../utils/utils.js'
 	let intervalSearch;
 
 	// 支付码合成背景图：按站点（与 uni.scss 的 $site 同步切换）选择不同的底图
@@ -254,7 +255,7 @@
 						} else {
 							this.startCountdown(this.timeout);
 							if (intervalSearch) clearInterval(intervalSearch);
-							intervalSearch = setInterval(this.startSearch, 3000);
+							intervalSearch = setInterval(() => this.startSearch(), 3000);
 						}
 						this.isload = true;
 						if (!this.istimeout) {
@@ -674,13 +675,12 @@
 			},
 			formatDueDate(createTime) {
 				if (!createTime) return '';
-
-				// 将中国时间转换为缅甸时间（减去1.5小时）
-				const chinaDate = new Date(createTime);
-				if (isNaN(chinaDate.getTime())) return '';
-				const myanmarTime = new Date(chinaDate.getTime() - (1.5 * 60 * 60 * 1000));
-
-				return `Due by ${this.$toolbox.formatDateTime(myanmarTime)}`;
+				// 统一走 utils.convertTimezone：服务器给的是 UTC+8 钟面时间，
+				// 按用户时区（缅甸 UTC+6:30）换算。原来硬编码减 1.5 小时，
+				// 一旦用户时区不是缅甸就会错。
+				const normalized = String(createTime).replace('T', ' ');
+				const converted = dateFormatUtils.convertTimezone(normalized);
+				return `Due by ${converted}`;
 			},
 		}
 	};

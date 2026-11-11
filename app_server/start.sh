@@ -15,10 +15,24 @@ if [ "${1:-}" != "" ]; then
     export APP_ENV="$1"
 fi
 
-# 激活虚拟环境
-VENV_ACTIVATE="/www/server/pyporject_evn/envFS/bin/activate"
-if [ ! -f "$VENV_ACTIVATE" ]; then
-    echo "[start.sh] 错误: 虚拟环境不存在: $VENV_ACTIVATE" >&2
+# 激活虚拟环境: 按顺序检查候选目录, 使用第一个存在的
+#   /www/server/pyporject_evn/envFS  生产服务器
+#   /root/envApp                     测试服务器 (192.168.3.208)
+# 也可通过环境变量 VENV_ACTIVATE 直接指定 activate 文件
+VENV_CANDIDATES=(
+    "/www/server/pyporject_evn/envFS"
+    "/root/envApp"
+)
+if [ -z "${VENV_ACTIVATE:-}" ]; then
+    for venv_dir in "${VENV_CANDIDATES[@]}"; do
+        if [ -f "$venv_dir/bin/activate" ]; then
+            VENV_ACTIVATE="$venv_dir/bin/activate"
+            break
+        fi
+    done
+fi
+if [ -z "${VENV_ACTIVATE:-}" ] || [ ! -f "$VENV_ACTIVATE" ]; then
+    echo "[start.sh] 错误: 虚拟环境不存在, 已检查: ${VENV_ACTIVATE:-${VENV_CANDIDATES[*]}}" >&2
     exit 1
 fi
 # shellcheck disable=SC1090

@@ -32,10 +32,10 @@
 				<view class="record-header">
 					<view class="flex-row justify-between align-center">
 						<view class="flex-row align-center">
-							<image :src="`/static/icon/register/${item.mb_bank_code || 'KBZ Pay'}.png`" 
+							<image :src="bankIcon(item.mb_bank_code)" 
 								mode="aspectFit" class="bank-icon"></image>
 							<view class="flex-column margin-left-sm">
-								<text class="bank-name">{{item.mb_bank_code || 'KBZ Pay'}}</text>
+								<text class="bank-name">{{ bankName(item.mb_bank_code) }}</text>
 								<text class="order-id">{{item.id}}</text>
 							</view>
 						</view>
@@ -126,6 +126,20 @@ export default {
 		}
 	},
 	methods: {
+			normalizeBank(code) {
+				const map = {
+					'KBZ': 'KBZ Pay', 'KBZPAY': 'KBZ Pay',
+					'WaveMoney': 'Wave Money', 'WAVEPAY': 'Wave Money',
+					'AYAPAY': 'AYAPAY', 'AYABANK': 'AYA BANK'
+				}
+				return map[code] || code || ''
+			},
+			bankName(code) { return this.normalizeBank(code) || '-'; },
+			bankIcon(code) {
+				const c = this.normalizeBank(code)
+				return c ? '/static/icon/register/' + c + '.png' : ''
+			},
+
 		// 返回上一页
 		goBack() {
 			uni.navigateBack();
