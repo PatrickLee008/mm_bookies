@@ -1721,6 +1721,10 @@
 
 	"Promotion相关": "",
 	"ip_limit": "This promotion is not accessible at this time. Thank you for your understanding.",
+	"device_limit": "This promotion is not accessible at this time. Thank you for your understanding.",
+	"ip_blacklisted": "This promotion is not accessible at this time. Thank you for your understanding.",
+	"device_blacklisted": "This promotion is not accessible at this time. Thank you for your understanding.",
+	"user_blacklisted": "Your account is not eligible for this promotion. Please contact customer service for assistance.",
 	"Promotion is not valid or has ended": "Promotion is not valid or has ended",
 
 	"0": "0",

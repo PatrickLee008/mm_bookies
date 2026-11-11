@@ -615,7 +615,7 @@
 								})
 								_this.get_activity()
 							} else {
-								_this.alertMsg(res.data.message || _this.$t('Failed to join activity'))
+								_this.alertMsg(res.data.message ? _this.$t(res.data.message) : _this.$t('Failed to join activity'))
 							}
 						})
 					}

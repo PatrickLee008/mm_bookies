@@ -144,6 +144,7 @@ def perform_risk_check(user_id, promotion_id, ip_address=None, device_id=None, u
             user_agent=user_agent,
             location=None,
             coupon_config=risk_config,
+            activity_type='Promotion',
             username=member.username
         )
 
@@ -824,7 +825,7 @@ def participate_promotion():
             }), 400
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent = request.headers.get('User-Agent')
         device_id = (request.headers.get('X-Device-ID') or
                      request.headers.get('Device-ID') or

@@ -55,6 +55,7 @@ invitation_v2 = Blueprint('invitation_v2', __name__)
 # ==================== 辅助函数 ====================
 
 def ensure_serializable(obj):
+    
     """递归确保对象中所有 Decimal 类型都转换为 float"""
     if isinstance(obj, dict):
         return {key: ensure_serializable(value) for key, value in obj.items()}
@@ -253,6 +254,7 @@ def perform_risk_check(user_id, activity_id, activity_obj, ip_address=None, devi
             user_agent=user_agent,
             location=None,
             coupon_config=config,
+            activity_type='Invitation',
             username=member.username
         )
 
@@ -1374,7 +1376,7 @@ def claim_achievement_reward():
             }), 400
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent_str = request.headers.get('User-Agent')
         device_id = (request.headers.get('X-Device-ID') or
                      request.headers.get('Device-ID') or
@@ -1737,7 +1739,7 @@ def claim_one_time_reward():
             }), 400
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent_str = request.headers.get('User-Agent')
         device_id = (request.headers.get('X-Device-ID') or
                      request.headers.get('Device-ID') or
@@ -2120,7 +2122,7 @@ def claim_deposit_share_reward():
             }), 400
 
         # 风险检查
-        ip_address = request.remote_addr
+        ip_address = Kits.get_real_ip(request)
         user_agent_str = request.headers.get('User-Agent')
         device_id = (request.headers.get('X-Device-ID') or
                      request.headers.get('Device-ID') or

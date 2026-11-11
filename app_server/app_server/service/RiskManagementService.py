@@ -30,6 +30,16 @@ def get_member_coupon_model():
         return None
 
 
+def get_promotion_participation_model():
+    """延迟导入促销参与记录模型"""
+    try:
+        from app_server.model.MAppPromotionParticipationModel import MAppPromotionParticipation
+        return MAppPromotionParticipation
+    except ImportError:
+        logger.warning("无法导入 MAppPromotionParticipation 模型，促销持久化IP/设备校验将被跳过")
+        return None
+
+
 class RiskManagementService:
     """
     风险管理服务
@@ -181,7 +191,7 @@ class RiskManagementService:
                 logger.warning(f"用户在黑名单中: username={username}, activity={activity_type}:{activity_id}")
                 return {
                     'allowed': False,
-                    'reason': 'User is blacklisted',
+                    'reason': 'user_blacklisted',
                     'risk_level': 'HIGH'
                 }
 
@@ -190,7 +200,7 @@ class RiskManagementService:
                 logger.warning(f"IP在黑名单中: ip={ip}, activity={activity_type}:{activity_id}")
                 return {
                     'allowed': False,
-                    'reason': 'IP address is blacklisted',
+                    'reason': 'ip_blacklisted',
                     'risk_level': 'HIGH'
                 }
 
@@ -200,7 +210,7 @@ class RiskManagementService:
                 logger.warning(f"设备在黑名单中: device_id={imei}, activity={activity_type}:{activity_id}")
                 return {
                     'allowed': False,
-                    'reason': 'Device is blacklisted',
+                    'reason': 'device_blacklisted',
                     'risk_level': 'HIGH'
                 }
 
@@ -211,55 +221,94 @@ class RiskManagementService:
             # 黑名单检查失败时，允许通过，避免影响正常业务
             return {'allowed': True, 'reason': f'Blacklist check error: {str(e)}', 'risk_level': 'LOW'}
 
-    def _count_coupon_claims_by_ip(self, ip: str, coupon_id: str, window_start: datetime,
+    def _count_coupon_claims_by_ip(self, ip: str, activity_id: str, window_start: datetime,
                                     activity_type: Optional[str]) -> Optional[int]:
-        """查询指定IP在时间窗口内对当前优惠券的持久化领取次数。
+        """查询指定IP在时间窗口内对当前活动的持久化领取次数。
 
-        仅对 activity_type='Coupon' 生效；不是优惠券或无法查询时返回 None，
-        由调用方回退到内存计数。
+        按 activity_type 分表查询：
+          - 'Coupon'      → m_app_member_coupon (p_id = activity_id)
+          - 'Promotion'   → m_app_promotion_participation (promotion_id = activity_id)
+          - 其他（含 'Invitation'）→ 返回 None，由调用方回退到内存计数
+
+        返回 None 时调用方会退回内存计数，意味着该活动类型的持久化校验尚未实现。
         """
-        if activity_type != 'Coupon':
-            return None
         if not ip or ip == '0.0.0.0':
             return None
-        MAppMemberCoupon = get_member_coupon_model()
-        if MAppMemberCoupon is None:
-            return None
-        try:
-            return MAppMemberCoupon.query.filter(
-                MAppMemberCoupon.p_id == coupon_id,
-                MAppMemberCoupon.mb_ip == ip,
-                MAppMemberCoupon.create_time >= window_start,
-                MAppMemberCoupon.del_flag == 0,
-            ).count()
-        except Exception as e:
-            logger.error(f"查询优惠券IP领取次数失败: {str(e)}")
-            return None
 
-    def _count_coupon_claims_by_device(self, device_id: str, coupon_id: str, window_start: datetime,
+        if activity_type == 'Coupon':
+            MAppMemberCoupon = get_member_coupon_model()
+            if MAppMemberCoupon is None:
+                return None
+            try:
+                return MAppMemberCoupon.query.filter(
+                    MAppMemberCoupon.p_id == activity_id,
+                    MAppMemberCoupon.mb_ip == ip,
+                    MAppMemberCoupon.create_time >= window_start,
+                    MAppMemberCoupon.del_flag == 0,
+                ).count()
+            except Exception as e:
+                logger.error(f"查询优惠券IP领取次数失败: {str(e)}")
+                return None
+
+        if activity_type == 'Promotion':
+            MAppPromotionParticipation = get_promotion_participation_model()
+            if MAppPromotionParticipation is None:
+                return None
+            try:
+                return MAppPromotionParticipation.query.filter(
+                    MAppPromotionParticipation.promotion_id == activity_id,
+                    MAppPromotionParticipation.mb_ip == ip,
+                    MAppPromotionParticipation.create_time >= window_start,
+                    MAppPromotionParticipation.del_flag == 0,
+                ).count()
+            except Exception as e:
+                logger.error(f"查询促销IP参与次数失败: {str(e)}")
+                return None
+
+        # Invitation 等其他活动类型：当前表结构无 IP 字段，回退内存
+        return None
+
+    def _count_coupon_claims_by_device(self, device_id: str, activity_id: str, window_start: datetime,
                                         activity_type: Optional[str]) -> Optional[int]:
-        """查询指定设备在时间窗口内对当前优惠券的持久化领取次数。
+        """查询指定设备在时间窗口内对当前活动的持久化领取次数。
 
-        仅对 activity_type='Coupon' 生效；不是优惠券或无法查询时返回 None，
-        由调用方回退到内存计数。
+        按 activity_type 分表查询，语义与 _count_coupon_claims_by_ip 对称。
         """
-        if activity_type != 'Coupon':
-            return None
         if not device_id:
             return None
-        MAppMemberCoupon = get_member_coupon_model()
-        if MAppMemberCoupon is None:
-            return None
-        try:
-            return MAppMemberCoupon.query.filter(
-                MAppMemberCoupon.p_id == coupon_id,
-                MAppMemberCoupon.device_id == device_id,
-                MAppMemberCoupon.create_time >= window_start,
-                MAppMemberCoupon.del_flag == 0,
-            ).count()
-        except Exception as e:
-            logger.error(f"查询优惠券设备领取次数失败: {str(e)}")
-            return None
+
+        if activity_type == 'Coupon':
+            MAppMemberCoupon = get_member_coupon_model()
+            if MAppMemberCoupon is None:
+                return None
+            try:
+                return MAppMemberCoupon.query.filter(
+                    MAppMemberCoupon.p_id == activity_id,
+                    MAppMemberCoupon.device_id == device_id,
+                    MAppMemberCoupon.create_time >= window_start,
+                    MAppMemberCoupon.del_flag == 0,
+                ).count()
+            except Exception as e:
+                logger.error(f"查询优惠券设备领取次数失败: {str(e)}")
+                return None
+
+        if activity_type == 'Promotion':
+            MAppPromotionParticipation = get_promotion_participation_model()
+            if MAppPromotionParticipation is None:
+                return None
+            try:
+                return MAppPromotionParticipation.query.filter(
+                    MAppPromotionParticipation.promotion_id == activity_id,
+                    MAppPromotionParticipation.device_id == device_id,
+                    MAppPromotionParticipation.create_time >= window_start,
+                    MAppPromotionParticipation.del_flag == 0,
+                ).count()
+            except Exception as e:
+                logger.error(f"查询促销设备参与次数失败: {str(e)}")
+                return None
+
+        # Invitation 等其他活动类型：当前表结构无 device_id 字段，回退内存
+        return None
 
     def _check_imei_restrictions(self, imei: str, coupon_id: str, config: Dict,
                                  activity_type: Optional[str] = None) -> Dict[str, Any]:
@@ -292,7 +341,7 @@ class RiskManagementService:
         if successful_redemptions >= imei_limit:
             return {
                 'allowed': False,
-                'reason': f'You have reached the limit for this device ({imei_limit} time{"s" if imei_limit > 1 else ""} per {time_window_hours}h). Please try again later.',
+                'reason': 'device_limit',
                 'risk_level': 'HIGH',
                 'details': {
                     'imei_redemption_count': successful_redemptions,

@@ -1097,7 +1097,7 @@
 					} else {
 						this.$notice.show({
 							title: _this.$t('title_alert'),
-							content: data.message || 'Failed to claim coupon',
+							content: data.message ? _this.$t(data.message) : 'Failed to claim coupon',
 							showCancel: false
 						})
 					}
@@ -1687,7 +1687,7 @@
 					} else {
 						this.$notice.show({
 							title: _this.$t('title_alert'),
-							content: res.data.message || 'Failed to join promotion',
+							content: res.data.message ? _this.$t(res.data.message) : 'Failed to join promotion',
 							showCancel: false
 						})
 					}
