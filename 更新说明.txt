@@ -1,0 +1,52 @@
+当前生产版本：待确认（mm_bookies master、javasaas-game master 的生产版本由用户告知后补写）。
+待更新到生产的内容：下方 2026.11.11 测试段。
+待执行的 SQL：javasaas-game 仓库 功能迭代/20261111_jp-console_MMBookies测试缺陷修复/sql/ 下按顺序执行
+  01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql（每个品牌库都要执行）。
+
+说明：MMBookies 的代码在两个仓库——mm_bookies（玩家端后端 app_server、移动端 mm_bookies_uniapp）和 javasaas-game（管理后台 jp-console / jp-ui）。本文件记录两个仓库合起来的每批更新。
+
+
+2026.11.11 更新到测试环境：
+（对应测试反馈 MM Bookies Enhancment v20261111 第 5、8、10、11、15、16、17 项；mm_bookies 1d19b98，javasaas-game 4e8aa7ce、65f91cba）
+
+一、充值（移动端）
+1. 充值页的 Notice 和各通道（VIP Pay / MC Pay / King Pay / TC Pay）的 How to Recharge 可以在后台配置英文、缅文；配置什么显示什么（保留换行，不自动编号），没配置的语言显示原来的内置文案。
+2. 充值页先用手机上缓存的文案显示，后台改了才重新加载，打开页面不会每次多一次请求；后台修改后最晚在下次进入充值页时生效（服务端最多再缓存 1 分钟）。
+
+二、提现（移动端）
+1. 提现分组支持按代理配置：代理有自己的提现组时，该代理玩家的提现只分到这些组；没有时用默认（平台）提现组。
+2. 同一代理（或默认组）内只要有组配置了金额区间，就按金额分到对应的组，金额不在任何区间内会被拒绝；都没配置区间时，按原来的方式轮流分组。
+3. 修复：提现记录接口在显示提现组名称时报错的问题。
+
+三、管理后台
+1. 新增 Finance → Withdrawal Group（提现组）：维护组名、处理数量、金额区间、启用、Auto Pay。
+   - admin / HOUSE 可以看全部，维护默认组和任意代理的组（新增时填代理 ID，留空为默认组）；
+   - 其他代理只能维护自己的组，默认组只读，页面会提示当前用的是自己的组还是默认组；
+   - 同一代理内金额区间不能重叠、组名不能重复；最后一个默认组不能删；代理自己的组删光后回到默认组。
+2. 提现列表的 Auto（自动出款）改为弹窗：按用户收款银行列出可用的出款通道，第一个为推荐，管理员可以改选；所属组没开 Auto Pay 或没有可用的自动付款卡时，弹窗里直接提示原因，不再出现一直转圈的遮罩。
+3. 自动出款不再要求付款卡的银行和用户银行一致（KBZ Pay 的 VIP Pay 卡也能给 Wave Money 出款）；KBZ Bank、YOMA、AYA、AYA Pay 只能走 MC Pay。自动出款金额按所属提现组的区间校验，组没配区间时按代理原来的最小 / 最大提现金额。
+4. 自动出款失败（含支付中心失败回调）后记录变为 AutoFail，可以重新自动出款，也可以用 Edit 手动放款或拒绝（拒绝会退回用户）。
+5. 手动放款（Edit）的付款卡只列：启用、非自动付款、用途为全部或提现、银行与用户收款银行一致的卡；同一银行有多张卡时不会再选错。
+6. Account Banking（平台银行卡）改为先选通道再选银行：VIP Pay、Cash Code、TC Pay、King Pay 只能选 KBZ Pay、Wave Money；MC Pay 可选 KBZ Pay、Wave Money、KBZ Bank、YOMA、AYA、AYA Pay；保存时后台也会校验。
+7. Deposit Apply / Withdraw Apply 增加 Query（向支付中心查单）；支付中心显示已成功而本地没处理时，可以 Close Order 补入账 / 补记出款成功（服务端会重新查单核对，不会重复上分）。
+8. Deposit、Deposit Apply、Withdraw、Withdraw Apply 之间可以互相查看关联记录（充值记录 ↔ 充值申请，提现记录 ↔ 该提现的全部代付申请）。
+9. Setting → Other 增加 Platform（Common / ONEX2 / MMBookies）；选 MMBookies 后可以配置充值页（Deposit Page）的说明文案，参数从固定清单里选；同一个设置键可以分别保存英文和缅文。
+
+四、回调与入账
+1. 代付终态失败回调会把提现记录从处理中改为 AutoFail，避免失败后一直停在处理中、无法再处理。
+
+五、部署注意
+1. SQL（先 SQL 后代码，每个品牌库都执行；脚本在 javasaas-game 仓库 功能迭代/20261111_jp-console_MMBookies测试缺陷修复/sql/）：
+   01_setting_other_platform.sql、02_withdrawal_group_menu.sql、03_app_withdrawal_group.sql。
+   03 会新建提现组新表并复制原表数据（ID 不变），原表保留不删。
+2. 管理后台和移动后端必须一起发布：两边都改为读写提现组新表，只发一边会导致提现组处理数分在新旧两张表。
+3. onex2 也用同一个管理后台：onex2 库同样要执行 01，onex2 移动后端需同步发布（ox2mm_server 5367be1）。
+4. 发布后在 Finance → Withdrawal Group 检查默认组的金额区间与 Auto Pay；需要单独配置的代理再给代理建组（一个代理内的区间请一次配齐）。
+5. 已有平台银行卡如果通道和银行不匹配，编辑保存时会被拦下，需按提示改正。
+
+六、需更新 / 重启的服务（先执行上面的 SQL）
+1. 移动前端（mm_bookies_uniapp）：重新发行 H5 并更新到服务器；App 需重新打包（充值页改动）。
+2. 管理前端（javasaas-game jp-ui）：重新构建（输出到 publish/web_manager）并更新到服务器。
+3. 管理后端（javasaas-game jeeplus-web）：拉取代码后重启（sh boot.sh restart）。
+4. 移动后端（mm_bookies app_server）：拉取代码后重启。
+5. 其他：onex2 移动后端（ox2mm_app_server）拉取后重启；jx-push 无变化，不需要更新。
