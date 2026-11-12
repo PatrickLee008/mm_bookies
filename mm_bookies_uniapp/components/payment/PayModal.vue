@@ -143,7 +143,7 @@
 				return titles[this.channel] || this.channel
 			},
 			paymentTitle() {
-				if (this.channel === 'VIPPay') {
+				if (this.channel === 'VIPPay' || this.channel === 'VIPPay_CashCode') {
 					return /wave/i.test(this.paymentBank) ? this.$t('deposit_with_wave') : this.$t('deposit_with_kpay')
 				}
 				return (this.$t('auto_deposit') || 'Auto Deposit') + ' - ' + this.title

@@ -276,15 +276,15 @@
 						<view class="margin-top-sm">{{'Bank Account Name'}}</view>
 						<view class="flex-row justify-between align-center height-42px text-black mybg-grey"
 							style="padding: 5px 7px;border: solid 1px #626262;">
-							<input type="text" class="" style="text-align: start;width: 100%;"
-								@input="set_add_disable()" :placeholder="$t('enter_bank_account_name')"
+							<input type="text" class="" style="text-align: start;width: 100%;" maxlength="50"
+								@input="onCardNameInput" :placeholder="$t('enter_bank_account_name')"
 								v-model="card_conf.acc_name" />
 						</view>
 						<view class="margin-top-sm">{{'Bank Account Number'}}</view>
 						<view class="flex-row justify-between align-center height-42px text-black mybg-grey"
 							style="padding: 5px 7px;border: solid 1px #626262;">
-							<input type="number" class="" style="text-align: start;width: 100%;" maxlength="17"
-								@input="set_add_disable()" :placeholder="$t('enter_bank_account_number')"
+							<input type="number" class="" style="text-align: start;width: 100%;" maxlength="20"
+								@input="onCardNumberInput" :placeholder="$t('enter_bank_account_number')"
 								v-model="card_conf.acc_number" />
 						</view>
 						<view class="width-100 text-left margin-top-sm text-red myfont-13px"
@@ -306,6 +306,7 @@
 	import config from '../../utils/config.js'
 	// import ClipboardJS from '../../utils/clipboard.min.js';
 	import dateFormatUtils from "../../utils/utils.js"
+	import { sanitizeAccNumber, sanitizeAccName, validateAccNumber, validateAccName } from '@/utils/bank-card.js'
 
 	export default {
 		components: {},
@@ -545,11 +546,19 @@
 				this.card_conf.bank_code = bank.bank_code
 			},
 			set_add_disable() {
-				if (!this.card_conf.acc_name || !this.card_conf.acc_number) {
+				if (validateAccNumber(this.card_conf.acc_number) || validateAccName(this.card_conf.acc_name)) {
 					this.add_disable = true
 					return
 				}
 				this.add_disable = false
+			},
+			onCardNumberInput(e) {
+				this.card_conf.acc_number = sanitizeAccNumber(e.detail.value)
+				this.set_add_disable()
+			},
+			onCardNameInput(e) {
+				this.card_conf.acc_name = sanitizeAccName(e.detail.value)
+				this.set_add_disable()
 			},
 			edit_card() {
 				this.editing = !this.editing
@@ -557,7 +566,8 @@
 			},
 			add_card() {
 				var _this = this;
-				if (!_this.card_conf.acc_number || !_this.card_conf.bank_code || !_this.card_conf.acc_name) return
+				if (!_this.card_conf.bank_code || validateAccNumber(_this.card_conf.acc_number) ||
+					validateAccName(_this.card_conf.acc_name)) return
 				var para = {
 					acc_number: _this.card_conf.acc_number,
 					bank_code: _this.card_conf.bank_code,

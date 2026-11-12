@@ -1,7 +1,7 @@
 from app_server import app, db, auth, app_opt
 from app_server.model.AppMemberBankModel import AppMemberBank
 from flask import g, request, jsonify, Blueprint, current_app
-from app_server.utils import OrmUttil
+from app_server.utils.BankCardValidation import validate_acc_number, validate_acc_name
 import uuid
 import hashlib
 
@@ -51,7 +51,7 @@ def check_repeat_bank_card():
         return response
 
     try:
-        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code).first()
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).first()
         if card:
             response = jsonify(
                 {'message': "This bank card has already been saved. Please use a different card to save"})
@@ -125,18 +125,28 @@ def add_bank_card():
         """
 
     args = request.get_json()
-    acc_number = args.get("acc_number")
-    bank_code = args.get("bank_code")
-    acc_name = args.get("acc_name")
+    acc_number = str(args.get("acc_number") or '').strip()
+    bank_code = str(args.get("bank_code") or '').strip()
+    acc_name = str(args.get("acc_name") or '').strip()
+
+    if not bank_code:
+        response = jsonify({'message': "Bank code is required"})
+        response.status_code = 400
+        return response
+    error = validate_acc_number(acc_number) or validate_acc_name(acc_name)
+    if error:
+        response = jsonify({'message': error})
+        response.status_code = 400
+        return response
 
     try:
-        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code).first()
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).first()
         if card:
             response = jsonify(
                 {'message': "This bank card has already been saved. Please use a different card to save"})
             response.status_code = 400
             return response
-        user_card_count = AppMemberBank.query.filter_by(mb_id=g.user.id).count()
+        user_card_count = AppMemberBank.query.filter_by(mb_id=g.user.id, del_flag=0).count()
         if user_card_count >= 5:
             response = jsonify(
                 {'message': "You have reached the maximum number of bank accounts allowed to be saved (5)"})
@@ -145,8 +155,7 @@ def add_bank_card():
 
         card = AppMemberBank(id=Kits.generate_uuid(), acc_number=acc_number, mb_id=g.user.id, bank_code=bank_code,
                              acc_name=acc_name)
-        card_count = AppMemberBank.query.filter_by(mb_id=g.user.id).count()
-        if card_count == 0:
+        if user_card_count == 0:
             card.is_default = 1
         db.session.add(card)
 
@@ -176,11 +185,11 @@ def edit_bank_card():
             schema:
               type: object
               required:
-                - ID
+                - id
               properties:
-                ID:
+                id:
                   type: string
-                  description: the ID of the bank_card
+                  description: the id of the bank_card (uppercase ID also accepted)
                   example: ""
                 acc_number:
                   type: string
@@ -200,13 +209,50 @@ def edit_bank_card():
           200:
             description: edit successful.
         """
-    args = request.get_json()
-    edit_id = args.get("ID")
+    args = request.get_json() or {}
+    edit_id = args.get("id") or args.get("ID")
+    if not edit_id:
+        response = jsonify({'message': "id is required"})
+        response.status_code = 400
+        return response
 
     try:
-        card = AppMemberBank.query.filter_by(ID=edit_id).one_or_none()
-        args.pop("ID")
-        OrmUttil.set_field(card, args)
+        card = AppMemberBank.query.filter_by(id=edit_id, mb_id=g.user.id, del_flag=0).first()
+        if not card:
+            response = jsonify({'message': "bank card not found"})
+            response.status_code = 404
+            return response
+
+        fields = {}
+        for key in ('acc_number', 'acc_name', 'bank_code'):
+            if args.get(key) is not None:
+                fields[key] = str(args[key]).strip()
+
+        if 'acc_number' in fields:
+            error = validate_acc_number(fields['acc_number'])
+            if error:
+                response = jsonify({'message': error})
+                response.status_code = 400
+                return response
+        if 'acc_name' in fields:
+            error = validate_acc_name(fields['acc_name'])
+            if error:
+                response = jsonify({'message': error})
+                response.status_code = 400
+                return response
+
+        new_number = fields.get('acc_number', card.acc_number)
+        new_bank = fields.get('bank_code', card.bank_code)
+        if new_number != card.acc_number or new_bank != card.bank_code:
+            dup = AppMemberBank.query.filter_by(acc_number=new_number, bank_code=new_bank, del_flag=0).first()
+            if dup and dup.id != card.id:
+                response = jsonify(
+                    {'message': "This bank card has already been saved. Please use a different card to save"})
+                response.status_code = 400
+                return response
+
+        for key, value in fields.items():
+            setattr(card, key, value)
         db.session.commit()
         return jsonify({'message': "edit successful."})
     except Exception as e:
@@ -231,11 +277,11 @@ def delete_bank_card():
             schema:
               type: object
               required:
-                - ID
+                - id
               properties:
-                ID:
+                id:
                   type: string
-                  description: the ID of the bank_card
+                  description: the id of the bank_card (uppercase ID also accepted)
                   example: ""
         responses:
           500:
@@ -286,11 +332,11 @@ def set_default_bank_card():
             schema:
               type: object
               required:
-                - ID
+                - id
               properties:
-                ID:
+                id:
                   type: string
-                  description: the ID of the bank_card
+                  description: the id of the bank_card (uppercase ID also accepted)
                   example: ""
         responses:
           500:
@@ -298,15 +344,24 @@ def set_default_bank_card():
           200:
             description: 设置成功
         """
-    args = request.get_json()
-    edit_id = args.get("ID")
+    args = request.get_json() or {}
+    edit_id = args.get("id") or args.get("ID")
+    if not edit_id:
+        response = jsonify({'message': "id is required"})
+        response.status_code = 400
+        return response
 
     try:
-        card = AppMemberBank.query.filter_by(ID=edit_id).one_or_none()
-        card.PRIMARY_CARD = True
-        AppMemberBank.query.filter(AppMemberBank.id == card.id, AppMemberBank.BANK_TYPE == card.BANK_TYPE,
-                                   AppMemberBank.ID != card.ID).update({'PRIMARY_CARD': False},
+        card = AppMemberBank.query.filter_by(id=edit_id, mb_id=g.user.id, del_flag=0).first()
+        if not card:
+            response = jsonify({'message': "bank card not found"})
+            response.status_code = 404
+            return response
+
+        AppMemberBank.query.filter(AppMemberBank.mb_id == g.user.id, AppMemberBank.id != card.id,
+                                   AppMemberBank.del_flag == 0).update({'is_default': 0},
                                                                        synchronize_session=False)
+        card.is_default = 1
         db.session.commit()
         return jsonify({'message': "设置成功"})
     except Exception as e:

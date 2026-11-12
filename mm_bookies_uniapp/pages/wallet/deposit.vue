@@ -133,11 +133,13 @@
 				<view class="modal-form">
 					<view class="modal-field">
 						<text class="field-label">{{ $t('account_no') }}</text>
-						<input class="modal-input" v-model="newCard.acc_number" :placeholder="$t('account_no')" />
+						<input class="modal-input" type="number" maxlength="20" v-model="newCard.acc_number"
+							:placeholder="$t('account_no')" @input="onCardNumberInput" />
 					</view>
 					<view class="modal-field">
 						<text class="field-label">{{ $t('user_name') }}</text>
-						<input class="modal-input" v-model="newCard.acc_name" :placeholder="$t('user_name')" />
+						<input class="modal-input" type="text" maxlength="50" v-model="newCard.acc_name"
+							:placeholder="$t('user_name')" @input="onCardNameInput" />
 					</view>
 					<view class="modal-btn primary" :class="{ disabled: !canSaveCard }" @click="saveCard">
 						{{ $t('confirm') }}
@@ -154,6 +156,7 @@
 	import dateFormatUtils from '../../utils/utils.js'
 	import { syncPageConfig, latestVersionOf, pickText, pageConfigLang } from '@/utils/page-config.js'
 	import { fetchConfigShared } from '@/utils/api/config.js'
+	import { sanitizeAccNumber, sanitizeAccName, validateAccNumber, validateAccName } from '@/utils/bank-card.js'
 
 	// 后台页面配置的页面标识（Setting → Other，平台 MMBookies，类型 wallet/deposit）
 	const PAGE_CONFIG_PAGE = 'wallet/deposit'
@@ -215,7 +218,7 @@
 				manualSubmitting: false,
 				manualCards: [],
 				configs: {},
-				// 后台 setting/AppConfigForm 的「前端展示」配置（含各通道教程视频链接）
+				// 后台 setting/AppConfigForm 的「前端展示」配置（page_config_versions 用于页面配置版本比对）
 				appConfig: {},
 				// 后台启用的页面配置（wallet/deposit 的 notice / steps.<通道>，全部语言）
 				pageConfigItems: []
@@ -252,26 +255,21 @@
 				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang)
 			},
 			currentVideo() {
-				// 视频按「通道 + 银行」从应用配置取（后台 setting/AppConfigForm 维护）。
-				// VIP Pay 要再分 KBZ Pay / Wave Money 两套教程，因为两者的付款流程不同。
+				// 视频从页面配置取（Setting → Page Config，wallet/deposit → Video Guide URL）。
+				// VIP Pay 按所选银行分 KBZ Pay / Wave Money；Cash Code 共用 VIP Pay 的配置。
 				const ch = this.selectedChannel
 				const bank = this.selectedBank || ''
-				let cfgKey = ''
+				let scope = ''
 				if (ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
 					if (/wave/i.test(bank)) {
-						cfgKey = 'vip_wave_video_link'
+						scope = 'VIPPay_Wave'
 					} else if (/kbz/i.test(bank)) {
-						cfgKey = 'vip_kbz_video_link'
+						scope = 'VIPPay_KBZ'
 					}
-				} else if (ch === 'TCPay') {
-					cfgKey = 'tc_video_link'
-				} else if (ch === 'MCPay') {
-					cfgKey = 'mc_video_link'
-				} else if (ch === 'KingPay') {
-					cfgKey = 'king_video_link'
+				} else if (ch === 'TCPay' || ch === 'MCPay' || ch === 'KingPay') {
+					scope = ch
 				}
-				const fromConfig = cfgKey ? (this.appConfig[cfgKey] || '') : ''
-				return fromConfig
+				return scope ? pickText(this.pageConfigItems, 'video.' + scope, this.pageConfigLang) : ''
 			},
 			minLimit() {
 				return Number(this.configs.deposit_min_limit) || 3000
@@ -291,8 +289,7 @@
 				return Number(this.amount || 0)
 			},
 			canSaveCard() {
-				return String(this.newCard.acc_number || '').trim().length >= 6 &&
-					!!String(this.newCard.acc_name || '').trim()
+				return !validateAccNumber(this.newCard.acc_number) && !validateAccName(this.newCard.acc_name)
 			},
 			amountValid() {
 				const v = this.amountValue
@@ -604,6 +601,12 @@
 				// #endif
 			},
 			// ---------- 银行卡 ----------
+			onCardNumberInput(e) {
+				this.newCard.acc_number = sanitizeAccNumber(e.detail.value)
+			},
+			onCardNameInput(e) {
+				this.newCard.acc_name = sanitizeAccName(e.detail.value)
+			},
 			openAddCard() {
 				this.newCard = {
 					acc_number: '',

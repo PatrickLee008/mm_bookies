@@ -138,14 +138,14 @@
 					<!-- Account No -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_number') }}</text>
-						<input class="form-input" type="number" maxlength="17" @input="set_add_disable()"
+						<input class="form-input" type="number" maxlength="20" @input="onCardNumberInput"
 							:placeholder="$t('enter_account_number')" v-model="card_conf.acc_number" />
 					</view>
 
 					<!-- User Name -->
 					<view class="form-group">
 						<text class="form-label">{{ $t('account_ame') }}</text>
-						<input class="form-input" type="text" @input="set_add_disable()"
+						<input class="form-input" type="text" maxlength="50" @input="onCardNameInput"
 							:placeholder="$t('account_ame')" v-model="card_conf.acc_name" />
 					</view>
 				</view>
@@ -173,6 +173,7 @@
 	import config from '../../utils/config.js';
 	import dateFormatUtils from "../../utils/utils.js"
 	import ConfirmDialog from '@/components/common/confirm-dialog.vue'
+	import { sanitizeAccNumber, sanitizeAccName, validateAccNumber, validateAccName } from '@/utils/bank-card.js'
 
 	export default {
 		name: 'WalletWithdraw',
@@ -422,16 +423,26 @@
 			},
 			// 设置添加按钮是否禁用
 			set_add_disable() {
-				if (!this.card_conf.acc_number || !this.card_conf.bank_code || !this.card_conf.acc_name) {
+				if (!this.card_conf.bank_code || validateAccNumber(this.card_conf.acc_number) ||
+					validateAccName(this.card_conf.acc_name)) {
 					this.add_disable = true
 					return
 				}
 				this.add_disable = false
 			},
+			onCardNumberInput(e) {
+				this.card_conf.acc_number = sanitizeAccNumber(e.detail.value)
+				this.set_add_disable()
+			},
+			onCardNameInput(e) {
+				this.card_conf.acc_name = sanitizeAccName(e.detail.value)
+				this.set_add_disable()
+			},
 			// 添加银行卡
 			add_card() {
 				var _this = this;
-				if (!_this.card_conf.acc_number || !_this.card_conf.bank_code || !_this.card_conf.acc_name) return
+				if (!_this.card_conf.bank_code || validateAccNumber(_this.card_conf.acc_number) ||
+					validateAccName(_this.card_conf.acc_name)) return
 				var para = {
 					acc_number: _this.card_conf.acc_number,
 					bank_code: _this.card_conf.bank_code,
