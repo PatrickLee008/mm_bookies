@@ -255,21 +255,25 @@
 				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang)
 			},
 			currentVideo() {
-				// 视频从页面配置取（Setting → Page Config，wallet/deposit → Video Guide URL）。
-				// VIP Pay 按所选银行分 KBZ Pay / Wave Money；Cash Code 共用 VIP Pay 的配置。
+				// 视频只从 House AppConfig 读取；VIP Pay 按所选银行分别取链接，不跨银行回退。
 				const ch = this.selectedChannel
 				const bank = this.selectedBank || ''
-				let scope = ''
+				let configKey = ''
 				if (ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
 					if (/wave/i.test(bank)) {
-						scope = 'VIPPay_Wave'
+						configKey = 'vip_wave_video_link'
 					} else if (/kbz/i.test(bank)) {
-						scope = 'VIPPay_KBZ'
+						configKey = 'vip_kbz_video_link'
 					}
-				} else if (ch === 'TCPay' || ch === 'MCPay' || ch === 'KingPay') {
-					scope = ch
+				} else if (ch === 'TCPay') {
+					configKey = 'tc_video_link'
+				} else if (ch === 'MCPay') {
+					configKey = 'mc_video_link'
+				} else if (ch === 'KingPay') {
+					configKey = 'king_video_link'
 				}
-				return scope ? pickText(this.pageConfigItems, 'video.' + scope, this.pageConfigLang) : ''
+				const value = configKey ? this.appConfig[configKey] : ''
+				return typeof value === 'string' ? value.trim() : ''
 			},
 			minLimit() {
 				return Number(this.configs.deposit_min_limit) || 3000
