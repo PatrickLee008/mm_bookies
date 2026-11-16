@@ -242,5 +242,4 @@ class AwcGame(BaseSaasModel):
     def __repr__(self):
         return f'<AwcGame {self.game_code} - {self.name_en}>'
 
-    with app.app_context():
-        db.create_all()
+    # 建表由部署侧统一维护; 导入期不执行 db.create_all()

@@ -153,5 +153,4 @@ class SysBisDict(BaseSaasModel):
         return app_front_setting_vo
 
 
-with app.app_context():
-    db.create_all()
+# 建表由部署侧统一维护; 导入期不执行 db.create_all()

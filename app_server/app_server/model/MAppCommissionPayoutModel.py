@@ -108,5 +108,4 @@ class MAppCommissionPayout(BaseSaasModel):
         return f'<MAppCommissionPayout {self.id}: {self.payout_no} {self.total_amount} ({self.payout_status})>'
 
 
-with app.app_context():
-    db.create_all()
+# 建表由部署侧统一维护; 导入期不执行 db.create_all()

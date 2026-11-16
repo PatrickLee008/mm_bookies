@@ -57,5 +57,4 @@ class AppAdjustment(BaseSaasModel):
     remarks = Column(String(500), comment="管理员备注")
 
 
-with app.app_context():
-    db.create_all()
+# 建表由部署侧统一维护; 导入期不执行 db.create_all()

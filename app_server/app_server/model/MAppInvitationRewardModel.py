@@ -27,5 +27,4 @@ class MAppInvitationReward(BaseSaasModel):
         # 可以根据业务需求添加约束，这里暂时不加唯一约束
         {'comment': '邀请奖励领取记录表'}
     )
-with app.app_context():
-    db.create_all()
+# 建表由部署侧统一维护; 导入期不执行 db.create_all()

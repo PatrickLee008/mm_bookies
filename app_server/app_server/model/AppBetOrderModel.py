@@ -237,5 +237,4 @@ class AppBetOrder(BaseSaasModel):
         return bet_order
 
 
-with app.app_context():
-    db.create_all()
+# 建表由部署侧统一维护; 导入期不执行 db.create_all()
