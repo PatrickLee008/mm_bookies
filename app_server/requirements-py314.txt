@@ -1,0 +1,86 @@
+# -*- coding: utf-8 -*-
+# MMBookies app_server - Python 3.14 依赖
+# 已用 uv pip compile --python-version 3.14 在 Linux x86_64 / Windows x86_64 验证可解析，
+# 已在 Windows Python 3.14 隔离安装并通过 pip check。
+# 安装: pip install -r requirements-py314.txt
+
+# ======== 直接依赖（代码中实际 import 的包）========
+# --- Web 框架 ---
+Flask==3.1.3
+Werkzeug==3.1.9
+Jinja2==3.1.6
+MarkupSafe==3.0.4
+itsdangerous==2.2.0
+click==8.5.1
+blinker==1.9.0
+Flask-Cors==6.0.5
+Flask-HTTPAuth==4.8.1
+Flask-Docs==0.7.6
+flasgger==0.9.7.1
+PyYAML==6.0.3
+
+# --- 数据库 / 缓存 ---
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.57
+PyMySQL==1.2.4
+redis==8.1.0
+
+# --- 协程（仅 PyCharm 调试模式下启用 monkey patch）---
+gevent==26.9.0
+greenlet==3.5.6
+
+# --- Google Cloud（翻译 / Vision OCR）---
+google-auth==2.62.1
+google-api-core==2.44.0
+google-cloud-translate==3.28.0
+google-cloud-vision==3.16.0
+
+# --- 工具类 ---
+pycryptodome==3.24.1
+Pillow==13.0.0
+pytz==2026.6
+requests==2.34.2
+python-dotenv==1.2.4
+user-agents==2.2.0
+ua-parser==0.18.0
+
+# ======== 间接依赖（锁定版本，保证可复现）========
+attrs==26.1.0
+certifi==2026.10.23
+cffi==2.1.1
+cryptography==50.0.2
+charset-normalizer==3.5.2
+google-cloud-core==2.8.0
+googleapis-common-protos==1.76.0
+grpc-google-iam-v1==0.14.6
+grpcio==1.85.1
+grpcio-status==1.85.1
+idna==3.20
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+mistune==3.4.0
+opentelemetry-api==1.45.2
+packaging==26.3
+proto-plus==1.29.0
+protobuf==7.36.2
+pyasn1==0.6.5
+pyasn1-modules==0.4.2
+pycparser==3.12
+referencing==0.37.0
+rpds-py==2026.9.1
+six==1.17.0
+typing-extensions==4.16.0
+urllib3==2.8.0
+zope.event==6.2
+zope.interface==8.7
+
+# ======== 已移除（项目代码未 import，且多数无 Python 3.14 wheel）========
+# numpy / scipy / pandas / matplotlib / scikit-image / PyWavelets / opencv-python /
+# opencv-contrib-python / Shapely / pyclipper / imgaug / lmdb / imageio / tifffile /
+# paddleocr / paddlepaddle / paddle-bfloat / visualdl / pytesseract / networkx /
+# Cython / Flask-Babel / Babel / Flask-RESTful / aniso8601 / bce-python-sdk /
+# openpyxl / et-xmlfile / lxml / premailer / cssselect / cssutils / cachetools /
+# rapidfuzz / snowflake-id / tqdm / astor / attrdict / future / decorator / dill /
+# multiprocess / colorama / cycler / kiwisolver / opt-einsum / pyparsing /
+# python-dateutil / rsa / async-timeout / importlib-metadata / importlib-resources /
+# zipp / dataclasses

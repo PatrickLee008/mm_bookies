@@ -32,10 +32,6 @@ class AppAgent(BaseSaasModel):
     status = Column(String(10), nullable=False, server_default='1', comment="状态: 0-停用, 1-启用")
     sort = Column(Integer, server_default='0', comment="排序序号")
 
-    __mapper_args__ = {
-        "order_by": sort.asc(),
-    }
-
     def get_admin_user_ids(self):
         """
         获取该代理关联的所有管理员用户ID列表

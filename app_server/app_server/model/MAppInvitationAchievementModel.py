@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, DECIMAL, Integer, SmallInteger, ForeignKey, Enum as SQLEnum, UniqueConstraint
 from enum import Enum
 
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 # 成就规则类型枚举（Method 1: Achievement Share）
@@ -51,4 +51,5 @@ class MAppInvitationAchievement(BaseSaasModel):
         except ValueError:
             return False
 
-db.create_all()
+with app.app_context():
+    db.create_all()

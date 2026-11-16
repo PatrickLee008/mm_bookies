@@ -88,5 +88,6 @@ db = SQLAlchemy(app)
 logger.info("Database initialized")
 
 # 添加数据库引擎到配置，供WebSocket消息控制器使用
-app.config['DATABASE_ENGINE'] = db.engine
+with app.app_context():
+    app.config['DATABASE_ENGINE'] = db.engine
 logger.info("=" * 60)

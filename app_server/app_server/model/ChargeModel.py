@@ -71,9 +71,6 @@ class Charge(BaseSaasModel):
     # 优惠信息
     mb_pro_id = Column(Integer, comment="会员优惠券ID")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
 
-
-db.create_all()
+with app.app_context():
+    db.create_all()

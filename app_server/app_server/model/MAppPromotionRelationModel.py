@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DECIMAL, DateTime, Integer, Boolean
 from enum import Enum
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 
@@ -73,4 +73,5 @@ class MAppPromotionRelation(BaseSaasModel):
         return f'<MAppPromotionRelation {self.id}: {self.promoter_id} -> {self.invitee_id} ({self.status})>'
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

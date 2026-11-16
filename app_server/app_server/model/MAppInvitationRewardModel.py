@@ -1,7 +1,7 @@
 
 from sqlalchemy import Column, String, DECIMAL, DateTime, Text, Integer, SmallInteger, ForeignKey, UniqueConstraint
 
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 class MAppInvitationReward(BaseSaasModel):
     """邀请奖励领取记录表模型"""
@@ -27,4 +27,5 @@ class MAppInvitationReward(BaseSaasModel):
         # 可以根据业务需求添加约束，这里暂时不加唯一约束
         {'comment': '邀请奖励领取记录表'}
     )
-db.create_all()
+with app.app_context():
+    db.create_all()

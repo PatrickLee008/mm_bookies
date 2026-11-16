@@ -503,7 +503,7 @@ def get_match_results():
                     LeagueTeamScraperModel.name == host_team_name,
                     LeagueTeamScraperModel.team_name == host_team_name
                 )
-            ).first()
+            ).order_by(LeagueTeamScraperModel.create_time.desc()).first()
             match_dict['home_logo'] = host_team.logo if host_team and host_team.logo else None
         else:
             match_dict['home_logo'] = None
@@ -517,7 +517,7 @@ def get_match_results():
                     LeagueTeamScraperModel.name == guest_team_name,
                     LeagueTeamScraperModel.team_name == guest_team_name
                 )
-            ).first()
+            ).order_by(LeagueTeamScraperModel.create_time.desc()).first()
             match_dict['away_logo'] = guest_team.logo if guest_team and guest_team.logo else None
         else:
             match_dict['away_logo'] = None

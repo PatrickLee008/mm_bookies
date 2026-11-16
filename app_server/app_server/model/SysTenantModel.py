@@ -18,10 +18,6 @@ class SysTenant(BaseSaasModel):
     domain = Column(String(64), nullable=False, server_default='', comment="域名")
     color = Column(String(64), nullable=False, server_default='', comment="主题色")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     # 获取tenant_id
     @staticmethod
     def get_tenant_id(request):
@@ -36,7 +32,7 @@ class SysTenant(BaseSaasModel):
             return "10000"
         # 从数据库表sys_tenant，查询domain对应的tenant_id
         # domain是逗号分隔的多个域名，如"域名1,域名2"
-        tenants = SysTenant.query.filter_by(status='1').all()
+        tenants = SysTenant.query.filter_by(status='1').order_by(SysTenant.create_time.desc()).all()
         for tenant in tenants:
             if tenant.domain:
                 # 将domain按逗号分隔，去除空格，检查host是否在其中
@@ -45,4 +41,5 @@ class SysTenant(BaseSaasModel):
                     return tenant.id
         return None
 
-db.create_all()
+with app.app_context():
+    db.create_all()

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DECIMAL, DateTime, Integer, Text, Boolean
 from enum import Enum
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 
@@ -108,4 +108,5 @@ class MAppCommissionPayout(BaseSaasModel):
         return f'<MAppCommissionPayout {self.id}: {self.payout_no} {self.total_amount} ({self.payout_status})>'
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

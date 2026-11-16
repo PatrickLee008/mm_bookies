@@ -75,10 +75,6 @@ class AppSettingBet1x2Model(BaseSaasModel):
     status = Column(TINYINT, comment="状态(0:禁用,1:启用)")
     sort = Column(Integer, comment="排序序号")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     __table_args__ = (
         Index('idx_aid_unique', 'aid', unique=True),
     )
@@ -98,7 +94,7 @@ class AppSettingBet1x2Model(BaseSaasModel):
         )
         if tenant_id:
             query = query.filter_by(tenant_id=tenant_id)
-        obj = query.first()
+        obj = query.order_by(AppSettingBet1x2Model.create_time.desc()).first()
         return obj
 
     def get_min_max_by_order_type(self, order_type: str) -> dict:

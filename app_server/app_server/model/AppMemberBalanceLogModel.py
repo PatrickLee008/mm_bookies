@@ -94,7 +94,3 @@ class AppMemberBalanceLog(BaseSaasModel):
     status = Column(TINYINT, nullable=False, server_default="1", comment="状态: 0-无效，1-有效")
     source_status = Column(TINYINT, nullable=False, server_default="0", comment="原数据状态: 0: 请求中,1: 成功,2: 拒绝")
     pay_wallet = Column(String(32), comment="付款账户（Money：主钱包，Promotion：活动钱包）（从字典读取）")
-
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }

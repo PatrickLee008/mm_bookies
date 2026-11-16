@@ -27,14 +27,10 @@ class LeagueTeamScraperModel(BaseSaasModel):
     status = Column(TINYINT, nullable=False, server_default='1', comment="状态(0:禁用,1:启用)")
     sort = Column(Integer, server_default='0', comment="排序序号")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     #通过web_id获取球队信息
     @staticmethod
     def get_match_icon(web_id: str) -> Optional['LeagueTeamScraperModel']:
-        obj = db.session.query(LeagueTeamScraperModel).filter_by(web_id=web_id).first()
+        obj = db.session.query(LeagueTeamScraperModel).filter_by(web_id=web_id).order_by(LeagueTeamScraperModel.create_time.desc()).first()
         if obj:
             return obj.logo
         else:

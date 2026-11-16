@@ -42,10 +42,6 @@ class OrderHistory(BaseSaasModel2):
     bet_status = Column(String(64), comment="订单状态")
     pay_wallet = Column(String(32), comment="付款账户（Money：主钱包，Promotion：活动钱包）")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel2.CREATE_TIME.desc(),
-    }
-
     def to_dict(self):
         columns = self.__table__.columns.keys()
         result = {}

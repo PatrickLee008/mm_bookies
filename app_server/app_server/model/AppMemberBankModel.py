@@ -18,7 +18,3 @@ class AppMemberBank(BaseSaasModel):
     sort = Column(Integer, default=100, comment='排序序号')
     del_flag = Column(Integer, default=0, comment='删除标记')
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-

@@ -3021,7 +3021,7 @@ def calculate_win_loss_commission_realtime(user_id, activity):
         AppBetOrder.create_time >= start_dt,
         AppBetOrder.create_time < end_dt,
         AppBetOrder.del_flag == 0
-    ).all()
+    ).order_by(AppBetOrder.create_time.desc()).all()
 
     total_platform_profit = Decimal('0')
     total_stake = Decimal('0')

@@ -203,7 +203,7 @@ def mark_all_as_read():
             AppMemberMessage.member_id == user_id,
             AppMemberMessage.is_read == 0,
             AppMemberMessage.del_flag == 0
-        ).all()
+        ).order_by(AppMemberMessage.create_time.desc()).all()
 
         count = 0
         for msg in unread_messages:

@@ -33,10 +33,6 @@ class Match(BaseSaasModel2):
     hide = Column(String(2), comment="是否隐藏")
     hide_reason = Column(String(256), comment="隐藏原因")
 
-    __mapper_args__ = {
-        "order_by": MATCH_ID.desc(),
-    }
-
     def to_dict(self):
         columns = self.__table__.columns.keys()
         result = {}

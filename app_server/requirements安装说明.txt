@@ -1,8 +1,29 @@
-# 1. 先安装没有冲突的核心依赖
-pip install numpy==1.19.5 pandas==1.1.5 scipy==1.5.4
+# Python 3.6.8 旧环境
+# 在对应虚拟环境中安装；不要混装 requirements-py314.txt。
+# 全新环境可先升级到仍支持 Python 3.6 的安装工具：
+python -m pip install pip==21.3.1 setuptools==59.6.0 wheel==0.37.1
+python -m pip install -r requirements.txt
+python -m pip check
 
-# 2. 安装 PaddleOCR（它会自动处理依赖）
-pip install paddleocr==2.6.0.1
+# Python 3.14 新环境
+# 使用 Python 3.14 单独创建虚拟环境后安装：
+python -m pip install -r requirements-py314.txt
+python -m pip check
 
-# 3. 安装其他依赖
-pip install -r requirements.txt --no-deps  # 跳过依赖检查
+# 当前 OCR / 翻译使用 Google Cloud，不需要安装 PaddleOCR 或科学计算栈。
+# 不使用 --no-deps；应让 pip 安装必要的间接依赖并检查冲突。
+
+# 启动脚本已与 onex2 一致。Linux 上首次部署：
+chmod +x start.sh
+# 如使用自建虚拟环境，显式指定，避免自动选择服务器上的旧环境：
+VENV_ACTIVATE=/path/to/venv/bin/activate ./start.sh start
+./start.sh status
+./start.sh logs error
+
+# 环境仍由 .env 中的 APP_ENV 和对应 .env.{APP_ENV} 决定。
+# itsdangerous 1.1.0 保持原 token 格式，更新代码不要求现有用户重新登录。
+# 切换到 itsdangerous 2.2.0 时使用新 token 格式，已有用户需要重新登录。
+# 新旧 token 格式不互通，因此升级新依赖应统一切换全部服务进程。
+
+# 离线 token 回归测试（不连接 MySQL / Redis）：
+python test_runtime_compat.py

@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import Column, String, Text
 from sqlalchemy.dialects.mysql import DATETIME, DECIMAL, TINYINT
 
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 
@@ -82,10 +82,6 @@ class ChargeApply(BaseSaasModel):
                     comment="充值状态：New/Pending/Success/Failed/Rejected/Timeout/Cancelling/Cancelled")
     expire_time = Column(DATETIME, comment="超时时间")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     def remaining_seconds(self):
         """剩余秒数（服务端计算，前端不得用本地时间算倒计时）。"""
         if not self.expire_time:
@@ -116,4 +112,5 @@ class ChargeApply(BaseSaasModel):
         return result
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

@@ -51,7 +51,7 @@ def check_repeat_bank_card():
         return response
 
     try:
-        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).first()
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).order_by(AppMemberBank.create_time.desc()).first()
         if card:
             response = jsonify(
                 {'message': "This bank card has already been saved. Please use a different card to save"})
@@ -140,7 +140,7 @@ def add_bank_card():
         return response
 
     try:
-        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).first()
+        card = AppMemberBank.query.filter_by(acc_number=acc_number, bank_code=bank_code, del_flag=0).order_by(AppMemberBank.create_time.desc()).first()
         if card:
             response = jsonify(
                 {'message': "This bank card has already been saved. Please use a different card to save"})
@@ -244,7 +244,7 @@ def edit_bank_card():
         new_number = fields.get('acc_number', card.acc_number)
         new_bank = fields.get('bank_code', card.bank_code)
         if new_number != card.acc_number or new_bank != card.bank_code:
-            dup = AppMemberBank.query.filter_by(acc_number=new_number, bank_code=new_bank, del_flag=0).first()
+            dup = AppMemberBank.query.filter_by(acc_number=new_number, bank_code=new_bank, del_flag=0).order_by(AppMemberBank.create_time.desc()).first()
             if dup and dup.id != card.id:
                 response = jsonify(
                     {'message': "This bank card has already been saved. Please use a different card to save"})

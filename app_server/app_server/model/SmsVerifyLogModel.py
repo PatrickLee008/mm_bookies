@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from app_server import db
+from app_server import db, app
 from datetime import datetime
 
 
@@ -28,4 +28,5 @@ class SmsVerifyLog(db.Model):
         return f'<SmsVerifyLog {self.phone} - {self.status}>'
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

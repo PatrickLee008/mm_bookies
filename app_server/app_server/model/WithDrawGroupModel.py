@@ -1,4 +1,4 @@
-from app_server import db
+from app_server import db, app
 from sqlalchemy import Column, String, Integer, DateTime, Boolean
 from sqlalchemy.dialects.mysql import DECIMAL, TINYINT
 
@@ -45,4 +45,5 @@ class WithDrawGroup(db.Model):
         return result
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

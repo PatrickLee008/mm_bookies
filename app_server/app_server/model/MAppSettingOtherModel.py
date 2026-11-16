@@ -40,7 +40,3 @@ class MAppSettingOther(BaseSaasModel):
     update_by_id = Column(String(64), comment="更新人ID")
     remarks = Column(String(500), comment="备注信息")
     del_flag = Column(Integer, server_default='0', comment="删除标记（0: 正常, 1: 删除）")
-
-    __mapper_args__ = {
-        "order_by": sort.asc(),
-    }

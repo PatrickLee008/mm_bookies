@@ -131,17 +131,17 @@ def get_setting_by_key(setting_key):
 
     # 如果指定了 aid，优先查询代理级别配置
     if aid:
-        setting = query.filter(MAppSettingOther.aid == aid).first()
+        setting = query.filter(MAppSettingOther.aid == aid).order_by(MAppSettingOther.sort.asc()).first()
         if not setting:
             # 如果没有代理级别配置，查询全局配置（aid 为 NULL 或空字符串）
             setting = query.filter(
                 or_(MAppSettingOther.aid.is_(None), MAppSettingOther.aid == '')
-            ).first()
+            ).order_by(MAppSettingOther.sort.asc()).first()
     else:
         # 只查询全局配置（aid 为 NULL 或空字符串）
         setting = query.filter(
             or_(MAppSettingOther.aid.is_(None), MAppSettingOther.aid == '')
-        ).first()
+        ).order_by(MAppSettingOther.sort.asc()).first()
 
     if not setting:
         return jsonify({

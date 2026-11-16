@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DECIMAL, DateTime, Integer, Text, Boolean
 from enum import Enum
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 
@@ -111,4 +111,5 @@ class MAppCommissionRecord(BaseSaasModel):
         return f'<MAppCommissionRecord {self.id}: {self.record_type} {self.amount} ({self.status})>'
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

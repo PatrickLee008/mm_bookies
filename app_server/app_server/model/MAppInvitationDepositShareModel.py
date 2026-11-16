@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, DECIMAL, Integer, ForeignKey
-from app_server import db
+from app_server import db, app
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
 
@@ -24,4 +24,5 @@ class MAppInvitationDepositShare(BaseSaasModel):
         return f'<MAppInvitationDepositShare {self.id}: {self.min_deposit}-{self.max_deposit} @ {self.bonus_rate}%>'
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

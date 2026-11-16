@@ -74,7 +74,7 @@ def get_cancel_lease_seconds():
             SysBisDict.dict_code == 'cancelLeaseSeconds',
             SysBisDict.status == 1,
             SysBisDict.del_flag == 0,
-        ).all()
+        ).order_by(SysBisDict.sort.asc()).all()
         for row in rows:
             value = str(row.dict_value or '').strip()
             if value.isdigit() and int(value) > 0:
@@ -192,7 +192,7 @@ def reconcile_stale_cancellations(user_id):
         ChargeApply.mb_id == user_id,
         ChargeApply.status == StatusLabelMap.Cancelling,
         or_(ChargeApply.cancel_lease_at.is_(None), ChargeApply.cancel_lease_at <= cutoff),
-    ).all()
+    ).order_by(ChargeApply.create_time.desc()).all()
 
     for apply in stale:
         apply_id = apply.id
@@ -507,7 +507,7 @@ def get_apply_status():
         apply = ChargeApply.query.filter(
             ChargeApply.mb_id == g.user.id,
             or_(ChargeApply.id == str(order_id), ChargeApply.out_order_id == str(order_id)),
-        ).first()
+        ).order_by(ChargeApply.create_time.desc()).first()
         if not apply:
             return jsonify({'code': 50004, 'message': 'order not found'})
 
@@ -537,7 +537,7 @@ def cancel_apply():
         apply = ChargeApply.query.filter(
             ChargeApply.mb_id == g.user.id,
             or_(ChargeApply.id == str(order_id), ChargeApply.out_order_id == str(order_id)),
-        ).first()
+        ).order_by(ChargeApply.create_time.desc()).first()
         if not apply:
             return jsonify({'code': 404, 'ok': False, 'message': 'Order not found'})
         if apply.pay_channel not in CANCELABLE_CHANNELS:
@@ -592,7 +592,7 @@ def submit_txn():
         apply = ChargeApply.query.filter(
             ChargeApply.mb_id == g.user.id,
             or_(ChargeApply.id == str(order_id), ChargeApply.out_order_id == str(order_id)),
-        ).first()
+        ).order_by(ChargeApply.create_time.desc()).first()
         if not apply:
             return jsonify({'code': 50004, 'message': 'order not found'})
         if apply.pay_channel not in TXN_LAST5_CHANNELS:
@@ -631,7 +631,7 @@ def get_payinfo():
         apply = ChargeApply.query.filter(
             ChargeApply.mb_id == g.user.id,
             or_(ChargeApply.id == str(order_id), ChargeApply.out_order_id == str(order_id)),
-        ).first()
+        ).order_by(ChargeApply.create_time.desc()).first()
         if not apply:
             return jsonify({'code': 50004, 'message': 'order not found'})
 
@@ -668,7 +668,7 @@ def get_processing():
         ChargeApply.mb_id == g.user.id,
         ChargeApply.status == StatusLabelMap.Pending,
         ChargeApply.expire_time > datetime.now(),
-    ).first()
+    ).order_by(ChargeApply.create_time.desc()).first()
     if order:
         return jsonify({'code': 20000, 'data': order.to_dict()})
     return jsonify({'code': 50000, 'message': 'no processing apply order.'})
@@ -824,7 +824,7 @@ def get_apply_list():
         charge_list = charge_list.filter(ChargeApply.pay_channel.in_(pay_channels))
 
     total_amount = charge_list.with_entities(func.sum(ChargeApply.money)).scalar() or 0
-    charge_list = charge_list.offset((current_page - 1) * limit).limit(limit).all()
+    charge_list = charge_list.order_by(ChargeApply.create_time.desc()).offset((current_page - 1) * limit).limit(limit).all()
 
     mark_expired_orders(charge_list)
 

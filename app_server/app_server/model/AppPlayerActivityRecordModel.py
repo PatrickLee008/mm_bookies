@@ -1,5 +1,5 @@
 from datetime import datetime
-from app_server import db
+from app_server import db, app
 
 
 class AppPlayerActivityRecord(db.Model):
@@ -61,4 +61,5 @@ class AppPlayerActivityRecord(db.Model):
         return result
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

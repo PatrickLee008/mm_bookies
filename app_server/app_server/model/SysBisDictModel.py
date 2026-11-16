@@ -22,10 +22,6 @@ class SysBisDict(BaseSaasModel):
     css_class = Column(String(50), nullable=False, server_default='', comment="前端样式类")
     icon_url = Column(String(255), nullable=False, server_default='', comment="图标地址")
 
-    __mapper_args__ = {
-        "order_by": sort.asc(),
-    }
-
     @staticmethod
     def get_dict_by_dir(dict_dir, tenant_id=None):
         """
@@ -157,4 +153,5 @@ class SysBisDict(BaseSaasModel):
         return app_front_setting_vo
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

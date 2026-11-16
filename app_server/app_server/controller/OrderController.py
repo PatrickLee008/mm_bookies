@@ -1048,7 +1048,7 @@ def mix_bet():
             mix_total_match_limit = betting_default_config.mix_total_match_limit
 
             link_orders = Order.query.filter(Order.MATCH_ID == bet['matchId'], Order.USER_ID == user.id,
-                                             Order.STATUS == 1, Order.IS_MIX == "1").group_by(Order.ORDER_ID).all()
+                                             Order.STATUS == 1, Order.IS_MIX == "1").group_by(Order.ORDER_ID).order_by(Order.CREATE_TIME.desc()).all()
             match_already_bet = 0
             for link_order in link_orders:
                 match_already_bet += int(link_order.BET_MONEY)
@@ -1124,7 +1124,7 @@ def mix_bet():
         logger.info(f"相同订单ID列表: {same_order_ids}")
         count_amount = 0
         for o_id in same_order_ids:
-            orders = Order.query.filter_by(ORDER_ID=o_id).all()
+            orders = Order.query.filter_by(ORDER_ID=o_id).order_by(Order.CREATE_TIME.desc()).all()
             is_same = True
             for o in orders:
                 if o.MATCH_ID not in match_to_orders:
@@ -1347,7 +1347,7 @@ def get_order_list():
     if is_detail:
         detail_order_list = Order.query.filter(Order.USER_ID == g.user.id, Order.ORDER_ID == order_id,
                                                Order.STATUS == "1")
-        detail_order_list = detail_order_list.all()
+        detail_order_list = detail_order_list.order_by(Order.CREATE_TIME.desc()).all()
         detail_result = []
         for order in detail_order_list:
             detail_result.append(order.to_dict())
@@ -1402,7 +1402,7 @@ def get_order_list():
         order_list = order_list.filter(AppBetOrder.create_time <= end_time)
 
     order_list = order_list.group_by(AppBetOrder.bet_group)
-    order_list = order_list.offset((current_page - 1) * limit).limit(limit).all()
+    order_list = order_list.order_by(AppBetOrder.create_time.desc()).offset((current_page - 1) * limit).limit(limit).all()
     result = []
     from app_server.model.MatchModel import Match
     for u in order_list:
@@ -1471,7 +1471,7 @@ def get_history_list():
 
     if is_detail:
         order_list = OrderHistory.query.filter(OrderHistory.USER_ID == g.user.id, OrderHistory.ORDER_ID == order_id)
-        order_list = order_list.all()
+        order_list = order_list.order_by(OrderHistory.CREATE_TIME.desc()).all()
         return jsonify({
             'items': [u.to_dict() for u in order_list],
         })
@@ -1566,7 +1566,7 @@ def get_history_list():
     # Execute AppBetOrder query
     order_query = order_list.group_by(AppBetOrder.bet_group)
     total_orders = order_query.count()
-    app_bet_orders = order_query.offset((current_page - 1) * limit).limit(limit).all()
+    app_bet_orders = order_query.order_by(AppBetOrder.create_time.desc()).offset((current_page - 1) * limit).limit(limit).all()
 
     # Execute GameSession query
     total_sessions = session_query.count()
@@ -1712,7 +1712,7 @@ def get_order_history_old():
 
     if is_detail:
         order_list = OrderHistory.query.filter(OrderHistory.USER_ID == g.user.id, OrderHistory.ORDER_ID == order_id)
-        order_list = order_list.all()
+        order_list = order_list.order_by(OrderHistory.CREATE_TIME.desc()).all()
         return jsonify({
             'items': [u.to_dict() for u in order_list],
         })
@@ -1783,7 +1783,7 @@ def get_order_history_old():
         order_list = order_list.group_by(OrderHistory.ORDER_ID)
         result = []
         # order_list = order_list.with_entities(OrderHistory, func.count(OrderHistory.ORDER_ID))
-        order_list = order_list.offset((current_page - 1) * limit).limit(limit).all()
+        order_list = order_list.order_by(OrderHistory.CREATE_TIME.desc()).offset((current_page - 1) * limit).limit(limit).all()
         for u in order_list:
             # temp = u[0].to_dict()
             # temp['ORDER_COUNT'] = u[1]
@@ -1816,7 +1816,7 @@ def get_order_history_old():
         #     'total': total
         # })
 
-    order_list = order_list.all()
+    order_list = order_list.order_by(OrderHistory.CREATE_TIME.desc()).all()
     return jsonify({
         'items': [u.to_dict() for u in order_list],
         'total': total

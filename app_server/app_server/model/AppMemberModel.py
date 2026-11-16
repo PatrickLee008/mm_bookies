@@ -1,6 +1,11 @@
 from app_server import db, app
 from sqlalchemy import Column, String, Integer, Boolean, Text, Numeric, SmallInteger, DateTime
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+try:
+    from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+    _LEGACY_TOKENS = True
+except ImportError:
+    from itsdangerous import URLSafeTimedSerializer as Serializer
+    _LEGACY_TOKENS = False
 from itsdangerous import BadSignature, SignatureExpired
 from sqlalchemy.dialects.mysql import TIMESTAMP, BIGINT
 import ipaddress
@@ -10,6 +15,8 @@ import hashlib
 import app_server.utils.DictDef as DictDef
 from app_server.utils.BaseSaasModel import BaseSaasModel
 from app_server.utils.Kits import Kits
+
+TOKEN_EXPIRATION = 60 * 60 * 12
 
 # 新会员新表
 class AppMember(BaseSaasModel):
@@ -73,10 +80,16 @@ class AppMember(BaseSaasModel):
         # print(hashlib.sha1(('Aa123456' + self.salt).encode(encoding='utf-8')).hexdigest())
         return hashlib.sha1((password + self.salt).encode(encoding='utf-8')).hexdigest() == self.password
 
-    # 获取token，有效时间10min
-    def generate_auth_token(self, expiration=60 * 60 * 12):
-        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+    # 获取token，默认有效期12小时
+    def generate_auth_token(self, expiration=TOKEN_EXPIRATION):
+        # Keep existing sessions valid while the old itsdangerous is installed.
+        if _LEGACY_TOKENS:
+            s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        else:
+            s = Serializer(app.config['SECRET_KEY'])
         token = s.dumps({'member_id': self.id})
+        if isinstance(token, str):
+            token = token.encode('utf-8')
         Redis.write("user_token|%s" % self.id, token, expiration)
         return token
 
@@ -96,7 +109,10 @@ class AppMember(BaseSaasModel):
     def verify_auth_token(token):
         s = Serializer(app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            if _LEGACY_TOKENS:
+                data = s.loads(token)
+            else:
+                data = s.loads(token, max_age=TOKEN_EXPIRATION)
             # print("token verifying:", token, data)
         except SignatureExpired:
             return None  # valid token, but expired

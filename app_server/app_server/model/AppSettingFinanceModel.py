@@ -39,10 +39,6 @@ class AppSettingFinanceModel(BaseSaasModel):
     status = Column(TINYINT, nullable=False, server_default='1', comment="状态(0:禁用,1:启用)")
     sort = Column(Integer, server_default='0', comment="排序序号")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     @staticmethod
     def get_by_aid(aid: str, tenant_id: str = None) -> Optional['AppSettingFinanceModel']:
         """
@@ -58,7 +54,7 @@ class AppSettingFinanceModel(BaseSaasModel):
         )
         if tenant_id:
             query = query.filter_by(tenant_id=tenant_id)
-        return query.first()
+        return query.order_by(AppSettingFinanceModel.create_time.desc()).first()
 
     @staticmethod
     def get_by_type(config_type: int, tenant_id: str = None) -> list:
@@ -75,7 +71,7 @@ class AppSettingFinanceModel(BaseSaasModel):
         )
         if tenant_id:
             query = query.filter_by(tenant_id=tenant_id)
-        return query.all()
+        return query.order_by(AppSettingFinanceModel.create_time.desc()).all()
 
     @staticmethod
     def get_agent_config(aid: str = '0', tenant_id: str = None) -> Optional['AppSettingFinanceModel']:
@@ -94,4 +90,4 @@ class AppSettingFinanceModel(BaseSaasModel):
         if tenant_id:
             query = query.filter_by(tenant_id=tenant_id)
 
-        return query.first()
+        return query.order_by(AppSettingFinanceModel.create_time.desc()).first()

@@ -363,7 +363,7 @@ def get_user_info():
         ).scalar() or 0
         user_info['total_withdraw'] = format(int(success_withdraw), ",")
         # 获取用户默认卡
-        bank_card = AppMemberBank.query.filter_by(mb_id=mb_id, is_default=1).first()
+        bank_card = AppMemberBank.query.filter_by(mb_id=mb_id, is_default=1).order_by(AppMemberBank.create_time.desc()).first()
         user_info['bank_card'] = bank_card.to_dict() if bank_card else None
         return Kits.rt_data(user_info)
     except Exception as e:
@@ -577,7 +577,7 @@ def add_app_user():
 
         db.session.add(user)
         if bank_type and bank_user_name and bank_card:
-            card = AppMemberBank.query.filter_by(acc_number=bank_card, bank_code=bank_type).first()
+            card = AppMemberBank.query.filter_by(acc_number=bank_card, bank_code=bank_type).order_by(AppMemberBank.create_time.desc()).first()
             if card:
                 response = jsonify(
                     {'message': "This bank card has already been saved. Please use a different card to save"})

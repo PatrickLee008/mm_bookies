@@ -58,7 +58,3 @@ class WithDraw(BaseSaasModel):
     callback_log = Column(Text, comment="第三方回调日志（JSON格式）")
     order_log = Column(Text, comment="提现订单状态变更日志")
     slip = Column(Text, comment="付款凭证（如转账截图URL）")
-
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }

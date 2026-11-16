@@ -112,4 +112,5 @@ def can_receive_reward(self):
     # 每条规则有自己的 max_claim_count 字段，需要在具体业务逻辑中检查
 
     return True
-db.create_all()
+with app.app_context():
+    db.create_all()

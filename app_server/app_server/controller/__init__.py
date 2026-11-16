@@ -1,3 +1,5 @@
+import threading
+
 from app_server import Redis, app
 from app_server.model.SysBankcardModel import SysBankcard
 
@@ -34,6 +36,17 @@ def initialize_cards():
         Redis.sadd('visible_cards_wave', card.ID)
 
 
-@app.before_first_request
+# Flask 2.3 起移除了 before_first_request，改用 before_request + 一次性标记实现（兼容 Flask 1.x）
+_cards_initialized = False
+_cards_init_lock = threading.Lock()
+
+
+@app.before_request
 def before_first_request():
-    initialize_cards()
+    global _cards_initialized
+    if _cards_initialized:
+        return
+    with _cards_init_lock:
+        if not _cards_initialized:
+            initialize_cards()
+            _cards_initialized = True

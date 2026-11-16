@@ -54,10 +54,6 @@ class AppBehaviorLog(BaseSaasModel):
 
     # 注意：remark 字段已在 BaseSaasModel 中定义为 remarks
 
-    __mapper_args__ = {
-        "order_by": event_time.desc(),
-    }
-
     @staticmethod
     def add_behavior_log(request, business_type, business_id, event_type, member_id=None, session_id=None,
                         utm_source=None, utm_campaign=None, access_channel=None, app_version=None,

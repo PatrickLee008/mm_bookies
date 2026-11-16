@@ -7,7 +7,7 @@ AWC游戏数据模型
 @date: 2025-11-05
 """
 
-from app_server import db
+from app_server import db, app
 from sqlalchemy import Column, String, DECIMAL, DateTime, Integer, Text
 from app_server.utils.BaseSaasModel import BaseSaasModel
 
@@ -242,4 +242,5 @@ class AwcGame(BaseSaasModel):
     def __repr__(self):
         return f'<AwcGame {self.game_code} - {self.name_en}>'
 
-    db.create_all()
+    with app.app_context():
+        db.create_all()

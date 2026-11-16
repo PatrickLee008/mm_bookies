@@ -24,4 +24,5 @@ class UploadedImage(db.Model):
             result[key] = value
         return result
 
-db.create_all()
+with app.app_context():
+    db.create_all()

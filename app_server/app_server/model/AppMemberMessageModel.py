@@ -58,10 +58,6 @@ class AppMemberMessage(BaseSaasModel):
     # 创建和更新信息继承自BaseSaasModel
     # create_by_id, create_time, update_by_id, update_time, del_flag, tenant_id
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
-
     def to_dict(self, user_timezone_str, include=None, exclude=None):
         """
         转换为字典

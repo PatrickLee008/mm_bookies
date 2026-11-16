@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from app_server import db
+from app_server import db, app
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.mysql import DATETIME, DECIMAL
 from app_server.utils.BaseSaasModel import BaseSaasModel
@@ -56,9 +56,6 @@ class AppAdjustment(BaseSaasModel):
     reason = Column(String(255), comment="调整原因")
     remarks = Column(String(500), comment="管理员备注")
 
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }
 
-
-db.create_all()
+with app.app_context():
+    db.create_all()

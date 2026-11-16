@@ -48,7 +48,3 @@ class AppAdlink(BaseSaasModel):
     # 状态和备注
     status = Column(String(20), server_default='active', index=True, comment="链接状态(active-有效/paused-暂停/expired-过期)")
     remarks = Column(String(500), comment="备注信息")
-
-    __mapper_args__ = {
-        "order_by": BaseSaasModel.create_time.desc(),
-    }

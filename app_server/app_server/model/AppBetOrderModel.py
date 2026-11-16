@@ -1,4 +1,4 @@
-from app_server import db
+from app_server import db, app
 from sqlalchemy import Column, String, DECIMAL, DateTime, Integer, Boolean
 from decimal import Decimal
 import datetime
@@ -91,10 +91,6 @@ class AppBetOrder(BaseSaasModel):
     is_credit = Column(Boolean, default=False, comment="是否信用投注(0否1是)")
     pay_wallet = Column(String(32), comment="付款账户（Money：主钱包，Promotion：活动钱包）（从字典读取）")
     platform_source = Column(String(32), default="1x2", comment="平台来源")
-
-    __mapper_args__ = {
-        "order_by": db.text("create_time desc"),
-    }
 
     # 新增
     @staticmethod
@@ -241,4 +237,5 @@ class AppBetOrder(BaseSaasModel):
         return bet_order
 
 
-db.create_all()
+with app.app_context():
+    db.create_all()

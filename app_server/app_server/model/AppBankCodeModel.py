@@ -34,4 +34,5 @@ class AppBankCode(db.Model):
 
 
 # 创建数据库表
-db.create_all()
+with app.app_context():
+    db.create_all()

@@ -353,7 +353,7 @@ def recharge():
             response = jsonify({'message': "amount cannot be null"})
             response.status_code = 400
             return response
-        recharge_record = Charge.query.filter(Charge.out_trade_no == transaction_id).first()
+        recharge_record = Charge.query.filter(Charge.out_trade_no == transaction_id).order_by(Charge.create_time.desc()).first()
         if recharge_record:
             response = jsonify({'message': "this transaction id has exist"})
             response.status_code = 400
