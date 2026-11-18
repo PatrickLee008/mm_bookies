@@ -941,7 +941,7 @@
 	.register-link {
 		font-weight: bold;
 		text-align: center;
-		font-size: 24rpx;
+		font-size: 28rpx;
 		font-style: italic;
 		margin-top: auto;
 		padding-top: 20rpx;

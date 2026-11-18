@@ -1106,7 +1106,7 @@
 
 	.register-link {
 		text-align: center;
-		font-size: 24rpx;
+		font-size: 28rpx;
 		font-weight: bold;
 		font-style: italic;
 		margin-top: auto;
