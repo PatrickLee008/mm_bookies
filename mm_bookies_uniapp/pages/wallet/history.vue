@@ -8,7 +8,8 @@
 
 		<!-- 下拉选项 -->
 		<view v-if="filterExpanded" class="filter-dropdown">
-			<view v-for="(option, index) in filterOptions" :key="index" class="filter-option" @click="toggleFilterOption(option)">
+			<view v-for="(option, index) in filterOptions" :key="index" class="filter-option"
+				@click="toggleFilterOption(option)">
 				<text class="option-text">{{ $t(option.label) }}</text>
 				<view class="option-radio" :class="{'active': option.checked}">
 					<view class="option-radio-inner" v-if="option.checked"></view>
@@ -16,12 +17,15 @@
 			</view>
 		</view>
 
-		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit" @scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh" :refresher-triggered="refresherTriggered">
+		<scroll-view scroll-y class="history-scroll" @scroll="onScrollEmit" @scrolltoupper="onScrollTopEmit"
+			@scrolltolower="loadMore" :refresher-enabled="true" @refresherrefresh="onRefresh"
+			:refresher-triggered="refresherTriggered">
 
 			<!-- 空状态 -->
 			<view v-if="!loading && recordList.length === 0" class="empty-state">
 				<image src="/static/image/order/empty.svg" mode="aspectFit" class="empty-icon"></image>
-				<text class="empty-text">{{$t('no_charge_records') || 'No deposit records available at the moment. Please check back later.'}}</text>
+				<text
+					class="empty-text">{{$t('no_charge_records') || 'No deposit records available at the moment. Please check back later.'}}</text>
 			</view>
 
 			<!-- 记录项 -->
@@ -78,24 +82,30 @@
 		</scroll-view>
 		<PayModal :visible="payVisible" :order="payOrder" @close="onPayClose" @payment-url="handlePaymentUrl"
 			@payment-page="handlePaymentPage" />
-			</view>
+	</view>
 </template>
 
 <script>
 	import config from '../../utils/config.js'
 	import dateFormatUtils from "../../utils/utils.js"
 	import PayModal from '@/components/payment/PayModal.vue'
-	import { getPaymentAction, getTransferPageUrl, openPaymentUrl } from '@/utils/payment-flow.js'
+	import {
+		getPaymentAction,
+		getTransferPageUrl,
+		openPaymentUrl
+	} from '@/utils/payment-flow.js'
 
 	export default {
 		name: 'WalletHistory',
-		components: { PayModal },
+		components: {
+			PayModal
+		},
 		data() {
 			return {
 				language: config.language,
 				recordList: [],
-			payVisible: false,
-			payOrder: {},
+				payVisible: false,
+				payOrder: {},
 				loading: false,
 				refreshing: false,
 				refresherTriggered: false,
@@ -104,11 +114,29 @@
 				pageSize: 8,
 
 				filterExpanded: false,
-				filterOptions: [
-					{ label: 'filter_all', value: 'all', checked: true },
-					{ label: 'filter_pending', value: 'Pending', type: 'status', checked: false },
-					{ label: 'filter_success', value: 'Success', type: 'status', checked: false },
-					{ label: 'filter_timeout', value: 'Timeout', type: 'status', checked: false },
+				filterOptions: [{
+						label: 'filter_all',
+						value: 'all',
+						checked: true
+					},
+					{
+						label: 'filter_pending',
+						value: 'Pending',
+						type: 'status',
+						checked: false
+					},
+					{
+						label: 'filter_success',
+						value: 'Success',
+						type: 'status',
+						checked: false
+					},
+					{
+						label: 'filter_timeout',
+						value: 'Timeout',
+						type: 'status',
+						checked: false
+					},
 				],
 			}
 		},
@@ -168,19 +196,28 @@
 
 			launchPaymentUrl(url) {
 				if (!openPaymentUrl(url)) {
-					uni.showToast({ title: 'Payment link unavailable', icon: 'none' });
+					uni.showToast({
+						title: 'Payment link unavailable',
+						icon: 'none'
+					});
 				}
 			},
 
 			openTransferPage(order) {
 				const url = getTransferPageUrl(order);
 				if (!url) {
-					uni.showToast({ title: 'Payment order ID is missing', icon: 'none' });
+					uni.showToast({
+						title: 'Payment order ID is missing',
+						icon: 'none'
+					});
 					return;
 				}
 				uni.navigateTo({
 					url,
-					fail: () => uni.showToast({ title: 'Unable to open payment page', icon: 'none' })
+					fail: () => uni.showToast({
+						title: 'Unable to open payment page',
+						icon: 'none'
+					})
 				});
 			},
 
@@ -204,7 +241,9 @@
 					};
 
 					await new Promise((resolve, reject) => {
-						this.$http.get('/charge_apply/get', { data: para }, (res) => {
+						this.$http.get('/charge_apply/get', {
+							data: para
+						}, (res) => {
 							if (res.statusCode === 200) {
 								const items = res.data.items || [];
 
@@ -559,7 +598,7 @@
 
 	/* 底部状态条 - 整条圆角药丸样式 */
 	.status-bar {
-		border-radius: 20px;
+		border-radius: $radius-large;
 		padding: 7px 12px;
 		text-align: center;
 		background-color: #8A9BA0;
@@ -604,7 +643,7 @@
 		background-color: $color-primary;
 		color: white;
 		padding: 10px 20px;
-		border-radius: 8px;
+		border-radius: $radius-large;
 		text-align: center;
 		display: flex;
 		align-items: center;

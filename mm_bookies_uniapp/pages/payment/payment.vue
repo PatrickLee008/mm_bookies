@@ -53,7 +53,8 @@
 								</button>
 								<!-- 收款电话号码 + 复制按钮 -->
 								<view class="deposit-phone-row margin-tb" v-if="payInfo.receiveAccount">
-									<text class="deposit-phone-value">{{ payInfo.receiveAccount }}</text>
+									<text class="deposit-phone-label">{{ $t('receiver_account') }}</text>
+									<text class="deposit-phone-value">{{ maskAccountNumber(payInfo.receiveAccount) }}</text>
 									<button class="cu-btn sm mybg-primary round deposit-copy-btn" @click="copyCardNo">
 										<text class="cuIcon-copy margin-right-xs"></text>
 										<text class="text-sm">{{ $t('copy') }}</text>
@@ -588,16 +589,8 @@
 			 * 银行卡账号脱敏处理（只保留后四位，前面用*替代）
 			 */
 			maskAccountNumber(accountNumber) {
-				if (!accountNumber || accountNumber === 'Account Number') {
-					return accountNumber;
-				}
-				const str = String(accountNumber);
-				if (str.length <= 4) {
-					return str;
-				}
-				const lastFour = str.slice(-4);
-				const maskedPart = '*'.repeat(str.length - 4);
-				return maskedPart + lastFour;
+				if (accountNumber === 'Account Number') return accountNumber;
+				return dateFormatUtils.maskAccountNumber(accountNumber);
 			},
 
 			/**
