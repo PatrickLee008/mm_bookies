@@ -255,25 +255,13 @@
 				return pickText(this.pageConfigItems, 'notice', this.pageConfigLang)
 			},
 			currentVideo() {
-				// 视频只从 House AppConfig 读取；VIP Pay 按所选银行分别取链接，不跨银行回退。
-				const ch = this.selectedChannel
+				const channel = this.selectedChannel === 'VIPPay_CashCode' ? 'VIPPay' : this.selectedChannel
+				if (!['VIPPay', 'MCPay', 'KingPay'].includes(channel)) return ''
 				const bank = this.selectedBank || ''
-				let configKey = ''
-				if (ch === 'VIPPay' || ch === 'VIPPay_CashCode') {
-					if (/wave/i.test(bank)) {
-						configKey = 'vip_wave_video_link'
-					} else if (/kbz/i.test(bank)) {
-						configKey = 'vip_kbz_video_link'
-					}
-				} else if (ch === 'TCPay') {
-					configKey = 'tc_video_link'
-				} else if (ch === 'MCPay') {
-					configKey = 'mc_video_link'
-				} else if (ch === 'KingPay') {
-					configKey = 'king_video_link'
-				}
-				const value = configKey ? this.appConfig[configKey] : ''
-				return typeof value === 'string' ? value.trim() : ''
+				const scope = /wave/i.test(bank) ? 'Wave' : /kbz/i.test(bank) ? 'KBZ' : ''
+				if (!scope) return ''
+				const url = pickText(this.pageConfigItems, 'video.' + channel + '_' + scope, this.pageConfigLang).trim()
+				return /^https?:\/\/\S+$/i.test(url) ? url : ''
 			},
 			minLimit() {
 				return Number(this.configs.deposit_min_limit) || 3000

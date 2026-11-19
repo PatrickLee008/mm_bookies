@@ -61,12 +61,6 @@ def get_configs():
         "under_maintenance": app_front_setting.updateState,
         "ai_helper_host": app_front_setting.aiHelperHost,
         "ai_helper_token": app_front_setting.aiHelperToken,
-        # 各通道的充值教程视频（后台 setting/AppConfigForm 配置）
-        "vip_kbz_video_link": app_front_setting.vipKbzVideoLink or '',
-        "vip_wave_video_link": app_front_setting.vipWaveVideoLink or '',
-        "king_video_link": app_front_setting.kingVideoLink or '',
-        "tc_video_link": app_front_setting.tcVideoLink or '',
-        "mc_video_link": app_front_setting.mcVideoLink or '',
         # 页面配置版本（2026-11-11）：{页面: 版本}，前端版本不一致时才重新拉取页面配置
         "page_config_versions": PageConfig.page_versions(),
     }
