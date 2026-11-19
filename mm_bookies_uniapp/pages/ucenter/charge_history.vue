@@ -77,7 +77,7 @@
 					</view>
 					<view class="info-row" v-if="item.receive_account">
 						<text class="label">{{$t('receiver_account') || 'Receiver Account'}}:</text>
-						<text class="value">{{item.receive_account}}</text>
+						<text class="value">{{maskAccountNumber(item.receive_account)}}</text>
 					</view>
 					<view class="info-row" v-if="item.fail_reason && item.status=='Failed'">
 						<text class="label">{{$t('fail_reason') || 'Fail Reason'}}:</text>
@@ -135,6 +135,9 @@ export default {
 				return map[code] || code || ''
 			},
 			bankName(code) { return this.normalizeBank(code) || '-'; },
+			maskAccountNumber(accountNumber) {
+				return dateFormatUtils.maskAccountNumber(accountNumber);
+			},
 			bankIcon(code) {
 				const c = this.normalizeBank(code)
 				return c ? '/static/icon/register/' + c + '.png' : ''

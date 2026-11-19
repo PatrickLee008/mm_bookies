@@ -19,6 +19,14 @@
 						<view class="download-icon"></view>
 						<text>{{ $t('save_qr') }}</text>
 					</view>
+					<view v-if="receiveAccount" class="payee-account-row">
+						<!-- <text class="payee-account-label">{{ $t('receiver_account') }}</text> -->
+						<text class="payee-account-value">{{ maskedReceiveAccount }}</text>
+						<view class="payee-copy-btn" @click="copyReceiveAccount">
+							<text class="cuIcon-copy margin-right-xs"></text>
+							<text>{{ $t('copy') }}</text>
+						</view>
+					</view>
 				</view>
 
 				<view class="notice-box">
@@ -121,7 +129,8 @@
 				paymentError: '',
 				cancelConfirm: false,
 				cancelling: false,
-				orderId: ''
+				orderId: '',
+				receiveAccount: ''
 			}
 		},
 		computed: {
@@ -173,6 +182,9 @@
 				const minutes = Math.floor((seconds % 3600) / 60)
 				const remainingSeconds = seconds % 60
 				return [hours, minutes, remainingSeconds].map(value => String(value).padStart(2, '0')).join(':')
+			},
+			maskedReceiveAccount() {
+				return dateFormatUtils.maskAccountNumber(this.receiveAccount)
 			}
 		},
 		watch: {
@@ -210,6 +222,8 @@
 				this.statusCheckDeadline = 0
 				this.statusCheckLimitReached = false
 				this.orderId = this.order.id || this.order.ID || this.order.out_order_id || this.order.OUT_ORDER_ID || ''
+				this.receiveAccount = this.order.receive_account || this.order.receiveAccount ||
+					this.order.receive_acc_number || ''
 				this.qrData = ''
 				this.qrImage = ''
 				this.paymentError = ''
@@ -221,6 +235,7 @@
 				this.setPollInterval(2000)
 				if (this.remain <= 0) this.markLocallyExpired()
 				if (!hasQr) this.fetchPayInfo()
+				else if (!this.receiveAccount) this.fetchPayInfo(true)
 			},
 			stop() {
 				if (this.timer) {
@@ -280,7 +295,7 @@
 					}, 300)
 				})
 			},
-			fetchPayInfo() {
+			fetchPayInfo(accountOnly = false) {
 				const activeOrderId = this.orderId
 				const id = this.order.out_order_id || this.order.OUT_ORDER_ID || this.order.id || this.order.ID
 				if (!id) {
@@ -295,6 +310,7 @@
 						return
 					}
 					const info = data.data
+					this.receiveAccount = info.receive_account || this.receiveAccount
 					if (info.success) {
 						this.state = 'success'
 						return
@@ -307,6 +323,7 @@
 						this.state = 'timeout'
 						return
 					}
+					if (accountOnly) return
 					if (info.qrcode) {
 						this.qrData = info.qrcode
 						this.makeQr()
@@ -414,8 +431,8 @@
 							ctx.font = 'bold ' + fontSize + 'px sans-serif'
 							ctx.fillStyle = '#FFFFFF'
 							ctx.textAlign = 'center'
-							const raw = this.order.receive_account || this.order.receive_acc_number || ''
-							const masked = raw && raw.length > 4 ? '****' + String(raw).slice(-4) : String(raw || '')
+							const raw = this.receiveAccount
+							const masked = dateFormatUtils.maskAccountNumber(raw)
 							ctx.fillText(masked, w / 2, iconY + iconSize + fontSize + 13)
 						}
 						if (iconSrc) {
@@ -476,6 +493,23 @@
 					return
 				}
 				uni.showToast({ title: this.$t('save_qr'), icon: 'none' })
+			},
+			copyReceiveAccount() {
+				uni.setClipboardData({
+					data: String(this.receiveAccount),
+					success: () => {
+						uni.showToast({
+							title: this.$t('copied_to_clipboard') || this.$t('copied') || 'Copied',
+							icon: 'success'
+						})
+					},
+					fail: () => {
+						uni.showToast({
+							title: this.$t('copy_failed') || 'Copy failed',
+							icon: 'none'
+						})
+					}
+				})
 			},
 			continueAfterPaid() {
 				if (this.state !== 'success') return
@@ -674,6 +708,38 @@
 
 	.save-qr.disabled {
 		opacity: .45;
+	}
+
+	.payee-account-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+		margin-top: 12px;
+	}
+
+	.payee-account-label {
+		margin-right: 7px;
+		color: $color-primary;
+		font-size: 12px;
+	}
+
+	.payee-account-value {
+		margin-right: 10px;
+		color: $color-primary;
+		font-size: 14px;
+		font-weight: 700;
+		letter-spacing: 1px;
+	}
+
+	.payee-copy-btn {
+		display: flex;
+		align-items: center;
+		padding: 6px 10px;
+		border-radius: 6px;
+		background: $color-primary;
+		color: #fff;
+		font-size: 12px;
 	}
 
 	.download-icon {

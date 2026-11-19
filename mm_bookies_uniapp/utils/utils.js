@@ -1,4 +1,9 @@
 var dateFormatUtils = {
+	maskAccountNumber: function(accountNumber) {
+		if (accountNumber === null || accountNumber === undefined || accountNumber === '') return '';
+		const account = String(accountNumber);
+		return account.length > 4 ? '*'.repeat(account.length - 4) + account.slice(-4) : account;
+	},
 	numFormat: function(n) {
 		if (!n) { n = 0 };
 		n = parseInt(n);
