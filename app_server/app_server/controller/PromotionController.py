@@ -8,6 +8,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 import json
+import pytz
 
 from sqlalchemy import func, and_, or_, case
 from flask import g, request, jsonify, Blueprint
@@ -49,6 +50,49 @@ promotion = Blueprint('promotion', __name__)
 
 
 # ==================== 辅助函数 ====================
+
+def _get_user_tz(user):
+    """获取用户时区，缺省 Asia/Yangon（与 AppMember 默认值一致）"""
+    timezone_name = getattr(user, 'timezone', None) if user else None
+    return timezone_name or 'Asia/Yangon'
+
+
+def _calc_participation_period(user_timezone, participation_frequency):
+    """
+    按用户时区计算参与频率对应的自然周期边界，并返回系统时区(Asia/Shanghai)的 naive datetime，
+    用于与数据库中以系统时间存储的 participation_time/create_time 比较。
+
+    Returns: (period_start, period_end, limit_value 由调用方决定)
+             Once 返回 (None, None)
+    """
+    user_tz = pytz.timezone(user_timezone)
+    user_now = datetime.now(user_tz)
+
+    if participation_frequency == 'Daily':
+        user_start = user_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        user_end = user_now.replace(hour=23, minute=59, second=59, microsecond=0)
+    elif participation_frequency == 'Weekly':
+        weekday = user_now.weekday()  # 0=Monday, 6=Sunday
+        user_start = (user_now - timedelta(days=weekday)).replace(hour=0, minute=0, second=0, microsecond=0)
+        user_end = (user_start + timedelta(days=6)).replace(hour=23, minute=59, second=59, microsecond=0)
+    elif participation_frequency == 'Monthly':
+        user_start = user_now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if user_now.month == 12:
+            next_month = user_now.replace(year=user_now.year + 1, month=1, day=1)
+        else:
+            next_month = user_now.replace(month=user_now.month + 1, day=1)
+        user_end = (next_month - timedelta(seconds=1)).replace(hour=23, minute=59, second=59, microsecond=0)
+    else:  # Once：不限时间
+        return None, None
+
+    # 用户时区的周期边界 -> 系统时区(Asia/Shanghai)字符串 -> naive datetime
+    start_str = user_start.strftime('%Y-%m-%d %H:%M:%S')
+    end_str = user_end.strftime('%Y-%m-%d %H:%M:%S')
+    system_start_str = Kits.user_time_to_system_time(user_timezone, start_str)
+    system_end_str = Kits.user_time_to_system_time(user_timezone, end_str)
+    return (datetime.strptime(system_start_str, '%Y-%m-%d %H:%M:%S'),
+            datetime.strptime(system_end_str, '%Y-%m-%d %H:%M:%S'))
+
 
 def is_promotion_valid(promotion):
     """检查促销活动是否有效（参考 InvitationActivityV2Controller.is_activity_valid）"""
@@ -465,33 +509,10 @@ def get_promotion_list():
             max_per_user = promo.max_participations_per_user if promo.max_participations_per_user else 0
             
             if max_per_user > 0 or participation_frequency == 'Once':
-                # 计算时间范围
-                if participation_frequency == 'Daily':
-                    period_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                    period_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
-                    limit_value = max_per_user
-                elif participation_frequency == 'Weekly':
-                    weekday = now.weekday()
-                    period_start = (now - timedelta(days=weekday)).replace(hour=0, minute=0, second=0, microsecond=0)
-                    period_end = (period_start + timedelta(days=6)).replace(hour=23, minute=59, second=59, microsecond=999999)
-                    limit_value = max_per_user
-                elif participation_frequency == 'Monthly':
-                    period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                    if now.month == 12:
-                        next_month = now.replace(year=now.year + 1, month=1, day=1)
-                    else:
-                        next_month = now.replace(month=now.month + 1, day=1)
-                    period_end = (next_month - timedelta(seconds=1))
-                    limit_value = max_per_user
-                elif participation_frequency == 'Once':
-                    period_start = None
-                    period_end = None
-                    limit_value = 1
-                else:
-                    period_start = None
-                    period_end = None
-                    limit_value = max_per_user
-                
+                user_timezone = _get_user_tz(user)
+                period_start, period_end = _calc_participation_period(user_timezone, participation_frequency)
+                limit_value = 1 if participation_frequency == 'Once' else max_per_user
+
                 # 统计该时间段内的参与次数
                 participation_query = AppPlayerActivityRecord.query.filter(
                     AppPlayerActivityRecord.mb_id == user_id,
@@ -857,38 +878,11 @@ def participate_promotion():
         max_per_user = promotion_obj.max_participations_per_user if promotion_obj.max_participations_per_user else 0
 
         if max_per_user > 0 or participation_frequency == 'Once':
-            # 计算时间范围
-            now = datetime.now()
-            if participation_frequency == 'Daily':
-                # 每天：从今天 00:00:00 到 23:59:59
-                period_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-                period_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
-                limit_value = max_per_user
-                period_name = 'daily'
-            elif participation_frequency == 'Weekly':
-                # 每周：从本周一到本周日
-                weekday = now.weekday()  # 0=Monday, 6=Sunday
-                period_start = (now - timedelta(days=weekday)).replace(hour=0, minute=0, second=0, microsecond=0)
-                period_end = (period_start + timedelta(days=6)).replace(hour=23, minute=59, second=59, microsecond=999999)
-                limit_value = max_per_user
-                period_name = 'weekly'
-            elif participation_frequency == 'Monthly':
-                # 每月：从本月1号到本月最后一天
-                period_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-                # 下月第一天减1秒
-                if now.month == 12:
-                    next_month = now.replace(year=now.year + 1, month=1, day=1)
-                else:
-                    next_month = now.replace(month=now.month + 1, day=1)
-                period_end = (next_month - timedelta(seconds=1))
-                limit_value = max_per_user
-                period_name = 'monthly'
-            else:  # Once
-                # 仅一次：检查所有时间
-                period_start = None
-                period_end = None
-                limit_value = 1
-                period_name = 'all time'
+            user_timezone = _get_user_tz(user)
+            period_start, period_end = _calc_participation_period(user_timezone, participation_frequency)
+            limit_value = 1 if participation_frequency == 'Once' else max_per_user
+            period_name = {'Daily': 'daily', 'Weekly': 'weekly', 'Monthly': 'monthly'}.get(
+                participation_frequency, 'all time')
 
             # 查询用户在周期内的参与次数
             query = MAppPromotionParticipation.query.filter(
